@@ -7,6 +7,7 @@ import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
+import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 
 /**
  * Feature destination for the continuous document scanner.
@@ -23,7 +24,12 @@ class ContinuousScanDestination : FeatureDestination {
 private fun EntryProviderScope<NavKey>.continuousScanScreen(
     navigationHandler: NavigationHandler,
 ) {
-    entry<ContinuousScanNavKey> {
+    // Transparent so the confirmation dialog dims the screen the user came from
+    // instead of a solid black backdrop. The loading and camera states draw their
+    // own full-screen background over it.
+    entry<ContinuousScanNavKey>(
+        metadata = transparentMetadata(),
+    ) {
         ScannerRouterScreen(navigationHandler = navigationHandler)
     }
 }

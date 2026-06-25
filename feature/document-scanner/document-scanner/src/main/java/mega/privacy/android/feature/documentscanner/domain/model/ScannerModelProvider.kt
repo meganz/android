@@ -39,4 +39,15 @@ interface ScannerModelProvider {
     suspend fun ensureModelReady(
         onProgress: suspend (downloadedBytes: Long, totalBytes: Long) -> Unit,
     ): File
+
+    companion object {
+        /**
+         * Exact size of the model artifact, in bytes. Single source of truth for
+         * both the download integrity check and the size shown to the user in the
+         * download-confirmation dialog — keep it here so the displayed figure can
+         * never drift from the size we verify against. Update it whenever the model
+         * is re-trained / re-exported.
+         */
+        const val SIZE_BYTES = 97_867_228L
+    }
 }

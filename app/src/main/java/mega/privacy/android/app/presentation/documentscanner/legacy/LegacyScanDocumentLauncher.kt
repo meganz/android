@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityOptionsCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
@@ -98,7 +99,14 @@ internal fun LegacyScanDocumentLauncher(
         // scanner launches exactly once and recomposition can't re-trigger it.
         try {
             val intentSender = scanner.getStartScanIntent(host).await()
-            scanLauncher.launch(IntentSenderRequest.Builder(intentSender).build())
+            // Launch with no activity transition: the scanner opens straight over the
+            // loading screen instead of the default slide, which otherwise pushes the
+            // loading screen off to the side and reads as a jarring extra "page".
+            val noTransitionOptions = ActivityOptionsCompat.makeCustomAnimation(host, 0, 0)
+            scanLauncher.launch(
+                IntentSenderRequest.Builder(intentSender).build(),
+                noTransitionOptions,
+            )
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (error: Exception) {

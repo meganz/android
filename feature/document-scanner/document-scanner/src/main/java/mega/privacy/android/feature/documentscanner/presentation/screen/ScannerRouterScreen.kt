@@ -13,6 +13,7 @@ import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.tokens.theme.DSTokens
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.documentscanner.presentation.ScannerRouterViewModel
+import mega.privacy.android.feature.documentscanner.presentation.component.ScannerDownloadConfirmationDialog
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
@@ -47,11 +48,22 @@ internal fun ScannerRouterScreen(
             navigationHandler.remove(ContinuousScanNavKey)
         }
 
-        // TODO(AND-23984/AND-23986): replace with the download-confirmation dialog
-        //  and prepare/loading screen. Until then, show a neutral preparing state.
+        ScannerRoute.NeedsDownload -> ScannerDownloadConfirmationDialog(
+            onCellular = false,
+            onConfirmDownload = viewModel::onDownloadConfirmed,
+            onUseOldScanner = viewModel::onDownloadDeclined,
+        )
+
+        ScannerRoute.NeedsCellularConsent -> ScannerDownloadConfirmationDialog(
+            onCellular = true,
+            onConfirmDownload = viewModel::onCellularDownloadConfirmed,
+            onUseOldScanner = viewModel::onDownloadDeclined,
+        )
+
+        // TODO(AND-23986): replace PreparingDownload with the prepare/loading screen
+        //  that observes WorkInfo. Until then, show a neutral preparing state.
         ScannerRoute.Resolving,
-        ScannerRoute.NeedsDownload,
-        ScannerRoute.NeedsCellularConsent,
+        ScannerRoute.PreparingDownload,
             -> {
             Timber.d("[DocScanner] Router showing loading for route: $current")
             LoadingState()

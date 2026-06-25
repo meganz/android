@@ -8,6 +8,7 @@ import mega.privacy.android.feature.documentscanner.domain.launchmode.CellularCo
 import mega.privacy.android.feature.documentscanner.domain.launchmode.LegacyReason
 import mega.privacy.android.feature.documentscanner.domain.launchmode.ScannerLaunchMode
 import mega.privacy.android.feature.documentscanner.domain.usecase.GetScannerLaunchModeUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.GrantScannerCellularConsentUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,14 +27,15 @@ class ScannerRouterViewModelTest {
     private lateinit var underTest: ScannerRouterViewModel
 
     private val getScannerLaunchMode = mock<GetScannerLaunchModeUseCase>()
+    private val grantScannerCellularConsent = mock<GrantScannerCellularConsentUseCase>()
 
     @BeforeEach
     fun resetMocks() {
-        reset(getScannerLaunchMode)
+        reset(getScannerLaunchMode, grantScannerCellularConsent)
     }
 
     private fun initTestSubject() {
-        underTest = ScannerRouterViewModel(getScannerLaunchMode)
+        underTest = ScannerRouterViewModel(getScannerLaunchMode, grantScannerCellularConsent)
     }
 
     @Test
@@ -90,6 +94,58 @@ class ScannerRouterViewModelTest {
         underTest.route.test {
             assertThat(awaitItem())
                 .isEqualTo(ScannerRoute.UseLegacy(LegacyReason.Unknown))
+        }
+    }
+
+    @Test
+    fun `test that onDownloadConfirmed moves the route to PreparingDownload`() = runTest {
+        whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
+
+        initTestSubject()
+
+        underTest.route.test {
+            assertThat(awaitItem()).isEqualTo(ScannerRoute.NeedsDownload)
+            underTest.onDownloadConfirmed()
+            assertThat(awaitItem()).isEqualTo(ScannerRoute.PreparingDownload)
+        }
+    }
+
+    @Test
+    fun `test that onDownloadConfirmed does not grant cellular consent`() = runTest {
+        whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
+
+        initTestSubject()
+        underTest.onDownloadConfirmed()
+
+        verifyNoInteractions(grantScannerCellularConsent)
+    }
+
+    @Test
+    fun `test that onCellularDownloadConfirmed persists consent and moves the route to PreparingDownload`() =
+        runTest {
+            whenever(getScannerLaunchMode()).thenAnswer { throw CellularConsentRequiredException() }
+
+            initTestSubject()
+
+            underTest.route.test {
+                assertThat(awaitItem()).isEqualTo(ScannerRoute.NeedsCellularConsent)
+                underTest.onCellularDownloadConfirmed()
+                assertThat(awaitItem()).isEqualTo(ScannerRoute.PreparingDownload)
+            }
+            verify(grantScannerCellularConsent).invoke()
+        }
+
+    @Test
+    fun `test that onDownloadDeclined routes to legacy with UserDeclined reason`() = runTest {
+        whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
+
+        initTestSubject()
+
+        underTest.route.test {
+            assertThat(awaitItem()).isEqualTo(ScannerRoute.NeedsDownload)
+            underTest.onDownloadDeclined()
+            assertThat(awaitItem())
+                .isEqualTo(ScannerRoute.UseLegacy(LegacyReason.UserDeclined))
         }
     }
 }

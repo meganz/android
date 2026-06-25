@@ -179,6 +179,6 @@ internal class DownloadingScannerModelProvider @Inject constructor(
         // Integrity guards for the downloaded artifact. Regenerate both if the
         // model is ever re-trained / re-exported.
         const val MODEL_SHA256 = "e0c37a9a9590efa228696bbd9e882a46c2c60ae440641c4a0e77d3f3860b4e55"
-        const val MODEL_SIZE_BYTES = 97_867_228L
+        const val MODEL_SIZE_BYTES = ScannerModelProvider.SIZE_BYTES
     }
 }

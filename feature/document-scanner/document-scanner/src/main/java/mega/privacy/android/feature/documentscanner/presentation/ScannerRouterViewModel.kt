@@ -11,6 +11,7 @@ import mega.privacy.android.feature.documentscanner.domain.launchmode.CellularCo
 import mega.privacy.android.feature.documentscanner.domain.launchmode.LegacyReason
 import mega.privacy.android.feature.documentscanner.domain.launchmode.ScannerLaunchMode
 import mega.privacy.android.feature.documentscanner.domain.usecase.GetScannerLaunchModeUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.GrantScannerCellularConsentUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import timber.log.Timber
 import javax.inject.Inject
@@ -20,11 +21,14 @@ import javax.inject.Inject
  *
  * Every entry point navigates to a single destination; this ViewModel runs the
  * launch-mode decision once and exposes a [ScannerRoute] the screen acts on —
- * camera, download flow, cellular-consent prompt, or legacy fallback.
+ * camera, download flow, cellular-consent prompt, or legacy fallback. The
+ * confirmation dialog's choices feed back through [onDownloadConfirmed],
+ * [onCellularDownloadConfirmed], and [onDownloadDeclined].
  */
 @HiltViewModel
 class ScannerRouterViewModel @Inject constructor(
     private val getScannerLaunchMode: GetScannerLaunchModeUseCase,
+    private val grantScannerCellularConsent: GrantScannerCellularConsentUseCase,
 ) : ViewModel() {
 
     private val _route = MutableStateFlow<ScannerRoute>(ScannerRoute.Resolving)
@@ -54,5 +58,30 @@ class ScannerRouterViewModel @Inject constructor(
                 },
             )
         }
+    }
+
+    /**
+     * The user confirmed the download on Wi-Fi (or on cellular with consent already
+     * granted). Hand off to the prepare/loading screen, which drives the download.
+     */
+    fun onDownloadConfirmed() {
+        _route.value = ScannerRoute.PreparingDownload
+    }
+
+    /**
+     * The user confirmed the download over cellular. Persist the metered-data consent
+     * so it is never asked again, then hand off to the prepare/loading screen.
+     */
+    fun onCellularDownloadConfirmed() {
+        viewModelScope.launch {
+            runCatching { grantScannerCellularConsent() }
+                .onFailure { Timber.e(it, "[DocScanner] Failed to persist cellular consent") }
+            _route.value = ScannerRoute.PreparingDownload
+        }
+    }
+
+    /** The user declined the download from the confirmation dialog; fall back to legacy. */
+    fun onDownloadDeclined() {
+        _route.value = ScannerRoute.UseLegacy(LegacyReason.UserDeclined)
     }
 }
