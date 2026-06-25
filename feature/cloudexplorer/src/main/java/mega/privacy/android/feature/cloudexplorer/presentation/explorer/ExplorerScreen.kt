@@ -131,6 +131,15 @@ internal fun ExplorerScreen(
         selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
         else -> false
     }
+    val selectedItemsCount = when {
+        !explorerMode.isFolderPicker -> (nodeSelectionState.selectedNodeIds - disabledNodeIds).size
+        selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.selectedItemsCount
+        else -> 0
+    }
+    val clearSelection: () -> Unit = {
+        nodeSelectionState.deselectAll()
+        chatExplorerSelectionState.deselectAll()
+    }
 
     if (!isInnerNavigation) {
         LaunchedOnceEffect {
@@ -197,10 +206,14 @@ internal fun ExplorerScreen(
                 )
 
                 else -> MegaTopAppBar(
-                    navigationType = if (isInnerNavigation) {
-                        AppBarNavigationType.Back { protectedUserTap { onNavigateBack() } }
-                    } else {
-                        AppBarNavigationType.Close {
+                    navigationType = when {
+                        selectedItemsCount > 0 ->
+                            AppBarNavigationType.Close { protectedUserTap { clearSelection() } }
+
+                        isInnerNavigation ->
+                            AppBarNavigationType.Back { protectedUserTap { onNavigateBack() } }
+
+                        else -> AppBarNavigationType.Close {
                             protectedUserTap {
                                 Analytics.tracker.trackEvent(CloudExplorerCloseButtonPressedEvent)
                                 onNavigateBack()
@@ -209,7 +222,7 @@ internal fun ExplorerScreen(
                     },
                     title = when {
                         uiState.isLoading -> stringResource(explorerMode.titleStringId)
-                        chatExplorerSelectionState.selectedItemsCount > 0 -> chatExplorerSelectionState.selectedItemsCount.toString()
+                        selectedItemsCount > 0 -> selectedItemsCount.toString()
                         isInnerNavigation -> uiState.folderName.text
                         else -> stringResource(explorerMode.titleStringId)
                     },
