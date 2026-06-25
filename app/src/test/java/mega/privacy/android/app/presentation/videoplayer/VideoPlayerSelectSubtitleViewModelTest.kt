@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
@@ -24,7 +25,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -45,7 +45,9 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
         monitorShowHiddenItemsUseCase.stub {
             on { invoke() } doReturn flow { emit(false); awaitCancellation() }
         }
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(emptyList())
+        runBlocking {
+            whenever(getSRTSubtitleFileListUseCase()).thenReturn(emptyList())
+        }
         underTest = VideoPlayerSelectSubtitleViewModel(
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             subtitleFileInfoItemMapper = subtitleFileInfoItemMapper,
@@ -71,7 +73,27 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
     }
 
     @Test
+    fun `test that getSubtitleFileInfoList emits isLoading false when use case succeeds`() = runTest {
+        underTest.getSubtitleFileInfoList()
+        underTest.uiState.test {
+            val state = awaitNonLoadingState()
+            assertThat(state.isLoading).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that getSubtitleFileInfoList emits isLoading false when use case throws`() = runTest {
+        whenever(getSRTSubtitleFileListUseCase()).thenThrow(RuntimeException("error"))
+        underTest.getSubtitleFileInfoList()
+        underTest.uiState.test {
+            val state = awaitNonLoadingState()
+            assertThat(state.isLoading).isFalse()
+        }
+    }
+
+    @Test
     fun `test that state emits empty items when subtitle list is empty`() = runTest {
+        underTest.getSubtitleFileInfoList()
         underTest.uiState.test {
             val state = awaitNonLoadingState()
             assertThat(state.items).isEmpty()
@@ -84,7 +106,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
             stubSubtitleFileInfo(1L, "subtitle1.srt"),
             stubSubtitleFileInfo(2L, "subtitle2.srt"),
         )
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(subtitleInfoList)
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(subtitleInfoList)
         subtitleInfoList.forEach { info ->
             whenever(subtitleFileInfoItemMapper(false, info)).thenReturn(mock())
         }
@@ -102,6 +124,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
             monitorHiddenNodesEnabledUseCase.stub {
                 on { invoke() } doReturn flow { emit(true); awaitCancellation() }
             }
+            underTest.getSubtitleFileInfoList()
             underTest.uiState.test {
                 val state = awaitNonLoadingState()
                 assertThat(state.hiddenNodesEnabled).isTrue()
@@ -111,6 +134,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
     @Test
     fun `test that hiddenNodesEnabled is false when monitorHiddenNodesEnabledUseCase emits false`() =
         runTest {
+            underTest.getSubtitleFileInfoList()
             underTest.uiState.test {
                 val state = awaitNonLoadingState()
                 assertThat(state.hiddenNodesEnabled).isFalse()
@@ -126,7 +150,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
             val sensitiveItem =
                 stubSubtitleFileInfo(1L, "sensitive.srt", isMarkedSensitive = true)
             val normalItem = stubSubtitleFileInfo(2L, "normal.srt")
-            wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(
+            whenever(getSRTSubtitleFileListUseCase()).thenReturn(
                 listOf(sensitiveItem, normalItem)
             )
             whenever(subtitleFileInfoItemMapper(false, normalItem)).thenReturn(mock())
@@ -142,7 +166,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
     fun `test that sensitive items are not filtered when hiddenNodesEnabled is false`() = runTest {
         val sensitiveItem = stubSubtitleFileInfo(1L, "sensitive.srt", isMarkedSensitive = true)
         val normalItem = stubSubtitleFileInfo(2L, "normal.srt")
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(
             listOf(sensitiveItem, normalItem)
         )
         whenever(subtitleFileInfoItemMapper(false, sensitiveItem)).thenReturn(mock())
@@ -165,7 +189,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
         }
         val sensitiveItem = stubSubtitleFileInfo(1L, "sensitive.srt", isMarkedSensitive = true)
         val normalItem = stubSubtitleFileInfo(2L, "normal.srt")
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(
             listOf(sensitiveItem, normalItem)
         )
         whenever(subtitleFileInfoItemMapper(false, sensitiveItem)).thenReturn(mock())
@@ -181,7 +205,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
     @Test
     fun `test that itemClickedUpdate selects item when it is not already selected`() = runTest {
         val item = stubSubtitleFileInfo(1L, "subtitle.srt")
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(listOf(item))
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(listOf(item))
         whenever(subtitleFileInfoItemMapper(false, item)).thenReturn(
             SubtitleFileInfoItem(selected = false, subtitleFileInfo = item)
         )
@@ -201,7 +225,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
     @Test
     fun `test that itemClickedUpdate deselects item when it is already selected`() = runTest {
         val item = stubSubtitleFileInfo(1L, "subtitle.srt")
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(listOf(item))
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(listOf(item))
         whenever(subtitleFileInfoItemMapper(false, item)).thenReturn(
             SubtitleFileInfoItem(selected = false, subtitleFileInfo = item)
         )
@@ -223,7 +247,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
     @Test
     fun `test that clearSelectedItem clears the selection`() = runTest {
         val item = stubSubtitleFileInfo(1L, "subtitle.srt")
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(listOf(item))
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(listOf(item))
         whenever(subtitleFileInfoItemMapper(false, item)).thenReturn(
             SubtitleFileInfoItem(selected = false, subtitleFileInfo = item)
         )
@@ -246,7 +270,7 @@ internal class VideoPlayerSelectSubtitleViewModelTest {
     fun `test that searchQuery filters items by name`() = runTest {
         val matchingItem = stubSubtitleFileInfo(1L, "english.srt")
         val nonMatchingItem = stubSubtitleFileInfo(2L, "french.srt")
-        wheneverBlocking { getSRTSubtitleFileListUseCase() }.thenReturn(
+        whenever(getSRTSubtitleFileListUseCase()).thenReturn(
             listOf(matchingItem, nonMatchingItem)
         )
         whenever(subtitleFileInfoItemMapper(false, matchingItem)).thenReturn(mock())

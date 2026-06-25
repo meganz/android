@@ -37,19 +37,20 @@ internal class VideoPlayerSelectSubtitleViewModel @Inject constructor(
     private val subtitleFileListFlow = MutableStateFlow(emptyList<SubtitleFileInfo>())
     private val selectedFlow = MutableStateFlow<SubtitleFileInfo?>(null)
     private val queryFlow = MutableStateFlow<String?>(null)
+    private val isLoadingFlow = MutableStateFlow(true)
 
     val uiState: StateFlow<VideoPlayerSubtitleUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            subtitleFileListFlow,
+            combine(subtitleFileListFlow, isLoadingFlow, ::Pair),
             selectedFlow,
             queryFlow,
             monitorHiddenNodesEnabledUseCase(),
             monitorShowHiddenItemsUseCase(),
-        ) { subtitleFileList, selected, query, hiddenNodesEnabled, showHiddenItems ->
+        ) { (subtitleFileList, isLoading), selected, query, hiddenNodesEnabled, showHiddenItems ->
             val filteredItems = filterItems(subtitleFileList, hiddenNodesEnabled, showHiddenItems)
             val mappedItems = mapItems(filteredItems, selected, query)
             VideoPlayerSubtitleUiState(
-                isLoading = false,
+                isLoading = isLoading,
                 items = mappedItems,
                 hiddenNodesEnabled = hiddenNodesEnabled,
                 query = query,
@@ -64,7 +65,11 @@ internal class VideoPlayerSelectSubtitleViewModel @Inject constructor(
      * Loads the subtitle file list from the repository.
      */
     suspend fun getSubtitleFileInfoList() {
-        subtitleFileListFlow.update { getSRTSubtitleFileListUseCase() }
+        isLoadingFlow.update { true }
+        runCatching { getSRTSubtitleFileListUseCase() }
+            .onSuccess { subtitleFileListFlow.value = it }
+            .onFailure { Timber.e(it, "Failed to load subtitle file list") }
+            .also { isLoadingFlow.update { false } }
     }
 
     /**
