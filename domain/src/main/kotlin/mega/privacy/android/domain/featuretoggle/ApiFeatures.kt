@@ -284,6 +284,18 @@ enum class ApiFeatures(
         description = "Enable ComposeUI MyAccountUsageFragment",
         singleCheckPerRun = true,
         defaultValue = false,
+    ),
+
+    /**
+     * Render Markdown (.md/.markdown) files in the Compose text editor (AND-24001).
+     * When enabled, Markdown files open in a formatted read-only preview in View mode;
+     * Edit shows the raw source. When disabled, Markdown files behave as plain text.
+     */
+    TextEditorMarkdownRendering(
+        experimentName = "temd",
+        description = "Render Markdown files in the text editor as a formatted preview",
+        singleCheckPerRun = true,
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

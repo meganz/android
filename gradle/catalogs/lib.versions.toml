@@ -85,6 +85,7 @@ mega-core-ui = { group = "mega.android.core", name = "ui", version.ref = "mega-c
 mega-core-ui-tokens = { group = "mega.android.core", name = "ui-tokens", version.ref = "mega-core-ui" }
 kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinx-collections-immutable" }
 commonmark-java = { module = "org.commonmark:commonmark", version.ref = "commonmark-java" }
+commonmark-ext-gfm-tables = { module = "org.commonmark:commonmark-ext-gfm-tables", version.ref = "commonmark-java" }
 ucropnedit = { module = "com.github.jens-muenker.mega:ucropnedit", version.ref = "ucropnedit" }
 sqlcipher = { module = "net.zetetic:sqlcipher-android", version.ref = "sqlcipher" }
 slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slack-compose-lints" }

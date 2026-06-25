@@ -26,6 +26,10 @@ dependencies {
     implementation(androidx.material3)
     implementation(lib.logging.timber)
 
+    // Markdown parsing for the in-house Compose reader (CommonMark + GFM tables). No UI dep.
+    implementation(lib.commonmark.java)
+    implementation(lib.commonmark.ext.gfm.tables)
+
     //test
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
