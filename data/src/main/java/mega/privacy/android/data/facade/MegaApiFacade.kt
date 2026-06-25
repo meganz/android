@@ -30,7 +30,9 @@ import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaFlag
 import nz.mega.sdk.MegaGlobalListenerInterface
+import nz.mega.sdk.MegaGroupNodesByDateFilter
 import nz.mega.sdk.MegaHandleList
+import nz.mega.sdk.MegaListAllNodesFilter
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -1697,4 +1699,18 @@ internal class MegaApiFacade @Inject constructor(
     ) {
         megaApi.fileServiceReclaim(options, listener)
     }
+
+    override suspend fun groupAllNodesByDate(
+        filter: MegaGroupNodesByDateFilter,
+        order: Int,
+        cancelToken: MegaCancelToken?,
+    ) = megaApi.groupAllNodesByDate(filter, order, cancelToken)
+
+    override suspend fun listAllNodesByPageAtOffset(
+        filter: MegaListAllNodesFilter,
+        order: Int,
+        cancelToken: MegaCancelToken?,
+        maxElements: Int,
+        offset: Long,
+    ) = megaApi.listAllNodesByPageAtOffset(filter, order, maxElements, cancelToken, offset)
 }

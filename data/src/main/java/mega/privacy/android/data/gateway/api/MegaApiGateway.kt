@@ -9,10 +9,13 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
+import nz.mega.sdk.MegaDateSectionList
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFileServiceReclaimOptions
 import nz.mega.sdk.MegaFlag
+import nz.mega.sdk.MegaGroupNodesByDateFilter
 import nz.mega.sdk.MegaHandleList
+import nz.mega.sdk.MegaListAllNodesFilter
 import nz.mega.sdk.MegaLoggerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
@@ -20,6 +23,7 @@ import nz.mega.sdk.MegaPushNotificationSettings
 import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRecentActionBucketList
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaSearchCursorOffset
 import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaSearchPage
 import nz.mega.sdk.MegaSet
@@ -4126,4 +4130,76 @@ interface MegaApiGateway {
         options: MegaFileServiceReclaimOptions?,
         listener: MegaRequestListenerInterface?,
     )
+
+    /**
+     * @brief Group all nodes matching @p filter into date buckets, sorted
+     *        by the active timestamp column.
+     *
+     * Same scope / sensitivity / file-version exclusion as
+     * MegaApi::listAllNodesByPage; any FILE_TYPE_* the latter accepts is
+     * accepted here. Nodes with mtime <= 0 are excluded so the section
+     * list does not contain a spurious "1970-01-01" bucket. Sections with
+     * zero remaining items are omitted.
+     *
+     * Always returns the section list across the entire filter scope.
+     *
+     * Supported sort orders (@p order):
+     *   - ORDER_MODIFICATION_ASC / ORDER_MODIFICATION_DESC
+     *
+     * Other order values are rejected (empty list + warning).
+     *
+     * @param filter       Required. Node-selection scope and bucket
+     *                     granularity (MegaGroupNodesByDateFilter::byGranularity).
+     * @param order        Timeline sort order; controls section ordering
+     *                     (ASC = oldest first, DESC = newest first).
+     * @param cancelToken  Optional; may be null. If cancelled mid-scan the
+     *                     call returns an empty list.
+     *
+     * @return Owning list of sections (caller must delete). Empty on
+     *         rejection, cancellation, or when the filter matches no nodes.
+     */
+    suspend fun groupAllNodesByDate(
+        filter: MegaGroupNodesByDateFilter,
+        order: Int,
+        cancelToken: MegaCancelToken?,
+    ): MegaDateSectionList?
+
+    /**
+     * @brief Fetch a contiguous window of nodes by offset + limit from the ordered result.
+     *
+     * Skips @p offset nodes and returns up to @p maxElements. Compose with
+     * MegaListAllNodesFilter::byTimestampAnchor: anchor a page at a date section (from
+     * MegaApi::groupAllNodesByDate), then pass the local position within that section as
+     * @p offset to land on the on-screen window. A window near the section end bleeds
+     * contiguously into the adjacent section (the anchor is half-bounded). Offset
+     * positions are NOT stable under concurrent add/delete; re-fetch on change notifications.
+     *
+     * NOTE: without byTimestampAnchor, an @p offset of N forces the query to skip N rows
+     * (and, for grouped categories FILE_TYPE_ALL_DOCS / FILE_TYPE_ALL_VISUAL_MEDIA, to
+     * materialize offset+maxElements rows per route) while holding the SDK lock. Anchor the
+     * page to a date section to keep @p offset small; an unanchored deep offset is O(offset).
+     *
+     * This entry point takes no MegaSearchCursorOffset: offset windowing and keyset cursor
+     * pagination are mutually exclusive. It has a distinct name from
+     * listAllNodesByPage(..., const MegaSearchCursorOffset*) so that a literal 0 / NULL last
+     * argument is never ambiguous between the two pagination modes.
+     *
+     * @param filter       Required. Scope/category filter; may carry byTimestampAnchor.
+     * @param order        Sort order constant. Accepts the same set as
+     *                     listAllNodesByPage (ORDER_DEFAULT / SIZE / MODIFICATION /
+     *                     LABEL / FAV, each ASC/DESC); the fast-scroller flow uses
+     *                     NEWEST/OLDEST = ORDER_MODIFICATION_DESC/ASC.
+     * @param cancelToken  Optional; may be null.
+     * @param maxElements  Window size (limit). 0 means no limit.
+     * @param offset       Leading nodes to skip; must be >= 0 (negative => empty list).
+     * @return Up to maxElements nodes starting at offset; empty on invalid args or no match.
+     *         The caller takes ownership and must delete the returned object.
+     */
+    suspend fun listAllNodesByPageAtOffset(
+        filter: MegaListAllNodesFilter,
+        order: Int,
+        cancelToken: MegaCancelToken?,
+        maxElements: Int,
+        offset: Long,
+    ): MegaNodeList?
 }
