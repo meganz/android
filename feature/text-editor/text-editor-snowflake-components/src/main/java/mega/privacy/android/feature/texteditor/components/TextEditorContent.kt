@@ -28,6 +28,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -55,12 +56,17 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import mega.android.core.ui.tokens.theme.DSTokens
 import timber.log.Timber
 
-/** Line height used for both line numbers and text field so the gutter aligns with content. */
-internal val EditorLineHeight = 20.sp
+/**
+ * Line height used for both line numbers and the text field so the gutter aligns with content.
+ * Public so the screen can convert a logical-line offset to pixels when restoring scroll position
+ * — keep this the single source of truth; do not hardcode the value elsewhere.
+ */
+val EditorLineHeight = 20.sp
 
 private val LineNumberGutterWidth = 36.dp
 private val LineNumberGutterPadding = 6.dp
@@ -100,7 +106,15 @@ fun TextEditorContent(
     restoreScrollIndex: Int? = null,
     /** Pixel offset within the target chunk for precise scroll restoration. */
     restoreScrollOffset: Int = 0,
+    /**
+     * When non-null, restores to this exact 0-based logical line within [restoreScrollIndex]'s
+     * chunk using the chunk's real text layout (handles wrapped lines). Takes precedence over
+     * [restoreScrollOffset]. Used to land Edit precisely where the Markdown preview was.
+     */
+    restoreScrollWithinChunkLine: Int? = null,
     onRestoreScrollConsumed: () -> Unit = {},
+    /** Reports the top visible logical line (0-based, absolute) — for precise Preview<->Edit sync. */
+    onTopLineChanged: ((Int) -> Unit)? = null,
     /** When non-null, restores focus to this chunk index and shows the keyboard (e.g. after rotation). */
     restoreFocusChunkIndex: Int? = null,
     onRestoreFocusConsumed: () -> Unit = {},
@@ -129,6 +143,29 @@ fun TextEditorContent(
         // Read through an updated-state holder so the long-lived pointerInput coroutine always
         // sees the latest provider without restarting when its lambda identity changes.
         val currentChunkStateProvider by rememberUpdatedState(chunkStateProvider)
+        // Real text layout per visible chunk (also produced for the gutter) — lets us map a scroll
+        // pixel to an exact logical line, which is correct even when long lines wrap.
+        val chunkLayouts = remember { mutableStateMapOf<Int, TextLayoutResult>() }
+        val onChunkLayout: (Int, TextLayoutResult?) -> Unit = { index, layout ->
+            if (layout != null) chunkLayouts[index] = layout else chunkLayouts.remove(index)
+        }
+
+        if (onTopLineChanged != null) {
+            LaunchedEffect(lazyListState, onTopLineChanged) {
+                snapshotFlow {
+                    val index = lazyListState.firstVisibleItemIndex
+                    Triple(index, lazyListState.firstVisibleItemScrollOffset, chunkLayouts[index])
+                }.collect { (index, offset, layout) ->
+                    if (layout != null) {
+                        val text = chunkTextProvider(index)
+                        val visualLine = layout.getLineForVerticalPosition(offset.toFloat())
+                        val charOffset = layout.getLineStart(visualLine).coerceIn(0, text.length)
+                        val logicalIntoChunk = text.substring(0, charOffset).count { it == '\n' }
+                        onTopLineChanged((chunkStartLineProvider(index) - 1) + logicalIntoChunk)
+                    }
+                }
+            }
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -157,11 +194,23 @@ fun TextEditorContent(
                     }
                 },
         ) {
-            LaunchedEffect(restoreScrollIndex) {
+            LaunchedEffect(restoreScrollIndex, restoreScrollWithinChunkLine) {
                 val targetIndex = restoreScrollIndex ?: return@LaunchedEffect
                 snapshotFlow { lazyListState.layoutInfo.totalItemsCount }
                     .first { it > targetIndex }
-                lazyListState.scrollToItem(targetIndex, restoreScrollOffset)
+                val withinLine = restoreScrollWithinChunkLine
+                if (withinLine != null && withinLine > 0) {
+                    // Land at the chunk, then offset to the exact logical line using its real
+                    // layout (so wrapped lines above the target are accounted for).
+                    lazyListState.scrollToItem(targetIndex, 0)
+                    val layout = snapshotFlow { chunkLayouts[targetIndex] }.filterNotNull().first()
+                    val text = chunkTextProvider(targetIndex)
+                    val charOffset = logicalLineStartOffset(text, withinLine)
+                    val visualLine = layout.getLineForOffset(charOffset)
+                    lazyListState.scrollToItem(targetIndex, layout.getLineTop(visualLine).toInt())
+                } else {
+                    lazyListState.scrollToItem(targetIndex, restoreScrollOffset)
+                }
                 onRestoreScrollConsumed()
             }
             if (readOnly) {
@@ -174,6 +223,7 @@ fun TextEditorContent(
                     showLineNumbers = showLineNumbers,
                     textStyle = textStyle,
                     selectionResetKey = selectionResetKey,
+                    onChunkLayout = onChunkLayout,
                 )
             } else {
                 val onChunkFocusedNonNull = requireNotNull(onChunkFocused) {
@@ -200,6 +250,7 @@ fun TextEditorContent(
                     requestInitialFocusOnFirstChunk = requestInitialFocusOnFirstChunk,
                     restoreFocusChunkIndex = restoreFocusChunkIndex,
                     onRestoreFocusConsumed = onRestoreFocusConsumed,
+                    onChunkLayout = onChunkLayout,
                 )
             }
         }
@@ -217,6 +268,7 @@ private fun ViewModeLazyColumn(
     textStyle: TextStyle,
     /** Bumped on a tap outside the text to recreate each chunk's SelectionContainer and clear the selection. */
     selectionResetKey: Int,
+    onChunkLayout: (Int, TextLayoutResult?) -> Unit,
 ) {
     LazyColumn(
         state = lazyListState,
@@ -235,6 +287,7 @@ private fun ViewModeLazyColumn(
             key = { "chunk-$it" },
             contentType = { "readOnlyChunk" },
         ) { idx ->
+            DisposableEffect(idx) { onDispose { onChunkLayout(idx, null) } }
             ReadOnlyChunkItem(
                 chunkText = chunkTextProvider(idx),
                 startLineNumber = chunkStartLineProvider(idx),
@@ -242,6 +295,7 @@ private fun ViewModeLazyColumn(
                 showLineNumbers = showLineNumbers,
                 textStyle = textStyle,
                 selectionResetKey = selectionResetKey,
+                onLayout = { onChunkLayout(idx, it) },
             )
         }
     }
@@ -262,6 +316,7 @@ private fun EditModeLazyColumn(
     requestInitialFocusOnFirstChunk: Boolean,
     restoreFocusChunkIndex: Int? = null,
     onRestoreFocusConsumed: () -> Unit = {},
+    onChunkLayout: (Int, TextLayoutResult?) -> Unit,
 ) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -301,7 +356,10 @@ private fun EditModeLazyColumn(
         ) { idx ->
             val chunkState = chunkStateProvider(idx)
             DisposableEffect(idx) {
-                onDispose { onChunkDisposed(idx) }
+                onDispose {
+                    onChunkDisposed(idx)
+                    onChunkLayout(idx, null)
+                }
             }
             EditableChunkItem(
                 textFieldState = chunkState,
@@ -311,6 +369,7 @@ private fun EditModeLazyColumn(
                 maxLineNumber = totalLineCount,
                 showLineNumbers = showLineNumbers,
                 textStyle = textStyle,
+                onLayout = { onChunkLayout(idx, it) },
                 focusRequester = if (
                     (idx == 0 && requestInitialFocusOnFirstChunk) ||
                     idx == restoreFocusChunkIndex
@@ -332,6 +391,7 @@ private fun ReadOnlyChunkItem(
     showLineNumbers: Boolean,
     textStyle: TextStyle,
     selectionResetKey: Int,
+    onLayout: (TextLayoutResult) -> Unit = {},
 ) {
     // Held outside the reset key() below so the gutter keeps its last layout while the
     // SelectionContainer is being recreated — onTextLayout repopulates it, avoiding a flicker.
@@ -354,7 +414,10 @@ private fun ReadOnlyChunkItem(
                 BasicText(
                     text = chunkText,
                     style = textStyle,
-                    onTextLayout = { layoutResult = it },
+                    onTextLayout = {
+                        layoutResult = it
+                        onLayout(it)
+                    },
                 )
             }
         }
@@ -370,6 +433,7 @@ private fun EditableChunkItem(
     maxLineNumber: Int,
     showLineNumbers: Boolean,
     textStyle: TextStyle,
+    onLayout: (TextLayoutResult) -> Unit = {},
     focusRequester: FocusRequester? = null,
 ) {
     val layoutResultState = remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -396,7 +460,11 @@ private fun EditableChunkItem(
                 )
                 .onFocusChanged { if (it.isFocused) onFocused() },
             lineLimits = TextFieldLineLimits.MultiLine(),
-            onTextLayout = { getResult -> layoutResultState.value = getResult() },
+            onTextLayout = { getResult ->
+                val result = getResult()
+                layoutResultState.value = result
+                result?.let(onLayout)
+            },
         )
     }
 }
@@ -568,3 +636,16 @@ private fun editorTextStyle(color: Color): TextStyle = TextStyle(
 
 private fun digitCountForMaxLine(maxLineNumber: Int): Int =
     maxLineNumber.coerceAtLeast(1).toString().length
+
+/** Char offset at the start of the [line]-th (0-based) logical line within [text]. */
+private fun logicalLineStartOffset(text: String, line: Int): Int {
+    if (line <= 0) return 0
+    var count = 0
+    for (i in text.indices) {
+        if (text[i] == '\n') {
+            count++
+            if (count == line) return (i + 1).coerceAtMost(text.length)
+        }
+    }
+    return text.length
+}

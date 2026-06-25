@@ -73,6 +73,7 @@ import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaFloatingToolbar
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.privacy.android.feature.texteditor.components.MarkdownPreview
 import mega.privacy.android.feature.texteditor.components.TextEditorContent
 import mega.privacy.android.feature.texteditor.components.TextEditorFastScrollbar
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
@@ -198,6 +199,15 @@ fun TextEditorScreen(
         null
     }
 
+    // Markdown files render as a read-only preview in View mode; Edit shows the raw source.
+    val showMarkdownPreview = uiState.isMarkdown && !isEditable
+    val markdownContent = remember(showMarkdownPreview, uiState.contentVersion) {
+        if (showMarkdownPreview) viewModel.getMarkdownPreviewContent() else null
+    }
+    // Hoisted so the preview scroll position survives leaving/re-entering (Preview -> Edit -> Preview).
+    val markdownListState = rememberLazyListState()
+
+
     // snapshotFlow re-emits automatically when layoutInfo.totalItemsCount changes as
     // new chunks are loaded, so chunkCount is intentionally excluded from the key to
     // avoid cancelling/relaunching the collector on every chunk load. Because this effect
@@ -209,7 +219,7 @@ fun TextEditorScreen(
         snapshotFlow {
             val info = lazyListState.layoutInfo
             val totalItems = info.totalItemsCount
-            // Anchor scroll restoration on the first visible chunk.
+            // Anchor scroll restoration on the first visible chunk (chunk-index fraction for CWLO).
             val scrollFraction = if (totalItems <= 1) 0f
             else lazyListState.firstVisibleItemIndex.toFloat() / (totalItems - 1).toFloat()
             // Read-through is measured in LINES at the bottom of the viewport; see
@@ -313,6 +323,7 @@ fun TextEditorScreen(
                 viewModel = viewModel,
                 onBack = onBack,
                 onOpenNodeOptions = onOpenNodeOptions,
+                isMarkdownPreview = showMarkdownPreview,
             )
         },
     ) { paddingValues ->
@@ -356,6 +367,17 @@ fun TextEditorScreen(
                     )
                 }
 
+                markdownContent != null -> {
+                    MarkdownPreview(
+                        content = markdownContent,
+                        lazyListState = markdownListState,
+                        modifier = Modifier.fillMaxSize(),
+                        restoreLine = uiState.restorePreviewLine,
+                        onRestoreConsumed = viewModel::consumeRestorePreviewLine,
+                        onTopLine = viewModel::updateTopLine,
+                    )
+                }
+
                 else -> {
                     Box(modifier = Modifier.fillMaxSize()) {
                         TextEditorContent(
@@ -373,7 +395,9 @@ fun TextEditorScreen(
                             requestInitialFocusOnFirstChunk = uiState.mode == TextEditorMode.Create,
                             restoreScrollIndex = uiState.restoreScrollIndex,
                             restoreScrollOffset = uiState.restoreScrollOffset,
+                            restoreScrollWithinChunkLine = uiState.restoreScrollWithinChunkLine,
                             onRestoreScrollConsumed = viewModel::consumeRestoreScrollIndex,
+                            onTopLineChanged = viewModel::updateTopLine,
                             restoreFocusChunkIndex = uiState.restoreFocusChunkIndex,
                             onRestoreFocusConsumed = viewModel::consumeRestoreFocusChunkIndex,
                         )
@@ -461,6 +485,7 @@ private fun CollapsingTopBar(
     viewModel: TextEditorComposeViewModel,
     onBack: () -> Unit,
     onOpenNodeOptions: (() -> Unit)?,
+    isMarkdownPreview: Boolean,
 ) {
     Column {
         // Reserve the status-bar height permanently via a window-insets modifier so the content and
@@ -506,6 +531,7 @@ private fun CollapsingTopBar(
                             onMenuAction = viewModel::onMenuAction,
                             onOpenNodeOptions = onOpenNodeOptions,
                             onTitleClick = onTitleClick,
+                            isMarkdownPreview = isMarkdownPreview,
                         )
                     }
                 }
@@ -767,9 +793,11 @@ private fun TextEditorViewModeTopAppBar(
     onMenuAction: (TextEditorTopBarAction) -> Unit,
     onOpenNodeOptions: (() -> Unit)?,
     onTitleClick: () -> Unit,
+    isMarkdownPreview: Boolean = false,
 ) {
     val actions = buildList {
-        add(TextEditorTopBarAction.LineNumbers)
+        // Line numbers are meaningless in the rendered Markdown preview.
+        if (!isMarkdownPreview) add(TextEditorTopBarAction.LineNumbers)
         if (onOpenNodeOptions != null) add(TextEditorTopBarAction.More)
     }
     MegaTopAppBar(
