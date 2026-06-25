@@ -183,6 +183,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private var lastScrollOffset: Int = 0
 
     /**
+     * Top visible logical line (0-based) reported by whichever view is active. The precise,
+     * shared position used to hand the scroll position between the Markdown preview and the
+     * chunked Edit/View — unlike [lastScrollFraction] it is a true line, not a chunk-index ratio.
+     */
+    private var lastTopLine: Int = 0
+
+    /**
      * How far the bottom of the viewport has reached through the document (0.0–1.0),
      * reported by the UI. Unlike [lastScrollFraction] (which anchors on the first visible
      * chunk for restoration), this reflects how much has actually been read and is used to
@@ -221,7 +228,12 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 longLineChunkingEnabled = runCatching {
                     getFeatureFlagValueUseCase(ApiFeatures.TextEditorLongLineChunking)
                 }.getOrDefault(true)
-                _uiState.update { it.copy(isFullyLoaded = false) }
+                val markdownRenderingEnabled = runCatching {
+                    getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering)
+                }.getOrDefault(false)
+                _uiState.update {
+                    it.copy(isFullyLoaded = false, isMarkdownEnabled = markdownRenderingEnabled)
+                }
                 val chatId = args.chatId
                 val messageId = args.messageId
                 val publicUrl = args.publicUrl
@@ -469,6 +481,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         _uiState.update { it.copy(focusedEditChunk = chunkIndex) }
     }
 
+    /**
+     * Full document text for the Markdown preview. The preview parses off the main thread and
+     * renders in a virtualized LazyColumn that splits long lines, so there is no size cap and no
+     * fallback — Markdown files in View mode always render; Edit shows the raw source.
+     */
+    fun getMarkdownPreviewContent(): String = fullContentLines.joinToString("\n")
+
     /** Returns the cached starting line number (1-based) for a chunk. O(1) per call. */
     fun getChunkStartLine(chunkIndex: Int): Int =
         cachedStartLines.getOrElse(chunkIndex) { 1 }
@@ -571,17 +590,47 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         chunkSelections.clear()
         hasDisposedEdits = false
         rebuildStartLineCache()
-        val initialChunk = if (chunkTexts.isNotEmpty())
-            focusedChunkIndex.coerceIn(0, chunkTexts.size - 1)
-        else 0
+        val chunkCount = chunkTexts.size
+        // Coming from the Markdown preview, the chunked list was never scrolled. Map the preview's
+        // reported scroll fraction to an exact source line, find the chunk that contains it, and
+        // offset to that line within the chunk so Edit lands precisely where the preview was.
+        val fromMarkdown = _uiState.value.isMarkdown
+        val targetLine = lastTopLine.coerceIn(0, (fullContentLines.size - 1).coerceAtLeast(0))
+        val initialChunk = when {
+            chunkCount == 0 -> 0
+            fromMarkdown -> chunkIndexForLine(targetLine).coerceIn(0, chunkCount - 1)
+            else -> focusedChunkIndex.coerceIn(0, chunkCount - 1)
+        }
+        // 0-based line offset of the target line within its chunk (chunk start lines are 1-based).
+        val withinChunkLine = if (fromMarkdown && chunkCount > 0) {
+            (targetLine - (getChunkStartLine(initialChunk) - 1)).coerceAtLeast(0)
+        } else {
+            null
+        }
         _uiState.update {
             it.copy(
                 mode = TextEditorMode.Edit,
                 totalLineCount = fullContentLines.size,
                 contentVersion = it.contentVersion + 1,
                 focusedEditChunk = initialChunk,
+                // Only force a scroll when switching from the preview (different list state);
+                // the plain chunked view keeps its position because it shares the list state.
+                restoreScrollIndex = if (fromMarkdown) initialChunk else it.restoreScrollIndex,
+                restoreScrollWithinChunkLine = withinChunkLine,
             )
         }
+    }
+
+    /** Index of the chunk whose line range contains the 0-based [line] (or the last chunk). */
+    private fun chunkIndexForLine(line: Int): Int {
+        val count = getChunkCount()
+        if (count <= 1) return 0
+        // getChunkStartLine is 1-based; find the last chunk that starts at or before line+1.
+        var result = 0
+        for (i in 0 until count) {
+            if (getChunkStartLine(i) - 1 <= line) result = i else break
+        }
+        return result
     }
 
     /**
@@ -618,6 +667,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 showDiscardDialog = false,
                 totalLineCount = fullContentLines.size,
                 contentVersion = it.contentVersion + 1,
+                // Returning to the Markdown preview: scroll it back to where Edit left off.
+                restorePreviewLine = if (it.isMarkdown) lastTopLine else it.restorePreviewLine,
             )
         }
         rebuildStartLineCache()
@@ -1092,6 +1143,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         lastReadThroughFraction = readThroughFraction
     }
 
+    /** Reports the top visible logical line (0-based) for the precise Preview <-> Edit handoff. */
+    fun updateTopLine(line: Int) {
+        lastTopLine = line.coerceAtLeast(0)
+    }
+
     private suspend fun saveScrollState() {
         if (resolvedNodeHandle == INVALID_NODE_HANDLE) return
         runCatching {
@@ -1126,10 +1182,15 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 val chunkCount = getChunkCount()
                 val targetIndex = (scroll.scrollFraction * chunkCount).toInt()
                     .coerceIn(0, (chunkCount - 1).coerceAtLeast(0))
+                val targetLine = (scroll.scrollFraction * fullContentLines.size).toInt()
+                    .coerceIn(0, (fullContentLines.size - 1).coerceAtLeast(0))
+                lastTopLine = targetLine
                 _uiState.update {
                     it.copy(
                         restoreScrollIndex = targetIndex,
                         restoreScrollOffset = scroll.cursorPosition,
+                        // Markdown opens in the preview, which restores by absolute line.
+                        restorePreviewLine = targetLine,
                     )
                 }
             }
@@ -1140,7 +1201,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      * Called by the UI after the scroll restoration has been applied.
      */
     fun consumeRestoreScrollIndex() {
-        _uiState.update { it.copy(restoreScrollIndex = null, restoreScrollOffset = 0) }
+        _uiState.update {
+            it.copy(
+                restoreScrollIndex = null,
+                restoreScrollOffset = 0,
+                restoreScrollWithinChunkLine = null,
+            )
+        }
+    }
+
+    /** Called by the Markdown preview after it has applied [TextEditorComposeUiState.restorePreviewLine]. */
+    fun consumeRestorePreviewLine() {
+        _uiState.update { it.copy(restorePreviewLine = null) }
     }
 
     /**

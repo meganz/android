@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.extension.isMarkdownFile
 
 /**
  * UI state for the Compose text editor screen.
@@ -44,5 +45,24 @@ data class TextEditorComposeUiState(
     val closeEvent: StateEvent = consumed,
     val restoreScrollIndex: Int? = null,
     val restoreScrollOffset: Int = 0,
+    /**
+     * 0-based line offset within [restoreScrollIndex]'s chunk to scroll to precisely (used when
+     * entering Edit from the Markdown preview). Converted to pixels by the UI. Null when unused.
+     */
+    val restoreScrollWithinChunkLine: Int? = null,
     val restoreFocusChunkIndex: Int? = null,
-)
+    /** True when the Markdown-rendering feature flag is enabled for this session. */
+    val isMarkdownEnabled: Boolean = false,
+    /**
+     * One-shot top logical line (0-based) to restore the Markdown preview to, e.g. when returning
+     * from Edit or resuming via Continue-Where-Left-Off. Null when nothing to restore.
+     */
+    val restorePreviewLine: Int? = null,
+) {
+    /**
+     * True when the current file should be treated as Markdown: the flag is on AND the
+     * file name has a Markdown extension. Derived so it tracks rename/chat/link updates.
+     * Markdown files open in a rendered preview in View mode; Edit shows the raw source.
+     */
+    val isMarkdown: Boolean get() = isMarkdownEnabled && fileName.isMarkdownFile()
+}

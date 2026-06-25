@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFileLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetTextContentForFolderLinkUseCase
 import mega.privacy.android.domain.usecase.texteditor.GetShowLineNumbersPreferenceUseCase
@@ -256,6 +257,60 @@ internal class TextEditorComposeViewModelTest {
         assertThat(state.fileName).isEqualTo("notes.txt")
         assertThat(state.mode).isEqualTo(TextEditorMode.View)
         assertThat(state.isLoading).isFalse()
+    }
+
+    @Test
+    fun `test that isMarkdown is true when flag enabled and file is md`() = runTest {
+        stubEmptyLoad()
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering))
+            .thenReturn(true)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "README.md")
+        advanceUntilIdle()
+        val state = underTest.uiState.value
+        assertThat(state.isMarkdownEnabled).isTrue()
+        assertThat(state.isMarkdown).isTrue()
+    }
+
+    @Test
+    fun `test that isMarkdown is false when flag disabled`() = runTest {
+        stubEmptyLoad()
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering))
+            .thenReturn(false)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "README.md")
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.isMarkdown).isFalse()
+    }
+
+    @Test
+    fun `test that isMarkdown is false for non markdown file even when flag enabled`() = runTest {
+        stubEmptyLoad()
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering))
+            .thenReturn(true)
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "notes.txt")
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.isMarkdown).isFalse()
+    }
+
+    @Test
+    fun `test that getMarkdownPreviewContent returns joined content for normal lines`() = runTest {
+        doReturn(flowOf(listOf("# Title", "body"))).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        runBlocking {
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getNodeAccessUseCase(any())).thenReturn(null)
+        }
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, fileName = "README.md")
+        advanceUntilIdle()
+        assertThat(underTest.getMarkdownPreviewContent()).isEqualTo("# Title\nbody")
+    }
+
+    private fun stubEmptyLoad() {
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        runBlocking {
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getNodeAccessUseCase(any())).thenReturn(null)
+        }
     }
 
     @Test
