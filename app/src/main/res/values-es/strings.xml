@@ -3105,7 +3105,7 @@
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Introduce tu contraseña</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">Examinando&#8230;</string>
+    <string name="scanning_transfers">Analizando&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">Cancelar transferencias</string>
     <!-- Warning informing transfers were cancelled. -->

@@ -2501,4 +2501,30 @@
     <string name="home_do_more_with_mega_scan_document">Dokument scannen</string>
     <string name="home_do_more_with_mega_create_album">Album erstellen</string>
     <string name="home_do_more_with_mega_schedule_meeting">Meeting planen</string>
+    <string name="notifications_payment_info_section">Zahlungsinformationen</string>
+    <string name="notifications_payment_reminder_section">Ihr Pro-Paket läuft bald ab</string>
+    <string name="notifications_payment_succeeded_title">Zahlung für Paket %1$s erhalten</string>
+    <string name="notifications_payment_failed_title">Zahlung für Paket %1$s fehlgeschlagen</string>
+    <string name="notifications_payment_reminder_expired_section">Pro-Paket abgelaufen</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="one">Ihr Pro-Paket läuft in %1$d Tag ab</item>
+        <item quantity="other">Ihr Pro-Paket läuft in %1$d Tagen ab</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="one">Ihr Pro-Paket ist vor %1$d Tag abgelaufen</item>
+        <item quantity="other">Ihr Pro-Paket ist vor %1$d Tagen abgelaufen</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Erzeugt eine Vorschau für die Links, die Sie in Chats versenden. Beachten Sie, dass der Abruf dieser Vorschauen nicht durch Zero-Knowledge-Verschlüsselung geschützt ist.</string>
+    <string name="video_player_video_not_rendered">Dieses Video kann nicht angezeigt werden</string>
+    <string name="sync_battery_optimisation_banner">Um Ihre Dateien und Ordner fortlaufend zu synchronisieren, erlauben Sie das Ausführen von MEGA im Hintergrund</string>
+    <string name="sync_dialog_battery_optimization_title">Akkuoptimierung</string>
+    <string name="general_do_not_allow_button">Nicht erlauben</string>
+    <string name="general_allow_button">Erlauben</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">Über mobile Daten herunterladen?</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Alten Scanner verwenden</string>
+    <string name="document_scanner_download_dialog_title">Dokumentenscanner herunterladen</string>
+    <string name="document_scanner_download_dialog_download_button">Download</string>
+    <string name="document_scanner_download_dialog_message">Zur Nutzung des neuen Dokumentenscanners ist ein einmaliger Download von %1$d&#160;MB erforderlich.</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Für den neuen Dokumentenscanner ist ein einmaliger Download von %1$d&#160;MB erforderlich. Es können Gebühren für die mobile Datenübertragung anfallen.</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Über mobile Daten herunterladen</string>
 </resources>

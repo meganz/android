@@ -2570,4 +2570,26 @@
     <string name="home_do_more_with_mega_scan_document">Escanear</string>
     <string name="home_do_more_with_mega_create_album">Crear álbum</string>
     <string name="home_do_more_with_mega_schedule_meeting">Programar reunión</string>
+    <string name="notifications_payment_info_section">Información de pago</string>
+    <string name="notifications_payment_reminder_section">Plan Pro a punto de caducar</string>
+    <string name="notifications_payment_succeeded_title">Pago recibido para el plan %1$s</string>
+    <string name="notifications_payment_failed_title">El pago del plan %1$s ha fallado</string>
+    <string name="notifications_payment_reminder_expired_section">El plan Pro ha caducado</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="one">Tu plan Pro caduca en %1$d día</item>
+        <item quantity="many">Tu plan Pro caduca en %1$d de días</item>
+        <item quantity="other">Tu plan Pro caduca en %1$d días</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="one">Tu plan Pro ha caducado hace %1$d día</item>
+        <item quantity="many">Tu plan Pro ha caducado hace %1$d de días</item>
+        <item quantity="other">Tu plan Pro ha caducado hace %1$d días</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Genera una vista previa de los enlaces que envías en el chat. Ten en cuenta que la recuperación de estas vistas previas no está protegida por cifrado de conocimiento cero.</string>
+    <string name="video_player_video_not_rendered">Este video no se puede mostrar</string>
+    <string name="sync_battery_optimisation_banner">Para una sincronización continua de tus archivos y carpetas, deja que MEGA se ejecute en segundo plano</string>
+    <string name="sync_dialog_battery_optimization_title">Optimización de la batería</string>
+    <string name="general_do_not_allow_button">Denegar</string>
+    <string name="general_allow_button">Permitir</string>
+    <string name="document_scanner_download_dialog_download_button">Descargar</string>
 </resources>

@@ -2366,4 +2366,38 @@
     <string name="home_do_more_with_mega_camera_uploads">Unggahan kamera</string>
     <string name="home_do_more_with_mega_add_sync">Tambah sync</string>
     <string name="home_do_more_with_mega_schedule_meeting">Jadwalkan pertemuan</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="other">%1$d terpilih</item>
+    </plurals>
+    <string name="contacts_groups_search_hint">Cari grup</string>
+    <string name="contacts_groups_empty_title">Tidak ada grup</string>
+    <string name="public_link_auth_alert_description_external_file">Simpan file ini dengan aman dan akses kapan saja</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="other">[A]%1$s [/A][B]%2$d item diperbarui.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Hapus riwayat</string>
+    <string name="home_cwlo_clear_history_dialog_message">Apakah anda yakin ingin menghapus riwayat anda? Tindakan ini tidak dapat dibatalkan.</string>
+    <string name="search_placeholder_chat">Cari di Obrolan</string>
+    <string name="search_landing_chat_explorer_subtitle">Cari kontak, obrolan, dan rapat</string>
+    <string name="home_do_more_with_mega_title">Lakukan lebih banyak hal dengan MEGA</string>
+    <string name="home_do_more_with_mega_scan_document">Pindai dokumen</string>
+    <string name="home_do_more_with_mega_create_album">Buat album</string>
+    <string name="notifications_payment_info_section">Info pembayaran</string>
+    <string name="notifications_payment_reminder_section">Paket pro akan segera berakhir</string>
+    <string name="notifications_payment_succeeded_title">Pembayaran diterima untuk paket %1$s</string>
+    <string name="notifications_payment_failed_title">Pembayaran untuk paket %1$s gagal</string>
+    <string name="notifications_payment_reminder_expired_section">Paket Pro telah berakhir</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="other">Paket Pro anda habis dalam %1$d hari</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="other">Paket Pro anda telah habis %1$d hari yang lalu</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Menghasilkan pratinjau tautan yang anda kirim dalam obrolan. Perlu diingat bahwa pengambilan pratinjau ini tidak dilindungi oleh enkripsi tanpa pengetahuan (zero-knowledge encryption).</string>
+    <string name="video_player_video_not_rendered">Video ini tidak dapat ditampilkan</string>
+    <string name="sync_battery_optimisation_banner">Untuk terus menyinkronkan file dan folder anda, izinkan MEGA berjalan di latar belakang</string>
+    <string name="sync_dialog_battery_optimization_title">Pengoptimalan baterai</string>
+    <string name="general_do_not_allow_button">Jangan izinkan</string>
+    <string name="general_allow_button">Izinkan</string>
+    <string name="document_scanner_download_dialog_download_button">Unduh</string>
 </resources>

@@ -87,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">Gói đăng ký dịch vụ đã được hủy bỏ</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">Có rắc rối trong việc hủy bỏ gói đăng ký dịch vụ. Xin liên hệ với support&#64;mega.io để được nhận giúp đỡ.</string>
+    <string name="cancel_subscription_error">Có rắc&#160;rối trong việc hủy bỏ gói đăng&#160;ký dịch&#160;vụ. Xin liên&#160;hệ với https://mega.nz/support để được nhận giúp&#160;đỡ.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">Đóng các phiên khác lại</string>
     <!-- Message after kill all opened sessions -->
@@ -359,7 +359,7 @@
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">Gửi</string>
     <!-- confirmation cancel subscriptions dialog -->
-    <string name="confirmation_cancel_subscriptions">Cảm ơn lời nhận xét của quý khách. Quý khách có muốn hủy gói dịch vụ MEGA ngay không?</string>
+    <string name="confirmation_cancel_subscriptions">Cảm&#160;ơn lời nhận xét của quý&#160;khách. Quý&#160;khách có muốn hủy gói dịch vụ MEGA ngay không?</string>
     <!-- provide a reason to cancel subscriptions dialog -->
     <string name="reason_cancel_subscriptions">Quá&#160;trình hủy gói đăng&#160;ký dịch&#160;vụ không thể tiếp&#160;tục vì bạn chưa nêu lý&#160;do</string>
     <!-- Pop up message shows when user purchased a lower level of subscription -->
@@ -459,7 +459,7 @@
     <!-- enter verification code page title -->
     <string name="verify_account_title">Xác thực tài khoản</string>
     <!-- Text to explain to user why to verify phone number (account suspended use case) -->
-    <string name="verify_account_helper_locked">Tài khoản của quý khách tạm thời bị khóa do xác định có thể bị lạm dụng. Xin xác thực số điện thoại để mở khóa tài khoản.</string>
+    <string name="verify_account_helper_locked">Tài&#160;khoản của quý&#160;khách tạm thời bị khóa do xác&#160;định có thể bị lạm&#160;dụng. Xin xác thực số điện&#160;thoại để mở khóa tài&#160;khoản.</string>
     <!-- Hint text of the region edittext for choosing dial code. -->
     <string name="sms_region_label">Lãnh thổ</string>
     <!-- place holder for enter mobile number field -->
@@ -595,7 +595,7 @@
     <!-- sort option, sort media files by photos first -->
     <string name="sortby_type_photo_first">Ảnh</string>
     <!-- sort option, sort media files by videos first -->
-    <string name="sortby_type_video_first">Videos</string>
+    <string name="sortby_type_video_first">Vidеos</string>
     <!-- Passcode with 4 digits -->
     <string name="four_pin_lock">Mã 4 số</string>
     <!-- Passcode with 6 digits -->
@@ -711,7 +711,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">E-mail hoặc mật khẩu không hợp lệ. Xin thử lại.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">Tài khoản bị đình chỉ do vi phạm Điều Khoản Dịch Vụ. Xin liên hệ support&#64;mega.io để được giải quyết</string>
+    <string name="error_account_suspended">Tài&#160;khoản bị đình&#160;chỉ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ. Xin liên&#160;hệ&#160;tranghttps://mega.nz/support để được giải&#160;quyết</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">Đăng nhập sai quá nhiều lần, xin chờ một tiếng đồng hồ rồi thử lại.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -719,7 +719,7 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Liên kết thư mục bất khả dụng</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Đường liên&#160;kết thư&#160;mục đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
+    <string name="folder_link_unavaible_ToS_violation">Đường liên kết thư mục đã bị xóa bỏ do vi phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Đường liên kết này không còn tồn tại</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
@@ -731,7 +731,7 @@
         <item quantity="other">%1$d mục</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
-    <string name="file_link_unavaible_delete_account">Tài khoản của chủ đường liên kết thư mục hay tệp tin này đã bị ngưng hoạt động do vi phạm Điều Khoản Dịch Vụ.</string>
+    <string name="file_link_unavaible_delete_account">Tài khoản của chủ đường liên kết thư mục hay tệp tin này đã bị ngưng hoạt động do vi phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
     <string name="general_error_invalid_decryption_key">Chìa&#160;khóa giải&#160;mã vừa cung&#160;cấp không&#160;đúng để dùng cho đường liên&#160;kết thư&#160;mục này.</string>
     <!-- Item of the navigation title for the chat section -->
@@ -1519,7 +1519,7 @@
     <!-- Button do not allow now the rich links previews on chat -->
     <string name="button_not_now_rich_links">Không phải lúc này</string>
     <!-- Button do not allow the rich links previews on chat -->
-    <string name="button_never_rich_links">Không bao giờ</string>
+    <string name="button_never_rich_links">Không bao&#160;giờ</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Bật xem trước đường liên kết đã gửi</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
@@ -1713,7 +1713,7 @@
     <!-- Title of the alert when the account have been logged out from another client -->
     <string name="title_alert_logged_out">Đã đăng xuất</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
-    <string name="account_confirmed">Tài&#160;khoản đã được kích&#160;hoạt rồi. Xin đăng&#160;nhập.</string>
+    <string name="account_confirmed">Tài&#160;khoản đã được kích hoạt rồi. Xin đăng&#160;nhập.</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">Không cần phải nhập chính e-mail của mình vào sổ liên lạc</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -1835,7 +1835,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Lời mời đã được gửi tới tên liên lạc %s trước đây rồi. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
     <!-- General label for files -->
-    <string name="general_files">Tệp tin</string>
+    <string name="general_files">Tệp&#160;tin</string>
     <!-- Item menu option upon right click on one or multiple files -->
     <string name="general_save_to_device">Tải xuống</string>
     <!-- Title of cloud explorer to upload a file -->
@@ -1879,7 +1879,7 @@
     <!-- option to dispute taken down file or folder -->
     <string name="dispute_takendown_file">Phản cáo yêu cầu</string>
     <!-- Error shown when download a file that has violated ToS/AUP. -->
-    <string name="error_download_takendown_node">Không truy cập được do vi phạm Điều Khoản Dịch Vụ</string>
+    <string name="error_download_takendown_node">Không truy cập được do vi phạm Điều&#160;Khoản Dịch&#160;Vụ</string>
     <!-- Subtitle of a file takedown reinstated historic notification -->
     <string name="subtitle_file_takedown_reinstated_notification">[A]Tệp tin chia sẻ công khai của bạn [/A][B]%s[/B] đã được khôi phục.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
@@ -2013,7 +2013,7 @@
     <!-- String that appears when we show the last activity of a contact, when the last activity was before today. For example: Last seen March 14th,2018 11:34a.m. -->
     <string name="last_seen_general">[A]Có mặt lần cuối [/A]%1$s lúc %2$s</string>
     <!-- label today -->
-    <string name="label_today">Hôm nay</string>
+    <string name="label_today">Hôm&#160;nay</string>
     <!-- label yesterday -->
     <string name="label_yesterday">Hôm qua</string>
     <!-- label tomorrow -->
@@ -2243,7 +2243,7 @@
     <!-- Title of an alert screen indicating the user has to verify their email -->
     <string name="verify_email_label">Xác thực địa chỉ e-mail của bạn</string>
     <!-- Text informing user that their account has been suspended -->
-    <string name="account_temporarily_suspended">Tài khoản đã tạm thời bị khóa để đảm bảo an toàn.</string>
+    <string name="account_temporarily_suspended">Tài&#160;khoản đã tạm&#160;thời bị khóa để đảm&#160;bảo an&#160;toàn.</string>
     <!-- Text informing user has to follow the steps of an email to unlock their account -->
     <string name="verify_email_and_follow_steps">Xin làm theo hướng dẫn có trong [A]thư e-mail xác thực[/A] để mở khóa tài khoản.</string>
     <!-- Question which takes the user to a help screen -->
@@ -2319,11 +2319,11 @@
         <item quantity="other">%d ngày</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_hours">%dh</string>
+    <string name="label_time_in_hours">%dg̀</string>
     <!-- Time in minutes. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_minutes">%dph</string>
+    <string name="label_time_in_minutes">%dph́</string>
     <!-- Time in seconds. The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="label_time_in_seconds">%d giây</string>
+    <string name="label_time_in_seconds">%dgiây</string>
     <!-- ”Verify user” dialog title -->
     <string name="authenticity_credentials_label">Công nhận chứng thực</string>
     <!-- Label title above your fingerprint credentials.  A credential in this case is a stored piece of information representing your identity -->
@@ -2341,7 +2341,7 @@
     <!-- Alert shown when a user tries to reset an account wich is bloqued. -->
     <string name="error_reset_account_blocked">Tài khoản bạn đang cố khôi phục đang bị chặn.</string>
     <!-- Error message appears to sub-users of a business account when they try to login and they are disabled. -->
-    <string name="error_business_disabled">Tài&#160;khoản của bạn đã bị đình&#160;chỉ bởi quản&#160;trị viên. Xin liên&#160;hệ với người quản&#160;lý tài&#160;khoản Doanh&#160;Nghiệp của bạn để tìm hiểu lý&#160;do.</string>
+    <string name="error_business_disabled">Tài khoản đã bị đình&#160;chỉ bởi quản&#160;trị viên. Xin liên hệ với người quản&#160;lý tài&#160;khoản Doanh&#160;Nghiệp của quý&#160;khách để tìm hiểu lý&#160;do.</string>
     <!-- An error message which appears to sub-users of a business account when they try to login and they are deleted. -->
     <string name="error_business_removed">Tài khoản này đã bị xóa bởi ban quản&#160;trị. Xin liên hệ trực&#160;tiếp với người quản&#160;lý tài&#160;khoản trong Doanh&#160;Nghiệp của bạn để biết thêm chi&#160;tiết.</string>
     <!-- Option in bottom sheet dialog for modifying the associated phone number of current account. -->
@@ -2581,7 +2581,7 @@
     <!-- Label of the option menu. When clicking this button, the app shows the info of the related item, e.g. file, folder, contact, chat, etc. -->
     <string name="general_info">Thông tin</string>
     <!-- settings of the Media section -->
-    <string name="settings_media">Phương tiện số</string>
+    <string name="settings_media">Phương&#160;tiện số</string>
     <!-- settings title of the Media section -->
     <string name="settings_media_audio_files">Tệp tin âm thanh</string>
     <!-- Settings hint that indicates the audio will still be played in background if the app is backgrounded -->
@@ -2589,7 +2589,7 @@
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Tự động sao lưu dự phòng hình ảnh và videos của bạn lên Ổ&#160;Mây.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
-    <string name="all_view_button">Tất cả</string>
+    <string name="all_view_button">Tất&#160;cả</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
     <string name="days_view_button">Ngày</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
@@ -2711,7 +2711,7 @@
     <!-- General label for speaker off-->
     <string name="general_speaker_off">Loa hiện đang bị tắt</string>
     <!-- Label for end meeting-->
-    <string name="meeting_end">Gác</string>
+    <string name="meeting_end">Gác&#160;máy</string>
     <!-- Invite contacts as participants of the meeting-->
     <string name="invite_participants">Mời thêm thành viên</string>
     <!-- The number of participants in the meeting-->
@@ -2883,7 +2883,7 @@
     <!-- Title of timeline tab in photos section -->
     <string name="tab_title_timeline">Dòng thời gian</string>
     <!-- Title of album tab in photos section. -->
-    <string name="tab_title_album">Albums</string>
+    <string name="tab_title_album">Αlbums</string>
     <!-- Title of favourite album. -->
     <string name="title_favourites_album">Ưa Thích</string>
     <!-- Text that indicates that there’s no media files to show in favourite album -->
@@ -3187,19 +3187,19 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">Đặt&#160;lịch cuộc&#160;họp</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;Lite hằng tháng</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch vụ Pro&#160;Lite hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;Lite thường&#160;niên</string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng ký dịch vụ Pro&#160;Lite thường&#160;niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
     <string name="upgrade_account_successful_pro_1_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;I hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;I thường&#160;niên</string>
+    <string name="upgrade_account_successful_pro_1_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng ký dịch vụ Pro&#160;I thường&#160;niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;II hằng tháng</string>
+    <string name="upgrade_account_successful_pro_2_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch vụ Pro&#160;II hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;II thường&#160;niên</string>
+    <string name="upgrade_account_successful_pro_2_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch vụ Pro&#160;II thường&#160;niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;III hằng tháng</string>
+    <string name="upgrade_account_successful_pro_3_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch vụ Pro&#160;III hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói Pro&#160;III thường&#160;niên</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -3687,7 +3687,7 @@
     <!-- In app notification description text representing the meeting repeats every Saturday. This text is used at the start of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_start_sat">Thứ7</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used at the start of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">CN</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">Cnhật</string>
     <!-- In app notification description text representing the meeting repeats every Monday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">Thứ2</string>
     <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used in the middle of the sentence. -->
@@ -3701,7 +3701,7 @@
     <!-- In app notification description text representing the meeting repeats every Saturday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Thứ7</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">CN</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Cnhật</string>
     <!-- Album selection dialog title -->
     <string name="photos_album_selection_dialog_title">Không&#160;thể chọn thêm được</string>
     <!-- Album selection dialog body -->
@@ -4077,15 +4077,15 @@
     <!-- Dropdown menu text to choose the Sunday of monthly recurrence in Custom Recurrence screen. This text is used in the middle of the sentence -->
     <string name="meetings_custom_recurrence_sunday_monthly_section_sentence_middle">Chủ&#160;Nhật</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates First-->
-    <string name="meetings_custom_recurrence_first_week_monthly_section">đầu&#160;tiên</string>
+    <string name="meetings_custom_recurrence_first_week_monthly_section">Đầu&#160;tiên</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Second-->
     <string name="meetings_custom_recurrence_second_week_monthly_section">lần thứ nhì</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Third-->
-    <string name="meetings_custom_recurrence_third_week_monthly_section">lần thứ ba</string>
+    <string name="meetings_custom_recurrence_third_week_monthly_section">lần thứ&#160;ba</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fourth-->
     <string name="meetings_custom_recurrence_fourth_week_monthly_section">lần thứ tư</string>
     <!-- Dropdown menu text to choose the week of the monthly recurrence in the Custom Recurrence screen. This option indicates Fifth-->
-    <string name="meetings_custom_recurrence_fifth_week_monthly_section">lần thứ năm</string>
+    <string name="meetings_custom_recurrence_fifth_week_monthly_section">lần thứ&#160;năm</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs first day every 1 or more months -->
     <plurals name="meetings_schedule_meeting_recurrence_first_day_every_number_of_months_label">
         <item quantity="other">%1$s đầu&#160;tiên của mỗi %2$d tháng</item>
@@ -4401,7 +4401,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">Tải lên bị tạm dừng vì pin ở dưới %1$d%%</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp diễn, vui lòng liên&#160;hệ với support&#64;mega.io</string>
+    <string name="photos_camera_uploads_general_issue">Đăng tải camêra đã dừng hoạt&#160;động. Hãy thử bật lại đăng tải camêra để giải&#160;quyết. Nếu vấn&#160;đề tiếp&#160;diễn, vui lòng liên&#160;hệ tại trang https://mega.nz/support</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">Việc đăng&#160;tải camêra đang được thực hiện, %1$d tệp đang chờ</item>

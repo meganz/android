@@ -1696,9 +1696,9 @@
     <string name="camera_uploads_tranfer_top_bar_title">In corso</string>
     <!--Subtitle for the Camera Uploads transfer top bar -->
     <plurals name="camera_uploads_tranfer_top_bar_subtitle">
-        <item quantity="one">Caricamento in corso: %1$d oggetto rimasto</item>
-        <item quantity="many">Caricamento in corso: %1$d oggetti rimasti</item>
-        <item quantity="other">Caricamento in corso: %1$d oggetti rimasti</item>
+        <item quantity="one">Caricamento: %1$d oggetto rimasto</item>
+        <item quantity="many">Caricamento: %1$d di oggetti rimasti</item>
+        <item quantity="other">Caricamento: %1$d oggetti rimasti</item>
     </plurals>
     <!-- Text of the button to start a video call -->
     <string name="start_video_call_button_text">Video</string>
@@ -2566,4 +2566,47 @@
     <string name="home_do_more_with_mega_camera_uploads">Caricamenti da fotocamera</string>
     <string name="home_do_more_with_mega_add_contact">Aggiungi contatto</string>
     <string name="home_do_more_with_mega_schedule_meeting">Programma meeting</string>
+    <string name="sync_battery_optimisation_banner">Per sincronizzare in modo continuo i tuoi file e le tue cartelle, permetti a MEGA di operare in background</string>
+    <string name="sync_dialog_battery_optimization_title">Ottimizzazione della batteria</string>
+    <string name="general_do_not_allow_button">Non permettere</string>
+    <string name="general_allow_button">Permetti</string>
+    <string name="contacts_groups_search_hint">Cerca gruppi</string>
+    <string name="home_do_more_with_mega_title">Fai di più con MEGA</string>
+    <string name="home_do_more_with_mega_add_sync">Aggiungi sincronizzazione</string>
+    <string name="home_do_more_with_mega_create_album">Crea album</string>
+    <string name="notifications_payment_info_section">Informazioni di pagamento</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one">%1$d selezionato</item>
+        <item quantity="many"></item>
+        <item quantity="other">%1$d selezionato</item>
+    </plurals>
+    <string name="contacts_groups_empty_title">Nessun gruppo</string>
+    <string name="public_link_auth_alert_description_external_file">Mantieni questo file al sicuro e accedi a esso in qualsiasi momento.</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one">[A]%1$s [/A][B]aggiornato %2$d elemento.[/B]</item>
+        <item quantity="many"></item>
+        <item quantity="other">[A]%1$s [/A][B]aggiornati %2$d elementi.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Cancella cronologia</string>
+    <string name="home_cwlo_clear_history_dialog_message">Se sei sicuro di voler eliminare la tua cronologia? Questo non può essere annullato.</string>
+    <string name="search_placeholder_chat">Cerca nella chat</string>
+    <string name="search_landing_chat_explorer_subtitle">Cerca contatti, chat e riunioni</string>
+    <string name="home_do_more_with_mega_scan_document">Scansiona documento</string>
+    <string name="notifications_payment_reminder_section">Il piano Pro sta per scadere</string>
+    <string name="notifications_payment_succeeded_title">Pagamento ricevuto per il piano %1$s</string>
+    <string name="notifications_payment_failed_title">Il pagamento per il piano %1$s è fallito</string>
+    <string name="notifications_payment_reminder_expired_section">Il piano Pro è scaduto</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="one">Il tuo piano Pro scade tra %1$d giorno</item>
+        <item quantity="many"></item>
+        <item quantity="other">Il tuo piano Pro scade tra %1$d giorni</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="one">Il tuo piano Pro è scaduto %1$d giorno fa</item>
+        <item quantity="many"></item>
+        <item quantity="other">Il tuo piano Pro è scaduto %1$d giorni fa</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Genera un\’anteprima dei link che invii nella chat. Nota che il recupero di queste anteprime non è protetto dalla criptografia a conoscenza zero.</string>
+    <string name="video_player_video_not_rendered">Questo video non può essere visualizzato</string>
+    <string name="document_scanner_download_dialog_download_button">Scarica</string>
 </resources>

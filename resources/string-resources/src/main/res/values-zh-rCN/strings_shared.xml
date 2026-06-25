@@ -2418,4 +2418,26 @@
     <string name="home_do_more_with_mega_camera_uploads">相机上传</string>
     <string name="home_do_more_with_mega_add_contact">添加联系人</string>
     <string name="home_do_more_with_mega_schedule_meeting">安排会议</string>
+    <string name="sync_battery_optimisation_banner">若要持续同步您的文件和文件夹，请允许MEGA在后台运行</string>
+    <string name="sync_dialog_battery_optimization_title">电池优化</string>
+    <string name="general_do_not_allow_button">不允许</string>
+    <string name="general_allow_button">允许</string>
+    <string name="home_do_more_with_mega_title">用 MEGA 做更多事情</string>
+    <string name="home_do_more_with_mega_scan_document">扫描文档</string>
+    <string name="home_do_more_with_mega_add_sync">添加同步</string>
+    <string name="home_do_more_with_mega_create_album">创建相册</string>
+    <string name="notifications_payment_info_section">付款信息</string>
+    <string name="notifications_payment_reminder_section">Pro 方案即将到期</string>
+    <string name="notifications_payment_succeeded_title">已收到 %1$s 方案的付款</string>
+    <string name="notifications_payment_failed_title">为 %1$s 方案的付款失败</string>
+    <string name="notifications_payment_reminder_expired_section">Pro 方案已过期</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="other">您的Pro 方案将在 %1$d 天后到期</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="other">您的 Pro 方案在 %1$d 天前过期</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">会生成您在聊天中发送的链接的预览。请注意，检索这些预览并未受到零知识加密的保护。</string>
+    <string name="video_player_video_not_rendered">此视频无法显示</string>
+    <string name="document_scanner_download_dialog_download_button">下载</string>
 </resources>

@@ -2414,4 +2414,28 @@
     <string name="home_do_more_with_mega_add_sync">เพิ่มการซิงค์ข้อมูล</string>
     <string name="home_do_more_with_mega_scan_document">สแกนเอกสาร</string>
     <string name="home_do_more_with_mega_create_album">สร้างอัลบั้ม</string>
+    <string name="sync_battery_optimisation_banner">เพื่อให้การซิงค์ไฟล์และโฟลเดอร์ของคุณเป็นไปอย่างต่อเนื่อง คุณต้องอนุญาตให้ MEGA ทำงานในเบื้องหลัง</string>
+    <string name="sync_dialog_battery_optimization_title">การยืดอายุการใช้งานแบตเตอรี่</string>
+    <string name="general_do_not_allow_button">ไม่อนุญาต</string>
+    <string name="general_allow_button">อนุญาต</string>
+    <string name="notifications_payment_info_section">ข้อมูลการชำระเงิน</string>
+    <string name="notifications_payment_reminder_section">แผน Pro ใกล้จะหมดอายุแล้ว</string>
+    <string name="notifications_payment_succeeded_title">ระบบได้รับชำระเงินสำหรับแผน %1$s เรียบร้อยแล้ว</string>
+    <string name="notifications_payment_failed_title">ชำระเงินสำหรับแผน %1$s ไม่สำเร็จ</string>
+    <string name="notifications_payment_reminder_expired_section">แผน Pro หมดอายุแล้ว</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="other">แผน Pro ของคุณจะหมดอายุในอีก %1$d วัน</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="other">แผน Pro ของคุณจะหมดอายุในอีก %1$d วัน</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">สร้างตัวอย่างของลิงก์ที่คุณส่งในแชท ทั้งนี้ การเรียกดูตัวอย่างลิงก์เหล่านี้จะไม่ได้รับการคุ้มครองด้วยการเข้ารหัสด้วยวิธีซีโร่-นอว์เลจ</string>
+    <string name="video_player_video_not_rendered">ไม่สามารถแสดงวิดีโอนี้ได้</string>
+    <string name="document_scanner_download_dialog_download_button">ดาวน์โหลด</string>
+    <string name="document_scanner_download_dialog_title">ดาวน์โหลดตัวสแกนเอกสาร</string>
+    <string name="document_scanner_download_dialog_message">ตัวสแกนเอกสารเวอร์ชันใหม่ต้องดาวน์โหลดไฟล์ขนาด %1$d MB เพียงครั้งเดียวก่อนเริ่มใช้งาน</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">ต้องการดาวน์โหลดผ่านอินเทอร์เน็ตมือถือหรือไม่</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">ตัวสแกนเอกสารเวอร์ชันใหม่ต้องดาวน์โหลดไฟล์ขนาด %1$d MB เพียงครั้งเดียว ซึ่งอาจมีค่าบริการอินเทอร์เน็ตมือถือเพิ่มเติม</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">ดาวน์โหลดผ่านอินเทอร์เน็ตมือถือ</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">ใช้ตัวสแกนเวอร์ชันเดิม</string>
 </resources>

@@ -41,7 +41,7 @@
     <!-- state while importing the file -->
     <string name="general_importing">Aggiungendo&#8230;</string>
     <!-- state while importing the file -->
-    <string name="general_forwarding">Inoltro in corso</string>
+    <string name="general_forwarding">Inoltro</string>
     <!-- Menu option to choose to add file or folders to Cloud Drive -->
     <string name="general_import">Aggiungi al Cloud drive</string>
     <!-- It will be followed by the error message -->
@@ -247,7 +247,7 @@
     <!-- Alert Dialog to get link -->
     <string name="option_decryption_key">Chiave di decrittazione</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="download_preparing_files">In corso</string>
+    <string name="download_preparing_files">Preparazione dei file</string>
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vedi trasferimenti</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
@@ -271,7 +271,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_open_link">Apri</string>
     <!-- while file provider is downloading a file -->
-    <string name="context_preparing_provider">Preparazione del file in corso</string>
+    <string name="context_preparing_provider">Preparazione del file</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_download">Scarica</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -425,9 +425,9 @@
     <!-- the options of how to upload, but in an array. needed for the settings, how to upload the camera images. when Wi-Fi connected and using data plan -->
     <string name="cam_sync_data">Wi-Fi o connessione dati</string>
     <!-- title of the notification when camera upload is checking files -->
-    <string name="settings_camera_notif_checking_title">Controllo di file da caricare in corso</string>
+    <string name="settings_camera_notif_checking_title">Controllo della presenza di file da caricare</string>
     <!-- title of the notification when camera upload is initializing -->
-    <string name="settings_camera_notif_initializing_title">Inizializzazione dei Caricamenti da fotocamera in corso</string>
+    <string name="settings_camera_notif_initializing_title">Inizializzazione dei Caricamenti da fotocamera</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
     <string name="camera_notif_primary_local_unavailable">I Caricamenti da fotocamera sono stati disattivati. La tua cartella locale non è disponibile.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
@@ -457,7 +457,7 @@
     <!-- Size of files in offline or cache folders -->
     <string name="settings_advanced_features_size">Attualmente %s usati</string>
     <!-- Calculating Size of files in offline or cache folders -->
-    <string name="settings_advanced_features_calculating">Calcolo in corso</string>
+    <string name="settings_advanced_features_calculating">Calcolo</string>
     <!-- title of the setting to set the default download location -->
     <string name="settings_storage_download_location">Cartella di download default</string>
     <!-- Whether to always ask the user each time. -->
@@ -701,7 +701,7 @@
     <!-- Option of the sliding panel to delete the existing avatar -->
     <string name="delete_avatar_panel">Cancella immagine</string>
     <!-- Message shown meanwhile the app is waiting for a request -->
-    <string name="recovering_info">Acquisizione delle informazioni in corso&#8230;</string>
+    <string name="recovering_info">Acquisizione delle informazioni&#8230;</string>
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">Il tuo nuovo indirizzo email deve essere verificato. Controlla la casella di posta elettronica del nuovo indirizzo email per procedere.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
@@ -715,7 +715,7 @@
     <!-- Hint of the confirmation dialog to get link with password -->
     <string name="hint_confirm_password_protection_dialog">Conferma password</string>
     <!-- Status text at the beginning of getting a link -->
-    <string name="link_request_status">In corso&#8230;</string>
+    <string name="link_request_status">Lavorazione&#8230;</string>
     <!-- Option of the sliding panel to edit the link of a node -->
     <string name="edit_link_option">Gestisci link</string>
     <!-- Error alert dialog shown when changing the password the user provides an incorrect password -->
@@ -1101,7 +1101,7 @@
     <!-- Menu option -->
     <string name="import_success_error">Errore. Non aggiunto al Cloud drive</string>
     <!-- Label in login screen to inform about the chat initialization proccess -->
-    <string name="chat_connecting">Connessione in corso&#8230;</string>
+    <string name="chat_connecting">Connessione&#8230;</string>
     <!-- message when trying to invite a contact with a pending request -->
     <string name="context_contact_already_invited">%s ha già ricevuto un tuo invito. Consulta le tue richieste in sospeso.</string>
     <!-- text_copyright_alert_title -->
@@ -1353,7 +1353,7 @@
     <!-- Text of dialog shown when a contact request has not been sent with QR code because of some error -->
     <string name="invite_not_sent_text_error">Un errore è stato riscontrato e l\’invito non è stato spedito.</string>
     <!-- Text of alert dialog informing that the qr is generating -->
-    <string name="generatin_qr">Generazione del codice QR in corso&#8230;</string>
+    <string name="generatin_qr">Generazione del codice QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
     <string name="menu_item_scan_code">Scansiona il codice QR</string>
     <!-- get the contact link and copy it -->
@@ -2121,7 +2121,7 @@
     <!-- Error message shown when a file cannot be opened by other app using the open with option menu -->
     <string name="error_open_file_with">È stato riscontrato un errore e non è stato possibile aprire il file con questa app.</string>
     <!-- Subtitle of the call screen when a outgoing call is just starting -->
-    <string name="outgoing_call_starting">Chiamata in corso&#8230;</string>
+    <string name="outgoing_call_starting">Chiamando&#8230;</string>
     <!-- Content of a invalid meta message -->
     <string name="error_meta_message_invalid">Il messaggio contiene metadati invalidi</string>
     <!-- Title of the activity that sends a location -->
@@ -2161,7 +2161,7 @@
     <!-- Label shown when a new group chat has been created correctly -->
     <string name="new_group_chat_created">Nuova chat di gruppo creata</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
-    <string name="preparing_chats">In corso</string>
+    <string name="preparing_chats">Preparazione dei file</string>
     <!-- Label indicating some content has been sent as message -->
     <string name="sent_as_message">Inviato come messaggio.</string>
     <!-- Action delete all file versions -->
@@ -2379,7 +2379,7 @@
     <!-- Text related to verified phone number. Used as title or cell description. -->
     <string name="phonenumber_title">Numero di telefono</string>
     <!-- Text shown in a call when it is trying to reconnect after lose the internet connection -->
-    <string name="reconnecting_message">Riconnessione in corso</string>
+    <string name="reconnecting_message">Riconnessione</string>
     <!-- Text shown for the action create new file -->
     <string name="create_new_file_action">Crea un nuovo file</string>
     <!-- Error title shown when you are trying to do an action with a file or folder and you don’t have the necessary permissions -->
@@ -2903,7 +2903,7 @@
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">Registrati ora ed utilizza la collaborazione avanzata gratuitamente.</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
-    <string name="ongoing_call_content">Un\’altra chiamata in corso. Per favore, termina la chiamata corrente prima di iniziarne un\’altra.</string>
+    <string name="ongoing_call_content">Un\’altra chiamata è in corso. Per favore, termina la chiamata corrente prima di iniziarne un\’altra.</string>
     <!-- The hint text when changing meeting name-->
     <string name="new_meeting_name">Nuovo nome del meeting</string>
     <!-- The content of dialog when failed for creating meeting-->
@@ -3105,7 +3105,7 @@
     <!-- Title in the Passcode screen to open the app with the password if it does not remember the passcode. -->
     <string name="settings_passcode_enter_password_title">Inserisci la tua password</string>
     <!-- Stage of the scanning transfers dialog indicating transfers are scanning. -->
-    <string name="scanning_transfers">Scansione in corso&#8230;</string>
+    <string name="scanning_transfers">Scansione&#8230;</string>
     <!-- Label cancel transfers. -->
     <string name="cancel_transfers">Annulla trasferimenti</string>
     <!-- Warning informing transfers were cancelled. -->
@@ -3211,7 +3211,7 @@
     <!-- Success message when submit issue succeeded-->
     <string name="settings_help_report_issue_success">Abbiamo ricevuto il tuo report. Controlleremo il problema e torneremo da te.</string>
     <!-- Message shown during log file upload-->
-    <string name="settings_help_report_issue_uploading_log_file">Upload del file log in corso</string>
+    <string name="settings_help_report_issue_uploading_log_file">Upload del file log</string>
     <!-- Message shown if user tries to leave report screen without submitting their report-->
     <string name="settings_help_report_issue_discard_dialog_title">Annullare il report?</string>
     <!-- Button text for discard dialog option-->
@@ -4753,7 +4753,7 @@
     <!-- Default status label for an absent participant at the not in call participants list -->
     <string name="meetings_bottom_panel_not_in_call_participants_not_in_call_status">Non nella chiamata</string>
     <!-- Status label when calling an absent participant from the not in call participants list -->
-    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Chiamata in corso&#8230;</string>
+    <string name="meetings_bottom_panel_not_in_call_participants_calling_status">Chiamata&#8230;</string>
     <!-- Status label after call an absent participant from the not in call participants list and get no response -->
     <string name="meetings_bottom_panel_not_in_call_participants_no_response_status">Nessuna risposta</string>
     <!-- Label of the button to call all absent participants from the not in call participants list -->

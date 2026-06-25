@@ -525,20 +525,6 @@
     <string name="document_scanning_error_type_generic_error">We’re having trouble opening the document scanner. Close and re-open the app, and try again.</string>
     <!-- The confirmation Button text of the Document Scanning Error Dialog -->
     <string name="document_scanning_error_dialog_confirm_button">OK, got it</string>
-    <!-- Title of the dialog asking the user to confirm the one-time download of the document scanner over Wi-Fi -->
-    <string name="document_scanner_download_dialog_title">Download document scanner</string>
-    <!-- Message of the dialog asking the user to confirm the one-time download of the document scanner over Wi-Fi. %1$d is the download size in MB. -->
-    <string name="document_scanner_download_dialog_message">The new document scanner needs a one-time %1$d MB download before you can use it.</string>
-    <!-- Title of the dialog asking the user to confirm downloading the document scanner over mobile data -->
-    <string name="document_scanner_download_dialog_mobile_data_title">Download over mobile data?</string>
-    <!-- Message of the dialog asking the user to confirm downloading the document scanner over mobile data. %1$d is the download size in MB. -->
-    <string name="document_scanner_download_dialog_mobile_data_message">The new document scanner needs a one-time %1$d MB download. You’re on mobile data, so charges may apply.</string>
-    <!-- Button that starts the document scanner download over Wi-Fi -->
-    <string name="document_scanner_download_dialog_download_button">Download</string>
-    <!-- Button that starts the document scanner download over mobile data -->
-    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Download over mobile data</string>
-    <!-- Button that dismisses the download dialog and opens the old document scanner instead -->
-    <string name="document_scanner_download_dialog_use_old_scanner_button">Use old scanner</string>
     <!--Title text to start a meeting from Meeting screen empty view-->
     <string name="meeting_recent_list_empty_title">Protect your calls</string>
     <!--Subtitle text from Meeting screen empty view-->
@@ -786,7 +772,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">File extension is needed</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">This file can’t be previewed in MEGA. We’ll download a temporary copy so you can open it in another app. %1$s will be downloaded.</string>
+    <string name="alert_larger_file_preview">This file can’t be previewed in MEGA. Download the file (%1$s) to open it in another app.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Completing operation: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1753,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1795,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -3035,4 +3025,18 @@
     <string name="general_do_not_allow_button">Don’t allow</string>
     <!-- Positive button on the battery optimisation dialog; allows disabling battery optimisation. -->
     <string name="general_allow_button">Allow</string>
+    <!-- Title of the dialog asking the user to confirm the one-time download of the document scanner over Wi-Fi -->
+    <string name="document_scanner_download_dialog_title">Download document scanner</string>
+    <!-- Message of the dialog asking the user to confirm the one-time download of the document scanner over Wi-Fi. %1$d is the download size in MB. -->
+    <string name="document_scanner_download_dialog_message">The new document scanner needs a one-time %1$d MB download before you can use it.</string>
+    <!-- Title of the dialog asking the user to confirm downloading the document scanner over mobile data -->
+    <string name="document_scanner_download_dialog_mobile_data_title">Download over mobile data?</string>
+    <!-- Message of the dialog asking the user to confirm downloading the document scanner over mobile data. %1$d is the download size in MB. -->
+    <string name="document_scanner_download_dialog_mobile_data_message">The new document scanner needs a one-time %1$d MB download. Mobile data charges may apply.</string>
+    <!-- Button that starts the document scanner download over Wi-Fi -->
+    <string name="document_scanner_download_dialog_download_button">Download</string>
+    <!-- Button that starts the document scanner download over mobile data -->
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Download over mobile data</string>
+    <!-- Button that dismisses the download dialog and opens the old document scanner instead -->
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Use old scanner</string>
 </resources>

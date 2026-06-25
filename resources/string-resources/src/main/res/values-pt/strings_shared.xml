@@ -677,7 +677,7 @@
     <!-- Bottom sheet option title for add the video to playlist from video section -->
     <string name="video_section_bottom_sheet_option_title_add_to_playlist">Adicionar à lista de reprodução</string>
     <!-- Stop Backup confirmation dialog text -->
-    <string name="sync_stop_backup_confirm_dialog_text">Para parar de fazer backup desta pasta, você precisa movê-la ou excluí-la</string>
+    <string name="sync_stop_backup_confirm_dialog_text">Para parar de fazer backup desta pasta, você precisa movê-la ou deletá-la</string>
     <!-- Name for a general button which action is "Confirm" something -->
     <string name="general_confirm_button">Confirmar</string>
     <!-- The failed Message when adding the video to the playlists from the video section. -->
@@ -2606,4 +2606,32 @@
     <string name="home_do_more_with_mega_add_sync">Adicionar sincronização</string>
     <string name="home_do_more_with_mega_scan_document">Escanear documento</string>
     <string name="home_do_more_with_mega_create_album">Criar álbum</string>
+    <string name="notifications_payment_info_section">Informações de pagamento</string>
+    <string name="notifications_payment_reminder_section">O seu plano Pro expira em breve</string>
+    <string name="notifications_payment_succeeded_title">Pagamento recebido para o plano %1$s</string>
+    <string name="notifications_payment_failed_title">Erro no pagamento do plano %1$s</string>
+    <string name="notifications_payment_reminder_expired_section">O seu plano Pro expirou</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="one">O seu plano Pro expira em %1$d dia</item>
+        <item quantity="many">O seu plano Pro expira em %1$d de dias</item>
+        <item quantity="other">O seu plano Pro expira em %1$d dias</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="one">O seu plano Pro expirou há %1$d dia</item>
+        <item quantity="many">O seu plano Pro expirou há %1$d de dias</item>
+        <item quantity="other">O seu plano Pro expirou há %1$d dias</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Gera uma visualização dos links que você envia no chat. A recuperação dessas visualizações não está protegida pela criptografia de conhecimento zero.</string>
+    <string name="video_player_video_not_rendered">Não é possível mostrar este vídeo</string>
+    <string name="sync_battery_optimisation_banner">Para a sincronização contínua dos seus arquivos e das suas pastas, permita que o MEGA seja executado em segundo plano</string>
+    <string name="sync_dialog_battery_optimization_title">Otimização da bateria</string>
+    <string name="general_do_not_allow_button">Não permitir</string>
+    <string name="general_allow_button">Permitir</string>
+    <string name="document_scanner_download_dialog_download_button">Fazer download</string>
+    <string name="document_scanner_download_dialog_title">Fazer o download do scanner de documentos</string>
+    <string name="document_scanner_download_dialog_message">Para poder usar o novo scanner de documentos, é necessário fazer um download de %1$d MB.</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">Fazer o download com dados móveis?</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Para poder usar o novo scanner de documentos, é necessário fazer um download de %1$d MB, o que pode gerar custos pelo uso de dados móveis.</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Fazer o download com dados móveis</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Usar o scanner antigo</string>
 </resources>

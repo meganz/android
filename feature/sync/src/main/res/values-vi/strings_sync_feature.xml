@@ -9,7 +9,7 @@
     <!-- Sync when storage permission is denied we show banner with text to the user-->
     <string name="sync_storage_permission_banner">MEGA cần truy&#160;cập bộ nhớ thiết&#160;bị để đồng&#160;bộ hóa thư&#160;mục cục&#160;bộ của bạn. Chạm vào đây để cho phép quyền truy&#160;cập.</string>
     <!-- Sync when battery optimization is turned on we show banner with text to the user-->
-    <string name="sync_battery_optimisation_banner">Để liên&#160;tục đồng&#160;bộ hóa các tệp&#160;tin và thư&#160;mục của bạn, cho phép MEGA chạy trong nền</string>
+    <string name="sync_battery_optimisation_banner">Để liên&#160;tục đồng&#160;bộ hóa các tệp&#160;tin và thư&#160;mục, hãy cho phép MEGA chạy trong&#160;nền</string>
     <!-- Sync file counts to show ongoing syncing-->
     <plurals name="num_files_with_parameter">
         <item quantity="other">%d tệp tin</item>
@@ -41,13 +41,13 @@
     <!-- Sync to resolve conflict Choose the one with the latest modified time -->
     <string name="sync_stalled_issue_choose_latest_modified_time">Chọn tệp tin được sửa đổi lần cuối cùng</string>
     <!-- Sync dialog continue button -->
-    <string name="sync_dialog_file_permission_positive_button">Tiếp tục</string>
+    <string name="sync_dialog_file_permission_positive_button">Tiếp&#160;tục</string>
     <!-- Sync dialog not now button -->
-    <string name="sync_dialog_file_permission_negative_button">Không phải lúc này</string>
+    <string name="sync_dialog_file_permission_negative_button">Không&#160;phải lúc&#160;này</string>
     <!-- Sync dialog title for battery optimization -->
-    <string name="sync_dialog_battery_optimization_title">Tối ưu hóa pin</string>
+    <string name="sync_dialog_battery_optimization_title">Tối ưu pin</string>
     <!-- Sync dialog cancel button text -->
-    <string name="sync_dialog_battery_optimization_negative_button">Không cho phép</string>
+    <string name="sync_dialog_battery_optimization_negative_button">Không cho</string>
     <!-- Sync dialog allow button text -->
     <string name="sync_dialog_battery_optimization_positive_button">Cho phép</string>
     <!-- Sync state message for No Stalled Issues -->

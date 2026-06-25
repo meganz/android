@@ -794,7 +794,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Potrzebne jest rozszerzenie pliku</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA pobierze tymczasową kopię tego pliku, abyś mógł go podejrzeć. Nie zostanie on zapisany ani dostępny poza aplikacją. %1$s zostanie pobrany.</string>
+    <string name="alert_larger_file_preview">Ten plik nie może być podglądany w MEGA. Pobierz plik (%1$s), aby otworzyć go w innej aplikacji.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Zakończenie operacji: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1262,7 +1262,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Zezwól na dane mobilne</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Podgląd dużego pliku</string>
+    <string name="alert_larger_file_preview_title">Podgląd niedostępny</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Zobacz teraz</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2699,4 +2699,34 @@
     <string name="home_do_more_with_mega_add_sync">Dodaj synchronizacje</string>
     <string name="home_do_more_with_mega_scan_document">Zeskanuj dokument</string>
     <string name="home_do_more_with_mega_create_album">Utwórz album</string>
+    <string name="notifications_payment_info_section">Dane płatności</string>
+    <string name="notifications_payment_reminder_section">Plan Pro wygasa wkrótce</string>
+    <string name="notifications_payment_succeeded_title">Otrzymano płatność za plan %1$s</string>
+    <string name="notifications_payment_failed_title">Płatność za plan %1$s nie powiodła się</string>
+    <string name="notifications_payment_reminder_expired_section">Plan Pro wygasł</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="one">Twój plan Pro wygasa za %1$d dzień</item>
+        <item quantity="few">Twój plan Pro wygasa za %1$d dni</item>
+        <item quantity="many">Twój plan Pro wygasa za %1$d dni</item>
+        <item quantity="other">Twój plan Pro wygasa za %1$d dni</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="one">Twój plan Pro wygasł %1$d dzień temu</item>
+        <item quantity="few">Twój plan Pro wygasł %1$d dni temu</item>
+        <item quantity="many">Twój plan Pro wygasł %1$d dni temu</item>
+        <item quantity="other">Twój plan Pro wygasł %1$d dni temu</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Generuje podgląd linków, które wysyłasz w czacie. Należy pamiętać, że pobieranie tych podglądów nie jest chronione przez szyfrowanie zero-knowledge.</string>
+    <string name="video_player_video_not_rendered">To wideo nie może być wyświetlone</string>
+    <string name="sync_battery_optimisation_banner">Aby stale synchronizować pliki i katalogi, pozwól MEGA działać w tle</string>
+    <string name="sync_dialog_battery_optimization_title">Optymalizacja baterii</string>
+    <string name="general_do_not_allow_button">Nie zezwalaj</string>
+    <string name="general_allow_button">Zezwól</string>
+    <string name="document_scanner_download_dialog_download_button">Pobierz</string>
+    <string name="document_scanner_download_dialog_title">Pobierz skaner dokumentów</string>
+    <string name="document_scanner_download_dialog_message">Nowy skaner dokumentów wymaga jednorazowego pobrania o rozmiarze %1$d MB, zanim będzie można go użyć.</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">Pobrać przy użyciu danych komórkowych?</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Nowy skaner dokumentów wymaga jednorazowego pobrania o wielkości %1$d MB. Mogą obowiązywać opłaty za dane mobilne.</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Pobieraj przez sieć komórkową</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Użyj starego skanera</string>
 </resources>

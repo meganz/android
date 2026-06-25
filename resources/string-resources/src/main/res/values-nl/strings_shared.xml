@@ -2514,4 +2514,24 @@
     <string name="home_do_more_with_mega_add_sync">Synchronisatie toevoegen</string>
     <string name="home_do_more_with_mega_scan_document">Document scannen</string>
     <string name="home_do_more_with_mega_create_album">Album aanmaken</string>
+    <string name="notifications_payment_info_section">Betalingsinformatie</string>
+    <string name="notifications_payment_reminder_section">Pro abonnement verloopt binnenkort</string>
+    <string name="notifications_payment_succeeded_title">Betaling ontvangen voor %1$s abonnement</string>
+    <string name="notifications_payment_failed_title">Betaling voor %1$s abonnement mislukt</string>
+    <string name="notifications_payment_reminder_expired_section">Abonnement verlopen</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="one">Uw Pro abonnement verloopt over %1$d dag</item>
+        <item quantity="other">Uw Pro abonnement verloopt over %1$d dagen</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="one">Uw Pro abonnement verliep %1$d dag geleden</item>
+        <item quantity="other">Uw Pro abonnement verliep %1$d dagen geleden</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Genereert een voorbeeld van de links die u in de chat verstuurt. Houd er rekening mee dat het ophalen van deze voorbeelden niet wordt beschermd door zero-knowledge-codering.</string>
+    <string name="video_player_video_not_rendered">Deze video kan niet worden weergegeven</string>
+    <string name="sync_battery_optimisation_banner">Als u uw bestanden en mappen continu wilt synchroniseren, moet u MEGA op de achtergrond laten draaien</string>
+    <string name="sync_dialog_battery_optimization_title">Batterij optimalisatie</string>
+    <string name="general_do_not_allow_button">Niet toestaan</string>
+    <string name="general_allow_button">Toestaan</string>
+    <string name="document_scanner_download_dialog_download_button">Downloaden</string>
 </resources>

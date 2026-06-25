@@ -55,7 +55,7 @@
     <!-- The name of the Device or Folder Sub State when its code is INSUFFICIENT_DISK_SPACE -->
     <string name="general_sync_insufficient_disk_space">장치에 충분한 저장 공간이 없습니다</string>
     <!-- The name for specific Sub States to indicate that an unknown error occurred -->
-    <string name="general_sync_message_unknown_error">알 수 없는 오류가 발생하였습니다. support&#64;mega.io에 연락하세요.</string>
+    <string name="general_sync_message_unknown_error">알 수 없는 오류가 발생하였습니다. https://mega.nz/support에서 지원 부서에 연락주세요</string>
     <!-- The name for specific Sub States to indicate that the Node is in the Rubbish Bin -->
     <string name="general_sync_message_node_in_rubbish_bin">MEGA 폴더가 휴지통에 있어서 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name for specific Sub States to indicate that the local drive cannot be located at this time -->
@@ -2412,4 +2412,22 @@
     <string name="home_do_more_with_mega_add_sync">동기화 추가</string>
     <string name="home_do_more_with_mega_scan_document">문서 스캔</string>
     <string name="home_do_more_with_mega_create_album">사진첩 만들기</string>
+    <string name="notifications_payment_reminder_section">프로 플랜이 곧 만료됩니다</string>
+    <string name="notifications_payment_succeeded_title">%1$s 플랜 결제가 접수되었습니다.</string>
+    <string name="notifications_payment_failed_title">%1$s 플랜 결제가 실패했습니다.</string>
+    <string name="notifications_payment_reminder_expired_section">프로 플랜이 만료되었습니다.</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="other">프로 플랜은 %1$d일 후에 만료됩니다.</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="other">프로 플랜은 %1$d일 전에 만료되었습니다.</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">채팅에서 보낸 링크의 미리보기를 생성합니다. 이 미리보기들은 제로지식 암호화로 보호되지 않습니다.</string>
+    <string name="video_player_video_not_rendered">이 비디오는 재생할 수 없습니다</string>
+    <string name="sync_battery_optimisation_banner">파일과 폴더를 계속 동기화하려면, MEGA가 백그라운드에서 작동하도록 허용하세요</string>
+    <string name="sync_dialog_battery_optimization_title">배터리 최적화</string>
+    <string name="general_do_not_allow_button">허용하지 않음</string>
+    <string name="general_allow_button">허용</string>
+    <string name="notifications_payment_info_section">결제 정보</string>
+    <string name="document_scanner_download_dialog_download_button">다운로드</string>
 </resources>

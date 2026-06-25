@@ -2851,4 +2851,42 @@
     <string name="home_do_more_with_mega_scan_document">مسح المستند الكترونياً</string>
     <string name="home_do_more_with_mega_create_album">إنشاء ألبوم</string>
     <string name="home_do_more_with_mega_schedule_meeting">جدول اجتماع</string>
+    <string name="sync_battery_optimisation_banner">لمزامنة ملفاتك ومجلداتك باستمرار اسمح بتشغيل ميغا MEGA في الخلفية</string>
+    <string name="sync_dialog_battery_optimization_title">تحسين البطارية</string>
+    <string name="general_do_not_allow_button">لا تسمح</string>
+    <string name="general_allow_button">سماح</string>
+    <string name="notifications_payment_info_section">معلومات الدفع</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="zero">[A]%1$s [/A][B]تم تحديث %2$d العناصر.[/B]</item>
+        <item quantity="one">[A]%1$s [/A][B]تم تحديث %2$d العنصر.[/B]</item>
+        <item quantity="two">[A]%1$s [/A][B]تم تحديث %2$d العناصر.[/B]</item>
+        <item quantity="few">[A]%1$s [/A][B]تم تحديث %2$d العناصر.[/B]</item>
+        <item quantity="many"></item>
+        <item quantity="other">[A]%1$s [/A][B]تم تحديث %2$d العناصر.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">مسح السجل</string>
+    <string name="home_cwlo_clear_history_dialog_message">هل أنت متأكد أنك تريد مسح سجلك؟ لا يمكن التراجع عن ذلك.</string>
+    <string name="notifications_payment_reminder_section">خطة Pro ستنتهي قريبًا</string>
+    <string name="notifications_payment_succeeded_title">تم استلام الدفع لخطة %1$s</string>
+    <string name="notifications_payment_failed_title">فشل الدفع لخطة %1$s</string>
+    <string name="notifications_payment_reminder_expired_section">انتهت خطة Pro</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="zero">تنتهي خطة Pro خلال %1$d يومًا</item>
+        <item quantity="one">تنتهي خطة Pro خلال %1$d يوم</item>
+        <item quantity="two">تنتهي خطة Pro خلال %1$d يومًا</item>
+        <item quantity="few">تنتهي خطة Pro خلال %1$d يومًا</item>
+        <item quantity="many"></item>
+        <item quantity="other">تنتهي خطة Pro خلال %1$d يومًا</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="zero">انتهت خطة Pro منذ %1$d يومًا</item>
+        <item quantity="one">انتهت خطة Pro منذ %1$d يوم</item>
+        <item quantity="two">انتهت خطة Pro منذ %1$d يومًا</item>
+        <item quantity="few">انتهت خطة Pro منذ %1$d يومًا</item>
+        <item quantity="many"></item>
+        <item quantity="other">انتهت خطة Pro منذ %1$d يومًا</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">ينشئ معاينة للروابط التي ترسلها في المحادثة. ملاحظة: استرجاع هذه المعاينات ليس محميًا بتشفير عديم المعرفة.</string>
+    <string name="video_player_video_not_rendered">هذا الفيديو لا يمكن عرضه.</string>
+    <string name="document_scanner_download_dialog_download_button">تنزيل</string>
 </resources>

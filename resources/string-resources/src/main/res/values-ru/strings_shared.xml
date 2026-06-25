@@ -2675,4 +2675,51 @@
     <string name="home_do_more_with_mega_camera_uploads">Загрузки из камеры</string>
     <string name="home_do_more_with_mega_add_contact">Добавить контакт</string>
     <string name="home_do_more_with_mega_schedule_meeting">Запланировать встречу</string>
+    <string name="sync_battery_optimisation_banner">Чтобы непрерывно синхронизировать файлы и папки, разрешите MEGA работать в фоновом режиме</string>
+    <string name="sync_dialog_battery_optimization_title">Оптимизация аккумулятора</string>
+    <string name="general_do_not_allow_button">Не разрешать</string>
+    <string name="general_allow_button">Разрешить</string>
+    <string name="contacts_groups_search_hint">Поиск групп</string>
+    <string name="home_do_more_with_mega_title">Будьте эффективнее с MEGA</string>
+    <string name="home_do_more_with_mega_add_sync">Добавить синхронизацию</string>
+    <string name="home_do_more_with_mega_create_album">Создать альбом</string>
+    <string name="notifications_payment_info_section">Платёжная информация</string>
+    <plurals name="general_selection_num_selected">
+        <item quantity="one"></item>
+        <item quantity="few">%1$d Выбрано</item>
+        <item quantity="many">%1$d Выбрано</item>
+        <item quantity="other">%1$d Выбрано</item>
+    </plurals>
+    <string name="contacts_groups_empty_title">Нет групп</string>
+    <string name="public_link_auth_alert_description_external_file">Храните этот файл в безопасности и имейте к нему доступ в любое время.</string>
+    <plurals name="notifications_history_updated_items_subtitle">
+        <item quantity="one"></item>
+        <item quantity="few">[A]%1$s [/A][B]обновленные %2$d элементы.[/B]</item>
+        <item quantity="many">[A]%1$s [/A][B]обновленные %2$d элементы.[/B]</item>
+        <item quantity="other">[A]%1$s [/A][B]обновленные %2$d элементы.[/B]</item>
+    </plurals>
+    <string name="home_cwlo_clear_history_dialog_title">Очистить историю</string>
+    <string name="home_cwlo_clear_history_dialog_message">Вы уверены, что хотите очистить историю? Это действие нельзя отменить.</string>
+    <string name="search_placeholder_chat">Поиск в чате</string>
+    <string name="search_landing_chat_explorer_subtitle">Поиск контактов, чатов и встреч</string>
+    <string name="home_do_more_with_mega_scan_document">Сканировать документ</string>
+    <string name="notifications_payment_reminder_section">План Pro скоро истекает</string>
+    <string name="notifications_payment_succeeded_title">Платеж за план %1$s получен</string>
+    <string name="notifications_payment_failed_title">Платеж за план %1$s не выполнен</string>
+    <string name="notifications_payment_reminder_expired_section">План Pro истёк</string>
+    <plurals name="notifications_payment_reminder_will_expire">
+        <item quantity="one"></item>
+        <item quantity="few">Ваш план Pro истекает через %1$d дней</item>
+        <item quantity="many">Ваш план Pro истекает через %1$d дней</item>
+        <item quantity="other">Ваш план Pro истекает через %1$d дней</item>
+    </plurals>
+    <plurals name="notifications_payment_reminder_expired">
+        <item quantity="one"></item>
+        <item quantity="few">Ваш план Pro истёк %1$d дней назад</item>
+        <item quantity="many">Ваш план Pro истёк %1$d дней назад</item>
+        <item quantity="other">Ваш план Pro истёк %1$d дней назад</item>
+    </plurals>
+    <string name="chat_settings_link_preview_summary">Генерирует предварительный просмотр ссылок, которые вы отправляете в чате. Обратите внимание, что эти превью не защищены шифрованием с нулевыми знаниями.</string>
+    <string name="video_player_video_not_rendered">Это видео не может быть отображено</string>
+    <string name="document_scanner_download_dialog_download_button">Скачать</string>
 </resources>
