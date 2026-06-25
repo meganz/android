@@ -54,7 +54,13 @@ internal fun TabsScope.CloudExplorerTab(
             factory.create(NodeExplorerSharedViewModel.Args(nodeExplorerId, nodeSourceType))
         }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val signal = remember(uiState) { uiState.toTabSignal() }
+    val signal = remember(uiState, isFileSelectionEnabled, disabledNodeIds, videosOnly) {
+        uiState.toTabSignal(
+            disabledNodeIds = disabledNodeIds,
+            videosOnly = videosOnly,
+            isFileSelectionEnabled = isFileSelectionEnabled,
+        )
+    }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
     val explorerUiState by explorerViewModel.uiState.collectAsStateWithLifecycle()
 

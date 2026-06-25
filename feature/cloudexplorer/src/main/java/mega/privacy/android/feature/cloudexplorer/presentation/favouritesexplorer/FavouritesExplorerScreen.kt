@@ -163,7 +163,13 @@ internal fun TabsScope.FavouritesExplorerTab(
             )
         }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val signal = remember(uiState) { uiState.toTabSignal() }
+    val signal = remember(uiState, isSelectionModeEnabled, disabledNodeIds, videosOnly) {
+        uiState.toTabSignal(
+            disabledNodeIds = disabledNodeIds,
+            videosOnly = videosOnly,
+            isFileSelectionEnabled = isSelectionModeEnabled,
+        )
+    }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
     val explorerUiState by explorerViewModel.uiState.collectAsStateWithLifecycle()
 

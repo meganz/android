@@ -7,6 +7,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.feature.cloudexplorer.presentation.components.selectableNodeIds
+import mega.privacy.android.feature.cloudexplorer.presentation.components.visibleNodeItems
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.TabSignal
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 
@@ -37,13 +39,25 @@ sealed interface NodeExplorerUiState {
     ) : NodeExplorerUiState
 }
 
-internal fun NodeExplorerUiState.toTabSignal(): TabSignal =
+internal fun NodeExplorerUiState.toTabSignal(
+    disabledNodeIds: Set<NodeId> = emptySet(),
+    videosOnly: Boolean = false,
+    isFileSelectionEnabled: Boolean = false,
+): TabSignal =
     when (this) {
         NodeExplorerUiState.Loading -> TabSignal(isLoading = true)
         is NodeExplorerUiState.Data -> TabSignal(
             isLoading = false,
             hasContent = items.isNotEmpty(),
             folderName = folderName,
+            selectableNodeIds = if (isFileSelectionEnabled) {
+                selectableNodeIds(
+                    items = visibleNodeItems(items, showHiddenNodes, isHiddenNodesEnabled),
+                    disabledNodeIds = disabledNodeIds,
+                    videosOnly = videosOnly,
+                )
+            } else emptySet(),
+            nodesLoadingState = nodesLoadingState,
         )
     }
 

@@ -206,6 +206,35 @@ internal fun ExplorerNodeGridItem(
 }
 
 /**
+ * Items actually shown after the hidden-nodes filter: sensitive nodes are dropped unless the user
+ * opted to show them or the feature is off. Single source of truth for both the rendered list
+ * ([rememberVisibleItems]) and "select all".
+ */
+internal fun visibleNodeItems(
+    items: List<NodeViewItem<TypedNode>>,
+    showHiddenNodes: Boolean,
+    isHiddenNodesEnabled: Boolean,
+): List<NodeViewItem<TypedNode>> =
+    if (showHiddenNodes || !isHiddenNodesEnabled) items
+    else items.filterNot { it.isSensitive }
+
+/**
+ * Of the already-visible [items], the ids the user can actually select, mirroring
+ * [explorerNodeClick]: file nodes that are not pre-added ([disabledNodeIds]) and, in video-only
+ * mode, only videos. Drives "select all".
+ */
+internal fun selectableNodeIds(
+    items: List<NodeViewItem<TypedNode>>,
+    disabledNodeIds: Set<NodeId>,
+    videosOnly: Boolean,
+): Set<NodeId> = items.asSequence()
+    .filterNot { it.isFolderNode }
+    .filterNot { it.id in disabledNodeIds }
+    .filter { !videosOnly || it.isVideoNode }
+    .map { it.id }
+    .toSet()
+
+/**
  * Tap handler shared by the cloud-drive and favourites lists: folders open (clearing any selection),
  * pre-added nodes and unsupported (non-video, in video-only mode) files ignore taps, and files
  * toggle selection when selection is enabled.

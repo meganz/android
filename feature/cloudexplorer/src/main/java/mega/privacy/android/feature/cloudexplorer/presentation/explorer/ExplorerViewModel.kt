@@ -51,6 +51,8 @@ internal class ExplorerViewModel @Inject constructor(
                 folderName = active.folderName,
                 isConnected = isConnected,
                 noConnectionEvent = noConnectionEvent,
+                selectableNodeIds = active.selectableNodeIds,
+                nodesLoadingState = active.nodesLoadingState,
             )
         }.asUiStateFlow(viewModelScope, ExplorerUiState())
 

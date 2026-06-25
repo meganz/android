@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.ChatExplorerTab
 import mega.privacy.android.feature.cloudexplorer.presentation.chatexplorer.rememberChatExplorerSelectionState
+import mega.privacy.android.feature.cloudexplorer.presentation.components.visibleNodeItems
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.actionStringId
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.extensions.titleStringId
 import mega.privacy.android.feature.cloudexplorer.presentation.favouritesexplorer.FavouritesExplorerTab
@@ -140,6 +141,7 @@ internal fun ExplorerScreen(
         nodeSelectionState.deselectAll()
         chatExplorerSelectionState.deselectAll()
     }
+    val isAllSelected = uiState.selectableNodeIds.all { it in nodeSelectionState.selectedNodeIds }
 
     if (!isInnerNavigation) {
         LaunchedOnceEffect {
@@ -153,6 +155,17 @@ internal fun ExplorerScreen(
         event = uiState.noConnectionEvent,
         onConsumed = viewModel::onNoConnectionEventConsumed,
     ) { showNoConnectionSnackbar() }
+
+    // Keep "select all" extending to nodes that arrive after the initial click while still loading.
+    LaunchedEffect(
+        nodeSelectionState.selectAllAwaitingMoreItems,
+        uiState.selectableNodeIds,
+        uiState.nodesLoadingState,
+    ) {
+        if (nodeSelectionState.selectAllAwaitingMoreItems) {
+            nodeSelectionState.selectAll(uiState.selectableNodeIds, uiState.nodesLoadingState)
+        }
+    }
 
     BackHandler(enabled = showSearch) { onCloseSearch() }
 
@@ -222,11 +235,32 @@ internal fun ExplorerScreen(
                     },
                     title = when {
                         uiState.isLoading -> stringResource(explorerMode.titleStringId)
+                        nodeSelectionState.selectAllAwaitingMoreItems ->
+                            stringResource(sharedR.string.app_bar_selection_mode_description)
+
                         selectedItemsCount > 0 -> selectedItemsCount.toString()
                         isInnerNavigation -> uiState.folderName.text
                         else -> stringResource(explorerMode.titleStringId)
                     },
                     actions = buildList {
+                        if (!explorerMode.isFolderPicker) {
+                            when {
+                                nodeSelectionState.selectAllAwaitingMoreItems ->
+                                    add(MenuActionWithClick(CommonMenuAction.Selecting) {})
+
+                                uiState.selectableNodeIds.isNotEmpty() && !isAllSelected ->
+                                    add(
+                                        MenuActionWithClick(CommonMenuAction.SelectAll) {
+                                            protectedUserTap {
+                                                nodeSelectionState.selectAll(
+                                                    uiState.selectableNodeIds,
+                                                    uiState.nodesLoadingState,
+                                                )
+                                            }
+                                        }
+                                    )
+                            }
+                        }
                         if (selectedTabIndex == CLOUD_TAB_INDEX && explorerMode.isFolderPicker) {
                             add(
                                 MenuActionWithClick(NewFolderMenuAction) {
@@ -477,11 +511,7 @@ internal fun rememberVisibleItems(
     isHiddenNodesEnabled: Boolean,
 ): List<NodeViewItem<TypedNode>> =
     remember(showHiddenNodes, isHiddenNodesEnabled, items) {
-        if (showHiddenNodes || !isHiddenNodesEnabled) {
-            items
-        } else {
-            items.filterNot { it.isSensitive }
-        }
+        visibleNodeItems(items, showHiddenNodes, isHiddenNodesEnabled)
     }
 
 internal const val CLOUD_EXPLORER_VIEW_TAG = "cloud_explorer_view"
