@@ -59,6 +59,28 @@ internal class SelectedItemsCountTest {
     }
 
     @Test
+    fun `test that the search action is shown when no items are selected`() {
+        setContent(
+            explorerMode = ExplorerMode.ShareFilesToChat,
+            items = listOf(previewFileNodeUiItem(id = FILE_ID, name = FILE_NAME)),
+        )
+
+        composeTestRule.onNodeWithTag(SEARCH_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the search action is hidden when items are selected`() {
+        setContent(
+            explorerMode = ExplorerMode.ShareFilesToChat,
+            items = listOf(previewFileNodeUiItem(id = FILE_ID, name = FILE_NAME)),
+        )
+
+        composeTestRule.onNodeWithText(FILE_NAME, useUnmergedTree = true).performClick()
+
+        composeTestRule.onNodeWithTag(SEARCH_TAG).assertDoesNotExist()
+    }
+
+    @Test
     fun `test that disabled nodes are not counted as selected`() {
         setContent(
             explorerMode = ExplorerMode.AddVideosToPlaylist,
@@ -272,6 +294,7 @@ internal class SelectedItemsCountTest {
         const val FILE_NAME = "Selected file"
         const val SELECTED_COUNT = "1"
         const val NAVIGATION_ICON = "Navigation Icon"
+        const val SEARCH_TAG = "app_bar:search"
         const val SELECT_ALL_TAG = "node_selection_action:select_all"
         const val SELECTING_TAG = "node_selection_action:selecting"
     }

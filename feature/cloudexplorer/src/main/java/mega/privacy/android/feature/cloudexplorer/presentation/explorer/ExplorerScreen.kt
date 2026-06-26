@@ -243,6 +243,22 @@ internal fun ExplorerScreen(
                         else -> stringResource(explorerMode.titleStringId)
                     },
                     actions = buildList {
+                        if (uiState.hasContent && selectedItemsCount == 0) {
+                            add(
+                                MenuActionWithClick(CommonMenuAction.Search) {
+                                    if (!isProcessingAction) {
+                                        if (uiState.isConnected) {
+                                            Analytics.tracker.trackEvent(
+                                                CloudExplorerSearchButtonPressedEvent
+                                            )
+                                            showSearch = true
+                                        } else {
+                                            showNoConnectionSnackbar()
+                                        }
+                                    }
+                                }
+                            )
+                        }
                         if (!explorerMode.isFolderPicker) {
                             when {
                                 nodeSelectionState.selectAllAwaitingMoreItems ->
@@ -271,22 +287,6 @@ internal fun ExplorerScreen(
                                                     parentNodeId = nodeExplorerId
                                                 )
                                             )
-                                        } else {
-                                            showNoConnectionSnackbar()
-                                        }
-                                    }
-                                }
-                            )
-                        }
-                        if (uiState.hasContent) {
-                            add(
-                                MenuActionWithClick(CommonMenuAction.Search) {
-                                    if (!isProcessingAction) {
-                                        if (uiState.isConnected) {
-                                            Analytics.tracker.trackEvent(
-                                                CloudExplorerSearchButtonPressedEvent
-                                            )
-                                            showSearch = true
                                         } else {
                                             showNoConnectionSnackbar()
                                         }
