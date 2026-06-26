@@ -6,6 +6,24 @@
 
 > **Status:** Design / pre-implementation. No production code written yet. This spec is for team review before coding.
 
+> **Revision (2026-06-25) — the implemented design differs from the original proposal below.**
+> The key facts that changed are summarised here; the rest of the document is kept for history.
+>
+> - **In-house renderer, no third-party UI library.** Markdown is parsed with the existing
+>   `org.commonmark:commonmark` (plus `commonmark-ext-gfm-tables` for GFM tables) and rendered by
+>   our own Compose code (`MarkdownNode` / `MarkdownPreview`). The `multiplatform-markdown-renderer`
+>   (mikepenz) library proposed in §3 was **not** adopted.
+> - **Preview-only — no Preview/Source toggle.** Markdown opens directly in the formatted preview in
+>   View mode; tapping Edit shows the raw chunked source. There is no in-view toggle and no
+>   `contentView` state.
+> - **No size guard or fallback.** Parsing runs on a background dispatcher and the preview is
+>   virtualized in a `LazyColumn`, so large files render without a size cap; over-long single lines
+>   are split into multiple `Text`s to avoid native text-measurement ANRs.
+> - **Precise Preview↔Edit scroll sync** maps scroll offset to logical line via the real
+>   `TextLayoutResult`, not a fixed line-height estimate, so both directions land on the exact line.
+> - Shipped as three stacked MRs: AND-24015 (deps + helper + flag, !16396), AND-24016 (state + VM,
+>   !16412), AND-24017 (renderer + UI, !16413).
+
 ## 1. Background & problem
 
 The legacy `app/textEditor` already renders Markdown: it detects `.md` by extension

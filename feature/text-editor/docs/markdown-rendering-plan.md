@@ -12,6 +12,15 @@
 
 **Companion spec:** [markdown-rendering-techspec.md](./markdown-rendering-techspec.md)
 
+> **Revision (2026-06-25) — the implemented approach differs from the plan below.** Key facts:
+> - **Renderer:** in-house — `org.commonmark:commonmark` (+ `commonmark-ext-gfm-tables`) parsing with
+>   our own Compose renderer (`MarkdownNode` / `MarkdownPreview`). The `com.mikepenz:multiplatform-markdown-renderer`
+>   library named in **Tech Stack** and the task steps below was **not** adopted.
+> - **UX:** preview-only in View mode (no Preview⇄Source toggle, no `contentView`); Edit shows raw source.
+> - **Large files:** background parse + virtualized `LazyColumn`, no size guard/fallback; long lines split to avoid ANRs.
+> - **Scroll sync:** Preview↔Edit position is matched exactly via `TextLayoutResult`.
+> - **Delivery:** three stacked MRs — AND-24015 (!16396), AND-24016 (!16412), AND-24017 (!16413).
+
 ---
 
 ## File Structure
