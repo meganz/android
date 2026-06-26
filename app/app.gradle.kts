@@ -255,6 +255,7 @@ dependencies {
     implementation(project(":feature:cloud-drive:cloud-drive"))
     implementation(project(":feature:document-scanner:document-scanner"))
     implementation(project(":feature:video-editor:video-editor"))
+    implementation(project(":feature:share-link"))
     preBuiltSdkDependency(rootProject.extra)
     implementation(project(":core:passcode:passcode"))
     implementation(project(":core:transfers"))
