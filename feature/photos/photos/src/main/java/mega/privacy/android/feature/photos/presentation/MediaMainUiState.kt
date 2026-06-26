@@ -10,4 +10,5 @@ import de.palm.composestateevents.consumed
  */
 data class MediaMainUiState(
     val newAlbumDialogEvent: StateEvent = consumed,
+    val isTimelineRevampEnabled: Boolean? = null,
 )

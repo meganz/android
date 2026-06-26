@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
@@ -80,6 +79,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabView
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampScreen
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
@@ -686,29 +686,39 @@ private fun MediaScreen.MediaContent(
 
     when (this) {
         MediaScreen.Timeline -> {
-            TimelineTabRoute(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = timelineContentPadding,
-                uiState = timelineTabUiState,
-                mediaCameraUploadUiState = mediaCameraUploadUiState,
-                timelineFilterUiState = timelineFilterUiState,
-                selectedPhotoIds = selectedPhotoIds,
-                showTimelineSortDialog = showTimelineSortDialog,
-                selectedTimePeriod = selectedTimePeriod,
-                clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
-                onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
-                setEnableCUPage = setEnableCUPage,
-                onGridSizeChange = onTimelineGridSizeChange,
-                onSortDialogDismissed = onTimelineSortDialogDismissed,
-                onSortOptionChange = onTimelineSortOptionChange,
-                onPhotoClick = onTimelinePhotoClick,
-                onPhotoSelected = onTimelinePhotoSelected,
-                handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
-                handleNotificationPermissionResult = handleNotificationPermissionResult,
-                onCUBannerDismissRequest = onCUBannerDismissRequest,
-                onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                onMediaTimePeriodSelected = onMediaTimePeriodSelected
-            )
+            when (uiState.isTimelineRevampEnabled) {
+                true -> {
+                    TimelineRevampScreen()
+                }
+
+                false -> {
+                    TimelineTabRoute(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = timelineContentPadding,
+                        uiState = timelineTabUiState,
+                        mediaCameraUploadUiState = mediaCameraUploadUiState,
+                        timelineFilterUiState = timelineFilterUiState,
+                        selectedPhotoIds = selectedPhotoIds,
+                        showTimelineSortDialog = showTimelineSortDialog,
+                        selectedTimePeriod = selectedTimePeriod,
+                        clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+                        onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                        setEnableCUPage = setEnableCUPage,
+                        onGridSizeChange = onTimelineGridSizeChange,
+                        onSortDialogDismissed = onTimelineSortDialogDismissed,
+                        onSortOptionChange = onTimelineSortOptionChange,
+                        onPhotoClick = onTimelinePhotoClick,
+                        onPhotoSelected = onTimelinePhotoSelected,
+                        handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                        handleNotificationPermissionResult = handleNotificationPermissionResult,
+                        onCUBannerDismissRequest = onCUBannerDismissRequest,
+                        onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
+                        onMediaTimePeriodSelected = onMediaTimePeriodSelected
+                    )
+                }
+
+                else -> {}
+            }
         }
 
         MediaScreen.Albums -> {
@@ -722,21 +732,25 @@ private fun MediaScreen.MediaContent(
             )
         }
 
-        MediaScreen.Videos -> VideosTabRoute(
-            videosSelectionUiState = videosSelectionUiState,
-            navigationHandler = navigationHandler,
-            onCurrentVideosSearchQueryRequest = onCurrentVideosSearchQueryRequest,
-            updateSelectionModeAvailableActions = updateSelectionModeAvailableActions,
-            contentPadding = timelineContentPadding.excludeTopPadding(),
-        )
+        MediaScreen.Videos -> {
+            VideosTabRoute(
+                videosSelectionUiState = videosSelectionUiState,
+                navigationHandler = navigationHandler,
+                onCurrentVideosSearchQueryRequest = onCurrentVideosSearchQueryRequest,
+                updateSelectionModeAvailableActions = updateSelectionModeAvailableActions,
+                contentPadding = timelineContentPadding.excludeTopPadding(),
+            )
+        }
 
-        MediaScreen.Playlists -> VideoPlaylistsTabRoute(
-            showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
-            dismissVideoPlaylistRemovedDialog = dismissVideoPlaylistRemovedDialog,
-            modifier = modifier,
-            navigate = navigationHandler::navigate,
-            contentPadding = timelineContentPadding.excludeTopPadding(),
-        )
+        MediaScreen.Playlists -> {
+            VideoPlaylistsTabRoute(
+                showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
+                dismissVideoPlaylistRemovedDialog = dismissVideoPlaylistRemovedDialog,
+                modifier = modifier,
+                navigate = navigationHandler::navigate,
+                contentPadding = timelineContentPadding.excludeTopPadding(),
+            )
+        }
     }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -36,6 +38,7 @@ import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
+import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -560,17 +563,29 @@ private fun HeaderBodyV2(
 }
 
 @Composable
-private fun PhotoNodeBodyV2(
-    node: PhotosNodeContentItemV2,
-    isPreview: Boolean,
-    isSelected: Boolean,
-    isHiddenNodesEnabled: Boolean,
-    shouldShowFavourite: Boolean,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
+internal fun PhotoNodeBodyV2(
+    node: PhotosNodeContentItemV2?,
     modifier: Modifier = Modifier,
+    isPreview: Boolean = false,
+    isSelected: Boolean = false,
+    isHiddenNodesEnabled: Boolean = false,
+    shouldShowFavourite: Boolean = false,
     enabled: Boolean = true,
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {},
 ) {
+    if (node == null) {
+        // Not loaded yet (revamp lazy pagination) — show a shimmer placeholder.
+        Spacer(
+            modifier = modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .testTag(PHOTOS_NODE_BODY_SHIMMER_TAG)
+                .shimmerEffect(shape = RoundedCornerShape(0.dp)),
+        )
+        return
+    }
+
     // Size each cell from its actual column width (fillMaxWidth + square aspect)
     // rather than the full window width / spanCount. On tablets the left nav rail
     // makes the grid narrower than the window, so a window-based square height
@@ -773,3 +788,4 @@ internal const val PHOTOS_NODE_HEADER_BODY_GRID_SIZE_SETTINGS_MENU_TAG =
     "header_body:menu_grid_size_settings"
 internal const val PHOTOS_NODE_BODY_IMAGE_NODE_TAG = "photos_node_body:image_photos_node"
 internal const val VIDEO_NODE_BODY_IMAGE_NODE_TAG = "photos_node_body:video_photos_node"
+internal const val PHOTOS_NODE_BODY_SHIMMER_TAG = "photos_node_body:shimmer"
