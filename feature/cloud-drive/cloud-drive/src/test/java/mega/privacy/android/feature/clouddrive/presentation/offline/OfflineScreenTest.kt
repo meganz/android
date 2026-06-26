@@ -363,7 +363,7 @@ class OfflineScreenTest {
         val mockCallback: (String) -> Unit = mock()
         val uiState = OfflineUiState(
             isLoadingCurrentFolder = false,
-            offlineNodes = emptyList(),
+            offlineNodes = listOf(createOfflineNodeUiItem("test_file.txt", isFolder = false)),
             searchQuery = "test query"
         )
 
@@ -803,6 +803,37 @@ class OfflineScreenTest {
             .performClick()
 
         verify(analyticsTracker).trackEvent(ViewModeButtonPressedEvent)
+    }
+
+    @Test
+    fun `test that empty top app bar tag is visible when offlineNodes is empty and not in selection mode`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = emptyList(),
+            selectedNodeHandles = emptyList()
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that offline screen title is shown in empty state top app bar when nodeId is root`() {
+        val uiState = OfflineUiState(
+            isLoadingCurrentFolder = false,
+            offlineNodes = emptyList(),
+            selectedNodeHandles = emptyList(),
+            nodeId = -1
+        )
+        setupComposeContent(uiState)
+
+        composeRule.onNodeWithText(
+            InstrumentationRegistry.getInstrumentation().targetContext
+                .getString(SharedR.string.offline_screen_title)
+        ).assertIsDisplayed()
+        composeRule.onNodeWithTag(OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG).assertIsDisplayed()
     }
 
     private fun setupComposeContent(

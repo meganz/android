@@ -70,7 +70,6 @@ import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
-import mega.privacy.android.shared.resources.R as sharedResR
 import mega.privacy.mobile.analytics.event.BackButtonPressedEvent
 import mega.privacy.mobile.analytics.event.OfflineScreenEvent
 import mega.privacy.mobile.analytics.event.ViewModeButtonPressedEvent
@@ -212,6 +211,11 @@ internal fun OfflineScreen(
         }
     }
 
+    BackHandler(isSearchMode && uiState.selectedNodeHandles.isEmpty()) {
+        isSearchMode = false
+        onSearch("")
+    }
+
     BackHandler(uiState.selectedNodeHandles.isNotEmpty()) {
         deselectAll()
     }
@@ -247,7 +251,10 @@ internal fun OfflineScreen(
             )
         },
         topBar = {
-            if (uiState.selectedNodeHandles.isEmpty()) {
+            val isInSelectionMode = uiState.selectedNodeHandles.isNotEmpty()
+            val defaultTitle = uiState.title.takeIf { uiState.nodeId != -1 }
+                ?: stringResource(sharedR.string.offline_screen_title)
+            if (!isInSelectionMode && (uiState.offlineNodes.isNotEmpty() || !uiState.searchQuery.isNullOrEmpty())) {
                 MegaSearchTopAppBar(
                     modifier = Modifier
                         .testTag(OFFLINE_SCREEN_SEARCH_TOP_APP_BAR_TAG),
@@ -261,10 +268,7 @@ internal fun OfflineScreen(
                             modifier = Modifier.testTag(OFFLINE_SCREEN_TRANSFER_WIDGET)
                         )
                     },
-                    title = uiState
-                        .title
-                        .takeIf { uiState.nodeId != -1 }
-                        ?: stringResource(sharedResR.string.offline_screen_title),
+                    title = defaultTitle,
                     query = uiState.searchQuery,
                     onQueryChanged = onSearch,
                     isSearchingMode = isSearchMode,
@@ -280,11 +284,25 @@ internal fun OfflineScreen(
             } else {
                 MegaTopAppBar(
                     modifier = Modifier
-                        .testTag(OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG),
-                    title = uiState.selectedNodeHandles.size.toString(),
-                    navigationType = AppBarNavigationType.Close(deselectAll),
+                        .testTag(
+                            if (isInSelectionMode) OFFLINE_SCREEN_DEFAULT_TOP_APP_BAR_TAG
+                            else OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG
+                        ),
+                    title = if (isInSelectionMode) {
+                        uiState.selectedNodeHandles.size.toString()
+                    } else {
+                        defaultTitle
+                    },
+                    navigationType = if (isInSelectionMode) {
+                        AppBarNavigationType.Close(deselectAll)
+                    } else {
+                        AppBarNavigationType.Back {
+                            Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                            onBack()
+                        }
+                    },
                     actions = buildList {
-                        if (!uiState.areAllNodesSelected) {
+                        if (isInSelectionMode && !uiState.areAllNodesSelected) {
                             add(OfflineSelectionAction.SelectAll)
                         }
                     },
@@ -324,7 +342,7 @@ internal fun OfflineScreen(
                     modifier = Modifier
                         .testTag(OFFLINE_SCREEN_TOP_WARNING_BANNER_TAG)
                         .fillMaxWidth(),
-                    body = stringResource(sharedResR.string.logout_offline_content_deletion_warning),
+                    body = stringResource(sharedR.string.logout_offline_content_deletion_warning),
                     showCancelButton = true,
                     onCancelButtonClick = onDismissOfflineWarning
                 )
@@ -428,7 +446,7 @@ internal fun OfflineScreen(
             SortBottomSheet(
                 modifier = Modifier.testTag(OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG),
                 options = NodeSortOption.getOptionsForSourceType(NodeSourceType.OFFLINE),
-                title = stringResource(sharedResR.string.action_sort_by_header),
+                title = stringResource(sharedR.string.action_sort_by_header),
                 sheetState = sortBottomSheetState,
                 selectedSort = SortBottomSheetResult(
                     sortOptionItem = uiState.selectedSortConfiguration.sortOption,
@@ -577,9 +595,9 @@ private fun RemoveFromOfflineDialog(
 ) {
     BasicDialog(
         modifier = modifier,
-        description = stringResource(sharedResR.string.offline_item_deletion_confirmation_title),
-        positiveButtonText = stringResource(sharedResR.string.general_remove),
-        negativeButtonText = stringResource(sharedResR.string.general_dialog_cancel_button),
+        description = stringResource(sharedR.string.offline_item_deletion_confirmation_title),
+        positiveButtonText = stringResource(sharedR.string.general_remove),
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
         onPositiveButtonClicked = onRemove,
         onNegativeButtonClicked = onCancel,
     )
@@ -599,3 +617,4 @@ internal const val OFFLINE_SCREEN_SELECTION_MODE_BOTTOM_BAR_TAG =
     "offline_screen:selection_mode_bottom_bar"
 internal const val OFFLINE_SCREEN_SORT_BOTTOM_SHEET_TAG = "offline_screen:sort_bottom_sheet"
 internal const val OFFLINE_SCREEN_TRANSFER_WIDGET = "offline_screen:transfers_widget"
+internal const val OFFLINE_SCREEN_EMPTY_TOP_APP_BAR_TAG = "offline_screen:empty_top_app_bar"
