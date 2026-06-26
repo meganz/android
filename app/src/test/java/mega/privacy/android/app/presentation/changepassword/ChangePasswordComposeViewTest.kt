@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordV
 import mega.privacy.android.app.presentation.changepassword.view.Constants.CHANGE_PASSWORD_BUTTON_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.CONFIRM_PASSWORD_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.LOADING_DIALOG_TEST_TAG
+import mega.privacy.android.app.presentation.changepassword.view.Constants.PARK_ACCOUNT_CONFIRM_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_TEST_TAG
@@ -104,6 +105,39 @@ class ChangePasswordComposeViewTest {
         setComposeContent(ChangePasswordUIState(isResetPasswordMode = true))
 
         composeTestRule.onNodeWithText(R.string.title_enter_new_password).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that toolbar title has correct value when mode is park account`() {
+        setComposeContent(
+            ChangePasswordUIState(isResetPasswordMode = true, isParkAccountMode = true)
+        )
+
+        composeTestRule.onNodeWithText(sharedR.string.park_account_screen_title)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that acknowledgement checkbox is not shown when mode is park account`() {
+        setComposeContent(
+            ChangePasswordUIState(isResetPasswordMode = true, isParkAccountMode = true)
+        )
+
+        composeTestRule.onNodeWithTag(TNC_CHECKBOX_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that park account confirmation dialog is shown when password validation succeeds`() {
+        setComposeContent(
+            ChangePasswordUIState(
+                isResetPasswordMode = true,
+                isParkAccountMode = true,
+                isSaveValidationSuccessful = true,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(PARK_ACCOUNT_CONFIRM_DIALOG_TEST_TAG)
+            .assertIsDisplayed()
     }
 
     @Test

@@ -323,6 +323,7 @@ internal class ChangePasswordViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isResetPasswordMode).isTrue()
+                assertThat(state.isParkAccountMode).isTrue()
             }
         }
 
@@ -338,6 +339,23 @@ internal class ChangePasswordViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isResetPasswordLinkValid).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that park account with a valid link does not show alert when master key is null`() =
+        runTest {
+            val fakeLink = "Link"
+            savedStateHandle[KEY_ACTION] = Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT
+            savedStateHandle[KEY_LINK_TO_RESET] = fakeLink
+            savedStateHandle[IntentConstants.EXTRA_MASTER_KEY] = null
+            initTestClass()
+            underTest.determineIfScreenIsResetPasswordMode()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isParkAccountMode).isTrue()
+                assertThat(state.isShowAlertMessage).isFalse()
             }
         }
 

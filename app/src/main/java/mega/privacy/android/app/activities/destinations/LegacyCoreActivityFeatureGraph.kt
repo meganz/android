@@ -15,6 +15,7 @@ import mega.privacy.android.app.meeting.activity.legacyWaitingRoomScreen
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.audiosection.audioSectionDestination
+import mega.privacy.android.app.presentation.changepassword.navigation.parkAccountDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatLegacyDestination
 import mega.privacy.android.app.presentation.chat.navigation.chatListLegacyDestination
 import mega.privacy.android.app.presentation.chat.navigation.showChatMessagesDestination
@@ -78,6 +79,7 @@ class LegacyCoreActivityFeatureGraph(
             showChatMessagesDestination(navigationHandler)
             manageChatHistoryLegacyDestination(navigationHandler::remove)
             testPasswordLegacyDestination(navigationHandler::back)
+            parkAccountDestination(navigationHandler::back)
             legacyFileLinkScreen(navigationHandler::back)
             legacyExportRecoveryKeyScreen(navigationHandler::back)
             legacyFolderLinkScreen(navigationHandler::back)

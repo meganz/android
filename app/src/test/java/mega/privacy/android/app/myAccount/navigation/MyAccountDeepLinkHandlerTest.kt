@@ -15,7 +15,7 @@ import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.MyAccountNavKey
-import mega.privacy.android.navigation.destination.WebSiteNavKey
+import mega.privacy.android.navigation.destination.ParkAccountNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -185,7 +185,7 @@ class MyAccountDeepLinkHandlerTest {
 
     @ParameterizedTest
     @ValueSource(booleans = [true, false])
-    fun `test that WebSiteNavKey is returned when uri matches RESET_PASSWORD_LINK pattern type and recovery key is not required`(
+    fun `test that ParkAccountNavKey is returned when uri matches RESET_PASSWORD_LINK pattern type and recovery key is not required`(
         isLoggedIn: Boolean,
     ) = runTest {
         val uriString = "mega://resetPassword"
@@ -211,7 +211,7 @@ class MyAccountDeepLinkHandlerTest {
         val actual = underTest
             .getNavKeysInternal(uri, RegexPatternType.RESET_PASSWORD_LINK, isLoggedIn)
 
-        assertThat(actual).containsExactly(WebSiteNavKey(uriString))
+        assertThat(actual).containsExactly(ParkAccountNavKey(link = uriString))
         verifyNoInteractions(snackbarEventQueue)
     }
 

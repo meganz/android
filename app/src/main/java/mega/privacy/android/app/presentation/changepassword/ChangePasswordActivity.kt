@@ -185,9 +185,14 @@ class ChangePasswordActivity : PasscodeActivity() {
         }
 
     private fun navigateToLoginAfterPasswordChanged(errorCode: Int?) {
+        val successMessage = if (viewModel.uiState.value.isParkAccountMode) {
+            getString(sharedR.string.park_account_success_message)
+        } else {
+            getString(R.string.pass_changed_alert)
+        }
         val intent: Intent = MegaActivity.getIntent(
-            this@ChangePasswordActivity,
-            getString(R.string.pass_changed_alert).takeIf {
+            context = this@ChangePasswordActivity,
+            warningMessage = successMessage.takeIf {
                 errorCode == MegaError.API_OK || errorCode == null
             },
         )

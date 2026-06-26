@@ -3,7 +3,6 @@ package mega.privacy.android.app.myAccount.navigation
 import android.net.Uri
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.R
-import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.RegexPatternType
 import mega.privacy.android.domain.entity.RegexPatternType.CANCEL_ACCOUNT_LINK
@@ -14,11 +13,12 @@ import mega.privacy.android.domain.usecase.QueryResetPasswordLinkUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
 import mega.privacy.android.navigation.contract.deeplinks.DeepLinkHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
-import mega.privacy.android.navigation.destination.WebSiteNavKey
+import mega.privacy.android.navigation.destination.ParkAccountNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import javax.inject.Inject
-import mega.privacy.android.shared.resources.R as sharedR
 
 class MyAccountDeepLinkHandler @Inject constructor(
     private val queryResetPasswordLinkUseCase: QueryResetPasswordLinkUseCase,
@@ -64,7 +64,12 @@ class MyAccountDeepLinkHandler @Inject constructor(
                             emptyList()
                         }
 
-                        linkInfo?.isRequiredRecoveryKey == true -> listOf(
+                        linkInfo == null -> {
+                            snackbarEventQueue.queueMessage(sharedR.string.general_text_error)
+                            emptyList()
+                        }
+
+                        linkInfo.isRequiredRecoveryKey -> listOf(
                             if (isLoggedIn) {
                                 MyAccountNavKey(
                                     action = Constants.ACTION_RESET_PASS,
@@ -78,7 +83,7 @@ class MyAccountDeepLinkHandler @Inject constructor(
                             }
                         )
 
-                        else -> listOf(WebSiteNavKey(uri.toString()))
+                        else -> listOf(ParkAccountNavKey(link = uri.toString()))
                     }
                 } else {
                     when (result.exceptionOrNull()) {

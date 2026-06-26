@@ -66,6 +66,7 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants.CONFI
 import mega.privacy.android.app.presentation.changepassword.view.Constants.DISABLED_BUTTON_ALPHA
 import mega.privacy.android.app.presentation.changepassword.view.Constants.ENABLED_BUTTON_ALPHA
 import mega.privacy.android.app.presentation.changepassword.view.Constants.LOADING_DIALOG_TEST_TAG
+import mega.privacy.android.app.presentation.changepassword.view.Constants.PARK_ACCOUNT_CONFIRM_DIALOG_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_BAR_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_STRENGTH_TEST_TAG
 import mega.privacy.android.app.presentation.changepassword.view.Constants.PASSWORD_TEST_TAG
@@ -74,6 +75,7 @@ import mega.privacy.android.app.presentation.changepassword.view.Constants.TNC_C
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.legacy.core.ui.controls.appbar.SimpleTopAppBar
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.legacy.core.ui.controls.text.MegaSpannedText
 import mega.privacy.android.shared.original.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.shared.original.core.ui.model.SpanIndicator
@@ -115,6 +117,11 @@ internal object Constants {
      * Test tag for terms and condition checkbox
      */
     const val TNC_CHECKBOX_TEST_TAG = "tnc_cb_test_tag"
+
+    /**
+     * Test tag for the park-account acknowledgement confirmation dialog
+     */
+    const val PARK_ACCOUNT_CONFIRM_DIALOG_TEST_TAG = "change_password_view:dialog_park_account_confirm"
 
     /**
      * Test tag for password strength
@@ -162,8 +169,11 @@ fun ChangePasswordView(
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
     val strengthAttribute = uiState.passwordStrength.toStrengthAttribute()
-    val title =
-        if (uiState.isResetPasswordMode) R.string.title_enter_new_password else R.string.my_account_change_password
+    val title = when {
+        uiState.isParkAccountMode -> sharedR.string.park_account_screen_title
+        uiState.isResetPasswordMode -> R.string.title_enter_new_password
+        else -> R.string.my_account_change_password
+    }
     val onBackPressedDispatcherOwner = LocalOnBackPressedDispatcherOwner.current
 
     Scaffold(
@@ -192,6 +202,8 @@ fun ChangePasswordView(
         var passwordText: String? by remember { mutableStateOf(null) }
         var confirmPasswordText: String? by remember { mutableStateOf(null) }
         var isTnCChecked by remember { mutableStateOf(false) }
+        var showParkAccountConfirmation by remember { mutableStateOf(false) }
+        var parkAccountPassword by remember { mutableStateOf("") }
         val coroutineScope = rememberCoroutineScope()
         val keyboardController = LocalSoftwareKeyboardController.current
         val noConnectionMessage = stringResource(id = R.string.error_server_connection_problem)
@@ -206,7 +218,7 @@ fun ChangePasswordView(
                     }
                 }
 
-                isTnCChecked.not() -> {
+                uiState.isParkAccountMode.not() && isTnCChecked.not() -> {
                     coroutineScope.launch {
                         snackBarHostState.showAutoDurationSnackbar(notCheckedMessage)
                     }
@@ -315,14 +327,16 @@ fun ChangePasswordView(
                 keyboardActions = KeyboardActions(onNext = { onConfirmPasswordChange() }),
             )
 
-            TnCCheckboxDescription(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 32.dp)
-                    .testTag(TNC_CHECKBOX_TEST_TAG),
-                onLinkClickListener = onTnCLinkClickListener,
-                onCheckChanged = { isTnCChecked = it }
-            )
+            if (uiState.isParkAccountMode.not()) {
+                TnCCheckboxDescription(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 32.dp)
+                        .testTag(TNC_CHECKBOX_TEST_TAG),
+                    onLinkClickListener = onTnCLinkClickListener,
+                    onCheckChanged = { isTnCChecked = it }
+                )
+            }
 
             ChangePasswordActionButtonGroup(
                 modifier = Modifier
@@ -332,7 +346,14 @@ fun ChangePasswordView(
                 isResetPasswordMode = uiState.isResetPasswordMode,
                 isPasswordValidated = uiState.isSaveValidationSuccessful,
                 passwordText = passwordText.orEmpty(),
-                onTriggerResetPassword = onTriggerResetPassword,
+                onTriggerResetPassword = if (uiState.isParkAccountMode) {
+                    { password ->
+                        parkAccountPassword = password
+                        showParkAccountConfirmation = true
+                    }
+                } else {
+                    onTriggerResetPassword
+                },
                 onTriggerChangePassword = onTriggerChangePassword,
                 onAfterPasswordChanged = onResetValidationState,
                 onFinishActivity = onFinishActivity,
@@ -344,6 +365,21 @@ fun ChangePasswordView(
                     modifier = Modifier.testTag(LOADING_DIALOG_TEST_TAG),
                     title = stringResource(id = res),
                     text = stringResource(id = res)
+                )
+            }
+
+            if (showParkAccountConfirmation) {
+                ConfirmationDialog(
+                    modifier = Modifier.testTag(PARK_ACCOUNT_CONFIRM_DIALOG_TEST_TAG),
+                    title = stringResource(id = sharedR.string.park_account_screen_start_button),
+                    text = stringResource(id = sharedR.string.park_account_screen_acknowledge),
+                    confirmButtonText = stringResource(id = sharedR.string.general_ok_only),
+                    cancelButtonText = stringResource(id = sharedR.string.general_dialog_cancel_button),
+                    onConfirm = {
+                        showParkAccountConfirmation = false
+                        onTriggerResetPassword(parkAccountPassword)
+                    },
+                    onDismiss = { showParkAccountConfirmation = false },
                 )
             }
         }
@@ -549,6 +585,35 @@ private fun ResetPasswordViewPreview() {
             uiState = ChangePasswordUIState(
                 isConnectedToNetwork = true,
                 isResetPasswordMode = true,
+                passwordStrength = PasswordStrength.STRONG
+            ),
+            onSnackBarShown = {},
+            onPasswordTextChanged = {},
+            onConfirmPasswordTextChanged = {},
+            onTnCLinkClickListener = {},
+            onTriggerChangePassword = {},
+            onTriggerResetPassword = {},
+            onValidatePassword = {},
+            onValidateOnSave = { _, _ -> },
+            onResetValidationState = {},
+            onAfterPasswordChanged = {},
+            onAfterPasswordReset = { _, _ -> },
+            onPromptedMultiFactorAuth = {},
+            onFinishActivity = {},
+            onShowAlert = {}
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun ParkAccountViewPreview() {
+    OriginalTheme(isSystemInDarkTheme()) {
+        ChangePasswordView(
+            uiState = ChangePasswordUIState(
+                isConnectedToNetwork = true,
+                isResetPasswordMode = true,
+                isParkAccountMode = true,
                 passwordStrength = PasswordStrength.STRONG
             ),
             onSnackBarShown = {},

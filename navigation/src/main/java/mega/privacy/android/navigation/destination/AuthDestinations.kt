@@ -15,6 +15,17 @@ data class LoginNavKey(
 ) : NoSessionNavKey.Mandatory, Parcelable
 
 /**
+ * Park account confirmation screen, opened from a park-account link.
+ *
+ * @param link the park-account confirmation link
+ */
+@Serializable
+@Parcelize
+data class ParkAccountNavKey(
+    val link: String,
+) : NoSessionNavKey.Optional, Parcelable
+
+/**
  * Create Account Screen
  * @param initialEmail if set, the email field will be pre-filled with this value
  */

@@ -210,12 +210,21 @@ internal class ChangePasswordViewModel @Inject constructor(
      * is on either change password or reset password mode
      */
     fun determineIfScreenIsResetPasswordMode() {
-        if (action == Constants.ACTION_RESET_PASS_FROM_LINK || action == Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT) {
-            _uiState.update {
+        when (action) {
+            Constants.ACTION_RESET_PASS_FROM_LINK -> _uiState.update {
                 it.copy(
                     isShowAlertMessage = masterKey.isNullOrBlank() || linkToReset.isNullOrBlank(),
                     isResetPasswordLinkValid = linkToReset != null,
                     isResetPasswordMode = true
+                )
+            }
+
+            Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT -> _uiState.update {
+                it.copy(
+                    isShowAlertMessage = linkToReset.isNullOrBlank(),
+                    isResetPasswordLinkValid = linkToReset != null,
+                    isResetPasswordMode = true,
+                    isParkAccountMode = true
                 )
             }
         }
