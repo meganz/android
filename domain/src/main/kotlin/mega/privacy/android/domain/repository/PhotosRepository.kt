@@ -3,6 +3,8 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
+import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -282,4 +284,31 @@ interface PhotosRepository {
      * Monitor the media in a list of [TypedNode]s.
      */
     val monitorMediaTypedNodes: Flow<List<TypedNode>>
+
+    /**
+     * Get media timeline sections
+     */
+    suspend fun getMediaTimelineSections(filter: MediaTimelineFilter): List<MediaTimelineSection>
+
+    /**
+     * List media timeline nodes for a single [section] using offset-based pagination.
+     *
+     * The query is scoped to the section's date range, so pagination happens independently within
+     * the section: any position can be loaded directly by [offset] without paging through the items
+     * before it.
+     *
+     * @param filter the [MediaTimelineFilter] describing the scope of the media to list
+     * @param section the [MediaTimelineSection] whose media is being paginated
+     * @param order the [SortOrder] to apply to the results
+     * @param maxElements the maximum number of nodes to return for the page (0 = no limit)
+     * @param offset the zero-based index, within the section, of the first node to return
+     * @return the page of media nodes as a list of [TypedFileNode]
+     */
+    suspend fun listMediaNodesByPage(
+        filter: MediaTimelineFilter,
+        section: MediaTimelineSection,
+        order: SortOrder,
+        maxElements: Int,
+        offset: Long,
+    ): List<TypedFileNode>
 }

@@ -53,6 +53,9 @@ import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.TypedFileNodeToImageNodeMapper
 import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineFilterMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineListFilterMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineSectionMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
@@ -65,6 +68,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
+import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.ImageNode
@@ -131,6 +136,9 @@ internal class DefaultPhotosRepository @Inject constructor(
     private val photoMapper: PhotoMapper,
     private val typedNodeMapper: TypedNodeMapper,
     private val typedFileNodeToImageNodeMapper: TypedFileNodeToImageNodeMapper,
+    private val mediaTimelineSectionMapper: MediaTimelineSectionMapper,
+    private val mediaTimelineFilterMapper: MediaTimelineFilterMapper,
+    private val mediaTimelineListFilterMapper: MediaTimelineListFilterMapper,
 ) : PhotosRepository {
     @Volatile
     private var isInitialized: Boolean = false
@@ -313,6 +321,49 @@ internal class DefaultPhotosRepository @Inject constructor(
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = MEDIA_TYPED_NODES_KEEP_ALIVE_MS),
             replay = 1
         )
+
+    override suspend fun getMediaTimelineSections(filter: MediaTimelineFilter) =
+        withContext(ioDispatcher) {
+            val sections = megaApiFacade
+                .groupAllNodesByDate(
+                    mediaTimelineFilterMapper(filter),
+                    MegaApiJava.ORDER_MODIFICATION_DESC,
+                    MegaCancelToken.createInstance()
+                ) ?: return@withContext emptyList()
+
+
+            mediaTimelineSectionMapper(sections)
+        }
+
+    override suspend fun listMediaNodesByPage(
+        filter: MediaTimelineFilter,
+        section: MediaTimelineSection,
+        order: SortOrder,
+        maxElements: Int,
+        offset: Long,
+    ): List<TypedFileNode> = withContext(ioDispatcher) {
+        // Scope the query to this section's date range so pagination stays within the section.
+        val sdkFilter = mediaTimelineListFilterMapper(filter).also {
+            it.byTimestampAnchor(section.startDate, section.endDate, sortOrderIntMapper(order))
+        }
+        val nodeList = megaApiFacade.listAllNodesByPageAtOffset(
+            filter = sdkFilter,
+            order = sortOrderIntMapper(order),
+            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            maxElements = maxElements,
+            offset = offset,
+        ) ?: return@withContext emptyList()
+
+        megaApiFacade.getNodesFromMegaNodeList(nodeList)
+            .mapNotNull { node ->
+                typedNodeMapper(
+                    megaNode = node,
+                    folderTypeData = null,
+                    offline = offlineNodesCache[node.handle.toString()],
+                )
+            }
+            .filterIsInstance<TypedFileNode>()
+    }
 
     @Deprecated("Please consider using monitorMediaTypedNodes")
     override fun monitorPhotos(): Flow<List<Photo>> {

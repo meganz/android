@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.PhotoMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.ImageNodeFileMapper
 import mega.privacy.android.data.mapper.node.ImageNodeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeFromChatMessageMapper
@@ -26,6 +27,9 @@ import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.TypedFileNodeToImageNodeMapper
 import mega.privacy.android.data.mapper.node.TypedNodeMapper
 import mega.privacy.android.data.mapper.photos.ContentConsumptionMegaStringMapMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineFilterMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineListFilterMapper
+import mega.privacy.android.data.mapper.photos.MediaTimelineSectionMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesMapper
 import mega.privacy.android.data.mapper.photos.MegaStringMapSensitivesRetriever
 import mega.privacy.android.data.mapper.photos.TimelineFilterPreferencesJSONMapper
@@ -35,10 +39,13 @@ import mega.privacy.android.data.repository.CancelTokenProvider
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
+import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -53,13 +60,18 @@ import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaCancelToken
+import nz.mega.sdk.MegaDateSectionList
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaGroupNodesByDateFilter
+import nz.mega.sdk.MegaListAllNodesFilter
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaSearchFilter
 import nz.mega.sdk.MegaStringMap
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
@@ -108,6 +120,10 @@ class DefaultPhotosRepositoryTest {
     private val photoMapper = mock<PhotoMapper>()
     private val typedNodeMapper = mock<TypedNodeMapper>()
     private val typedFileNodeToImageNodeMapper = mock<TypedFileNodeToImageNodeMapper>()
+    private val sortOrderIntMapper = mock<SortOrderIntMapper>()
+    private val mediaTimelineSectionMapper = mock<MediaTimelineSectionMapper>()
+    private val mediaTimelineFilterMapper = mock<MediaTimelineFilterMapper>()
+    private val mediaTimelineListFilterMapper = mock<MediaTimelineListFilterMapper>()
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
@@ -115,6 +131,13 @@ class DefaultPhotosRepositoryTest {
     private val defaultVideoType =
         VideoFileTypeInfo(mimeType = "", extension = "video", duration = 120.seconds)
     private val defaultImageType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
+
+    private val mediaTimelineFilter = MediaTimelineFilter(
+        granularity = MediaTimelineFilter.Granularity.Day,
+        category = MediaTimelineFilter.Category.All,
+        location = MediaTimelineFilter.Location.CloudDriveAndVault,
+        sensitivity = MediaTimelineFilter.Sensitivity.ShowAll,
+    )
 
     @Before
     fun setUp() {
@@ -386,6 +409,157 @@ class DefaultPhotosRepositoryTest {
             underTest.clearImageResult(NodeId(99L))
         }
 
+    @Test
+    fun `test that getMediaTimelineSections returns the sections mapped from the gateway result`() =
+        runTest {
+            val sdkFilter = mock<MegaGroupNodesByDateFilter>()
+            val sectionList = mock<MegaDateSectionList>()
+            val sections = listOf(
+                MediaTimelineSection(
+                    groupId = "May 2026",
+                    startDate = 100L,
+                    endDate = 200L,
+                    count = 5L,
+                ),
+            )
+            whenever(mediaTimelineFilterMapper(mediaTimelineFilter)).thenReturn(sdkFilter)
+            whenever(
+                megaApiGateway.groupAllNodesByDate(eq(sdkFilter), any(), anyOrNull())
+            ).thenReturn(sectionList)
+            whenever(mediaTimelineSectionMapper(sectionList)).thenReturn(sections)
+            underTest = createUnderTest()
+
+            val result = mockStatic(MegaCancelToken::class.java).use { mockedStatic ->
+                mockedStatic.`when`<MegaCancelToken> { MegaCancelToken.createInstance() }
+                    .thenReturn(mock())
+                underTest.getMediaTimelineSections(mediaTimelineFilter)
+            }
+
+            assertThat(result).isEqualTo(sections)
+        }
+
+    @Test
+    fun `test that getMediaTimelineSections returns an empty list when the gateway returns null`() =
+        runTest {
+            whenever(mediaTimelineFilterMapper(mediaTimelineFilter))
+                .thenReturn(mock<MegaGroupNodesByDateFilter>())
+            whenever(
+                megaApiGateway.groupAllNodesByDate(any(), any(), anyOrNull())
+            ).thenReturn(null)
+            underTest = createUnderTest()
+
+            val result = mockStatic(MegaCancelToken::class.java).use { mockedStatic ->
+                mockedStatic.`when`<MegaCancelToken> { MegaCancelToken.createInstance() }
+                    .thenReturn(mock())
+                underTest.getMediaTimelineSections(mediaTimelineFilter)
+            }
+
+            assertThat(result).isEmpty()
+            verify(mediaTimelineSectionMapper, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that listMediaNodesByPage returns the mapped file nodes and skips nodes that fail to map`() =
+        runTest {
+            val sdkFilter = mock<MegaListAllNodesFilter>()
+            val nodeList = mock<MegaNodeList>()
+            val mappedMegaNode = createMegaNode(handle = 1L)
+            val unmappableMegaNode = createMegaNode(handle = 2L)
+            val fileNode = mock<TypedFileNode>()
+            val section = MediaTimelineSection(
+                groupId = "May 2026",
+                startDate = 10L,
+                endDate = 99L,
+                count = 5L,
+            )
+            whenever(mediaTimelineListFilterMapper(mediaTimelineFilter)).thenReturn(sdkFilter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(mock())
+            whenever(
+                megaApiGateway.listAllNodesByPageAtOffset(
+                    filter = eq(sdkFilter),
+                    order = any(),
+                    cancelToken = anyOrNull(),
+                    maxElements = any(),
+                    offset = any(),
+                )
+            ).thenReturn(nodeList)
+            whenever(megaApiGateway.getNodesFromMegaNodeList(nodeList))
+                .thenReturn(listOf(mappedMegaNode, unmappableMegaNode))
+            whenever(
+                typedNodeMapper(eq(mappedMegaNode), anyOrNull(), anyOrNull(), any(), any())
+            ).thenReturn(fileNode)
+            whenever(
+                typedNodeMapper(eq(unmappableMegaNode), anyOrNull(), anyOrNull(), any(), any())
+            ).thenReturn(null)
+            underTest = createUnderTest()
+
+            val result = underTest.listMediaNodesByPage(
+                filter = mediaTimelineFilter,
+                section = section,
+                order = SortOrder.ORDER_MODIFICATION_DESC,
+                maxElements = 5,
+                offset = 0L,
+            )
+
+            assertThat(result).containsExactly(fileNode)
+        }
+
+    @Test
+    fun `test that listMediaNodesByPage returns an empty list when the gateway returns null`() =
+        runTest {
+            val section = MediaTimelineSection(
+                groupId = "May 2026",
+                startDate = 10L,
+                endDate = 99L,
+                count = 5L,
+            )
+            whenever(mediaTimelineListFilterMapper(mediaTimelineFilter))
+                .thenReturn(mock<MegaListAllNodesFilter>())
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(mock())
+            whenever(
+                megaApiGateway.listAllNodesByPageAtOffset(any(), any(), anyOrNull(), any(), any())
+            ).thenReturn(null)
+            underTest = createUnderTest()
+
+            val result = underTest.listMediaNodesByPage(
+                filter = mediaTimelineFilter,
+                section = section,
+                order = SortOrder.ORDER_MODIFICATION_DESC,
+                maxElements = 5,
+                offset = 0L,
+            )
+
+            assertThat(result).isEmpty()
+        }
+
+    @Test
+    fun `test that listMediaNodesByPage anchors the query to the section date range`() = runTest {
+        val sdkFilter = mock<MegaListAllNodesFilter>()
+        val section = MediaTimelineSection(
+            groupId = "May 2026",
+            startDate = 10L,
+            endDate = 99L,
+            count = 5L,
+        )
+        whenever(mediaTimelineListFilterMapper(mediaTimelineFilter)).thenReturn(sdkFilter)
+        whenever(sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_DESC)).thenReturn(8)
+        whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(mock())
+        whenever(
+            megaApiGateway.listAllNodesByPageAtOffset(any(), any(), anyOrNull(), any(), any())
+        ).thenReturn(null)
+        underTest = createUnderTest()
+
+        underTest.listMediaNodesByPage(
+            filter = mediaTimelineFilter,
+            section = section,
+            order = SortOrder.ORDER_MODIFICATION_DESC,
+            maxElements = 5,
+            offset = 0L,
+        )
+
+        verify(sdkFilter).byTimestampAnchor(section.startDate, section.endDate, 8)
+    }
+
     private fun createUnderTest() = DefaultPhotosRepository(
         nodeRepository = nodeRepository,
         megaApiFacade = megaApiGateway,
@@ -401,7 +575,7 @@ class DefaultPhotosRepositoryTest {
         imageNodeMapper = imageNodeMapper,
         megaNodeFromChatMessageMapper = megaNodeFromChatMessageMapper,
         cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
-        sortOrderIntMapper = mock(),
+        sortOrderIntMapper = sortOrderIntMapper,
         megaNodeMapper = megaNodeMapper,
         sensitivesMapper = megaStringMapSensitivesMapper,
         sensitivesRetriever = megaStringMapSensitivesRetriever,
@@ -414,6 +588,9 @@ class DefaultPhotosRepositoryTest {
         photoMapper = photoMapper,
         typedNodeMapper = typedNodeMapper,
         typedFileNodeToImageNodeMapper = typedFileNodeToImageNodeMapper,
+        mediaTimelineSectionMapper = mediaTimelineSectionMapper,
+        mediaTimelineFilterMapper = mediaTimelineFilterMapper,
+        mediaTimelineListFilterMapper = mediaTimelineListFilterMapper,
     )
 
     private fun createMegaNode(
