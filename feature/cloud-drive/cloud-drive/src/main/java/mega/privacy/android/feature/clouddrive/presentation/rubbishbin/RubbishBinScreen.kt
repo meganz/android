@@ -2,8 +2,12 @@ package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,6 +34,8 @@ import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.menu.MenuActionWithClick
+import mega.android.core.ui.modifiers.calculateSafeBottomPadding
+import mega.android.core.ui.modifiers.excludingBottomPadding
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.MultiNodeActionHandler
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
@@ -47,6 +53,11 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SearchNavKey
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
+import mega.privacy.android.shared.account.overquota.OverQuotaStatusViewModel
+import mega.privacy.android.shared.account.overquota.model.OverQuotaIssue
+import mega.privacy.android.shared.account.overquota.view.OverQuotaErrorBanner
+import mega.privacy.android.shared.account.overquota.view.OverQuotaWarningBanner
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodeSkeletons
 import mega.privacy.android.shared.nodes.components.NodesView
@@ -73,11 +84,14 @@ internal fun RubbishBinScreen(
         hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
             creationCallback = { it.create(NodeSourceType.RUBBISH_BIN) }
         ),
+    overQuotaStatusViewModel: OverQuotaStatusViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
+    val megaNavigator = rememberMegaNavigator()
     val onBackPressedDispatcher =
         LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val overQuotaUiState by overQuotaStatusViewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackBarHostState.current
     val coroutineScope = rememberCoroutineScope()
     val multiNodeActionHandler: MultiNodeActionHandler = rememberMultiNodeActionHandler(
@@ -198,65 +212,98 @@ internal fun RubbishBinScreen(
             )
         },
     ) { innerPadding ->
-        when {
-            uiState.isLoading -> {
-                NodesViewSkeleton(
-                    contentPadding = innerPadding,
-                    isListView = uiState.currentViewType == ViewType.LIST,
-                    spanCount = spanCount,
-                    delay = NodeSkeletons.defaultDelay,
-                )
-            }
-
-            uiState.items.isEmpty() && uiState.nodesLoadingState == NodesLoadingState.FullyLoaded -> {
-                EmptyStateView(
-                    modifier = Modifier
-                        .testTag(NODES_EMPTY_VIEW_VISIBLE),
-                    imagePainter = painterResource(
-                        if (isRootDirectory) {
-                            iconPackR.drawable.ic_empty_trash_glass
-                        } else {
-                            iconPackR.drawable.ic_empty_folder_glass
-                        }
-                    ),
-                    title = stringResource(
-                        if (isRootDirectory) {
-                            sharedR.string.annotated_empty_rubbish_bin_menu
-                        } else {
-                            sharedR.string.annotated_empty_folder
-                        }
+        val showOverQuotaWarning =
+            overQuotaUiState.overQuotaStatus.severity is OverQuotaIssue.Severity.Warning && overQuotaUiState.shouldShowWarning
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding.excludingBottomPadding())
+        ) {
+            OverQuotaErrorBanner(
+                overQuotaStatus = overQuotaUiState.overQuotaStatus,
+                onUpgradeClicked = {
+                    megaNavigator.openUpgradeAccount(context)
+                },
+            )
+            when {
+                uiState.isLoading -> {
+                    NodesViewSkeleton(
+                        contentPadding = PaddingValues(),
+                        isListView = uiState.currentViewType == ViewType.LIST,
+                        spanCount = spanCount,
+                        delay = NodeSkeletons.defaultDelay,
                     )
-                )
-            }
+                }
 
-            else -> {
-                NodesView(
-                    items = uiState.items,
-                    listContentPadding = innerPadding,
-                    onMenuClicked = { nodeUiItem ->
-                        navigationHandler.navigate(
-                            NodeOptionsBottomSheetNavKey(
-                                nodeHandle = nodeUiItem.node.id.longValue,
-                                nodeSourceType = NodeSourceType.RUBBISH_BIN,
-                                partiallyExpand = false
-                            )
+                uiState.items.isEmpty() && uiState.nodesLoadingState == NodesLoadingState.FullyLoaded -> {
+                    EmptyStateView(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .testTag(NODES_EMPTY_VIEW_VISIBLE),
+                        imagePainter = painterResource(
+                            if (isRootDirectory) {
+                                iconPackR.drawable.ic_empty_trash_glass
+                            } else {
+                                iconPackR.drawable.ic_empty_folder_glass
+                            }
+                        ),
+                        title = stringResource(
+                            if (isRootDirectory) {
+                                sharedR.string.annotated_empty_rubbish_bin_menu
+                            } else {
+                                sharedR.string.annotated_empty_folder
+                            }
                         )
-                    },
-                    onItemClicked = { nodeUiItem ->
-                        viewModel.onItemClicked(nodeUiItem)
-                    },
-                    onLongClicked = { nodeUiItem ->
-                        viewModel.onItemLongClicked(nodeUiItem)
-                    },
-                    sortConfiguration = uiState.sortConfiguration,
-                    isListView = uiState.currentViewType == ViewType.LIST,
-                    onSortOrderClick = { showSortBottomSheet = true },
-                    onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
-                    spanCount = spanCount,
-                    showHiddenNodes = true,
-                    isHiddenNodesEnabled = uiState.accountType?.isPaid == true && !uiState.isBusinessAccountExpired,
-                    inSelectionMode = uiState.isInSelectionMode,
-                )
+                    )
+                }
+
+                else -> {
+                    NodesView(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        items = uiState.items,
+                        listContentPadding = PaddingValues(
+                            bottom = innerPadding.calculateSafeBottomPadding()
+                        ),
+                        onMenuClicked = { nodeUiItem ->
+                            navigationHandler.navigate(
+                                NodeOptionsBottomSheetNavKey(
+                                    nodeHandle = nodeUiItem.node.id.longValue,
+                                    nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                                    partiallyExpand = false
+                                )
+                            )
+                        },
+                        onItemClicked = { nodeUiItem ->
+                            viewModel.onItemClicked(nodeUiItem)
+                        },
+                        onLongClicked = { nodeUiItem ->
+                            viewModel.onItemLongClicked(nodeUiItem)
+                        },
+                        sortConfiguration = uiState.sortConfiguration,
+                        isListView = uiState.currentViewType == ViewType.LIST,
+                        onSortOrderClick = { showSortBottomSheet = true },
+                        onChangeViewTypeClicked = viewModel::onChangeViewTypeClicked,
+                        spanCount = spanCount,
+                        showHiddenNodes = true,
+                        isHiddenNodesEnabled = uiState.accountType?.isPaid == true && !uiState.isBusinessAccountExpired,
+                        inSelectionMode = uiState.isInSelectionMode,
+                        bannerHeader = if (showOverQuotaWarning) {
+                            {
+                                OverQuotaWarningBanner(
+                                    overQuotaUiState.overQuotaStatus,
+                                    onDismissed = {
+                                        overQuotaStatusViewModel.dismissWarning()
+                                    },
+                                    onUpgradeClicked = {
+                                        megaNavigator.openUpgradeAccount(context)
+                                    },
+                                )
+                            }
+                        } else null,
+                    )
+                }
             }
         }
     }
