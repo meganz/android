@@ -19,8 +19,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,10 +38,12 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDotName
 import mega.privacy.android.domain.usecase.node.CheckForValidNameUseCase.Companion.isInvalidDoubleDotName
@@ -74,6 +79,8 @@ class AlbumImportViewModel @AssistedInject constructor(
     private val getPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase,
     private val getCurrentStorageStateUseCase: GetCurrentStorageStateUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     @ApplicationContext private val context: Context,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @Assisted private val albumLink: String?,
@@ -104,9 +111,13 @@ class AlbumImportViewModel @AssistedInject constructor(
         viewModelScope.launch {
             monitorNetworkConnection()
             handleSharedAlbumLink()
-            validateLink()
 
             val isLogin = hasCredentialsUseCase()
+            if (isLogin) {
+                awaitFetchNodes()
+            }
+            validateLink()
+
             if (isLogin) {
                 getStorageState()
                 loadUserAlbums()
@@ -165,6 +176,25 @@ class AlbumImportViewModel @AssistedInject constructor(
 
         if (isNetworkConnected) return
         cancelImportAlbum()
+    }
+
+    /**
+     * Suspend until the SDK has finished fetching nodes, so the public album fetch does not
+     * race the cold-start session resume. Returns immediately if nodes already exist (warm
+     * start) or if connectivity is lost (let the fetch fail and surface the normal error).
+     */
+    private suspend fun awaitFetchNodes() {
+        val rootNodeExists = runCatching { rootNodeExistsUseCase() }
+            .onFailure { Timber.e(it) }
+            .getOrDefault(false)
+        if (rootNodeExists) return
+
+        runCatching {
+            merge(
+                monitorFetchNodesFinishUseCase().filter { it },
+                monitorConnectivityUseCase().filter { !it },
+            ).first()
+        }.onFailure { Timber.e(it) }
     }
 
     private suspend fun validateLink() {
