@@ -15,16 +15,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -332,6 +336,14 @@ fun TextEditorScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .navigationBarsPadding()
+                // Match the top bar's horizontal safe area (it uses safeDrawing) so the content and
+                // fast-scroll thumb stay clear of the landscape display cutout instead of running
+                // under it while the toolbar is inset — keeping the back button/title aligned with
+                // the text. Reading the same safeDrawing channel as the toolbar also ensures the
+                // inset recomputes on a portrait→landscape rotation, which displayCutout did not
+                // (AND-23925). navigationBarsPadding above consumes the nav-bar inset first, so this
+                // only adds the cutout portion and never double-pads the side bars.
+                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
                 .nestedScroll(scrollBarState.scrollConnection)
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
