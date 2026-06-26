@@ -126,16 +126,18 @@ class MegaActivityIntentActionHandler @Inject constructor(
             }
 
             Intent.ACTION_SEND_MULTIPLE, Intent.ACTION_SEND -> {
-                if (intent.action == Intent.ACTION_SEND
-                    && intent.type == Constants.TYPE_TEXT_PLAIN
-                ) {
-                    buildShareTextNavKey(intent)?.let { navKey ->
-                        navigationEventQueue.emit(navKey)
-                    } ?: Timber.w("Action send text but nothing to share")
-                } else {
-                    getShareUris(intent)?.let { shareUris ->
+                val shareUris = getShareUris(intent)
+                when {
+                    shareUris != null ->
                         navigationEventQueue.emit(ShareFilesToMegaNavKey(shareUris))
-                    } ?: Timber.w("Action send or send multiple but nothing to share")
+
+                    intent.action == Intent.ACTION_SEND
+                            && intent.type == Constants.TYPE_TEXT_PLAIN ->
+                        buildShareTextNavKey(intent)?.let { navKey ->
+                            navigationEventQueue.emit(navKey)
+                        } ?: Timber.w("Action send text but nothing to share")
+
+                    else -> Timber.w("Action send or send multiple but nothing to share")
                 }
                 intent.action = null
                 intent.removeExtra(Intent.EXTRA_STREAM)

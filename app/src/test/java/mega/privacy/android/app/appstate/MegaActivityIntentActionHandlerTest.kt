@@ -256,6 +256,44 @@ class MegaActivityIntentActionHandlerTest {
         }
 
     @Test
+    fun `test that handleAction emits ShareFilesToMegaNavKey when action is ACTION_SEND with text plain type but EXTRA_STREAM is present`() =
+        runTest {
+            val uriString = "content://test.txt"
+            val uri = mock<Uri> {
+                on { toString() } doReturn uriString
+            }
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND)
+            whenever(intent.type).thenReturn(Constants.TYPE_TEXT_PLAIN)
+            whenever(intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)).thenReturn(uri)
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue)
+                .emit(ShareFilesToMegaNavKey(listOf(UriPath(uriString))))
+        }
+
+    @Test
+    fun `test that handleAction emits ShareFilesToMegaNavKey when action is ACTION_SEND_MULTIPLE with text plain type and EXTRA_STREAM is present`() =
+        runTest {
+            val firstUri = mock<Uri> { on { toString() } doReturn "content://first.txt" }
+            val secondUri = mock<Uri> { on { toString() } doReturn "content://second.txt" }
+            val intent = mock<Intent>()
+            whenever(intent.action).thenReturn(Intent.ACTION_SEND_MULTIPLE)
+            whenever(intent.type).thenReturn(Constants.TYPE_TEXT_PLAIN)
+            whenever(intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM))
+                .thenReturn(arrayListOf(firstUri, secondUri))
+
+            underTest.handleAction(intent, {})
+
+            verify(navigationEventQueue).emit(
+                ShareFilesToMegaNavKey(
+                    listOf(UriPath("content://first.txt"), UriPath("content://second.txt"))
+                )
+            )
+        }
+
+    @Test
     fun `test that handleAction navigates to upload when shortcut upload and connected`() =
         runTest {
             val intent = mock<Intent>()
