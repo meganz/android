@@ -7,14 +7,18 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
@@ -24,10 +28,12 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.HasCredentialsUseCase
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.GetCurrentStorageStateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.GetPublicAlbumNodesDataUseCase
@@ -47,7 +53,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -74,6 +83,8 @@ class AlbumImportViewModelTest {
     private val mockGetPublicAlbumNodesDataUseCase: GetPublicAlbumNodesDataUseCase = mock()
     private val mockGetCurrentStorageStateUseCase: GetCurrentStorageStateUseCase = mock()
     private val mockGetFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
+    private val mockRootNodeExistsUseCase: RootNodeExistsUseCase = mock()
+    private val mockMonitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase = mock()
     private val mockContext: Context = mock()
     private val mockPhotoUiStateMapper: PhotoUiStateMapper = mock()
 
@@ -102,10 +113,18 @@ class AlbumImportViewModelTest {
             getPublicAlbumNodesDataUseCase = mockGetPublicAlbumNodesDataUseCase,
             getCurrentStorageStateUseCase = mockGetCurrentStorageStateUseCase,
             getFeatureFlagValueUseCase = mockGetFeatureFlagValueUseCase,
+            rootNodeExistsUseCase = mockRootNodeExistsUseCase,
+            monitorFetchNodesFinishUseCase = mockMonitorFetchNodesFinishUseCase,
             context = mockContext,
             defaultDispatcher = testDispatcher,
             albumLink = albumLink,
         )
+    }
+
+    private suspend fun stubFetchNodesState() {
+        whenever(mockGetUserAlbums()).thenReturn(emptyFlow())
+        whenever(mockMonitorAccountDetailUseCase()).thenReturn(emptyFlow())
+        whenever(mockGetCurrentStorageStateUseCase()).thenReturn(StorageState.Unknown)
     }
 
     @AfterEach
@@ -122,6 +141,8 @@ class AlbumImportViewModelTest {
             mockMonitorConnectivityUseCase,
             mockGetPublicNodeFromSerializedDataUseCase,
             mockGetPublicAlbumNodesDataUseCase,
+            mockRootNodeExistsUseCase,
+            mockMonitorFetchNodesFinishUseCase,
         )
     }
 
@@ -170,6 +191,75 @@ class AlbumImportViewModelTest {
             assertThat(awaitItem().album).isEqualTo(album)
         }
     }
+
+    @Test
+    fun `test that fetch public album waits for fetch nodes finish when logged in and root node does not exist`() =
+        runTest {
+            val link = "https://mega.app/collection/handle#key"
+            val album = mock<UserAlbum>()
+            val fetchNodesFinish = MutableStateFlow(false)
+
+            whenever(mockHasCredentialsUseCase()).thenReturn(true)
+            whenever(mockRootNodeExistsUseCase()).thenReturn(false)
+            whenever(mockMonitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
+            whenever(mockMonitorFetchNodesFinishUseCase()).thenReturn(fetchNodesFinish)
+            whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(link)))
+                .thenReturn(album to listOf())
+            whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+                .thenReturn(listOf())
+            stubFetchNodesState()
+
+            initUnderTest(albumLink = link)
+            advanceUntilIdle()
+
+            verify(mockGetPublicAlbumUseCase, never()).invoke(albumLink = AlbumLink(link))
+
+            fetchNodesFinish.value = true
+            advanceUntilIdle()
+
+            verify(mockGetPublicAlbumUseCase).invoke(albumLink = AlbumLink(link))
+        }
+
+    @Test
+    fun `test that fetch public album proceeds immediately when logged in and root node exists`() =
+        runTest {
+            val link = "https://mega.app/collection/handle#key"
+            val album = mock<UserAlbum>()
+
+            whenever(mockHasCredentialsUseCase()).thenReturn(true)
+            whenever(mockRootNodeExistsUseCase()).thenReturn(true)
+            whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(link)))
+                .thenReturn(album to listOf())
+            whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+                .thenReturn(listOf())
+            stubFetchNodesState()
+
+            initUnderTest(albumLink = link)
+            advanceUntilIdle()
+
+            verify(mockGetPublicAlbumUseCase).invoke(albumLink = AlbumLink(link))
+            verifyNoInteractions(mockMonitorFetchNodesFinishUseCase)
+        }
+
+    @Test
+    fun `test that fetch public album does not wait for fetch nodes finish when not logged in`() =
+        runTest {
+            val link = "https://mega.app/collection/handle#key"
+            val album = mock<UserAlbum>()
+
+            whenever(mockHasCredentialsUseCase()).thenReturn(false)
+            whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(link)))
+                .thenReturn(album to listOf())
+            whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+                .thenReturn(listOf())
+
+            initUnderTest(albumLink = link)
+            advanceUntilIdle()
+
+            verify(mockGetPublicAlbumUseCase).invoke(albumLink = AlbumLink(link))
+            verifyNoInteractions(mockRootNodeExistsUseCase)
+            verifyNoInteractions(mockMonitorFetchNodesFinishUseCase)
+        }
 
     @Test
     fun `test that close decryption key dialog works properly`() = runTest {
