@@ -383,6 +383,7 @@ class MegaActivity : FragmentActivity() {
                                     StartTransferComponent(
                                         event = transferState.transferEvent,
                                         onConsumeEvent = appTransferViewModel::consumedTransferEvent,
+                                        isPasscodeLocked = passcodeState is PasscodeCheckState.Locked,
                                     )
 
                                     if (currentNavKey !is HomeScreensNavKey && (currentNavKey == null || !navigationHandler.isFetchNodeDestination(
