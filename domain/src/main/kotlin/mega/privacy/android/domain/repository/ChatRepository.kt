@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.chat.notification.ChatMessageNotificat
 import mega.privacy.android.domain.entity.chat.room.update.ChatRoomMessageUpdate
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.settings.ChatSettings
 
 /**
  * Chat repository
@@ -406,6 +407,27 @@ interface ChatRepository {
      * Reset chat settings if not initialized yet.
      */
     suspend fun resetChatSettings()
+
+    /**
+     * Monitor the chat settings.
+     *
+     * @return a [Flow] of [ChatSettings], emitting null if no chat settings are stored.
+     */
+    fun monitorChatSettings(): Flow<ChatSettings?>
+
+    /**
+     * Get the stored chat settings.
+     *
+     * @return the stored [ChatSettings], or null if none are stored.
+     */
+    suspend fun getChatSettings(): ChatSettings?
+
+    /**
+     * Store the given chat settings.
+     *
+     * @param chatSettings the [ChatSettings] to store.
+     */
+    suspend fun setChatSettings(chatSettings: ChatSettings)
 
     /**
      * Signal chat presence activity

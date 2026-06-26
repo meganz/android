@@ -7,7 +7,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
-import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.qualifier.DatabaseDispatcher
 import nz.mega.sdk.MegaApiJava.ORDER_CREATION_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_CREATION_DESC
@@ -179,15 +178,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.get().lastPublicHandleType = type
     }
 
-    override suspend fun getChatSettings(): ChatSettings? = withContext(databaseDispatcher) {
-        dbHandler.get().chatSettings
-    }
-
-    override suspend fun setChatSettings(chatSettings: ChatSettings) =
-        withContext(databaseDispatcher) {
-            dbHandler.get().chatSettings = chatSettings
-        }
-
     override suspend fun clearPreferences() = withContext(databaseDispatcher) {
         dbHandler.get().clearPreferences()
     }
@@ -214,10 +204,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun clearAttributes() = withContext(databaseDispatcher) {
         dbHandler.get().clearAttributes()
-    }
-
-    override suspend fun clearChatSettings() = withContext(databaseDispatcher) {
-        dbHandler.get().clearChatSettings()
     }
 
     override suspend fun setTransferQueueStatus(isPause: Boolean) =

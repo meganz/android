@@ -3,7 +3,6 @@ package mega.privacy.android.data.gateway
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.Contact
-import mega.privacy.android.domain.entity.settings.ChatSettings
 
 /**
  * Mega local storage gateway
@@ -196,18 +195,6 @@ interface MegaLocalStorageGateway {
     suspend fun setLastPublicHandleType(type: Int)
 
     /**
-     * Gets chat settings.
-     */
-    suspend fun getChatSettings(): ChatSettings?
-
-    /**
-     * Sets chat settings.
-     *
-     * @param chatSettings [ChatSettings]
-     */
-    suspend fun setChatSettings(chatSettings: ChatSettings)
-
-    /**
      * Clear preferences
      */
     suspend fun clearPreferences()
@@ -241,11 +228,6 @@ interface MegaLocalStorageGateway {
      * clears attributes.
      */
     suspend fun clearAttributes()
-
-    /**
-     * Clears chat settings.
-     */
-    suspend fun clearChatSettings()
 
     /**
      * Set transfer queue status

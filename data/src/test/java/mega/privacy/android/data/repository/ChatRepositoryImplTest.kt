@@ -21,6 +21,7 @@ import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
@@ -161,6 +162,7 @@ class ChatRepositoryImplTest {
         chatListItemChangesMapper = chatListItemChangesMapper
     )
     private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
+    private val chatSettingsPreferenceGateway = mock<ChatSettingsPreferenceGateway>()
 
     @BeforeAll
     fun init() {
@@ -208,6 +210,7 @@ class ChatRepositoryImplTest {
             context = context,
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
             inviteContactRequestMapper = inviteContactRequestMapper,
+            chatSettingsPreferenceGateway = chatSettingsPreferenceGateway,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)

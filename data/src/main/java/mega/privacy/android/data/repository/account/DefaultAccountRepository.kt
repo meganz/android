@@ -40,6 +40,7 @@ import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
@@ -176,6 +177,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val fileGateway: FileGateway,
     private val recoveryKeyToFileMapper: RecoveryKeyToFileMapper,
     private val cameraUploadsSettingsPreferenceGateway: CameraUploadsSettingsPreferenceGateway,
+    private val chatSettingsPreferenceGateway: ChatSettingsPreferenceGateway,
     private val cookieSettingsMapper: CookieSettingsMapper,
     private val cookieSettingsIntMapper: CookieSettingsIntMapper,
     private val credentialsPreferencesGateway: Lazy<CredentialsPreferencesGateway>,
@@ -775,8 +777,8 @@ internal class DefaultAccountRepository @Inject constructor(
             clearNonContacts()
             clearChatItems()
             clearAttributes()
-            clearChatSettings()
         }
+        chatSettingsPreferenceGateway.clearPreferences()
         credentialsPreferencesGateway.get().clear()
         megaLocalRoomGateway.deleteAllBackups()
         megaLocalRoomGateway.deleteAllCompletedTransfers()

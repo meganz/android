@@ -20,6 +20,7 @@ import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CameraUploadsSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.gateway.preferences.CredentialsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.EphemeralCredentialsGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
@@ -142,6 +143,7 @@ class DefaultAccountRepositoryTest {
     private val recoveryKeyToFileMapper = mock<RecoveryKeyToFileMapper>()
     private val cameraUploadsSettingsPreferenceGateway =
         mock<CameraUploadsSettingsPreferenceGateway>()
+    private val chatSettingsPreferenceGateway = mock<ChatSettingsPreferenceGateway>()
     private val cookieSettingsMapper = mock<CookieSettingsMapper>()
     private val cookieSettingsIntMapper = mock<CookieSettingsIntMapper>()
     private val credentialsPreferencesGateway = mock<CredentialsPreferencesGateway>()
@@ -217,6 +219,7 @@ class DefaultAccountRepositoryTest {
             fileGateway,
             recoveryKeyToFileMapper,
             cameraUploadsSettingsPreferenceGateway,
+            chatSettingsPreferenceGateway,
             cookieSettingsMapper,
             cookieSettingsIntMapper,
             credentialsPreferencesGateway,
@@ -263,6 +266,7 @@ class DefaultAccountRepositoryTest {
             fileGateway = fileGateway,
             recoveryKeyToFileMapper = recoveryKeyToFileMapper,
             cameraUploadsSettingsPreferenceGateway = cameraUploadsSettingsPreferenceGateway,
+            chatSettingsPreferenceGateway = chatSettingsPreferenceGateway,
             cookieSettingsMapper = cookieSettingsMapper,
             cookieSettingsIntMapper = cookieSettingsIntMapper,
             credentialsPreferencesGateway = { credentialsPreferencesGateway },
@@ -1085,7 +1089,7 @@ class DefaultAccountRepositoryTest {
             verify(localStorageGateway).clearChatItems()
             verify(localStorageGateway).clearAttributes()
             verify(megaLocalRoomGateway).deleteAllCompletedTransfers()
-            verify(localStorageGateway).clearChatSettings()
+            verify(chatSettingsPreferenceGateway).clearPreferences()
             verify(megaLocalRoomGateway).deleteAllBackups()
             verify(cameraUploadsSettingsPreferenceGateway).clearPreferences()
         }

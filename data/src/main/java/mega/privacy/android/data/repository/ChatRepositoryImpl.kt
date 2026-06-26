@@ -36,6 +36,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
@@ -172,6 +173,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val inviteContactRequestMapper: InviteContactRequestMapper,
+    private val chatSettingsPreferenceGateway: ChatSettingsPreferenceGateway,
 ) : ChatRepository {
     private val richLinkConfig = MutableStateFlow(RichLinkConfig())
     private var chatRoomUpdates: HashMap<Long, Flow<ChatRoomUpdate>> = hashMapOf()
@@ -728,9 +730,20 @@ internal class ChatRepositoryImpl @Inject constructor(
         .shareIn(sharingScope, SharingStarted.WhileSubscribed(), replay = 1)
 
     override suspend fun resetChatSettings() = withContext(ioDispatcher) {
-        if (localStorageGateway.getChatSettings() == null) {
-            localStorageGateway.setChatSettings(ChatSettings())
+        if (chatSettingsPreferenceGateway.getChatSettings() == null) {
+            chatSettingsPreferenceGateway.setChatSettings(ChatSettings())
         }
+    }
+
+    override fun monitorChatSettings(): Flow<ChatSettings?> =
+        chatSettingsPreferenceGateway.monitorChatSettings()
+
+    override suspend fun getChatSettings(): ChatSettings? = withContext(ioDispatcher) {
+        chatSettingsPreferenceGateway.getChatSettings()
+    }
+
+    override suspend fun setChatSettings(chatSettings: ChatSettings) = withContext(ioDispatcher) {
+        chatSettingsPreferenceGateway.setChatSettings(chatSettings)
     }
 
     override suspend fun signalPresenceActivity() =
@@ -898,7 +911,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         defaultSound: String?,
     ) = withContext(ioDispatcher) {
         chatMessageNotificationBehaviourMapper(
-            localStorageGateway.getChatSettings(),
+            chatSettingsPreferenceGateway.getChatSettings(),
             beep,
             defaultSound
         )
