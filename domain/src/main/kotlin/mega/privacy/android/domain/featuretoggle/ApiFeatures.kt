@@ -59,6 +59,15 @@ enum class ApiFeatures(
     ),
 
     /**
+     * Share & Manage link revamp
+     */
+    ShareLinkRevamp(
+        "slink",
+        "Enable the Share & Manage link revamp screens",
+        false,
+    ),
+
+    /**
      * Enabled rewarded ads in public link screens. AND-21960
      */
     RewardedAds(
