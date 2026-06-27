@@ -40,7 +40,7 @@ internal class ScannerModelDownloadWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result = try {
-        modelProvider.ensureModelReady { downloaded, total ->
+        modelProvider.ensureModelReady().collect { (downloaded, total) ->
             setProgress(
                 workDataOf(
                     KEY_BYTES_DOWNLOADED to downloaded,

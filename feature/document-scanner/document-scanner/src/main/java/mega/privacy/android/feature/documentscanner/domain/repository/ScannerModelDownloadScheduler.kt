@@ -1,7 +1,10 @@
 package mega.privacy.android.feature.documentscanner.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelDownloadState
+
 /**
- * Schedules the background download of the scanner model.
+ * Schedules and observes the background download of the scanner model.
  *
  * The job is enqueued as unique work, so repeatedly asking to download (e.g.
  * tapping "Scan" several times) keeps the in-flight download rather than
@@ -19,4 +22,13 @@ interface ScannerModelDownloadScheduler {
      * waits on.
      */
     suspend fun enqueueModelDownload(requireUnmeteredNetwork: Boolean)
+
+    /**
+     * Observes the state of the unique model-download job so the prepare screen
+     * can render progress and react to success or failure.
+     *
+     * Emits [ScannerModelDownloadState.Pending] when there is no job yet or it is
+     * still waiting on its constraints.
+     */
+    fun monitorModelDownload(): Flow<ScannerModelDownloadState>
 }

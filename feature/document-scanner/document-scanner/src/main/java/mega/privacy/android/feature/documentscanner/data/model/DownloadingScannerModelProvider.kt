@@ -4,7 +4,9 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.feature.documentscanner.di.ScannerModelHttpClient
 import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelProvider
@@ -41,15 +43,13 @@ internal class DownloadingScannerModelProvider @Inject constructor(
     override fun cachedModelFile(): File? =
         modelFile.takeIf { it.isFile && it.length() == MODEL_SIZE_BYTES }
 
-    override suspend fun ensureModelReady(
-        onProgress: suspend (downloadedBytes: Long, totalBytes: Long) -> Unit,
-    ): File = withContext(ioDispatcher) {
+    override fun ensureModelReady(): Flow<Pair<Long, Long>> = flow {
         cachedModelFile()?.let { cached ->
             Timber.d("[DocScanner][model] Using cached model at ${cached.absolutePath}")
-            return@withContext cached
+            return@flow
         }
-        download(onProgress)
-    }
+        download { downloaded, total -> emit(downloaded to total) }
+    }.flowOn(ioDispatcher)
 
     private suspend fun download(
         onProgress: suspend (downloadedBytes: Long, totalBytes: Long) -> Unit,
