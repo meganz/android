@@ -52,6 +52,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
+import mega.privacy.android.domain.usecase.featureflag.ClearPersistedFeatureFlagsUseCase
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
@@ -133,6 +134,7 @@ internal class LoginViewModelTest {
     private val monitorMiscLoadedFlow = MutableSharedFlow<Boolean>()
     private val decodeGoogleIdTokenUseCase: DecodeGoogleIdTokenUseCase = mock()
     private val createAccountUseCase: CreateAccountUseCase = mock()
+    private val clearPersistedFeatureFlagsUseCase = mock<ClearPersistedFeatureFlagsUseCase>()
 
     @BeforeEach
     fun setUp() = runTest {
@@ -175,6 +177,7 @@ internal class LoginViewModelTest {
             fetchNodeProvider = mock(),
             decodeGoogleIdTokenUseCase = decodeGoogleIdTokenUseCase,
             createAccountUseCase = createAccountUseCase,
+            clearPersistedFeatureFlagsUseCase = clearPersistedFeatureFlagsUseCase,
         )
     }
 
@@ -697,6 +700,18 @@ internal class LoginViewModelTest {
 
         verify(loginUseCase).invoke(eq(googleResult.email), eq(googleResult.sub), any())
         verifyNoInteractions(createAccountUseCase)
+    }
+
+    @Test
+    fun `test that clearPersistedFeatureFlagsUseCase is invoked on login success`() = runTest {
+        whenever(decodeGoogleIdTokenUseCase("fake.jwt.token")).thenReturn(googleResult)
+        whenever(loginUseCase(eq(googleResult.email), eq(googleResult.sub), any()))
+            .thenReturn(flowOf(LoginStatus.LoginSucceed))
+
+        underTest.onGoogleSignIn("fake.jwt.token")
+        advanceUntilIdle()
+
+        verify(clearPersistedFeatureFlagsUseCase).invoke()
     }
 
     @Test

@@ -67,6 +67,7 @@ import mega.privacy.android.domain.usecase.account.ResendVerificationEmailUseCas
 import mega.privacy.android.domain.usecase.account.ResumeCreateAccountUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitReasonsUseCase
+import mega.privacy.android.domain.usecase.featureflag.ClearPersistedFeatureFlagsUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
 import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
@@ -133,6 +134,7 @@ class LoginViewModel @Inject constructor(
     private val accountBlockedTypeStringMapper: AccountBlockedTypeStringMapper,
     private val decodeGoogleIdTokenUseCase: DecodeGoogleIdTokenUseCase,
     private val createAccountUseCase: CreateAccountUseCase,
+    private val clearPersistedFeatureFlagsUseCase: ClearPersistedFeatureFlagsUseCase,
 ) : ViewModel() {
     private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
@@ -182,7 +184,12 @@ class LoginViewModel @Inject constructor(
                 if (ephemeral != null && !ephemeral.session.isNullOrEmpty()) {
                     if (ephemeral.session == GOOGLE_SIGN_IN_PENDING_SESSION) {
                         runCatching { clearEphemeralCredentialsUseCase() }
-                            .onFailure { Timber.e(it, "[GSIGN] Failed to clear Google ephemeral credentials") }
+                            .onFailure {
+                                Timber.e(
+                                    it,
+                                    "[GSIGN] Failed to clear Google ephemeral credentials"
+                                )
+                            }
                         setPendingFragmentToShow(LoginScreen.LoginScreen)
                         return@launch
                     } else {
@@ -795,6 +802,7 @@ class LoginViewModel @Inject constructor(
                     multiFactorAuthState = null
                 )
             }
+            clearFeatureFlagCache()
             sendAnalyticsEventIfFirstTimeLogin(email)
         }
 
@@ -815,6 +823,16 @@ class LoginViewModel @Inject constructor(
 
         is LoginStatus.LoginWaiting -> {
             Timber.d("Login waiting")
+        }
+    }
+
+    private fun clearFeatureFlagCache() {
+        viewModelScope.launch {
+            runCatching {
+                clearPersistedFeatureFlagsUseCase()
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

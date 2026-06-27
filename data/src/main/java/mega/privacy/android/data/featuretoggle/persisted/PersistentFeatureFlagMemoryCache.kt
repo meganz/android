@@ -4,22 +4,17 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.data.gateway.featuretoggle.PersistedFeatureFlagSnapshotGateway
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
-import mega.privacy.android.domain.featuretoggle.qualifier.DefaultFeatureFlagProviders
 import mega.privacy.android.domain.featuretoggle.qualifier.PersistedFeatures
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Persistent feature flag memory cache
- *
- * @property defaultProviders
- * @property managedFeatures
- * @property persistedFeatureFlagCache
+ * In-memory cache of persisted feature flags. Serves only values actually persisted to disk;
+ * returns `null` for anything else so resolution falls through to remote/default providers.
+ * (Returning a default here would mask the remote value, since this runs at `Cached` priority.)
  */
 @Singleton
 internal class PersistentFeatureFlagMemoryCache @Inject constructor(
-    @DefaultFeatureFlagProviders private val defaultProviders: Set<@JvmSuppressWildcards FeatureFlagValueProvider>,
     @PersistedFeatures private val managedFeatures: Set<@JvmSuppressWildcards Feature>,
     private val persistedFeatureFlagCache: PersistedFeatureFlagCache,
 ) : PersistedFeatureFlagSnapshotGateway {
@@ -28,11 +23,7 @@ internal class PersistentFeatureFlagMemoryCache @Inject constructor(
     private val requested = mutableSetOf<String>()
     private var loaded = false
 
-    /**
-     * Returns the currently effective value for [feature], lazily seeding all [managedFeatures]
-     * from disk + defaults on the first call. Marks [feature] as read for session consistency.
-     * @param feature
-     */
+    /** Persisted value for [feature], or `null` if unmanaged or not persisted yet. */
     suspend fun enabled(
         feature: Feature,
     ): Boolean? = mutex.withLock {
@@ -43,10 +34,7 @@ internal class PersistentFeatureFlagMemoryCache @Inject constructor(
         memoryCache[key]
     }
 
-    /**
-     * Sparse snapshot of the on-disk store, keyed by feature. Entries absent from disk are
-     * omitted so callers can distinguish "not yet persisted" from "persisted as `false`".
-     */
+    /** Sparse snapshot of the on-disk store; features absent from disk are omitted. */
     override suspend fun currentSnapshot(): Map<Feature, Boolean> {
         val fileMap = persistedFeatureFlagCache.read()
         return buildMap {
@@ -56,11 +44,7 @@ internal class PersistentFeatureFlagMemoryCache @Inject constructor(
         }
     }
 
-    /**
-     * Replace the on-disk snapshot with [snapshot] and update in-memory values — but only for
-     * keys that have not yet been read this session.
-     * @param snapshot
-     */
+    /** Persist [snapshot] to disk and update memory, skipping keys already read this session. */
     override suspend fun applySnapshot(snapshot: Map<Feature, Boolean>) {
         val keyed = snapshot.mapKeys { (feature, _) -> keyOf(feature) }
         persistedFeatureFlagCache.write(keyed)
@@ -72,10 +56,7 @@ internal class PersistentFeatureFlagMemoryCache @Inject constructor(
         }
     }
 
-    /**
-     * Clear the persisted snapshot from disk and reset all in-memory state, so the next read
-     * re-seeds from defaults.
-     */
+    /** Delete the on-disk snapshot and reset in-memory state; next read re-loads from disk. */
     override suspend fun clear() {
         persistedFeatureFlagCache.clear()
         mutex.withLock {
@@ -90,17 +71,11 @@ internal class PersistentFeatureFlagMemoryCache @Inject constructor(
         val fileMap = persistedFeatureFlagCache.read()
         managedFeatures.forEach { feature ->
             val key = keyOf(feature)
-            val default = defaultProviders.firstNotNullOfOrNull { it.isEnabled(feature) } ?: false
-            memoryCache[key] = fileMap[key] ?: default
+            fileMap[key]?.let { memoryCache[key] = it }
         }
         loaded = true
     }
 
-    /**
-     * Key of
-     *
-     * @param feature
-     */
     private fun keyOf(feature: Feature): String =
         "${feature::class.java.name}#${feature.name}"
 }
