@@ -45,6 +45,7 @@ internal fun TimelineRevampScreen(
 
         is TimelineRevampUiState.Empty -> {
             EmptyStateView(
+                modifier = Modifier.testTag(TIMELINE_REVAMP_EMPTY_VIEW_TAG),
                 imagePainter = painterResource(R.drawable.il_glass_image),
                 title = stringResource(sharedR.string.timeline_tab_empty_body_no_media_found)
             )
