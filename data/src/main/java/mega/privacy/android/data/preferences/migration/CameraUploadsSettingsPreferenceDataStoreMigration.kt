@@ -80,8 +80,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
         oldPreferences: MegaPreferences,
     ) {
         store.setValues(
-            isCameraUploadsEnabled = oldPreferences.camSyncEnabled?.toBooleanStrictOrNull()
-                ?: false,
+            isCameraUploadsEnabled = oldPreferences.camSyncEnabled?.toBooleanStrictOrNull(),
             isMediaUploadsEnabled = oldPreferences.secondaryMediaFolderEnabled?.toBooleanStrictOrNull()
                 ?: false,
             cameraUploadsHandle = oldPreferences.camSyncHandle?.toLongOrNull(),
@@ -92,7 +91,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
                 ?: false,
             uploadVideoQuality = oldPreferences.uploadVideoQuality?.toIntOrNull()
                 ?: VideoQuality.ORIGINAL.value,
-            areUploadFileNamesKept = oldPreferences.keepFileNames?.toBooleanStrictOrNull() ?: false,
+            areUploadFileNamesKept = oldPreferences.keepFileNames?.toBooleanStrictOrNull(),
             isChargingRequiredForVideoCompression = oldPreferences.conversionOnCharging?.toBooleanStrictOrNull()
                 ?: true,
             videoCompressionSizeLimit = oldPreferences.chargingOnSize?.toIntOrNull()
@@ -114,7 +113,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
         mediaUploadsLocalPath: String?,
         areLocationTagsEnabled: Boolean,
         uploadVideoQuality: Int,
-        areUploadFileNamesKept: Boolean,
+        areUploadFileNamesKept: Boolean?,
         isChargingRequiredForVideoCompression: Boolean,
         videoCompressionSizeLimit: Int,
         fileUploadOption: Int,
@@ -130,7 +129,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigration @Inject constru
             setMediaUploadsLocalPath(mediaUploadsLocalPath)
             setLocationTagsEnabled(areLocationTagsEnabled)
             setUploadVideoQuality(uploadVideoQuality)
-            setUploadFileNamesKept(areUploadFileNamesKept)
+            areUploadFileNamesKept?.let { setUploadFileNamesKept(it) }
             setChargingRequiredForVideoCompression(isChargingRequiredForVideoCompression)
             setVideoCompressionSizeLimit(videoCompressionSizeLimit)
             setFileUploadOption(fileUploadOption)
