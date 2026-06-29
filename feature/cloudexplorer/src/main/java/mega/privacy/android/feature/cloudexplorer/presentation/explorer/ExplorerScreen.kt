@@ -105,10 +105,6 @@ internal fun ExplorerScreen(
     var showSearch by rememberSaveable { mutableStateOf(false) }
     var searchText by rememberSaveable { mutableStateOf("") }
     val onSearchQueryChanged: (String) -> Unit = { searchText = it }
-    val onCloseSearch: () -> Unit = {
-        searchText = ""
-        showSearch = false
-    }
     val protectedUserTap: (() -> Unit) -> Unit = { action -> if (!isProcessingAction) action() }
     val viewModel = hiltViewModel<ExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -140,6 +136,11 @@ internal fun ExplorerScreen(
     val clearSelection: () -> Unit = {
         nodeSelectionState.deselectAll()
         chatExplorerSelectionState.deselectAll()
+    }
+    val onCloseSearch: () -> Unit = {
+        clearSelection()
+        searchText = ""
+        showSearch = false
     }
     val isAllSelected = uiState.selectableNodeIds.all { it in nodeSelectionState.selectedNodeIds }
 
@@ -251,6 +252,7 @@ internal fun ExplorerScreen(
                                             Analytics.tracker.trackEvent(
                                                 CloudExplorerSearchButtonPressedEvent
                                             )
+                                            clearSelection()
                                             showSearch = true
                                         } else {
                                             showNoConnectionSnackbar()
