@@ -11,6 +11,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
+import mega.privacy.android.shared.resources.R as sharedR
 
 class AddContactsScreenScreenshotTest {
 
@@ -82,6 +83,21 @@ class AddContactsScreenScreenshotTest {
                 onConfirm = {},
                 onBack = {},
                 initialSelectedHandles = setOf(1L, 2L),
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun AddChatParticipantsScreen() {
+        AndroidThemeForPreviews {
+            AddContactsScreen(
+                state = sampleData(),
+                onSearchQueryChange = {},
+                onConfirm = {},
+                onBack = {},
+                titleRes = sharedR.string.add_participants_title,
             )
         }
     }

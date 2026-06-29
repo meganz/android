@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
 import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
@@ -24,6 +25,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verifyNoInteractions
 import java.time.Instant
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -32,6 +34,7 @@ class AddContactViewModelTest {
     private lateinit var underTest: AddContactViewModel
 
     private val getContactsUseCase = mock<GetContactsUseCase>()
+    private val getContactsToAddToChatUseCase = mock<GetContactsToAddToChatUseCase>()
     private val contactItemUiStateMapper = ContactItemUiStateMapper(
         contactItemStatusMapper = ContactItemStatusMapper(),
         contactItemAvatarMapper = ContactItemAvatarMapper(),
@@ -39,16 +42,20 @@ class AddContactViewModelTest {
 
     @BeforeEach
     fun setUp() {
-        underTest = AddContactViewModel(
-            getContactsUseCase = getContactsUseCase,
-            contactItemUiStateMapper = contactItemUiStateMapper,
-        )
+        underTest = createViewModel(chatId = null)
     }
 
     @AfterEach
     fun tearDown() {
-        reset(getContactsUseCase)
+        reset(getContactsUseCase, getContactsToAddToChatUseCase)
     }
+
+    private fun createViewModel(chatId: Long?) = AddContactViewModel(
+        chatId = chatId,
+        getContactsUseCase = getContactsUseCase,
+        getContactsToAddToChatUseCase = getContactsToAddToChatUseCase,
+        contactItemUiStateMapper = contactItemUiStateMapper,
+    )
 
     @Test
     fun `test that initial state is Loading`() = runTest {
@@ -171,6 +178,23 @@ class AddContactViewModelTest {
                     .containsExactly("a@test.com")
             }
         }
+
+    @Test
+    fun `test that contacts come from getContactsToAddToChatUseCase when chatId is set`() = runTest {
+        val chatId = 55L
+        getContactsToAddToChatUseCase.stub {
+            on { invoke(chatId) } doReturn flow {
+                emit(listOf(createContactItem(handle = 7L, email = "p@test.com", alias = "Pam")))
+                awaitCancellation()
+            }
+        }
+        underTest = createViewModel(chatId = chatId)
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().contacts.map { it.displayName }).containsExactly("Pam")
+        }
+        verifyNoInteractions(getContactsUseCase)
+    }
 
     @Test
     fun `test that error in contacts flow is caught`() = runTest {

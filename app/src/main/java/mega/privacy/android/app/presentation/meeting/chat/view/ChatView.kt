@@ -56,7 +56,6 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatId
 import mega.privacy.android.feature.chat.meeting.call.isJoined
@@ -68,7 +67,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.meeting.chat.view.actions.MessageAction
 import mega.privacy.android.app.presentation.meeting.chat.view.appbar.ChatAppBar
 import mega.privacy.android.app.presentation.meeting.chat.view.bottombar.ChatBottomBar
-import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openAddContactActivity
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.openChatPicker
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.startLoginActivity
 import mega.privacy.android.app.presentation.meeting.view.dialog.CallRecordingConsentDialog
@@ -109,7 +107,7 @@ import mega.privacy.mobile.analytics.event.ChatMessageLongPressedEvent
  * @param setPendingAction
  * @param setAddingReactionTo
  * @param getApplicableActions
- * @param inviteContactsToChat
+ * @param onNavigateToAddParticipants invoked to open the add-chat-participants picker.
  * @param onInfoToShowConsumed
  * @param enablePasscodeCheck
  * @param archiveChat
@@ -192,7 +190,7 @@ internal fun ChatView(
     navigateToConversation: (Long) -> Unit,
     navigateToWebSite: (String) -> Unit,
     navHostController: androidx.navigation.NavHostController,
-    inviteContactsToChat: (Long, List<String>) -> Unit = { _, _ -> },
+    onNavigateToAddParticipants: () -> Unit = {},
     onInfoToShowConsumed: () -> Unit = {},
     enablePasscodeCheck: () -> Unit = {},
     archiveChat: () -> Unit = {},
@@ -276,21 +274,6 @@ internal fun ChatView(
 
 
     with(uiState) {
-        val addContactLauncher =
-            rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartActivityForResult()
-            ) { result ->
-                result.data?.let { intent ->
-                    intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-                        ?.let { contactList ->
-                            inviteContactsToChat(
-                                chatId,
-                                contactList
-                            )
-                        }
-                }
-            }
-
         if (callEndedDueToFreePlanLimits && isCallUnlimitedProPlanFeatureFlagEnabled
             && usersCallLimitReminders == UsersCallLimitReminders.Enabled
         ) {
@@ -407,13 +390,7 @@ internal fun ChatView(
                                 onStartCall = { isVideoCall ->
                                     startCall(isVideoCall)
                                 },
-                                openAddContactActivity = {
-                                    openAddContactActivity(
-                                        context = context,
-                                        chatId = chatId,
-                                        addContactLauncher = addContactLauncher
-                                    )
-                                },
+                                onAddParticipants = onNavigateToAddParticipants,
                                 showClearChatConfirmationDialog = {
                                     showClearChatConfirmationDialog(
                                         isMeeting
@@ -680,7 +657,6 @@ private fun ChatViewPreview() {
             navigateToNotSentModal = {},
             navigateToConversation = {},
             navHostController = rememberNavController(),
-            inviteContactsToChat = { _, _ -> },
             navigateToWebSite = {},
         )
     }

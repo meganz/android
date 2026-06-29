@@ -22,6 +22,20 @@ data object AddContactsNavKey : NavKey {
     const val KEY: String = "add_contacts"
 }
 
+/**
+ * Add chat participants nav key. Opens the MEGA-contacts multi-select picker filtered to the
+ * contacts that are not already participants of chat [chatId]; the selected contact emails are
+ * published as a `List<String>` under [KEY].
+ *
+ * @property chatId the chat the selected contacts will be added to; used to exclude existing participants.
+ */
+@Serializable
+data class AddChatParticipantsNavKey(val chatId: Long) : NavKey {
+    companion object {
+        const val KEY: String = "add_chat_participants"
+    }
+}
+
 /** Launches the legacy "Add contacts" activity in "only create group" mode; result published under [KEY]. */
 @Serializable
 data object CreateGroupChatNavKey : NavKey {

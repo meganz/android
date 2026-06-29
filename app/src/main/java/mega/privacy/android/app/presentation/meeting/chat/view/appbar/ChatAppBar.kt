@@ -69,7 +69,7 @@ internal fun ChatAppBar(
     showGroupOrContactInfoActivity: () -> Unit = {},
     onMenuActionPressed: (ChatRoomMenuAction) -> Unit = {},
     onStartCall: (Boolean) -> Unit = {},
-    openAddContactActivity: () -> Unit = {},
+    onAddParticipants: () -> Unit = {},
     showClearChatConfirmationDialog: () -> Unit = {},
     showMutePushNotificationDialog: () -> Unit = {},
     archiveChat: () -> Unit = {},
@@ -146,7 +146,7 @@ internal fun ChatAppBar(
                     when {
                         !uiState.hasAnyContact -> showNoContactToAddDialog()
                         uiState.allContactsParticipateInChat -> showAllContactsParticipateInChat()
-                        else -> openAddContactActivity()
+                        else -> onAddParticipants()
                     }
                 }
 

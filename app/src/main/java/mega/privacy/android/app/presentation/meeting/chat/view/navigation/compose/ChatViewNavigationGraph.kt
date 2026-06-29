@@ -98,6 +98,7 @@ internal fun NavGraphBuilder.chatViewNavigationGraph(
             onBackPress = onBackPress,
             enablePasscodeCheck = enablePasscodeCheck,
             navigateToWebSite = navigateToWebSite,
+            onNavigate = onNavigate,
         )
 
         chatFileModal(

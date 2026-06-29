@@ -8,12 +8,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.ChatView
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.destination.AddChatParticipantsNavKey
 import mega.privacy.android.navigation.destination.AddContactsNavKey
 import mega.privacy.android.navigation.destination.ShareFilesToChatNavKey
 
@@ -46,6 +48,7 @@ internal fun NavGraphBuilder.chatScreen(
     onBackPress: () -> Unit,
     enablePasscodeCheck: () -> Unit,
     navigateToWebSite: (String) -> Unit,
+    onNavigate: (NavKey) -> Unit = {},
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
 ) {
@@ -74,6 +77,16 @@ internal fun NavGraphBuilder.chatScreen(
                 ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
             viewModel.onAttachContacts(emails)
             clearResult(AddContactsNavKey.KEY)
+        }
+
+        val addParticipantsResult by monitorResult(AddChatParticipantsNavKey.KEY)
+            .collectAsStateWithLifecycle(null)
+        LaunchedEffect(addParticipantsResult) {
+            @Suppress("UNCHECKED_CAST")
+            val emails = (addParticipantsResult as? List<String>)
+                ?.takeIf { it.isNotEmpty() } ?: return@LaunchedEffect
+            viewModel.inviteContactsToChat(uiState.chatId, emails)
+            clearResult(AddChatParticipantsNavKey.KEY)
         }
 
         ChatView(
@@ -111,7 +124,7 @@ internal fun NavGraphBuilder.chatScreen(
             navigateToConversation = navigateToConversation,
             navigateToWebSite = navigateToWebSite,
             navHostController = navController,
-            inviteContactsToChat = viewModel::inviteContactsToChat,
+            onNavigateToAddParticipants = { onNavigate(AddChatParticipantsNavKey(uiState.chatId)) },
             onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
             enablePasscodeCheck = enablePasscodeCheck,
             archiveChat = viewModel::archiveChat,

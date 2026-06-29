@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.contact.add.view
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -55,6 +56,7 @@ import androidx.compose.ui.graphics.Color
  * @param onBack invoked when the user navigates back without confirming.
  * @param modifier
  * @param initialSelectedHandles handles to pre-select on first composition.
+ * @param titleRes toolbar title shown while nothing is selected; defaults to "Send contacts".
  */
 @Composable
 internal fun AddContactsScreen(
@@ -64,6 +66,7 @@ internal fun AddContactsScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     initialSelectedHandles: Set<Long> = emptySet(),
+    @StringRes titleRes: Int = sharedR.string.send_contacts,
 ) {
     val selectionState = rememberContactSelectionState(initialSelectedHandles)
     var searchActive by rememberSaveable { mutableStateOf(false) }
@@ -88,7 +91,7 @@ internal fun AddContactsScreen(
                     selectionState.selectedItemsCount,
                 )
             } else {
-                stringResource(sharedR.string.send_contacts)
+                stringResource(titleRes)
             }
             MegaSearchTopAppBar(
                 title = title,
