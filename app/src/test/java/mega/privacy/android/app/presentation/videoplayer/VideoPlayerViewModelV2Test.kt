@@ -2106,6 +2106,23 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
+    fun `test that isVideoNotRendered is cleared after onMediaItemTransition is invoked`() =
+        runTest {
+            whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.VIDEO_NOT_RENDERED)
+            initViewModel()
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_DECODER_INIT_FAILED)
+            underTest.uiState.test {
+                // skip state where isVideoNotRendered = true
+                awaitItem()
+                underTest.onMediaItemTransition(testHandle.toString(), false)
+                val state = awaitItem()
+                assertThat(state.isVideoNotRendered).isFalse()
+                assertThat(state.playerErrorType).isNull()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that subtitle status is cleared correctly after onMediaItemTransition is invoked`() =
         runTest {
             initViewModel()

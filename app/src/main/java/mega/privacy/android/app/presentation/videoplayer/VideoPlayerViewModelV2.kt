@@ -1165,6 +1165,12 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             Analytics.tracker.trackEvent(VideoPlayerIsActivatedEvent)
         updateCurrentPlayingHandle(handle.toLong(), isUpdateName)
         saveVideoWatchedTime()
+        uiState.update {
+            it.copy(
+                isVideoNotRendered = false,
+                playerErrorType = null,
+            )
+        }
         if (isUpdateName) {
             val items = uiState.value.items
             val playingIndex = items.indexOfFirst { it.nodeHandle == handle.toLong() }
