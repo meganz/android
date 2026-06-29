@@ -71,9 +71,11 @@ import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailView
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
 import mega.privacy.android.app.presentation.login.model.LoginScreen
 import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.ChangeEmailAddressButtonPressedEvent
 import mega.privacy.mobile.analytics.event.ResendEmailConfirmationButtonPressedEvent
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun NewConfirmEmailRoute(
@@ -187,6 +189,7 @@ internal fun NewConfirmEmailScreen(
     modifier: Modifier = Modifier,
 ) {
     var cancelRegistration by remember { mutableStateOf(false) }
+    val durationFormatter = remember { DurationInSecondsTextMapper() }
     val spacing = LocalSpacing.current
     val orientation = LocalConfiguration.current.orientation
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
@@ -301,7 +304,15 @@ internal fun NewConfirmEmailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally),
-                        text = stringResource(sharedR.string.general_resend_button),
+                        text = if (uiState.canResend) {
+                            stringResource(sharedR.string.general_resend_button)
+                        } else {
+                            stringResource(
+                                sharedR.string.email_confirmation_resend_button_countdown,
+                                durationFormatter(uiState.resendCountdownSeconds.seconds)
+                            )
+                        },
+                        enabled = uiState.canResend,
                         onClick = {
                             Analytics.tracker.trackEvent(ResendEmailConfirmationButtonPressedEvent)
                             onResendSignUpLink(email)
@@ -381,12 +392,29 @@ private fun ContentLoading() {
 
 @CombinedThemePreviews
 @Composable
-private fun ConfirmEmailScreenPreview() {
+private fun ConfirmEmailScreenCountdownPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         NewConfirmEmailScreen(
             modifier = Modifier.fillMaxSize(),
             email = "email@email.com",
-            uiState = ConfirmEmailUiState(),
+            uiState = ConfirmEmailUiState(resendCountdownSeconds = 60),
+            onCancelClick = {},
+            onResendSignUpLink = {},
+            onNavigateToChangeEmailAddress = {},
+            onNavigateToHelpCentre = {},
+            snackBarHostState = remember { SnackbarHostState() }
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ConfirmEmailScreenResendEnabledPreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        NewConfirmEmailScreen(
+            modifier = Modifier.fillMaxSize(),
+            email = "email@email.com",
+            uiState = ConfirmEmailUiState(resendCountdownSeconds = 0),
             onCancelClick = {},
             onResendSignUpLink = {},
             onNavigateToChangeEmailAddress = {},

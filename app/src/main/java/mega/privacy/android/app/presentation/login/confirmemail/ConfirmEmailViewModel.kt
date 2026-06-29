@@ -1,10 +1,13 @@
 package mega.privacy.android.app.presentation.login.confirmemail
 
+import android.os.SystemClock
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.login.confirmemail.mapper.ResendSignUpLinkErrorMapper
 import mega.privacy.android.app.presentation.login.confirmemail.model.ConfirmEmailUiState
+import mega.privacy.android.app.presentation.login.confirmemail.model.RESEND_EMAIL_COUNTDOWN_SECONDS
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CancelCreateAccountUseCase
@@ -41,7 +45,10 @@ class ConfirmEmailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ConfirmEmailUiState())
     val uiState: StateFlow<ConfirmEmailUiState> = _uiState
 
+    private var resendCountdownJob: Job? = null
+
     init {
+        startResendCountdown()
         viewModelScope.launch {
             monitorAccountConfirmationUseCase().collectLatest {
                 _uiState.update { state -> state.copy(isAccountConfirmed = true) }
@@ -87,6 +94,7 @@ class ConfirmEmailViewModel @Inject constructor(
                 .onSuccess { email ->
                     updateRegisteredEmail(email)
                     showSuccessSnackBar()
+                    startResendCountdown()
                 }
                 .onFailure { exception ->
                     Timber.e("Failed to re-send the sign up link: ${exception.message}")
@@ -127,6 +135,27 @@ class ConfirmEmailViewModel @Inject constructor(
 
     private fun showSuccessSnackBar() {
         _uiState.update { it.copy(shouldShowSuccessMessage = true) }
+    }
+
+    /**
+     * (Re)start the resend cooldown countdown.
+     *
+     */
+    private fun startResendCountdown() {
+        resendCountdownJob?.cancel()
+        val endTimeMillis = SystemClock.elapsedRealtime() + RESEND_EMAIL_COUNTDOWN_SECONDS * 1_000L
+        resendCountdownJob = viewModelScope.launch {
+            while (true) {
+                val remainingMillis = endTimeMillis - SystemClock.elapsedRealtime()
+                // Round up so the timer only reads 0 once the full cooldown has elapsed.
+                val remainingSeconds = ((remainingMillis + 999) / 1_000L)
+                    .coerceIn(0L, RESEND_EMAIL_COUNTDOWN_SECONDS.toLong())
+                    .toInt()
+                _uiState.update { it.copy(resendCountdownSeconds = remainingSeconds) }
+                if (remainingSeconds <= 0) break
+                delay(RESEND_COUNTDOWN_TICK_MILLIS)
+            }
+        }
     }
 
     /**
@@ -173,5 +202,13 @@ class ConfirmEmailViewModel @Inject constructor(
      */
     fun onHandleCancelCreateAccount() {
         _uiState.update { it.copy(isCreatingAccountCancelled = false) }
+    }
+
+    companion object {
+        /**
+         * How often the resend countdown re-evaluates the remaining time. Sub-second so the
+         * displayed seconds update promptly when a whole-second boundary is crossed.
+         */
+        private const val RESEND_COUNTDOWN_TICK_MILLIS = 500L
     }
 }
