@@ -3213,6 +3213,122 @@ class VideoPlayerViewModelV2Test {
             }
         }
 
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when items list is empty`() =
+        runTest {
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = emptyList(),
+                mediaItems = emptyList(),
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when only one item in playlist`() =
+        runTest {
+            val item = initVideoPlayerItem(handle = 1L, name = "video.mp4")
+            val mediaItem = MediaItem.Builder().setMediaId("1").build()
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = listOf(item),
+                mediaItems = listOf(mediaItem),
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate removes current item and navigates to next when blocked item is not last`() =
+        runTest {
+            val items = (0..2).map { initVideoPlayerItem(handle = it.toLong(), name = "$it.mp4") }
+            val mediaItems = (0..2).map { MediaItem.Builder().setMediaId(it.toString()).build() }
+            initViewModel()
+
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = items,
+                mediaItems = mediaItems,
+            )
+
+            assertThat(result).isTrue()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            verify(mediaPlayerGateway).playerSeekTo(1)
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerGateway).playerPrepare()
+            underTest.uiState.test {
+                awaitItem().let { state ->
+                    assertThat(state.items.size).isEqualTo(2)
+                    assertThat(state.items.none { it.nodeHandle == 1L }).isTrue()
+                    assertThat(state.currentPlayingIndex).isEqualTo(1)
+                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
+                    assertThat(state.currentPlayingItemName).isEqualTo("2.mp4")
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate removes current item and navigates to previous when blocked item is last`() =
+        runTest {
+            val items = (0..2).map { initVideoPlayerItem(handle = it.toLong(), name = "$it.mp4") }
+            val mediaItems = (0..2).map { MediaItem.Builder().setMediaId(it.toString()).build() }
+            initViewModel()
+
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 2L,
+                items = items,
+                mediaItems = mediaItems,
+            )
+
+            assertThat(result).isTrue()
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).buildPlaySources(any())
+            verify(mediaPlayerGateway).playerSeekTo(1)
+            verify(mediaPlayerGateway).setPlayWhenReady(true)
+            verify(mediaPlayerGateway).playerPrepare()
+            underTest.uiState.test {
+                awaitItem().let { state ->
+                    assertThat(state.items.size).isEqualTo(2)
+                    assertThat(state.items.none { it.nodeHandle == 2L }).isTrue()
+                    assertThat(state.currentPlayingIndex).isEqualTo(1)
+                    assertThat(state.mediaPlaySources?.newIndexForCurrentItem).isEqualTo(INVALID_VALUE)
+                    assertThat(state.currentPlayingItemName).isEqualTo("1.mp4")
+                }
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when current handle not found in items`() =
+        runTest {
+            val item = initVideoPlayerItem(handle = 1L, name = "1.mp4")
+            val mediaItem = MediaItem.Builder().setMediaId("1").build()
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 999L,
+                items = listOf(item),
+                mediaItems = listOf(mediaItem),
+            )
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    fun `test that removeBlockedItemAndNavigate returns false when items and mediaItems sizes differ`() =
+        runTest {
+            val items = listOf(initVideoPlayerItem(handle = 1L, name = "1.mp4"))
+            val mediaItems = (0..1).map { MediaItem.Builder().setMediaId(it.toString()).build() }
+            initViewModel()
+            val result = underTest.removeBlockedItemAndNavigate(
+                currentHandle = 1L,
+                items = items,
+                mediaItems = mediaItems,
+            )
+            assertThat(result).isFalse()
+        }
+
     companion object {
         @JvmField
         @RegisterExtension

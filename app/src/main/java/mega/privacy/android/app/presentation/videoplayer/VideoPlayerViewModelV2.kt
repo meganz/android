@@ -1980,6 +1980,65 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
 
     internal fun onBlockedErrorConsumed() = uiState.update { it.copy(blockedError = consumed) }
 
+    /**
+     * Removes the blocked/inaccessible item from the playlist and navigates to the next
+     * available video. If the blocked item was the last in the playlist, navigates to the
+     * previous item instead. Returns `true` when another video is available and playback
+     * continues; `false` when the playlist is empty after removal (caller should close the player).
+     */
+    internal fun removeBlockedItemAndNavigate(
+        currentHandle: Long = uiState.value.currentPlayingHandle,
+        items: List<VideoPlayerItem> = uiState.value.items,
+        mediaItems: List<MediaItem>? = uiState.value.mediaPlaySources?.mediaItems,
+    ): Boolean {
+        if (items.isEmpty() || mediaItems.isNullOrEmpty() || items.size != mediaItems.size) return false
+
+        val currentIndex = items.indexOfFirst { it.nodeHandle == currentHandle }
+        if (currentIndex == -1) return false
+
+        val updatedItems = items.filterNot { it.nodeHandle == currentHandle }
+        // MediaItem.mediaId is the string representation of the node handle
+        val updatedMediaItems = mediaItems.filterNot { it.mediaId.toLongOrNull() == currentHandle }
+
+        if (updatedItems.isEmpty()) return false
+
+        // Play the next item if available, otherwise fall back to the previous one.
+        val newPlayingIndex = minOf(currentIndex, updatedItems.size - 1)
+
+        val targetName = updatedItems[newPlayingIndex].nodeName
+
+        val mediaPlaySources = MediaPlaySources(
+            mediaItems = updatedMediaItems,
+            // INVALID_VALUE forces setMediaSources() — a full playlist replacement.
+            // The newIndexForCurrentItem != INVALID_VALUE path keeps the current
+            // (blocked) item in ExoPlayer and wraps items around it, which is wrong here.
+            newIndexForCurrentItem = INVALID_VALUE,
+            nameToDisplay = targetName,
+        )
+
+        uiState.update {
+            it.copy(
+                items = updatedItems,
+                currentPlayingIndex = newPlayingIndex,
+                currentPlayingHandle = updatedItems[newPlayingIndex].nodeHandle,
+                mediaPlaySources = mediaPlaySources,
+            )
+        }
+
+        runCatching {
+            with(mediaPlayerGateway) {
+                buildPlaySources(mediaPlaySources)
+                playerSeekTo(newPlayingIndex)
+                setPlayWhenReady(!isPausedByUser && !uiState.value.showSubTitlesOptions)
+                playerPrepare()
+            }
+            uiState.update { it.copy(currentPlayingItemName = targetName) }
+        }.onFailure {
+            Timber.e(it, "Failed to start playback after removing blocked item")
+        }
+        return true
+    }
+
     companion object {
         private const val MEDIA_PLAYER_STATE_ENDED = 4
         private const val MEDIA_PLAYER_STATE_READY = 3
