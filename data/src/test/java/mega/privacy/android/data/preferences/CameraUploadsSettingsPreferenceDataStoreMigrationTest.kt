@@ -133,4 +133,22 @@ internal class CameraUploadsSettingsPreferenceDataStoreMigrationTest {
             verify(dataStore).setUploadsByWifi(expectedUploadsByWifi)
             verify(dataStore, never()).setChargingRequiredToUploadContent(any())
         }
+
+    @Test
+    internal fun `test that camera uploads enabled and keep file names are not written when their legacy values are null`() =
+        runTest {
+            val megaPreferences = mock<MegaPreferences> {
+                on { camSyncEnabled }.thenReturn(null)
+                on { keepFileNames }.thenReturn(null)
+            }
+
+            databaseHandler.stub {
+                on { preferences }.thenReturn(megaPreferences)
+            }
+
+            underTest.migrate(mock())
+
+            verify(dataStore, never()).setCameraUploadsEnabled(any())
+            verify(dataStore, never()).setUploadFileNamesKept(any())
+        }
 }
