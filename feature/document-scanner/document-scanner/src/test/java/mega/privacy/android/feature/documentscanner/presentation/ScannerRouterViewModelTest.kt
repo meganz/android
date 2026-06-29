@@ -175,4 +175,31 @@ class ScannerRouterViewModelTest {
             verify(startScannerModelDownload).invoke(requireUnmeteredNetwork = true)
             verifyNoInteractions(grantScannerCellularConsent)
         }
+
+    @Test
+    fun `test that onModelReady moves the route to LaunchCamera`() = runTest {
+        whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
+
+        initTestSubject()
+
+        underTest.route.test {
+            assertThat(awaitItem()).isEqualTo(ScannerRoute.NeedsDownload)
+            underTest.onModelReady()
+            assertThat(awaitItem()).isEqualTo(ScannerRoute.LaunchCamera)
+        }
+    }
+
+    @Test
+    fun `test that onPrepareUseLegacy routes to legacy with a user-declined reason`() = runTest {
+        whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.NeedsDownload)
+
+        initTestSubject()
+
+        underTest.route.test {
+            assertThat(awaitItem()).isEqualTo(ScannerRoute.NeedsDownload)
+            underTest.onPrepareUseLegacy()
+            assertThat(awaitItem())
+                .isEqualTo(ScannerRoute.UseLegacy(LegacyReason.UserDeclined))
+        }
+    }
 }

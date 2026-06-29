@@ -108,6 +108,21 @@ class ScannerRouterViewModel @Inject constructor(
         }
     }
 
+    /**
+     * The prepare screen reports the model is downloaded and verified; open the camera.
+     */
+    fun onModelReady() {
+        _route.value = ScannerRoute.LaunchCamera
+    }
+
+    /**
+     * The user left the prepare screen via "Use old scanner"; fall back to legacy.
+     * The download keeps running in the background.
+     */
+    fun onPrepareUseLegacy() {
+        _route.value = ScannerRoute.UseLegacy(LegacyReason.UserDeclined)
+    }
+
     private suspend fun enqueueModelDownload(requireUnmeteredNetwork: Boolean) {
         runCatching { startScannerModelDownload(requireUnmeteredNetwork) }
             .onFailure { Timber.e(it, "[DocScanner] Failed to enqueue model download") }

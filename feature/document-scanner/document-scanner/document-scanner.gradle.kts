@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":core:navigation-contract"))
+    implementation(project(":core:coroutine"))
 
     // Compose
     implementation(androidx.bundles.compose.bom)

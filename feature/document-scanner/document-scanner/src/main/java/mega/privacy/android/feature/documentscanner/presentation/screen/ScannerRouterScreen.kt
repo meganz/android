@@ -60,11 +60,12 @@ internal fun ScannerRouterScreen(
             onUseOldScanner = viewModel::onCellularDownloadDeclined,
         )
 
-        // TODO(AND-23986): replace PreparingDownload with the prepare/loading screen
-        //  that observes WorkInfo. Until then, show a neutral preparing state.
-        ScannerRoute.Resolving,
-        ScannerRoute.PreparingDownload,
-            -> {
+        ScannerRoute.PreparingDownload -> PrepareScannerScreen(
+            onModelReady = viewModel::onModelReady,
+            onUseLegacy = viewModel::onPrepareUseLegacy,
+        )
+
+        ScannerRoute.Resolving -> {
             Timber.d("[DocScanner] Router showing loading for route: $current")
             LoadingState()
         }

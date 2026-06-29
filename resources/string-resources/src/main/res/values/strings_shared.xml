@@ -3043,6 +3043,18 @@
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Download over mobile data</string>
     <!-- Button that dismisses the download dialog and opens the old document scanner instead -->
     <string name="document_scanner_download_dialog_use_old_scanner_button">Use old scanner</string>
+    <!-- Title of the loading screen shown while the document scanner is being downloaded and set up for the first time -->
+    <string name="document_scanner_prepare_title">Setting up document scanner</string>
+    <!-- Message shown on the loading screen while the document scanner downloads, reassuring the user it is a one-time setup -->
+    <string name="document_scanner_prepare_message">This only happens once. You can keep using your device while it downloads.</string>
+    <!-- Title of the error state shown when the document scanner download fails -->
+    <string name="document_scanner_prepare_error_title">Couldn\'t set up the document scanner</string>
+    <!-- Error description shown when the download fails for a reason that may be fixed by retrying, such as a lost connection -->
+    <string name="document_scanner_prepare_error_transient_message">Check your connection and try again.</string>
+    <!-- Error description shown when the download fails permanently and retrying won\'t help -->
+    <string name="document_scanner_prepare_error_permanent_message">You can use the old scanner instead.</string>
+    <!-- Button that retries the failed document scanner download -->
+    <string name="document_scanner_prepare_retry_button">Try again</string>
     <!-- Title of the park account confirmation screen, shown when the user opens a park-account confirmation link. -->
     <string name="park_account_screen_title">Park account</string>
     <!-- Message of the confirmation dialog shown when the user taps the start-new-account button on the park account screen. The user must confirm they understand they are starting a fresh account and will lose existing data. -->
