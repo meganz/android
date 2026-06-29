@@ -123,8 +123,8 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
-import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
+import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.After
@@ -1004,13 +1004,13 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test that ManageLinkAction single node handle navigates via GetLinkNavKey when navigationHandler is not null`() {
+    fun `test that ManageLinkAction single node handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(GetLinkNavKey(handles = listOf(123L)))
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L)))
     }
 
     @Test
@@ -1540,13 +1540,13 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test that GetLinkAction single node handle navigates via GetLinkNavKey when navigationHandler is not null`() {
+    fun `test that GetLinkAction single node handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = GetLinkActionClickHandler(mockMegaNavigator)
         val menuAction = mock<GetLinkMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(GetLinkNavKey(handles = listOf(123L)))
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L)))
     }
 
     @Test
