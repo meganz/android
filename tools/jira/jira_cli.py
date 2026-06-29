@@ -391,6 +391,56 @@ def cmd_comment(args):
     print(json.dumps({"id": data["id"], "url": url}))
 
 
+def cmd_worklog(args):
+    """POST a worklog entry. Optional comment body on stdin.
+
+    --started must be `YYYY-MM-DDTHH:MM:SS.SSS+ZZZZ` (Jira's required format,
+    timezone offset with NO colon, e.g. 2026-06-25T09:00:00.000+0600).
+    --time is Jira duration syntax: `5h`, `4h 30m`, `2h 20m`.
+    """
+    _validate(args.key, ISSUE_KEY_RE, "issue key")
+    comment = "" if sys.stdin.isatty() else sys.stdin.read()
+    payload = {"timeSpent": args.time, "started": args.started}
+    if comment.strip():
+        payload["comment"] = comment
+    if args.dry_run:
+        print(json.dumps({"key": args.key, "payload": payload}, indent=2))
+        return
+    code, body = jira("POST", f"/issue/{args.key}/worklog", payload)
+    expect_status(code, body, 201)
+    data = json.loads(body)
+    print(json.dumps({
+        "id": data["id"],
+        "timeSpent": data.get("timeSpent"),
+        "started": data.get("started"),
+        "browse_url": f"{BASE_URL}/browse/{args.key}",
+    }, indent=2))
+
+
+def cmd_worklog_delete(args):
+    """Delete a worklog entry by id (e.g. to fix a mis-logged entry)."""
+    _validate(args.key, ISSUE_KEY_RE, "issue key")
+    code, body = jira("DELETE", f"/issue/{args.key}/worklog/{args.id}")
+    expect_status(code, body, 204)
+    print(json.dumps({"deleted": args.id, "key": args.key}))
+
+
+def cmd_worklogs(args):
+    """List existing worklogs on an issue (for dedup before posting)."""
+    _validate(args.key, ISSUE_KEY_RE, "issue key")
+    code, body = jira("GET", f"/issue/{args.key}/worklog")
+    expect_status(code, body, 200)
+    data = json.loads(body)
+    out = [{
+        "id": w["id"],
+        "author": (w.get("author") or {}).get("name")
+                  or (w.get("author") or {}).get("emailAddress"),
+        "started": w.get("started"),
+        "timeSpent": w.get("timeSpent"),
+    } for w in data.get("worklogs", [])]
+    print(json.dumps({"key": args.key, "total": len(out), "worklogs": out}, indent=2))
+
+
 def cmd_field_id(args):
     cands = [c.strip().lower() for c in args.candidates.split(",") if c.strip()]
     code, body = jira("GET", "/field")
@@ -1081,6 +1131,24 @@ def main():
     sp = sub.add_parser("comment", help="POST a comment (body on stdin)")
     sp.add_argument("key")
     sp.set_defaults(func=cmd_comment)
+
+    sp = sub.add_parser("worklog", help="POST a worklog (optional comment on stdin)")
+    sp.add_argument("key")
+    sp.add_argument("--time", required=True, help="Jira duration, e.g. '5h' or '4h 30m'")
+    sp.add_argument("--started", required=True,
+                    help="Start time: YYYY-MM-DDTHH:MM:SS.000+0600 (offset, no colon)")
+    sp.add_argument("--dry-run", action="store_true",
+                    help="Print the payload and make NO network call")
+    sp.set_defaults(func=cmd_worklog)
+
+    sp = sub.add_parser("worklogs", help="List existing worklogs on an issue (JSON)")
+    sp.add_argument("key")
+    sp.set_defaults(func=cmd_worklogs)
+
+    sp = sub.add_parser("worklog-delete", help="Delete a worklog by id")
+    sp.add_argument("key")
+    sp.add_argument("id")
+    sp.set_defaults(func=cmd_worklog_delete)
 
     sp = sub.add_parser("field-id", help="Discover custom field id by name candidates")
     sp.add_argument("candidates",
