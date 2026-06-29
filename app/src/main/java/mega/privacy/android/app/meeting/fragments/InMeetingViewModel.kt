@@ -378,6 +378,20 @@ class InMeetingViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI).let { flag ->
+                    _state.update { state ->
+                        state.copy(
+                            isContactsComposeUIEnabled = flag,
+                        )
+                    }
+                }
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
+
+        viewModelScope.launch {
             getParticipantsChangesUseCase()
                 .catch { Timber.e(it) }
                 .collect { (chatId, typeChange, peers) ->

@@ -53,6 +53,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
@@ -2826,19 +2827,26 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             dialog.show(childFragmentManager, dialog.tag)
         } else {
             val inviteParticipantIntent =
-                Intent(meetingActivity, AddContactActivity::class.java).apply {
-                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                    putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
-                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.getChatId())
-                    putExtra(
-                        INTENT_EXTRA_KEY_MAX_USER,
-                        inMeetingViewModel.state.value.call?.callUsersLimit
+                if (inMeetingViewModel.state.value.isContactsComposeUIEnabled) {
+                    AddParticipantsComposeActivity.getMeetingIntent(
+                        context = meetingActivity,
+                        chatId = inMeetingViewModel.getChatId(),
                     )
-                    putExtra(
-                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                        getString(R.string.invite_participants)
-                    )
+                } else {
+                    Intent(meetingActivity, AddContactActivity::class.java).apply {
+                        putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                        putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                        putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
+                        putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.getChatId())
+                        putExtra(
+                            INTENT_EXTRA_KEY_MAX_USER,
+                            inMeetingViewModel.state.value.call?.callUsersLimit
+                        )
+                        putExtra(
+                            INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                            getString(R.string.invite_participants)
+                        )
+                    }
                 }
             meetingActivity.startActivityForResult(
                 inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS

@@ -12,12 +12,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.usecase.call.MonitorParticipantsLimitWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
@@ -32,35 +34,50 @@ import timber.log.Timber
  *
  * When [chatId] is provided the contacts already participating in that chat are excluded,
  * which backs the "add chat participants" flow; otherwise the full visible contact list is shown.
+ * When [monitorCallLimit] is set the active call is monitored to surface the user-limit warning,
+ * which backs the "add meeting participants" flow.
  *
  * @property chatId optional chat whose existing participants should be excluded.
+ * @property monitorCallLimit whether to monitor the active call for the user-limit warning.
  * @property getContactsUseCase
  * @property getContactsToAddToChatUseCase
+ * @property monitorParticipantsLimitWarningUseCase
  * @property contactItemUiStateMapper
  */
 @HiltViewModel(assistedFactory = AddContactViewModel.Factory::class)
 class AddContactViewModel @AssistedInject constructor(
     @Assisted private val chatId: Long?,
+    @Assisted private val monitorCallLimit: Boolean,
     private val getContactsUseCase: GetContactsUseCase,
     private val getContactsToAddToChatUseCase: GetContactsToAddToChatUseCase,
+    private val monitorParticipantsLimitWarningUseCase: MonitorParticipantsLimitWarningUseCase,
     private val contactItemUiStateMapper: ContactItemUiStateMapper,
 ) : ViewModel() {
 
     /**
-     * Factory for assisted creation, supplying the optional [chatId] from the navigation key.
+     * Factory for assisted creation, supplying the optional [chatId] and [monitorCallLimit] from the
+     * navigation key.
      */
     @AssistedFactory
     interface Factory {
         /**
          * @param chatId the chat whose existing participants to exclude, or null for the full list.
+         * @param monitorCallLimit whether to monitor the active call for the user-limit warning.
          */
-        fun create(chatId: Long?): AddContactViewModel
+        fun create(chatId: Long?, monitorCallLimit: Boolean): AddContactViewModel
     }
 
     private val queryChannel = Channel<String?>(Channel.CONFLATED)
 
     private fun contactsSource(): Flow<List<ContactItem>> =
         chatId?.let { getContactsToAddToChatUseCase(it) } ?: getContactsUseCase()
+
+    private fun userLimitWarningSource(): Flow<Boolean> =
+        if (monitorCallLimit && chatId != null) {
+            monitorParticipantsLimitWarningUseCase(chatId)
+        } else {
+            flowOf(false)
+        }
 
     /**
      * Resolves a selected contact handle back to its email. Retained from the full
@@ -86,12 +103,14 @@ class AddContactViewModel @AssistedInject constructor(
                     .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.ui.displayName })
                     .also { indexed -> handleToEmail = indexed.associate { it.ui.handle to it.data.email } }
             },
-        ) { query, indexed: List<IndexedContact> ->
+            userLimitWarningSource(),
+        ) { query, indexed: List<IndexedContact>, showUserLimitWarning ->
             val visible =
                 if (query.isNullOrBlank()) indexed else indexed.filter { it.matches(query) }
             AddContactUiState.Data(
                 contacts = visible.map { it.ui }.toImmutableList(),
                 query = query,
+                showUserLimitWarning = showUserLimitWarning,
             )
         }.catch { Timber.e(it) }
             .asUiStateFlow(viewModelScope, AddContactUiState.Loading)

@@ -36,6 +36,21 @@ data class AddChatParticipantsNavKey(val chatId: Long) : NavKey {
     }
 }
 
+/**
+ * Add meeting participants nav key. Like [AddChatParticipantsNavKey] but for an in-call/meeting
+ * context: the picker additionally surfaces the call user-limit warning. Selected contact emails
+ * are published as a `List<String>` under [KEY].
+ *
+ * @property chatId the meeting chat the selected contacts will be added to; used to exclude existing
+ * participants and to monitor the active call for the user-limit warning.
+ */
+@Serializable
+data class AddMeetingParticipantsNavKey(val chatId: Long) : NavKey {
+    companion object {
+        const val KEY: String = "add_meeting_participants"
+    }
+}
+
 /** Launches the legacy "Add contacts" activity in "only create group" mode; result published under [KEY]. */
 @Serializable
 data object CreateGroupChatNavKey : NavKey {

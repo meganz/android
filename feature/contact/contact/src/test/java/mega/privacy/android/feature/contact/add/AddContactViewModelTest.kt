@@ -5,12 +5,14 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.usecase.call.MonitorParticipantsLimitWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
@@ -35,6 +37,7 @@ class AddContactViewModelTest {
 
     private val getContactsUseCase = mock<GetContactsUseCase>()
     private val getContactsToAddToChatUseCase = mock<GetContactsToAddToChatUseCase>()
+    private val monitorParticipantsLimitWarningUseCase = mock<MonitorParticipantsLimitWarningUseCase>()
     private val contactItemUiStateMapper = ContactItemUiStateMapper(
         contactItemStatusMapper = ContactItemStatusMapper(),
         contactItemAvatarMapper = ContactItemAvatarMapper(),
@@ -47,15 +50,22 @@ class AddContactViewModelTest {
 
     @AfterEach
     fun tearDown() {
-        reset(getContactsUseCase, getContactsToAddToChatUseCase)
+        reset(
+            getContactsUseCase,
+            getContactsToAddToChatUseCase,
+            monitorParticipantsLimitWarningUseCase,
+        )
     }
 
-    private fun createViewModel(chatId: Long?) = AddContactViewModel(
-        chatId = chatId,
-        getContactsUseCase = getContactsUseCase,
-        getContactsToAddToChatUseCase = getContactsToAddToChatUseCase,
-        contactItemUiStateMapper = contactItemUiStateMapper,
-    )
+    private fun createViewModel(chatId: Long?, monitorCallLimit: Boolean = false) =
+        AddContactViewModel(
+            chatId = chatId,
+            monitorCallLimit = monitorCallLimit,
+            getContactsUseCase = getContactsUseCase,
+            getContactsToAddToChatUseCase = getContactsToAddToChatUseCase,
+            monitorParticipantsLimitWarningUseCase = monitorParticipantsLimitWarningUseCase,
+            contactItemUiStateMapper = contactItemUiStateMapper,
+        )
 
     @Test
     fun `test that initial state is Loading`() = runTest {
@@ -194,6 +204,36 @@ class AddContactViewModelTest {
             assertThat(awaitDataState().contacts.map { it.displayName }).containsExactly("Pam")
         }
         verifyNoInteractions(getContactsUseCase)
+    }
+
+    @Test
+    fun `test that user limit warning is shown when monitoring the call limit and the use case emits true`() =
+        runTest {
+            val chatId = 55L
+            getContactsToAddToChatUseCase.stub {
+                on { invoke(chatId) } doReturn flow {
+                    emit(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+                    awaitCancellation()
+                }
+            }
+            monitorParticipantsLimitWarningUseCase.stub {
+                on { invoke(chatId) } doReturn flowOf(true)
+            }
+            underTest = createViewModel(chatId = chatId, monitorCallLimit = true)
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().showUserLimitWarning).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that user limit warning is not shown when not monitoring the call limit`() = runTest {
+        stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().showUserLimitWarning).isFalse()
+        }
+        verifyNoInteractions(monitorParticipantsLimitWarningUseCase)
     }
 
     @Test

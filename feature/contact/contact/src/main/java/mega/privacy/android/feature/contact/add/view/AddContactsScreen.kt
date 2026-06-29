@@ -2,13 +2,13 @@ package mega.privacy.android.feature.contact.add.view
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,21 +18,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import mega.android.core.ui.components.MegaScaffold
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.banner.TopWarningBanner
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.TextColor
@@ -58,6 +58,7 @@ import androidx.compose.ui.graphics.Color
  * @param initialSelectedHandles handles to pre-select on first composition.
  * @param titleRes toolbar title shown while nothing is selected; defaults to "Send contacts".
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AddContactsScreen(
     state: AddContactUiState,
@@ -79,7 +80,7 @@ internal fun AddContactsScreen(
         }
     }
 
-    MegaScaffold(
+    MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier
             .fillMaxSize()
             .testTag(ADD_CONTACTS_SCREEN_TAG),
@@ -109,7 +110,9 @@ internal fun AddContactsScreen(
         floatingActionButton = {
             if (state is AddContactUiState.Data && selectionState.selectedItemsCount > 0) {
                 MegaFab(
-                    modifier = Modifier.testTag(ADD_CONTACTS_FAB_TAG),
+                    modifier = Modifier
+                        .testTag(ADD_CONTACTS_FAB_TAG)
+                        .applyScrollToHideFabBehavior(),
                     onClick = { onConfirm(selectionState.selectedHandles) },
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
                 )
@@ -125,39 +128,46 @@ internal fun AddContactsScreen(
             )
 
             is AddContactUiState.Data -> {
-                if (state.isEmpty) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(padding)
-                            .testTag(ADD_CONTACTS_EMPTY_TAG),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        MegaText(
-                            text = stringResource(sharedR.string.contacts_empty_title),
-                            textColor = TextColor.Secondary,
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                ) {
+                    if (state.showUserLimitWarning) {
+                        TopWarningBanner(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(ADD_CONTACTS_USER_LIMIT_WARNING_TAG),
+                            body = stringResource(sharedR.string.meetings_add_participants_user_limit_warning),
+                            showCancelButton = false,
                         )
                     }
-                } else {
-                    val layoutDirection = LocalLayoutDirection.current
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .testTag(ADD_CONTACTS_LIST_TAG),
-                        contentPadding = PaddingValues(
-                            start = padding.calculateStartPadding(layoutDirection),
-                            top = padding.calculateTopPadding(),
-                            end = padding.calculateEndPadding(layoutDirection),
-                            bottom = padding.calculateBottomPadding() + FAB_BOTTOM_CLEARANCE,
-                        ),
-                    ) {
-                        items(state.contacts, key = { it.handle }) { contact ->
-                            ContactItemView(
-                                contactItemUiState = contact,
-                                onClick = { selectionState.toggleSelection(contact.handle) },
-                                selected = contact.handle in selectionState.selectedHandles,
-                                inSelectionMode = true,
+                    if (state.isEmpty) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag(ADD_CONTACTS_EMPTY_TAG),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            MegaText(
+                                text = stringResource(sharedR.string.contacts_empty_title),
+                                textColor = TextColor.Secondary,
                             )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .testTag(ADD_CONTACTS_LIST_TAG),
+                        ) {
+                            items(state.contacts, key = { it.handle }) { contact ->
+                                ContactItemView(
+                                    contactItemUiState = contact,
+                                    onClick = { selectionState.toggleSelection(contact.handle) },
+                                    selected = contact.handle in selectionState.selectedHandles,
+                                    inSelectionMode = true,
+                                )
+                            }
                         }
                     }
                 }
@@ -166,18 +176,21 @@ internal fun AddContactsScreen(
     }
 }
 
-private val FAB_BOTTOM_CLEARANCE = 88.dp
-
 internal const val ADD_CONTACTS_SCREEN_TAG = "add_contacts_screen"
 internal const val ADD_CONTACTS_LOADING_TAG = "add_contacts_screen:loading"
 internal const val ADD_CONTACTS_LIST_TAG = "add_contacts_screen:list"
 internal const val ADD_CONTACTS_EMPTY_TAG = "add_contacts_screen:empty"
 internal const val ADD_CONTACTS_FAB_TAG = "add_contacts_screen:fab"
+internal const val ADD_CONTACTS_USER_LIMIT_WARNING_TAG = "add_contacts_screen:user_limit_warning"
 
 private class AddContactUiStateProvider : PreviewParameterProvider<AddContactUiState> {
     override val values: Sequence<AddContactUiState> = sequenceOf(
         AddContactUiState.Loading,
-        AddContactUiState.Data(contacts = persistentListOf(), query = null),
+        AddContactUiState.Data(
+            contacts = persistentListOf(),
+            query = null,
+            showUserLimitWarning = false,
+        ),
         AddContactUiState.Data(
             contacts = listOf(
                 ContactItemUiState(
@@ -200,6 +213,7 @@ private class AddContactUiStateProvider : PreviewParameterProvider<AddContactUiS
                 ),
             ).toImmutableList(),
             query = null,
+            showUserLimitWarning = false,
         ),
     )
 }

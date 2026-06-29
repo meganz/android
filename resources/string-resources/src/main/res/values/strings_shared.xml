@@ -2956,6 +2956,8 @@
         <item quantity="one">%1$d selected</item>
         <item quantity="other">%1$d selected</item>
     </plurals>
+    <!-- Add participants picker: warning shown when the meeting call has reached its participant limit -->
+    <string name="meetings_add_participants_user_limit_warning">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
     <!-- Contact groups: screen/top bar title for the list of the user's group chats -->
     <string name="contacts_groups_title">Groups</string>
     <!-- Contact groups: placeholder displayed inside the search field on the groups screen -->

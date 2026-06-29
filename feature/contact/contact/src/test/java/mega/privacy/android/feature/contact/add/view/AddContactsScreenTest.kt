@@ -39,7 +39,13 @@ class AddContactsScreenTest {
 
     @Test
     fun `test that the empty view is displayed when there are no contacts`() {
-        setScreen(AddContactUiState.Data(contacts = persistentListOf(), query = null))
+        setScreen(
+            AddContactUiState.Data(
+                contacts = persistentListOf(),
+                query = null,
+                showUserLimitWarning = false,
+            )
+        )
 
         composeTestRule.onNodeWithTag(ADD_CONTACTS_EMPTY_TAG).assertIsDisplayed()
     }
@@ -110,6 +116,26 @@ class AddContactsScreenTest {
         composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the user limit warning is displayed when showUserLimitWarning is true`() {
+        setScreen(
+            AddContactUiState.Data(
+                contacts = persistentListOf(contact(1L, "Alice")),
+                query = null,
+                showUserLimitWarning = true,
+            )
+        )
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_USER_LIMIT_WARNING_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the user limit warning is not displayed when showUserLimitWarning is false`() {
+        setScreen(dataState(contact(1L, "Alice")))
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_USER_LIMIT_WARNING_TAG).assertIsNotDisplayed()
+    }
+
     private fun setScreen(
         state: AddContactUiState,
         onSearchQueryChange: (String?) -> Unit = {},
@@ -127,7 +153,11 @@ class AddContactsScreenTest {
     }
 
     private fun dataState(vararg contacts: ContactItemUiState) =
-        AddContactUiState.Data(contacts = contacts.toList().toImmutableList(), query = null)
+        AddContactUiState.Data(
+            contacts = contacts.toList().toImmutableList(),
+            query = null,
+            showUserLimitWarning = false,
+        )
 
     private fun contact(
         handle: Long,

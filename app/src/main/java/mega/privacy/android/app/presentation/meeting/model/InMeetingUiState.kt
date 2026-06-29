@@ -55,6 +55,7 @@ import timber.log.Timber
  * @property shouldUpdateLocalAVFlags               True, if should update local av flag. False, if not
  * @property sessionOnHoldChanges                   [ChatSession] with changes in session on hold
  * @property isPictureInPictureFeatureFlagEnabled       True, if Picture in Picture feature flag enabled. False, otherwise.
+ * @property isContactsComposeUIEnabled                 True, if the Compose contacts UI feature flag is enabled. False, otherwise.
  * @property isInPipMode                                True, if is in Picture in Picture mode. False, otherwise.
  * @property myUserHandle                               My user handle
  * @property changesInAVFlagsInSession              [ChatSession] with changes in remote audio video flags
@@ -105,6 +106,7 @@ data class InMeetingUiState(
     val shouldUpdateLocalAVFlags: Boolean = true,
     val sessionOnHoldChanges: ChatSession? = null,
     val isPictureInPictureFeatureFlagEnabled: Boolean = false,
+    val isContactsComposeUIEnabled: Boolean = false,
     val isInPipMode: Boolean = false,
     val myUserHandle: Long? = null,
     val changesInAVFlagsInSession: ChatSession? = null,

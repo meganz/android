@@ -35,7 +35,11 @@ class AddContactsScreenScreenshotTest {
     fun AddContactsScreenEmpty() {
         AndroidThemeForPreviews {
             AddContactsScreen(
-                state = AddContactUiState.Data(contacts = persistentListOf(), query = null),
+                state = AddContactUiState.Data(
+                    contacts = persistentListOf(),
+                    query = null,
+                    showUserLimitWarning = false,
+                ),
                 onSearchQueryChange = {},
                 onConfirm = {},
                 onBack = {},
@@ -102,13 +106,29 @@ class AddContactsScreenScreenshotTest {
         }
     }
 
-    private fun sampleData() = AddContactUiState.Data(
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun AddMeetingParticipantsScreenWithWarning() {
+        AndroidThemeForPreviews {
+            AddContactsScreen(
+                state = sampleData(showUserLimitWarning = true),
+                onSearchQueryChange = {},
+                onConfirm = {},
+                onBack = {},
+                titleRes = sharedR.string.add_participants_title,
+            )
+        }
+    }
+
+    private fun sampleData(showUserLimitWarning: Boolean = false) = AddContactUiState.Data(
         contacts = listOf(
             contact(1L, "Alice Anderson", "alice@example.com", Color(0xFF2E7D32)),
             contact(2L, "Bob Brown", "bob@example.com", Color(0xFF1565C0)),
             contact(3L, "Charlie Clark", "charlie@example.com", Color(0xFF6A1B9A)),
         ).toImmutableList(),
         query = null,
+        showUserLimitWarning = showUserLimitWarning,
     )
 
     private fun contact(
