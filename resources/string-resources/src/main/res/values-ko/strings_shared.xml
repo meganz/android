@@ -27,7 +27,7 @@
     <!-- The name of the Device or Folder Sub State when its code is ACCOUNT_BLOCKED -->
     <string name="general_sync_account_blocked">계정이 차단되었기 때문에 이 폴더를 동기화 또는 백업할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is UNKNOWN_TEMPORARY_ERROR -->
-    <string name="general_sync_unknown_temporary_error">이 폴더를 동기화 또는 백업하던 중 문제가 발생했습니다. 나중에 다시 시도하세요. 만약 문제가 계속되면, 지원에 연락주세요.</string>
+    <string name="general_sync_unknown_temporary_error">이 폴더를 동기화 또는 백업하던 중 문제가 발생했습니다. 나중에 다시 시도하세요. 만약 문제가 계속되면, 지원 부서에 연락주세요.</string>
     <!-- The name of the Device or Folder Sub State when its code is TOO_MANY_ACTION_PACKETS -->
     <string name="general_sync_too_many_action_packets">계정을 다시 불러왔습니다. 백업 또는 동기화에 누락된 변경사항이 적용되지 않습니다.</string>
     <!-- The name of the Device or Folder Sub State when its code is LOGGED_OUT -->
@@ -63,9 +63,9 @@
     <!-- The name for specific Sub States to indicate that the local drive cannot be located -->
     <string name="general_sync_message_cannot_locate_local_drive">장치의 폴더를 찾을 수 없습니다</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder due to some changes -->
-    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">이 폴더를 동기화 또는 백업하던 중 MEGA 폴더의 변경으로 인해 문제가 발생했습니다. 동기화 또는 백업을 멈추고 데스크톱 앱에서 다시 설정하세요, 또는 지원에 연락주세요.</string>
+    <string name="general_sync_message_folder_backup_issue_due_to_recent_changes">이 폴더를 동기화 또는 백업하던 중 MEGA 폴더의 변경으로 인해 문제가 발생했습니다. 동기화 또는 백업을 멈추고 데스크톱 앱에서 다시 설정하세요, 또는 지원 부서에 연락하세요.</string>
     <!-- The name for specific Sub States to indicate that a problem occurred when syncing or backing up the MEGA Folder -->
-    <string name="general_sync_message_folder_backup_issue">이 폴더를 동기화 또는 백업하던 중 문제가 발생했습니다. 동기화 또는 백업을 멈추고 데스크톱 앱에서 다시 설정하세요, 또는 지원에 연락주세요.</string>
+    <string name="general_sync_message_folder_backup_issue">이 폴더를 동기화 또는 백업하던 중 문제가 발생했습니다. 동기화 또는 백업을 멈추고 데스크톱 앱에서 다시 설정하세요, 또는 지원 부서에 연락주세요.</string>
     <!-- The name for specific Sub States to indicate that the MEGA Folder cannot be synced or backed up as it is inside another synced MEGA Folder -->
     <string name="general_sync_message_folder_backup_issue_due_to_being_inside_another_backed_up_folder">동기화된 폴더 안에 위치한 폴더이기 때문에 동기화할 수 없습니다</string>
     <!-- The name of the Device or Folder Sub State when its code is LOCAL_FILESYSTEM_MISMATCH -->
@@ -755,7 +755,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">파일 확장자가 필요합니다</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">당신이 이 파일을 미리 볼 수 있도록 MEGA가 이 파일의 임시 사본을 가져올 것입니다. 앱 외부에서 이용 가능하거나 저장되지 않을 것입니다. %1$s가 다운로드 됩니다.</string>
+    <string name="alert_larger_file_preview">이 파일은 MEGA에서 미리 볼 수 없습니다. 다른 앱에서 열려면 파일(%1$s)을 다운로드하세요.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">작업 완료 중: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -2413,14 +2413,14 @@
     <string name="home_do_more_with_mega_scan_document">문서 스캔</string>
     <string name="home_do_more_with_mega_create_album">사진첩 만들기</string>
     <string name="notifications_payment_reminder_section">프로 플랜이 곧 만료됩니다</string>
-    <string name="notifications_payment_succeeded_title">%1$s 플랜 결제가 접수되었습니다.</string>
-    <string name="notifications_payment_failed_title">%1$s 플랜 결제가 실패했습니다.</string>
-    <string name="notifications_payment_reminder_expired_section">프로 플랜이 만료되었습니다.</string>
+    <string name="notifications_payment_succeeded_title">%1$s 요금제에 대한 결제를 받았습니다</string>
+    <string name="notifications_payment_failed_title">%1$s 요금제에 대한 결제를 실패했습니다</string>
+    <string name="notifications_payment_reminder_expired_section">Pro 요금제가 만료되었습니다</string>
     <plurals name="notifications_payment_reminder_will_expire">
-        <item quantity="other">프로 플랜은 %1$d일 후에 만료됩니다.</item>
+        <item quantity="other">프로 요금제가 %1$d일 후에 만료됩니다</item>
     </plurals>
     <plurals name="notifications_payment_reminder_expired">
-        <item quantity="other">프로 플랜은 %1$d일 전에 만료되었습니다.</item>
+        <item quantity="other">Pro 요금제가 %1$d일 전에 만료되었습니다</item>
     </plurals>
     <string name="chat_settings_link_preview_summary">채팅에서 보낸 링크의 미리보기를 생성합니다. 이 미리보기들은 제로지식 암호화로 보호되지 않습니다.</string>
     <string name="video_player_video_not_rendered">이 비디오는 재생할 수 없습니다</string>
@@ -2430,4 +2430,5 @@
     <string name="general_allow_button">허용</string>
     <string name="notifications_payment_info_section">결제 정보</string>
     <string name="document_scanner_download_dialog_download_button">다운로드</string>
+    <string name="add_participants_title">참여자 추가</string>
 </resources>

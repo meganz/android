@@ -755,7 +755,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">จำเป็นต้องมีนามสกุลไฟล์</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA จะเรียกสำเนาไฟล์นี้แบบชั่วคราวเพื่อให้คุณดูตัวอย่างได้ ไฟล์จะไม่ถูกบันทึกหรือเข้าถึงได้จากภายนอกแอป และจะมีการดาวน์โหลด %1$s</string>
+    <string name="alert_larger_file_preview">ไม่สามารถดูตัวอย่างไฟล์นี้ใน MEGA ได้ กรุณาดาวน์โหลดไฟล์ (%1$s) เพื่อนำไปเปิดใช้งานในแอปอื่น</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">กำลังดำเนินการ: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1211,7 +1211,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">อนุญาตให้ใช้ข้อมูลมือถือ</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">กำลังดูตัวอย่างไฟล์ขนาดใหญ่</string>
+    <string name="alert_larger_file_preview_title">ไม่สามารถดูตัวอย่างได้</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">ดูตัวอย่างตอนนี้</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2438,4 +2438,9 @@
     <string name="document_scanner_download_dialog_mobile_data_message">ตัวสแกนเอกสารเวอร์ชันใหม่ต้องดาวน์โหลดไฟล์ขนาด %1$d MB เพียงครั้งเดียว ซึ่งอาจมีค่าบริการอินเทอร์เน็ตมือถือเพิ่มเติม</string>
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">ดาวน์โหลดผ่านอินเทอร์เน็ตมือถือ</string>
     <string name="document_scanner_download_dialog_use_old_scanner_button">ใช้ตัวสแกนเวอร์ชันเดิม</string>
+    <string name="park_account_screen_title">เก็บบัญชี</string>
+    <string name="park_account_screen_acknowledge">ฉันรับทราบว่ากำลังเริ่มต้นใช้งานบัญชีใหม่แบบว่างเปล่า และข้อมูลทั้งหมดในบัญชีปัจจุบันจะสูญหายไป เว้นแต่จะจำรหัสผ่านได้หรือค้นพบข้อมูลคีย์การกู้คืนที่เคยส่งออกไว้</string>
+    <string name="park_account_screen_start_button">เริ่มต้นใช้งานบัญชีใหม่</string>
+    <string name="park_account_success_message">ระบบเก็บบัญชีเดิมของคุณเรียบร้อยแล้ว ตอนนี้คุณสามารถเข้าสู่ระบบเพื่อใช้งานบัญชีใหม่ได้ทันที</string>
+    <string name="add_participants_title">เพิ่มผู้เข้าร่วม</string>
 </resources>

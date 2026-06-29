@@ -768,7 +768,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">De bestandsextensie is nodig</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA zal een tijdelijke kopie van dit bestand ophalen, zodat u er een voorbeeld van kunt bekijken. Het wordt niet opgeslagen of is niet beschikbaar buiten de applicatie. %1$s wordt gedownload.</string>
+    <string name="alert_larger_file_preview">Dit bestand kan niet worden weergegeven in MEGA. Download het bestand (%1$s) om het in een andere applicatie te openen.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Bewerking voltooien: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1228,7 +1228,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Mobiele gegevens toestaan</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Voorbeeld groot bestand bekijken</string>
+    <string name="alert_larger_file_preview_title">Voorbeeld niet beschikbaar</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Voorbeeld nu bekijken</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2534,4 +2534,15 @@
     <string name="general_do_not_allow_button">Niet toestaan</string>
     <string name="general_allow_button">Toestaan</string>
     <string name="document_scanner_download_dialog_download_button">Downloaden</string>
+    <string name="document_scanner_download_dialog_title">Documentscanner downloaden</string>
+    <string name="document_scanner_download_dialog_message">Voor de nieuwe documentscanner is een éénmalige download van %1$d MB vereist voordat u deze kunt gebruiken.</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">Downloaden via mobiele data?</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Voor de nieuwe documentscanner is een éénmalige download van %1$d MB vereist. Er kunnen kosten voor mobiele data in rekening worden gebracht.</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Downloaden via mobiele data</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Gebruik een oude scanner</string>
+    <string name="park_account_screen_title">Account parkeren</string>
+    <string name="park_account_screen_acknowledge">Ik erken dat ik een nieuw, leeg account begin en dat ik alle gegevens in mijn huidige account verlies, tenzij ik mijn wachtwoord weet te herinneren of een geëxporteerde herstelsleutel terugvind.</string>
+    <string name="park_account_screen_start_button">Nieuw account aanmaken</string>
+    <string name="park_account_success_message">Uw oude account is geparkeerd.U kunt nu inloggen op uw nieuwe account.</string>
+    <string name="add_participants_title">Deelnemers toevoegen</string>
 </resources>

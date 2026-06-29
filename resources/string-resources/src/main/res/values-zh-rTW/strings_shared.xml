@@ -2440,4 +2440,5 @@
     <string name="chat_settings_link_preview_summary">會生成您在聊天中發送的連結的預覽。請注意，檢索這些預覽並未受到零知識加密的保護。</string>
     <string name="video_player_video_not_rendered">此影片無法顯示</string>
     <string name="document_scanner_download_dialog_download_button">下載</string>
+    <string name="add_participants_title">新增與會者</string>
 </resources>

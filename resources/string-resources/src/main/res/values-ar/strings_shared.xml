@@ -2889,4 +2889,5 @@
     <string name="chat_settings_link_preview_summary">ينشئ معاينة للروابط التي ترسلها في المحادثة. ملاحظة: استرجاع هذه المعاينات ليس محميًا بتشفير عديم المعرفة.</string>
     <string name="video_player_video_not_rendered">هذا الفيديو لا يمكن عرضه.</string>
     <string name="document_scanner_download_dialog_download_button">تنزيل</string>
+    <string name="add_participants_title">إضافة مشاركين</string>
 </resources>

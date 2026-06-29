@@ -768,7 +768,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Eine Dateierweiterung ist erforderlich</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA ruft eine temporäre Kopie dieser Datei ab, damit Sie sie in der Vorschau betrachten können. Diese wird nicht gespeichert und ist außerhalb der App nicht verfügbar. %1$s werden heruntergeladen.</string>
+    <string name="alert_larger_file_preview">Diese Datei kann auf MEGA nicht in der Vorschau angezeigt werden. Laden Sie die Datei herunter (%1$s), um sie in einer anderen App zu öffnen.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Vorgang wird abgeschlossen: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1228,7 +1228,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Mobile Daten verwenden</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Vorschau einer großen Datei</string>
+    <string name="alert_larger_file_preview_title">Keine Vorschau verfügbar</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Vorschau jetzt anzeigen</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2527,4 +2527,9 @@
     <string name="document_scanner_download_dialog_message">Zur Nutzung des neuen Dokumentenscanners ist ein einmaliger Download von %1$d&#160;MB erforderlich.</string>
     <string name="document_scanner_download_dialog_mobile_data_message">Für den neuen Dokumentenscanner ist ein einmaliger Download von %1$d&#160;MB erforderlich. Es können Gebühren für die mobile Datenübertragung anfallen.</string>
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Über mobile Daten herunterladen</string>
+    <string name="park_account_screen_title">Account parken</string>
+    <string name="park_account_screen_acknowledge">Ich bestätige, dass ich einen neuen, leeren Account erstelle und alle Daten in meinem jetzigen Account verliere, sofern ich mein Passwort oder den exportierten Rettungsschlüssel nicht wiederfinde.</string>
+    <string name="park_account_screen_start_button">Neuen Account erstellen</string>
+    <string name="park_account_success_message">Ihr alter Account wurde geparkt. Sie können sich jetzt bei Ihrem neuen Account anmelden.</string>
+    <string name="add_participants_title">Teilnehmer hinzufügen</string>
 </resources>
