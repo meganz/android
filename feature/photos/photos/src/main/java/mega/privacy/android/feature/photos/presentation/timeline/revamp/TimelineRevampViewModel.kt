@@ -49,7 +49,7 @@ import kotlin.time.Duration.Companion.milliseconds
  * with a bounded LRU and only the currently visible window is fetched.
  */
 @HiltViewModel
-internal class TimelineRevampViewModel @Inject constructor(
+class TimelineRevampViewModel @Inject constructor(
     private val getMediaTimelineSectionsUseCase: GetMediaTimelineSectionsUseCase,
     private val listMediaNodesByOffsetUseCase: ListMediaNodesByOffsetUseCase,
     private val mediaTimelineNodeUiItemMapper: MediaTimelineNodeUiItemMapper,

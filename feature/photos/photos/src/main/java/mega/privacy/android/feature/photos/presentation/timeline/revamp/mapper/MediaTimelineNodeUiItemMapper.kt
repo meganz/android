@@ -16,7 +16,7 @@ import javax.inject.Inject
  * section headers, so the date fields ([PhotosNodeContentItemV2.day]/[PhotosNodeContentItemV2.month]/
  * [PhotosNodeContentItemV2.year]) are unused and left at 0.
  */
-internal class MediaTimelineNodeUiItemMapper @Inject constructor(
+class MediaTimelineNodeUiItemMapper @Inject constructor(
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
 ) {
 

@@ -9,36 +9,26 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
+import mega.android.core.ui.components.state.EmptyStateView
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
+import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.presentation.component.PhotoNodeBodyV2
-
-@Composable
-internal fun TimelineRevampScreen(
-    modifier: Modifier = Modifier,
-    viewModel: TimelineRevampViewModel = hiltViewModel(),
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    TimelineRevampScreen(
-        uiState = uiState,
-        onVisibleRangeChanged = viewModel::onVisibleRangeChanged,
-        modifier = modifier,
-    )
-}
+import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
+import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
 internal fun TimelineRevampScreen(
@@ -48,11 +38,16 @@ internal fun TimelineRevampScreen(
 ) {
     when (uiState) {
         is TimelineRevampUiState.Loading -> {
-            // Loading handled by skeleton in a later step
+            MediaSkeletonView(
+                modifier = modifier.testTag(TIMELINE_REVAMP_LOADING_SKELETON_TAG),
+            )
         }
 
         is TimelineRevampUiState.Empty -> {
-            // Empty body handled together with the screen plumbing in a later step
+            EmptyStateView(
+                imagePainter = painterResource(R.drawable.il_glass_image),
+                title = stringResource(sharedR.string.timeline_tab_empty_body_no_media_found)
+            )
         }
 
         is TimelineRevampUiState.Data -> {
@@ -152,6 +147,8 @@ private const val MEDIA_KEY_PREFIX = "media_"
 
 internal const val TIMELINE_REVAMP_CONTENT_GRID_TAG = "timeline_revamp_content:grid"
 internal const val TIMELINE_REVAMP_SECTION_HEADER_TAG = "timeline_revamp_content:section_header_"
+internal const val TIMELINE_REVAMP_LOADING_SKELETON_TAG = "timeline_revamp_content:loading_skeleton"
+internal const val TIMELINE_REVAMP_EMPTY_VIEW_TAG = "timeline_revamp_content:empty_view"
 
 @CombinedThemePreviews
 @Composable
@@ -176,6 +173,17 @@ private fun TimelineRevampScreenPreview() {
                 sectionStartOffsets = listOf(0, 7),
                 loadedNodes = emptyMap(),
             ),
+            onVisibleRangeChanged = { _, _ -> }
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun TimelineRevampEmptyPreview() {
+    AndroidThemeForPreviews {
+        TimelineRevampScreen(
+            uiState = TimelineRevampUiState.Empty,
             onVisibleRangeChanged = { _, _ -> }
         )
     }

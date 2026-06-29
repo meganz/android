@@ -80,6 +80,8 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Timel
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampScreen
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampUiState
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabRoute
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
@@ -105,6 +107,7 @@ fun MediaMainRoute(
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
     albumsTabViewModel: AlbumsTabViewModel = hiltViewModel(),
     timelineViewModel: TimelineTabViewModel = hiltViewModel(),
+    timelineRevampViewModel: TimelineRevampViewModel = hiltViewModel(),
     mediaCameraUploadViewModel: MediaCameraUploadViewModel = hiltViewModel(),
     nodeOptionsActionViewModel: NodeOptionsActionViewModel =
         hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
@@ -115,6 +118,7 @@ fun MediaMainRoute(
 ) {
     val albumsTabUiState by albumsTabViewModel.uiState.collectAsStateWithLifecycle()
     val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
+    val timelineRevampUiState by timelineRevampViewModel.uiState.collectAsStateWithLifecycle()
     val selectedPhotosInTypedNodes by timelineViewModel.selectedPhotosInTypedNodesFlow.collectAsStateWithLifecycle()
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
@@ -264,6 +268,8 @@ fun MediaMainRoute(
     MediaMainScreen(
         albumsTabUiState = albumsTabUiState,
         timelineTabUiState = timelineTabUiState,
+        timelineRevampUiState = timelineRevampUiState,
+        onTimelineRevampVisibleRangeChanged = timelineRevampViewModel::onVisibleRangeChanged,
         timelineTabActionUiState = timelineTabActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         timelineFilterUiState = timelineFilterUiState,
@@ -332,6 +338,8 @@ fun MediaMainRoute(
 fun MediaMainScreen(
     albumsTabUiState: AlbumsTabUiState,
     timelineTabUiState: TimelineTabUiState,
+    timelineRevampUiState: TimelineRevampUiState,
+    onTimelineRevampVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
     timelineTabActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     videosSelectionUiState: VideosTabUiState.Selection,
@@ -558,6 +566,8 @@ fun MediaMainScreen(
                                     mainViewModel = viewModel,
                                     albumsTabViewModel = albumsTabViewModel,
                                     timelineTabUiState = timelineTabUiState,
+                                    timelineRevampUiState = timelineRevampUiState,
+                                    onTimelineRevampVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
                                     timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                                     videosSelectionUiState = videosSelectionUiState,
@@ -655,6 +665,8 @@ private fun MediaScreen.MediaContent(
     mainViewModel: MediaMainViewModel,
     albumsTabViewModel: AlbumsTabViewModel,
     timelineTabUiState: TimelineTabUiState,
+    timelineRevampUiState: TimelineRevampUiState,
+    onTimelineRevampVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
     videosSelectionUiState: VideosTabUiState.Selection,
@@ -688,7 +700,11 @@ private fun MediaScreen.MediaContent(
         MediaScreen.Timeline -> {
             when (uiState.isTimelineRevampEnabled) {
                 true -> {
-                    TimelineRevampScreen()
+                    TimelineRevampScreen(
+                        modifier = Modifier.fillMaxSize(),
+                        uiState = timelineRevampUiState,
+                        onVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
+                    )
                 }
 
                 false -> {
@@ -773,6 +789,8 @@ private fun PhotosMainScreenPreview() {
     AndroidThemeForPreviews {
         MediaMainScreen(
             timelineTabUiState = TimelineTabUiState(),
+            timelineRevampUiState = TimelineRevampUiState.Loading,
+            onTimelineRevampVisibleRangeChanged = { _, _ -> },
             timelineTabActionUiState = TimelineTabActionUiState(),
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),

@@ -39,6 +39,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActi
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabUiState
 import mega.privacy.android.feature.photos.presentation.videos.VideosTabViewModel
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
@@ -142,6 +143,8 @@ class MediaMainScreenAnalyticsTest {
                 MediaMainScreen(
                     albumsTabUiState = AlbumsTabUiState(),
                     timelineTabUiState = timelineTabUiState,
+                    timelineRevampUiState = TimelineRevampUiState.Loading,
+                    onTimelineRevampVisibleRangeChanged = { _, _ -> },
                     timelineTabActionUiState = timelineTabActionUiState,
                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                     videosSelectionUiState = videosSelectionUiState,
