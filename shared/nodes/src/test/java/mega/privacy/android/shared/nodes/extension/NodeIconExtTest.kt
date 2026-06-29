@@ -56,7 +56,7 @@ class NodeIconExtTest {
                 fileTypeIconMapper = fileTypeIconMapper
             )
         )
-            .isEqualTo(if (outShareOverride) IconPackR.drawable.ic_folder_outgoing_medium_solid else expectedResource)
+            .isEqualTo(if (outShareOverride) IconPackR.drawable.ic_folder_users_medium_solid else expectedResource)
     }
 
     private class FolderMockNameResource(
@@ -88,7 +88,7 @@ class NodeIconExtTest {
         },
         FolderMockNameResource(
             "IncomingShare",
-            IconPackR.drawable.ic_folder_incoming_medium_solid
+            IconPackR.drawable.ic_folder_users_medium_solid
         ) {
             on { isIncomingShare }.thenReturn(true)
         },
@@ -101,12 +101,12 @@ class NodeIconExtTest {
         FolderMockNameResource("Chat", IconPackR.drawable.ic_folder_chat_medium_solid) {
             on { type }.thenReturn(FolderType.ChatFilesFolder)
         },
-        FolderMockNameResource("Shared", IconPackR.drawable.ic_folder_outgoing_medium_solid) {
+        FolderMockNameResource("Shared", IconPackR.drawable.ic_folder_users_medium_solid) {
             on { isShared }.thenReturn(true)
         },
         FolderMockNameResource(
             "PendingShare",
-            IconPackR.drawable.ic_folder_outgoing_medium_solid
+            IconPackR.drawable.ic_folder_users_medium_solid
         ) {
             on { isPendingShare }.thenReturn(true)
         },
@@ -156,14 +156,14 @@ class NodeIconExtTest {
 
 
     @Test
-    fun `test that incoming share returns the incoming folder icon`() {
+    fun `test that incoming share returns the shared folder icon`() {
         val folderNode = mock<TypedFolderNode> { on { isIncomingShare }.thenReturn(true) }
 
         assertThat(
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(IconPackR.drawable.ic_folder_incoming_medium_solid)
+        ).isEqualTo(IconPackR.drawable.ic_folder_users_medium_solid)
     }
 
     @Test
@@ -200,7 +200,7 @@ class NodeIconExtTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(IconPackR.drawable.ic_folder_outgoing_medium_solid)
+        ).isEqualTo(IconPackR.drawable.ic_folder_users_medium_solid)
     }
 
     @Test
@@ -211,7 +211,7 @@ class NodeIconExtTest {
             getDefaultFolderIcon(
                 folderNode = folderNode,
             )
-        ).isEqualTo(IconPackR.drawable.ic_folder_outgoing_medium_solid)
+        ).isEqualTo(IconPackR.drawable.ic_folder_users_medium_solid)
     }
 
     @Test

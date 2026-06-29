@@ -105,7 +105,7 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
             channel.setShowBadge(true)
             notificationManager.createNotificationChannel(channel)
             val icon: Bitmap? = getBitmapFromVectorDrawable(
-                mega.privacy.android.icon.pack.R.drawable.ic_folder_incoming_medium_solid
+                mega.privacy.android.icon.pack.R.drawable.ic_folder_users_medium_solid
             )
             val notificationBuilder: NotificationCompat.Builder =
                 NotificationCompat.Builder(appContext, notificationChannelId)

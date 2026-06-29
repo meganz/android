@@ -34,7 +34,7 @@ fun TypedNode.getIcon(
             && !isInRubbishBin
             && !isIncomingShare
         ) {
-            IconPackR.drawable.ic_folder_outgoing_medium_solid
+            IconPackR.drawable.ic_folder_users_medium_solid
         } else {
             getDefaultFolderIcon(
                 folderNode = this,
@@ -62,10 +62,9 @@ fun getDefaultFolderIcon(
             isColoredFolderEnabled = isColoredFolderEnabled
         )
 
-        isIncomingShare -> IconPackR.drawable.ic_folder_incoming_medium_solid
         type is FolderType.MediaSyncFolder -> IconPackR.drawable.ic_folder_camera_uploads_medium_solid
         type is FolderType.ChatFilesFolder -> IconPackR.drawable.ic_folder_chat_medium_solid
-        isShared || isPendingShare -> IconPackR.drawable.ic_folder_outgoing_medium_solid
+        isIncomingShare || isShared || isPendingShare -> IconPackR.drawable.ic_folder_users_medium_solid
         type is FolderType.RootBackup -> IconPackR.drawable.ic_backup_medium_solid
         type is FolderType.DeviceBackup -> getDeviceFolderIcon((type as FolderType.DeviceBackup).deviceType)
         type is FolderType.ChildBackup -> IconPackR.drawable.ic_folder_backup_medium_solid

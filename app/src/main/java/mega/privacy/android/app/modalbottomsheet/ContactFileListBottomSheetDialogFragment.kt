@@ -127,7 +127,7 @@ class ContactFileListBottomSheetDialogFragment : BaseBottomSheetDialogFragment()
 
         optionInfo.setText(R.string.general_info)
         if (node.isFolder) {
-            nodeThumb.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_incoming_medium_solid)
+            nodeThumb.setImageResource(mega.privacy.android.icon.pack.R.drawable.ic_folder_users_medium_solid)
             nodeInfo.text = MegaApiUtils.getMegaNodeFolderInfo(node, megaApi, requireContext())
 
             if (!node.isTakenDown && (firstLevel || parentHandle == MegaApiJava.INVALID_HANDLE)) {

@@ -312,23 +312,23 @@ object MegaNodeUtil {
     @JvmStatic
     fun getFolderIcon(megaApi: MegaApiAndroid, node: MegaNode, drawerItem: DrawerItem): Int {
         return if (node.isInShare) {
-            IconPackR.drawable.ic_folder_incoming_medium_solid
+            IconPackR.drawable.ic_folder_users_medium_solid
         } else if (isCameraUploads(megaApi, node)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
-                IconPackR.drawable.ic_folder_outgoing_medium_solid
+                IconPackR.drawable.ic_folder_users_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_camera_uploads_medium_solid
             }
         } else if (isMyChatFilesFolder(node)) {
             if (drawerItem == DrawerItem.SHARED_ITEMS && isOutShareInternal(megaApi, node)) {
-                IconPackR.drawable.ic_folder_outgoing_medium_solid
+                IconPackR.drawable.ic_folder_users_medium_solid
             } else {
                 IconPackR.drawable.ic_folder_chat_medium_solid
             }
         } else if (isSynced(megaApi, node)) {
             IconPackR.drawable.ic_folder_sync_medium_solid
         } else if (isOutShareInternal(megaApi, node)) {
-            IconPackR.drawable.ic_folder_outgoing_medium_solid
+            IconPackR.drawable.ic_folder_users_medium_solid
         } else if (isRootBackupFolder(megaApi, node)) {
             IconPackR.drawable.ic_backup_medium_solid
         } else if (isDeviceBackupFolder(megaApi, node)) {

@@ -70,8 +70,10 @@ class RecentActionBucketUiEntityMapper @Inject constructor(
                 fileTypeIconMapper(node.type.extension),
             shareIcon = when (item.parentFolderSharesType) {
                 RecentActionsSharesType.NONE -> null
-                RecentActionsSharesType.INCOMING_SHARES -> IconPackR.drawable.ic_folder_incoming_medium_solid
-                RecentActionsSharesType.OUTGOING_SHARES, RecentActionsSharesType.PENDING_OUTGOING_SHARES -> IconPackR.drawable.ic_folder_outgoing_medium_solid
+                RecentActionsSharesType.INCOMING_SHARES,
+                RecentActionsSharesType.OUTGOING_SHARES,
+                RecentActionsSharesType.PENDING_OUTGOING_SHARES,
+                    -> IconPackR.drawable.ic_folder_users_medium_solid
             },
             actionIcon = if (item.isUpdate) R.drawable.ic_versions_small else R.drawable.ic_recents_up,
             showMenuButton = isSingleNode,

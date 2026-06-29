@@ -265,7 +265,7 @@ class RecentActionBucketUiEntityMapperTest {
 
         val recentActionBucketUiEntity = underTest(recentActionBucket)
 
-        assertThat(recentActionBucketUiEntity.shareIcon).isEqualTo(mega.privacy.android.icon.pack.R.drawable.ic_folder_incoming_medium_solid)
+        assertThat(recentActionBucketUiEntity.shareIcon).isEqualTo(mega.privacy.android.icon.pack.R.drawable.ic_folder_users_medium_solid)
     }
 
     @Test

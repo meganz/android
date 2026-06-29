@@ -172,7 +172,7 @@ class MegaProviderAdapter(
             } else {
                 holder.imageView.setImageResource(
                     if (node.isInShare)
-                        IconPackR.drawable.ic_folder_incoming_medium_solid
+                        IconPackR.drawable.ic_folder_users_medium_solid
                     else
                         IconPackR.drawable.ic_folder_medium_solid
                 )
