@@ -727,7 +727,7 @@
     <!-- The additional security description in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_description">Adicione senhas e datas de validade para links de arquivos e de pastas.</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_button_view_pro_plan">Conheça os planos Pro</string>
+    <string name="payment_ads_free_intro_button_view_pro_plan">Ver os planos Pro</string>
     <!-- Label for call option on settings -->
     <string name="settings_calls_title">Chamadas</string>
     <!-- Label for the sound notifications option on calls settings -->
@@ -781,7 +781,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">É necessário incluir a extensão do arquivo</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">O MEGA vai fazer uma cópia temporária desse arquivo para que você possa visualizá-lo. Ele não será salvo nem estará disponível fora do aplicativo. Será feito o download de %1$s.</string>
+    <string name="alert_larger_file_preview">Este arquivo não pode ser visualizado no MEGA. Faça o download do arquivo (%1$s) para abri-lo em outro aplicativo.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Finalizando a operação: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1245,7 +1245,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Permitir dados móveis</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Visualização de um arquivo grande</string>
+    <string name="alert_larger_file_preview_title">Visualização não disponível</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Visualizar agora</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2634,4 +2634,9 @@
     <string name="document_scanner_download_dialog_mobile_data_message">Para poder usar o novo scanner de documentos, é necessário fazer um download de %1$d MB, o que pode gerar custos pelo uso de dados móveis.</string>
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Fazer o download com dados móveis</string>
     <string name="document_scanner_download_dialog_use_old_scanner_button">Usar o scanner antigo</string>
+    <string name="park_account_screen_title">Estacionar a minha conta</string>
+    <string name="park_account_screen_acknowledge">Entendo que estou criando uma conta nova e vazia, e que vou perder todos os dados na minha conta atual, a menos que recupere a minha senha ou encontre a chave de recuperação exportada.</string>
+    <string name="park_account_screen_start_button">Criar uma nova conta</string>
+    <string name="park_account_success_message">A sua conta antiga foi estacionada. Agora você pode fazer login na sua nova conta.</string>
+    <string name="add_participants_title">Adicionar participantes</string>
 </resources>

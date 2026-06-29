@@ -4563,7 +4563,7 @@
     <!-- Warning warning dialog message if user has offline files or transfers in progress. -->
     <string name="logout_warning_dialog_offline_and_transfers_message">如果您現在退出，所有待處理的傳輸和離線檔案都將被刪除</string>
     <!-- Toolbar action menu button in file storage screen to open 3rd-party File Manager -->
-    <string name="filestorage_menu_option_open_in_file_manager">在檔案管理員中開啟</string>
+    <string name="filestorage_menu_option_open_in_file_manager">在檔案管理器中開啟</string>
     <!-- Snackbar message when file storage screen is unable to open 3rd-party File Manager -->
     <string name="filestorage_snackbar_file_manager_is_not_available">此裝置上沒有可用的檔案管理器應用程式</string>
     <!--Success message to show when user enables the camera upload feature from camera backup permission onboarding-->

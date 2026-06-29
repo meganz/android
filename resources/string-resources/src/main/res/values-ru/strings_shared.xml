@@ -2722,4 +2722,5 @@
     <string name="chat_settings_link_preview_summary">Генерирует предварительный просмотр ссылок, которые вы отправляете в чате. Обратите внимание, что эти превью не защищены шифрованием с нулевыми знаниями.</string>
     <string name="video_player_video_not_rendered">Это видео не может быть отображено</string>
     <string name="document_scanner_download_dialog_download_button">Скачать</string>
+    <string name="add_participants_title">Добавить участников</string>
 </resources>

@@ -2411,4 +2411,5 @@
     <string name="general_do_not_allow_button">Không cho</string>
     <string name="general_allow_button">Cho phép</string>
     <string name="document_scanner_download_dialog_download_button">Tải xuống</string>
+    <string name="add_participants_title">Thêm thành viên</string>
 </resources>

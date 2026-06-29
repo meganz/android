@@ -755,7 +755,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">ファイル拡張子が必要です</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGAはこのファイルの一時コピーを取得し、プレビューできるようにします。このファイルは保存されず、アプリ外で利用することもできません。%1$sがダウンロードされます。</string>
+    <string name="alert_larger_file_preview">このファイルはMEGAではプレビューできません。ファイル（%1$s）をダウンロードして、別のアプリで開いてください。</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">操作を完了しています ：%1$d%%\n</string>
     <!-- Add to album files existed message -->
@@ -1211,7 +1211,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">モバイルデータを許可</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">大きなファイルのプレビュー</string>
+    <string name="alert_larger_file_preview_title">プレビューは利用できません</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">今すぐプレビュー</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2447,4 +2447,9 @@
     <string name="document_scanner_download_dialog_mobile_data_message">新しいドキュメントスキャナーの利用には、初回のみ%1$dMBのダウンロードが必要です。モバイルデータ通信料が発生する場合があります。</string>
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">モバイルデータ通信でダウンロード</string>
     <string name="document_scanner_download_dialog_use_old_scanner_button">従来のスキャナーを使用</string>
+    <string name="park_account_screen_title">アカウントの保留</string>
+    <string name="park_account_screen_acknowledge">パスワードを思い出すか、エクスポート済みの復元キーを見つけられない限り、現在のアカウントのデータはすべて失われ、新しく空のアカウントが開始されることを承知します。</string>
+    <string name="park_account_screen_start_button">新しいアカウントを開始</string>
+    <string name="park_account_success_message">古いアカウントが保留されました。新しいアカウントにログインできます。</string>
+    <string name="add_participants_title">参加者を追加</string>
 </resources>

@@ -2729,4 +2729,9 @@
     <string name="document_scanner_download_dialog_mobile_data_message">Nowy skaner dokumentów wymaga jednorazowego pobrania o wielkości %1$d MB. Mogą obowiązywać opłaty za dane mobilne.</string>
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Pobieraj przez sieć komórkową</string>
     <string name="document_scanner_download_dialog_use_old_scanner_button">Użyj starego skanera</string>
+    <string name="park_account_screen_title">Zaparkuj konto</string>
+    <string name="park_account_screen_acknowledge">Potwierdzam, że zaczynam nowe, puste konto i że utracę wszystkie dane z mojego obecnego konta, chyba że przypomnę sobie hasło lub odnajdę wyeksportowany klucz odzyskiwania.</string>
+    <string name="park_account_screen_start_button">Utwórz nowe konto</string>
+    <string name="park_account_success_message">Twoje stare konto zostało zablokowane. Teraz możesz zalogować się na swoje nowe konto.</string>
+    <string name="add_participants_title">Dodaj uczestnikow</string>
 </resources>

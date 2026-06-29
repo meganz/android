@@ -781,7 +781,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Se necesita la extensión del archivo</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA buscará una copia temporal de este archivo para que puedas previsualizarlo. No se guardará ni estará disponible fuera de la aplicación. Se descargarán %1$s.</string>
+    <string name="alert_larger_file_preview">Este archivo no se puede previsualizar en MEGA. Descarga el archivo (%1$s) para abrirlo en otra aplicación.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Completando operación: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1239,7 +1239,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Permitir datos móviles</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Previsualizar archivos grandes</string>
+    <string name="alert_larger_file_preview_title">Vista previa no disponible</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Vista previa</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2592,4 +2592,15 @@
     <string name="general_do_not_allow_button">Denegar</string>
     <string name="general_allow_button">Permitir</string>
     <string name="document_scanner_download_dialog_download_button">Descargar</string>
+    <string name="document_scanner_download_dialog_title">Descargar escáner de documentos</string>
+    <string name="document_scanner_download_dialog_message">El nuevo escáner de documentos necesita una descarga única de %1$d MB antes de que puedas usarlo.</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">¿Descargar con datos móviles?</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">El nuevo escáner de documentos necesita una descarga única de %1$d MB. Podrían aplicarse cargos por datos móviles.</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Descargar con datos móviles</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Usar el escáner antiguo</string>
+    <string name="park_account_screen_title">Aparcar cuenta</string>
+    <string name="park_account_screen_acknowledge">Entiendo que estoy creando una cuenta nueva y vacía, y que perderé todos los datos de mi cuenta actual a menos que recuerde mi contraseña o encuentre la clave de recuperación que exporté.</string>
+    <string name="park_account_screen_start_button">Crear una cuenta nueva</string>
+    <string name="park_account_success_message">Has aparcado tu cuenta antigua. Accede a tu cuenta nueva.</string>
+    <string name="add_participants_title">Añadir participantes</string>
 </resources>
