@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -27,6 +28,7 @@ import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMed
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
@@ -43,6 +45,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
@@ -62,6 +65,7 @@ class TimelineTabViewModel @Inject constructor(
     private val monitorTimelineMediaUseCase: MonitorTimelineMediaUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val getDeviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private var allMediaInTypedFileNodes: List<TypedFileNode> = emptyList()
@@ -106,12 +110,18 @@ class TimelineTabViewModel @Inject constructor(
     }
 
     internal val uiState: StateFlow<TimelineTabUiState> by lazy {
-        monitorPhotos()
-            .distinctUntilChanged()
-            .asUiStateFlow(
-                scope = viewModelScope,
-                initialValue = TimelineTabUiState()
-            )
+        flow {
+            // When revamp flag is on, we prevent monitorPhotos() because this is a heavy operation
+            val isRevampEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.TimelineRevamp)
+            }.getOrDefault(false)
+            if (!isRevampEnabled) {
+                emitAll(monitorPhotos().distinctUntilChanged())
+            }
+        }.asUiStateFlow(
+            scope = viewModelScope,
+            initialValue = TimelineTabUiState()
+        )
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)

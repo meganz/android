@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMed
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
@@ -30,6 +31,7 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,6 +46,7 @@ import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -63,6 +66,7 @@ class TimelineTabViewModelTest {
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val getDeviceCurrentTimeUseCase: GetDeviceCurrentTimeUseCase = mock()
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase = mock()
     private val analyticsTracker: AnalyticsTracker = mock()
 
     private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
@@ -80,6 +84,7 @@ class TimelineTabViewModelTest {
             monitorTimelineMediaUseCase = monitorTimelineMediaUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             getDeviceCurrentTimeUseCase = getDeviceCurrentTimeUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -94,6 +99,7 @@ class TimelineTabViewModelTest {
             monitorHiddenNodesEnabledUseCase,
             durationInSecondsTextMapper,
             getDeviceCurrentTimeUseCase,
+            getFeatureFlagValueUseCase,
             analyticsTracker
         )
     }
@@ -149,6 +155,17 @@ class TimelineTabViewModelTest {
             sortOrder = SortOrder.ORDER_MODIFICATION_DESC
         )
     }
+
+    @Test
+    fun `test that uiState does not monitor timeline media when timeline revamp is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.TimelineRevamp)) doReturn true
+
+            underTest.uiState.test {
+                assertThat(awaitItem().displayedPhotos).isEmpty()
+            }
+            verifyNoInteractions(monitorTimelineMediaUseCase)
+        }
 
     @Test
     fun `test that all photos are resorted when the sort order changes`() = runTest {
