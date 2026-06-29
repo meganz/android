@@ -840,7 +840,9 @@ internal fun VideoPlayerScreen(
             cancelButtonText = null,
             onConfirm = {
                 showBlockedDialog = false
-                onFinish()
+                if (!viewModel.removeBlockedItemAndNavigate()) {
+                    onFinish()
+                }
             },
             onDismiss = {},
             dismissOnClickOutside = false,
