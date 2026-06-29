@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
@@ -89,6 +90,59 @@ internal class TimelineRevampViewModelTest {
         )
     }
 
+    @Test
+    fun `test that uiState emits Empty when sections are empty`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Empty>().test {
+            assertThat(awaitItem()).isEqualTo(TimelineRevampUiState.Empty)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that getMediaTimelineSectionsUseCase is invoked with the default filter`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.uiState.test {
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(getMediaTimelineSectionsUseCase).invoke(DEFAULT_FILTER)
+    }
+
+    @Test
+    fun `test that listMediaNodesByOffsetUseCase is invoked with the default filter`() = runTest {
+        val sections = listOf(section(groupId = "May 2026", count = 5))
+        val nodes = (0 until 5).map { mock<TypedFileNode>() }
+        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(sections)
+        whenever(
+            listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any())
+        ).thenReturn(nodes)
+        nodes.forEach { node ->
+            whenever(mediaTimelineNodeUiItemMapper(node)).thenReturn(item(id = 0L))
+        }
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 4)
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(listMediaNodesByOffsetUseCase).invoke(
+            filter = eq(DEFAULT_FILTER),
+            section = any(),
+            order = any(),
+            maxElements = any(),
+            offset = any(),
+        )
+    }
+
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)
 
@@ -107,4 +161,13 @@ internal class TimelineRevampViewModelTest {
         isFavourite = false,
         isSensitive = false,
     )
+
+    private companion object {
+        val DEFAULT_FILTER = MediaTimelineFilter(
+            granularity = MediaTimelineFilter.Granularity.Day,
+            category = MediaTimelineFilter.Category.All,
+            location = MediaTimelineFilter.Location.CloudDriveAndVault,
+            sensitivity = MediaTimelineFilter.Sensitivity.ShowAll,
+        )
+    }
 }

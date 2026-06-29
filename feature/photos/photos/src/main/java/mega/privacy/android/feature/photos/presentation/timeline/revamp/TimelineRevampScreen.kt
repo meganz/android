@@ -51,6 +51,10 @@ internal fun TimelineRevampScreen(
             // Loading handled by skeleton in a later step
         }
 
+        is TimelineRevampUiState.Empty -> {
+            // Empty body handled together with the screen plumbing in a later step
+        }
+
         is TimelineRevampUiState.Data -> {
             TimelineRevampContent(
                 sections = uiState.sections,

@@ -3,7 +3,9 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +13,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,6 +31,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.DEFAULT_FILTER
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
 import timber.log.Timber
@@ -56,6 +61,13 @@ internal class TimelineRevampViewModel @Inject constructor(
     private val mediaLoaderStarted = AtomicBoolean(false)
 
     /**
+     * The filter that scopes both the timeline sections and the per-section node pages. Seeded with
+     * [DEFAULT_FILTER]; the user-controllable options (sort, media type, location, sensitivity,
+     * granularity) update this in later steps and the sections re-load reactively.
+     */
+    private val currentFilter = MutableStateFlow(DEFAULT_FILTER)
+
+    /**
      * The section layout the cache was built against. When the sections change, the global-index
      * keying is invalidated, so the cache is reset.
      */
@@ -81,17 +93,21 @@ internal class TimelineRevampViewModel @Inject constructor(
         ): Boolean = size > MAX_CACHED_ITEMS
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<TimelineRevampUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
-            flow { emit(getMediaTimelineSectionsUseCase(DEFAULT_FILTER)) }
-                .onEach { newSections -> sections.update { newSections } },
+            monitorTimelineSections(),
             loadedNodes.asStateFlow(),
         ) { sectionItems, loaded ->
-            TimelineRevampUiState.Data(
-                sections = sectionItems,
-                sectionStartOffsets = sectionStartOffsetsOf(sectionItems),
-                loadedNodes = loaded,
-            ) as TimelineRevampUiState
+            if (sectionItems.isEmpty()) {
+                TimelineRevampUiState.Empty
+            } else {
+                TimelineRevampUiState.Data(
+                    sections = sectionItems,
+                    sectionStartOffsets = sectionStartOffsetsOf(sectionItems),
+                    loadedNodes = loaded,
+                )
+            }
         }
             .catch { e -> Timber.e(e, "Failed to load media timeline sections") }
             .asUiStateFlow(
@@ -99,6 +115,14 @@ internal class TimelineRevampViewModel @Inject constructor(
                 TimelineRevampUiState.Loading,
             )
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun monitorTimelineSections(): Flow<List<MediaTimelineSection>> =
+        currentFilter
+            .mapLatest { getMediaTimelineSectionsUseCase(it) }
+            .onEach { newSections ->
+                sections.update { newSections }
+            }
 
     /**
      * Called by the screen when the set of visible media slots changes.
@@ -256,7 +280,7 @@ internal class TimelineRevampViewModel @Inject constructor(
         Timber.d("Fetching section '${section.groupId}' offsets [${localRange.first}, ${localRange.last}]")
         return runCatching {
             listMediaNodesByOffsetUseCase(
-                filter = DEFAULT_FILTER,
+                filter = currentFilter.value,
                 section = section,
                 order = SortOrder.ORDER_MODIFICATION_DESC,
                 maxElements = localRange.last - localRange.first + 1,
@@ -290,7 +314,10 @@ internal class TimelineRevampViewModel @Inject constructor(
         private const val MAX_CACHED_ITEMS = 480
         private const val SCROLL_SETTLE_DEBOUNCE_MS = 500L
 
-        // Todo: Hardcoded filter for now, filtering will implemented later
+        /**
+         * The filter [currentFilter] starts with. Its options become user-controllable in later
+         * steps; until then the timeline always loads with these defaults.
+         */
         private val DEFAULT_FILTER = MediaTimelineFilter(
             granularity = Granularity.Day,
             category = Category.All,

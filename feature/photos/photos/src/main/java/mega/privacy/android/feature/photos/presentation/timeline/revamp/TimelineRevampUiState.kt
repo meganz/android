@@ -16,6 +16,11 @@ sealed interface TimelineRevampUiState {
     data object Loading : TimelineRevampUiState
 
     /**
+     * Empty state, shown once the timeline sections have been fetched and there is no media to display
+     */
+    data object Empty : TimelineRevampUiState
+
+    /**
      * Loaded state holding the timeline sections to display
      *
      * @property sections the list of media timeline sections
