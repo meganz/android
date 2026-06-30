@@ -132,6 +132,7 @@ private fun VerifyTwoFactorBody(
                     .focusRequester(focusRequester),
                 value = state.pin,
                 isCodeCorrect = if (state.isPinError) false else null,
+                cursorIndex = if (state.isPinError) 0 else -1,
                 errorText = stringResource(R.string.pin_error_2fa),
                 onValueChange = onPinChanged,
             )
