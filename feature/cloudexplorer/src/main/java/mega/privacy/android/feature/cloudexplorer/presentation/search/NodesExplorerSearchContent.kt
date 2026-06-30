@@ -28,6 +28,8 @@ internal fun NodesExplorerSearchContent(
     onCloseSearch: () -> Unit,
     recentSearchesEnabled: Boolean,
     modifier: Modifier = Modifier,
+    restrictedNodeIds: Set<NodeId> = emptySet(),
+    onRestrictedNodeClick: (NodeId) -> Unit = {},
 ) = ExplorerSearchContent(
     query,
     onQueryChanged,
@@ -56,6 +58,8 @@ internal fun NodesExplorerSearchContent(
         isSelectionModeEnabled = isFileSelectionEnabled,
         disabledNodeIds = disabledNodeIds,
         videosOnly = videosOnly,
+        restrictedNodeIds = restrictedNodeIds,
+        onRestrictedNodeClick = onRestrictedNodeClick,
         emptyView = { SearchResultsEmptyView() },
         modifier = modifier,
     )

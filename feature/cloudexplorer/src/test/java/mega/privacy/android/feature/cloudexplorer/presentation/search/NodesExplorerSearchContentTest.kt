@@ -6,10 +6,13 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -49,7 +52,29 @@ internal class NodesExplorerSearchContentTest {
         composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).assertIsDisplayed()
     }
 
-    private fun setContent(searchItems: List<NodeViewItem<TypedNode>>) {
+    @Test
+    fun `test that clicking a restricted folder in search invokes the restricted callback instead of navigating`() {
+        var navigatedPath: List<NodeId>? = null
+        var restrictedNodeId: NodeId? = null
+        setContent(
+            searchItems = listOf(previewFolderNodeUiItem(1L, name = FOLDER_NAME)),
+            restrictedNodeIds = setOf(NodeId(1L)),
+            onNavigateToFolderPath = { navigatedPath = it },
+            onRestrictedNodeClick = { restrictedNodeId = it },
+        )
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        assertThat(restrictedNodeId).isEqualTo(NodeId(1L))
+        assertThat(navigatedPath).isNull()
+    }
+
+    private fun setContent(
+        searchItems: List<NodeViewItem<TypedNode>>,
+        restrictedNodeIds: Set<NodeId> = emptySet(),
+        onNavigateToFolderPath: (List<NodeId>) -> Unit = {},
+        onRestrictedNodeClick: (NodeId) -> Unit = {},
+    ) {
         val searchViewModel = mock<ExplorerSearchViewModel> {
             on { uiState } doReturn MutableStateFlow(
                 ExplorerSearchUiState.Data(debouncedQuery = QUERY, recentSearches = emptyList())
@@ -66,16 +91,24 @@ internal class NodesExplorerSearchContentTest {
         }
         composeTestRule.setContent {
             Content(
-                viewModelStoreOwnerOf(
+                owner = viewModelStoreOwnerOf(
                     ExplorerSearchViewModel::class.java to searchViewModel,
                     NodesExplorerViewModel::class.java to nodesViewModel,
-                )
+                ),
+                restrictedNodeIds = restrictedNodeIds,
+                onNavigateToFolderPath = onNavigateToFolderPath,
+                onRestrictedNodeClick = onRestrictedNodeClick,
             )
         }
     }
 
     @Composable
-    private fun Content(owner: androidx.lifecycle.ViewModelStoreOwner) {
+    private fun Content(
+        owner: androidx.lifecycle.ViewModelStoreOwner,
+        restrictedNodeIds: Set<NodeId> = emptySet(),
+        onNavigateToFolderPath: (List<NodeId>) -> Unit = {},
+        onRestrictedNodeClick: (NodeId) -> Unit = {},
+    ) {
         AndroidThemeForPreviews {
             CompositionLocalProvider(
                 LocalViewModelStoreOwner provides owner,
@@ -92,9 +125,11 @@ internal class NodesExplorerSearchContentTest {
                     videosOnly = false,
                     disabledNodeIds = emptySet(),
                     isConnected = true,
-                    onNavigateToFolderPath = {},
+                    onNavigateToFolderPath = onNavigateToFolderPath,
                     onCloseSearch = {},
                     recentSearchesEnabled = true,
+                    restrictedNodeIds = restrictedNodeIds,
+                    onRestrictedNodeClick = onRestrictedNodeClick,
                 )
             }
         }

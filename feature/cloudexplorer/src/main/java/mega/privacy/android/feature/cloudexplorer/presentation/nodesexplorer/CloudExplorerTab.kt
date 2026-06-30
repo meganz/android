@@ -93,6 +93,8 @@ internal fun TabsScope.CloudExplorerTab(
                 onCloseSearch = onCloseSearch,
                 recentSearchesEnabled = isActive,
                 modifier = modifier,
+                restrictedNodeIds = restrictedNodeIds,
+                onRestrictedNodeClick = onRestrictedNodeClick,
             )
         } else {
             NodesExplorerScreenContent(
