@@ -411,6 +411,47 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
     }
 
     @Test
+    fun `test that item is flagged taken down from the current node`() = runTest {
+        val items = listOf(item(1L))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
+        val takenDownNode = mock<TypedNode> { on { isTakenDown } doReturn true }
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(takenDownNode)
+
+        underTest(10).test {
+            assertThat(awaitItem().single().isTakenDown).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that item is not flagged taken down when node is not taken down`() = runTest {
+        val items = listOf(item(1L))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
+        val plainNode = mock<TypedNode> { on { isTakenDown } doReturn false }
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(plainNode)
+
+        underTest(10).test {
+            assertThat(awaitItem().single().isTakenDown).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that stored taken down flag is kept when node lookup returns null`() = runTest {
+        val items = listOf(item(1L))
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(items))
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
+
+        underTest(10).test {
+            assertThat(awaitItem().single().isTakenDown).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that trashed node is not looked up for sensitivity`() = runTest {
         val items = listOf(item(1L))
         whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))

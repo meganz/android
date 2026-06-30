@@ -20,6 +20,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -40,6 +44,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
@@ -50,6 +55,7 @@ import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.DurationBadge
 import mega.privacy.mobile.home.presentation.continuewhereleftoff.iconForType
@@ -61,6 +67,8 @@ internal fun ContinueWhereLeftOffCarousel(
     onViewAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
+
     Column(modifier = modifier) {
         ContinueWhereLeftOffHeader(
             onViewAllClick = onViewAllClick,
@@ -98,7 +106,15 @@ internal fun ContinueWhereLeftOffCarousel(
                 ) { item ->
                     ContinueWhereLeftOffCard(
                         item = item,
-                        onClick = { onItemClick(item) },
+                        onClick = {
+                            // Taken-down files must not be opened/played; show the dispute
+                            // dialog instead, mirroring the node lists.
+                            if (item.isTakenDown) {
+                                showTakenDownDialog = true
+                            } else {
+                                onItemClick(item)
+                            }
+                        },
                     )
                 }
                 if (showMore) {
@@ -108,6 +124,13 @@ internal fun ContinueWhereLeftOffCarousel(
                 }
             }
         }
+    }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = { showTakenDownDialog = false },
+        )
     }
 }
 
@@ -201,7 +224,9 @@ private fun ContinueWhereLeftOffCard(
             contentAlignment = Alignment.Center,
         ) {
             NodeThumbnailView(
-                data = ThumbnailRequest(NodeId(item.nodeHandle)),
+                // Taken-down nodes must not show their original thumbnail; passing null data
+                // falls back to the generic file-type icon, mirroring the node lists.
+                data = ThumbnailRequest(NodeId(item.nodeHandle)).takeIf { !item.isTakenDown },
                 defaultImage = iconForType(item.type),
                 contentDescription = item.title,
                 layoutType = ThumbnailLayoutType.Grid,
@@ -221,14 +246,29 @@ private fun ContinueWhereLeftOffCard(
                 )
             }
         }
-        MegaText(
-            text = item.title,
-            textColor = TextColor.Primary,
-            style = AppTheme.typography.bodySmall,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
+        Row(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-        )
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            MegaText(
+                text = item.title,
+                // Taken-down nodes are marked in error red, mirroring the node lists.
+                textColor = if (item.isTakenDown) TextColor.Error else TextColor.Primary,
+                style = AppTheme.typography.bodySmall,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            if (item.isTakenDown) {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.AlertTriangle,
+                    contentDescription = "Dispute taken down",
+                    tint = SupportColor.Error,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
     }
 }
 

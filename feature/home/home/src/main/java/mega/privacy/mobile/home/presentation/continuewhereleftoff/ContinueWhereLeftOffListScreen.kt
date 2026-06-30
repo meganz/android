@@ -44,6 +44,7 @@ import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
@@ -56,6 +57,7 @@ import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.nodecomponents.action.HandleNodeAction3
 import mega.privacy.android.core.nodecomponents.action.NodeSourceData
@@ -76,6 +78,7 @@ import mega.privacy.android.shared.nodes.components.rememberDynamicSpanCount
 import mega.privacy.android.shared.nodes.components.SortBottomSheet
 import mega.privacy.android.shared.nodes.components.SortBottomSheetResult
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeSortOption
 import mega.privacy.android.shared.resources.R as sharedR
@@ -99,6 +102,7 @@ internal fun ContinueWhereLeftOffListScreen(
     val gridSpanCount = rememberDynamicSpanCount(isListView = isListView)
     val coroutineScope = rememberCoroutineScope()
     var showClearConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
 
     EventEffect(
         event = uiState.openNodeEvent,
@@ -189,7 +193,14 @@ internal fun ContinueWhereLeftOffListScreen(
                             nodeHandle = item.nodeHandle,
                             icon = iconForType(item.type),
                             isSensitive = item.isSensitive,
-                            onItemClicked = { viewModel.onItemClicked(item.nodeHandle, item.type) },
+                            isTakenDown = item.isTakenDown,
+                            onItemClicked = {
+                                if (item.isTakenDown) {
+                                    showTakenDownDialog = true
+                                } else {
+                                    viewModel.onItemClicked(item.nodeHandle, item.type)
+                                }
+                            },
                         )
                     }
                 }
@@ -229,7 +240,14 @@ internal fun ContinueWhereLeftOffListScreen(
                             duration = item.duration,
                             icon = iconForType(item.type),
                             isSensitive = item.isSensitive,
-                            onItemClicked = { viewModel.onItemClicked(item.nodeHandle, item.type) },
+                            isTakenDown = item.isTakenDown,
+                            onItemClicked = {
+                                if (item.isTakenDown) {
+                                    showTakenDownDialog = true
+                                } else {
+                                    viewModel.onItemClicked(item.nodeHandle, item.type)
+                                }
+                            },
                         )
                     }
                 }
@@ -296,6 +314,13 @@ internal fun ContinueWhereLeftOffListScreen(
         )
     }
 
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = { showTakenDownDialog = false },
+        )
+    }
+
     openedFileNode?.let { node ->
         HandleNodeAction3(
             typedFileNode = node,
@@ -314,6 +339,7 @@ private fun ContinueWhereLeftOffListItem(
     nodeHandle: Long,
     @DrawableRes icon: Int,
     isSensitive: Boolean,
+    isTakenDown: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -329,7 +355,9 @@ private fun ContinueWhereLeftOffListItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         NodeThumbnailView(
-            data = ThumbnailRequest(NodeId(nodeHandle)),
+            // Taken-down nodes must not show their original thumbnail; passing null data
+            // falls back to the generic file-type icon, mirroring the node lists.
+            data = ThumbnailRequest(NodeId(nodeHandle)).takeIf { !isTakenDown },
             defaultImage = icon,
             contentDescription = title,
             layoutType = ThumbnailLayoutType.List,
@@ -340,7 +368,8 @@ private fun ContinueWhereLeftOffListItem(
         )
         MegaText(
             text = title,
-            textColor = TextColor.Primary,
+            // Taken-down nodes are marked in error red, mirroring the node lists.
+            textColor = if (isTakenDown) TextColor.Error else TextColor.Primary,
             style = AppTheme.typography.bodyMedium,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
@@ -348,6 +377,16 @@ private fun ContinueWhereLeftOffListItem(
                 .weight(1f)
                 .padding(horizontal = 12.dp),
         )
+        if (isTakenDown) {
+            MegaIcon(
+                imageVector = IconPack.Medium.Thin.Outline.AlertTriangle,
+                contentDescription = "Dispute taken down",
+                tint = SupportColor.Error,
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(16.dp),
+            )
+        }
     }
 }
 
@@ -358,6 +397,7 @@ private fun ContinueWhereLeftOffGridItem(
     duration: String?,
     @DrawableRes icon: Int,
     isSensitive: Boolean,
+    isTakenDown: Boolean,
     onItemClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -382,7 +422,9 @@ private fun ContinueWhereLeftOffGridItem(
             contentAlignment = Alignment.Center,
         ) {
             NodeThumbnailView(
-                data = ThumbnailRequest(NodeId(nodeHandle)),
+                // Taken-down nodes must not show their original thumbnail; passing null data
+                // falls back to the generic file-type icon, mirroring the node lists.
+                data = ThumbnailRequest(NodeId(nodeHandle)).takeIf { !isTakenDown },
                 defaultImage = icon,
                 contentDescription = title,
                 layoutType = ThumbnailLayoutType.Grid,
@@ -402,15 +444,29 @@ private fun ContinueWhereLeftOffGridItem(
                 )
             }
         }
-        MegaText(
-            text = title,
-            textColor = TextColor.Primary,
-            style = AppTheme.typography.bodySmall,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            modifier = Modifier
-                .padding(start = 8.dp, top = 6.dp, bottom = 6.dp),
-        )
+        Row(
+            modifier = Modifier.padding(start = 8.dp, top = 6.dp, bottom = 6.dp, end = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            MegaText(
+                text = title,
+                // Taken-down nodes are marked in error red, mirroring the node lists.
+                textColor = if (isTakenDown) TextColor.Error else TextColor.Primary,
+                style = AppTheme.typography.bodySmall,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            if (isTakenDown) {
+                MegaIcon(
+                    imageVector = IconPack.Medium.Thin.Outline.AlertTriangle,
+                    contentDescription = "Dispute taken down",
+                    tint = SupportColor.Error,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
     }
 }
 
@@ -427,6 +483,7 @@ private fun ContinueWhereLeftOffListItemPreview() {
                 nodeHandle = 1L,
                 icon = IconPackR.drawable.ic_video_medium_solid,
                 isSensitive = false,
+                isTakenDown = false,
                 onItemClicked = {},
             )
             ContinueWhereLeftOffListItem(
@@ -434,6 +491,7 @@ private fun ContinueWhereLeftOffListItemPreview() {
                 nodeHandle = 2L,
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
                 isSensitive = true,
+                isTakenDown = true,
                 onItemClicked = {},
             )
         }
@@ -451,6 +509,7 @@ private fun ContinueWhereLeftOffGridItemPreview() {
                 duration = "1:34",
                 icon = IconPackR.drawable.ic_video_medium_solid,
                 isSensitive = false,
+                isTakenDown = false,
                 onItemClicked = {},
                 modifier = Modifier.width(140.dp),
             )
@@ -460,6 +519,7 @@ private fun ContinueWhereLeftOffGridItemPreview() {
                 duration = null,
                 icon = IconPackR.drawable.ic_pdf_medium_solid,
                 isSensitive = true,
+                isTakenDown = true,
                 onItemClicked = {},
                 modifier = Modifier.width(140.dp),
             )
