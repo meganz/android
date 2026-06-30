@@ -45,6 +45,7 @@ import mega.privacy.android.core.nodecomponents.scanner.DocumentScanningError
 import mega.privacy.android.core.nodecomponents.scanner.InsufficientRAMToLaunchDocumentScanner
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.call.ChatCall
 import mega.privacy.android.domain.entity.call.ChatCallStatus
 import mega.privacy.android.domain.entity.call.ChatCallTermCodeType
@@ -53,12 +54,15 @@ import mega.privacy.android.domain.entity.chat.ChatPushNotificationMuteOption
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
@@ -145,6 +149,7 @@ import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUs
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
@@ -1644,6 +1649,58 @@ class ChatViewModel @Inject constructor(
      */
     fun onActionToManageEventConsumed() {
         _state.update { state -> state.copy(actionToManageEvent = consumed()) }
+    }
+
+    /**
+     * Handle a click on a PDF attachment. Decides between the Compose PDF viewer (in-place
+     * navigation handled by the host) and the legacy activity, then exposes the result as an event
+     * so the view can route it without the business layer touching the NavigationHandler.
+     *
+     * @param message the PDF [NodeAttachmentMessage] being opened.
+     * @param content the resolved [NodeContentUri] of the PDF.
+     */
+    fun onOpenPdfMessage(message: NodeAttachmentMessage, content: NodeContentUri) {
+        viewModelScope.launch {
+            val isComposePdfViewerEnabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)
+            }.getOrDefault(false)
+            val navigation = if (isComposePdfViewerEnabled) {
+                val (contentUri, isLocal, shouldStop) = when (content) {
+                    is NodeContentUri.LocalContentUri -> Triple(content.file.path, true, false)
+                    is NodeContentUri.RemoteContentUri -> Triple(
+                        content.url,
+                        false,
+                        content.shouldStopHttpSever
+                    )
+                }
+                ChatPdfNavigation.InPlace(
+                    PdfViewerNavKey(
+                        nodeHandle = message.fileNode.id.longValue,
+                        contentUri = contentUri,
+                        isLocalContent = isLocal,
+                        shouldStopHttpServer = shouldStop,
+                        nodeSourceType = NodeSourceType.CHAT,
+                        mimeType = PdfFileTypeInfo.mimeType,
+                        chatId = message.chatId,
+                        messageId = message.msgId,
+                        title = message.fileNode.name,
+                    )
+                )
+            } else {
+                ChatPdfNavigation.Legacy(
+                    content = content,
+                    nodeHandle = message.fileNode.id.longValue,
+                    chatId = message.chatId,
+                    messageId = message.msgId,
+                    mimeType = PdfFileTypeInfo.mimeType,
+                )
+            }
+            _state.update { state -> state.copy(openPdfEvent = triggered(navigation)) }
+        }
+    }
+
+    fun onOpenPdfEventConsumed() {
+        _state.update { state -> state.copy(openPdfEvent = consumed()) }
     }
 
     private fun messageCannotBeEdited() {

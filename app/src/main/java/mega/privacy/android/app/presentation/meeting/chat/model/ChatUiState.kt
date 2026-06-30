@@ -96,6 +96,7 @@ data class ChatUiState(
     val myUserHandle: Long? = null,
     val downloadEvent: StateEventWithContent<TransferTriggerEvent> = consumed(),
     val actionToManageEvent: StateEventWithContent<ActionToManage> = consumed(),
+    val openPdfEvent: StateEventWithContent<ChatPdfNavigation> = consumed(),
     val callEndedDueToFreePlanLimits: Boolean = false,
     val shouldUpgradeToProPlan: Boolean = false,
     val isCallUnlimitedProPlanFeatureFlagEnabled: Boolean = false,

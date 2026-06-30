@@ -13,9 +13,9 @@ import javax.inject.Inject
  */
 class ChatMenuOptionsProvider @Inject constructor(
     @Chat private val bottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+    @Chat private val selectionModeOptions: Lazy<Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>>>,
 ) : NodeMenuOptionsProvider {
     override val supportedSourceType: NodeSourceType = NodeSourceType.CHAT
     override fun getBottomSheetOptions() = bottomSheetOptions.get()
-    override fun getSelectionModeOptions(): Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>> =
-        emptySet()
+    override fun getSelectionModeOptions() = selectionModeOptions.get()
 }

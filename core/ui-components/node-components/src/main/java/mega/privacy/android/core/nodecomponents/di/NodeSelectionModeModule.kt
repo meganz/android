@@ -33,6 +33,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.Shar
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.ShareSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.menu.menuitem.selectionmode.UnhideSelectionMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
+import mega.privacy.android.domain.qualifier.features.Chat
 import mega.privacy.android.domain.qualifier.features.CloudDrive
 import mega.privacy.android.domain.qualifier.features.FileLink
 import mega.privacy.android.domain.qualifier.features.FolderLink
@@ -99,6 +100,24 @@ abstract class NodeSelectionModeModule {
             removeFromFavouritesSelectionMenuItem,
             availableOfflineSelectionMenuItem,
             removeOfflineSelectionMenuItem,
+        )
+
+        /**
+         * Provide chat selection mode (bottom bar) options for the PDF viewer's bottom bar on
+         * chat-sourced files. Limited to download and save-to-MEGA: available-offline is
+         * intentionally excluded from the bar (it gives no visible feedback when tapped here and
+         * remains reachable from the 3-dot node-options menu).
+         */
+        @Provides
+        @ElementsIntoSet
+        @Chat
+        @Singleton
+        fun provideChatToolbarItems(
+            downloadSelectionMenuItem: DownloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem: SaveToMegaSelectionMenuItem,
+        ): Set<NodeSelectionMenuItem<MenuActionWithIcon>> = setOf(
+            downloadSelectionMenuItem,
+            saveToMegaSelectionMenuItem,
         )
 
         @Provides

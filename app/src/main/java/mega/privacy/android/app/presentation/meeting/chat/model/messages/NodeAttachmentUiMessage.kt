@@ -22,7 +22,6 @@ import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageView
 import mega.privacy.android.app.presentation.meeting.chat.view.message.attachment.NodeAttachmentMessageViewModel
 import mega.privacy.android.app.presentation.meeting.chat.view.navigation.compose.sharedViewModel
-import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.node.FileNodeContent
@@ -97,11 +96,9 @@ data class NodeAttachmentUiMessage(
                             coroutineScope
                         )
 
-                        is FileNodeContent.Pdf -> openPdfActivity(
-                            context = context,
+                        is FileNodeContent.Pdf -> chatViewModel.onOpenPdfMessage(
                             message = message,
-                            chatId = message.chatId,
-                            content = content.uri
+                            content = content.uri,
                         )
 
                         FileNodeContent.TextContent -> handleTextEditor(
@@ -150,23 +147,6 @@ data class NodeAttachmentUiMessage(
                 Timber.e(it, "No activity found to open file")
             }
         }
-    }
-
-    private fun openPdfActivity(
-        context: Context,
-        message: NodeAttachmentMessage,
-        chatId: Long,
-        content: NodeContentUri,
-    ) {
-        context.megaNavigator.openPdfViewerFromChat(
-            context = context,
-            content = content,
-            nodeHandle = message.fileNode.id.longValue,
-            chatId = chatId,
-            messageId = message.msgId,
-            mimeType = PdfFileTypeInfo.mimeType,
-            title = message.fileNode.name,
-        )
     }
 
     private fun openImagePreview(

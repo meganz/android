@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.settings.compose.navigation.Setting
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -232,4 +233,20 @@ class MegaNavigatorImplTest {
 
         verify(context).startActivity(any())
     }
+
+    @Test
+    fun `test that openPdfViewerFromChat starts the legacy PdfViewerActivity`() =
+        runTest {
+            underTest.openPdfViewerFromChat(
+                context = context,
+                content = NodeContentUri.RemoteContentUri(url = "https://mega.nz/pdf", shouldStopHttpSever = false),
+                nodeHandle = 1L,
+                chatId = 2L,
+                messageId = 3L,
+                mimeType = "application/pdf",
+            )
+
+            verify(context).startActivity(any())
+            verify(navigationQueue, never()).emit(any<NavKey>(), any(), any())
+        }
 }

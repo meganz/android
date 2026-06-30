@@ -364,8 +364,9 @@ interface AppNavigator {
     )
 
     /**
-     * Open PDF viewer from chat. Routes to Compose PDF viewer via MegaActivity when the
-     * PdfViewerComposeUI feature flag is enabled, otherwise falls back to PdfViewerActivity.
+     * Open the legacy PdfViewerActivity for a PDF attachment from chat. The Compose PDF viewer
+     * (when the PdfViewerComposeUI flag is enabled) is opened in-place by the chat host via its
+     * NavigationHandler, so this method only covers the legacy, flag-disabled path.
      *
      * @param context Context
      * @param content NodeContentUri
@@ -373,7 +374,6 @@ interface AppNavigator {
      * @param chatId the chat room id
      * @param messageId the message id
      * @param mimeType the MIME type of the file
-     * @param title the title to display in the toolbar
      */
     fun openPdfViewerFromChat(
         context: Context,
@@ -382,7 +382,6 @@ interface AppNavigator {
         chatId: Long,
         messageId: Long,
         mimeType: String,
-        title: String,
     )
 
     /**

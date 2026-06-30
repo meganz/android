@@ -25,6 +25,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
+import androidx.compose.material.navigation.BottomSheetNavigator
+import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,8 +46,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.material.navigation.BottomSheetNavigator
-import androidx.compose.material.navigation.rememberBottomSheetNavigator
+import androidx.navigation3.runtime.NavKey
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -61,6 +62,7 @@ import mega.privacy.android.app.presentation.meeting.chat.extension.getOpenChatI
 import mega.privacy.android.feature.chat.meeting.call.isJoined
 import mega.privacy.android.feature.chat.meeting.call.isStarted
 import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatPdfNavigation
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatUiState
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
@@ -80,6 +82,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
+import mega.privacy.android.navigation.megaNavigator
 import mega.privacy.android.shared.original.core.ui.controls.appbar.SelectModeAppBar
 import mega.privacy.android.shared.original.core.ui.controls.chat.ChatObserverIndicator
 import mega.privacy.android.shared.original.core.ui.controls.chat.ScrollToBottomFab
@@ -209,6 +212,8 @@ internal fun ChatView(
     onForwardMessages: (Set<TypedMessage>, List<Long>?, List<Long>?) -> Unit = { _, _, _ -> },
     consumeDownloadEvent: () -> Unit = {},
     onActionToManageEventConsumed: () -> Unit = {},
+    onOpenPdfEventConsumed: () -> Unit = {},
+    onNavigate: (NavKey) -> Unit = {},
     onVoiceClipRecordEvent: (VoiceClipRecordEvent) -> Unit = {},
     onConsumeShouldUpgradeToProPlan: () -> Unit = {},
 ) {
@@ -566,6 +571,23 @@ internal fun ChatView(
                     is ActionToManage.EnableSelectMode -> setSelectMode(true)
                     is ActionToManage.OpenContactInfo -> navigateToContactInfo(action.email)
                     is ActionToManage.CloseChat -> onBackPressed()
+                }
+            }
+
+            EventEffect(
+                event = uiState.openPdfEvent,
+                onConsumed = onOpenPdfEventConsumed,
+            ) { navigation ->
+                when (navigation) {
+                    is ChatPdfNavigation.InPlace -> onNavigate(navigation.navKey)
+                    is ChatPdfNavigation.Legacy -> context.megaNavigator.openPdfViewerFromChat(
+                        context = context,
+                        content = navigation.content,
+                        nodeHandle = navigation.nodeHandle,
+                        chatId = navigation.chatId,
+                        messageId = navigation.messageId,
+                        mimeType = navigation.mimeType,
+                    )
                 }
             }
         }

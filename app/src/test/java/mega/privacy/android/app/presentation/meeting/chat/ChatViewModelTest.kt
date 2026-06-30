@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.meeting.chat.mapper.ForwardMessages
 import mega.privacy.android.app.presentation.meeting.chat.mapper.InviteParticipantResultMapper
 import mega.privacy.android.app.presentation.meeting.chat.mapper.ParticipantNameMapper
 import mega.privacy.android.app.presentation.meeting.chat.model.ActionToManage
+import mega.privacy.android.app.presentation.meeting.chat.model.ChatPdfNavigation
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatRoomMenuAction
 import mega.privacy.android.app.presentation.meeting.chat.model.ChatViewModel
 import mega.privacy.android.app.presentation.meeting.chat.model.ForwardMessagesToChatsResult
@@ -45,6 +46,7 @@ import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.call.ChatCall
@@ -60,11 +62,14 @@ import mega.privacy.android.domain.entity.chat.ChatRoomChange
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.messages.ContactAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.ForwardResult
+import mega.privacy.android.domain.entity.chat.messages.NodeAttachmentMessage
 import mega.privacy.android.domain.entity.chat.messages.TypedMessage
 import mega.privacy.android.domain.entity.chat.messages.normal.NormalMessage
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
+import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
@@ -151,6 +156,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotification
 import mega.privacy.android.domain.usecase.transfers.paused.AreTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.transfers.paused.PauseTransfersQueueUseCase
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.navigation.destination.PdfViewerNavKey
 import mega.privacy.android.shared.original.core.ui.controls.chat.VoiceClipRecordEvent
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReaction
 import mega.privacy.android.shared.original.core.ui.controls.chat.messages.reaction.model.UIReactionUser
@@ -1535,6 +1541,77 @@ internal class ChatViewModelTest {
             assertThat(result).isInstanceOf(InviteContactToChatResult.MultipleContactsAdded::class.java)
         }
     }
+
+    private fun stubPdfMessage(
+        handle: Long = 123L,
+        name: String = "document.pdf",
+        chatId: Long = 10L,
+        msgId: Long = 20L,
+    ): NodeAttachmentMessage {
+        val chatFile = mock<ChatDefaultFile> {
+            on { id } doReturn NodeId(handle)
+            on { this.name } doReturn name
+        }
+        return mock {
+            on { fileNode } doReturn chatFile
+            on { this.chatId } doReturn chatId
+            on { this.msgId } doReturn msgId
+        }
+    }
+
+    @Test
+    fun `test that onOpenPdfMessage triggers InPlace navigation with local content when compose pdf viewer flag is enabled`() =
+        runTest {
+            val message = stubPdfMessage()
+            val content = NodeContentUri.LocalContentUri(File("/local/path/document.pdf"))
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)) doReturn true
+            initTestClass()
+
+            underTest.onOpenPdfMessage(message, content)
+
+            underTest.state.test {
+                val navigation =
+                    (awaitItem().openPdfEvent as StateEventWithContentTriggered).content
+                assertThat(navigation).isEqualTo(
+                    ChatPdfNavigation.InPlace(
+                        PdfViewerNavKey(
+                            nodeHandle = 123L,
+                            contentUri = "/local/path/document.pdf",
+                            isLocalContent = true,
+                            shouldStopHttpServer = false,
+                            nodeSourceType = NodeSourceType.CHAT,
+                            mimeType = PdfFileTypeInfo.mimeType,
+                            chatId = 10L,
+                            messageId = 20L,
+                            title = "document.pdf",
+                        )
+                    )
+                )
+            }
+        }
+
+    @Test
+    fun `test that onOpenPdfMessage triggers InPlace navigation with remote content when compose pdf viewer flag is enabled`() =
+        runTest {
+            val message = stubPdfMessage()
+            val content = NodeContentUri.RemoteContentUri(
+                url = "https://mega.nz/document.pdf",
+                shouldStopHttpSever = true,
+            )
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.PdfViewerComposeUI)) doReturn true
+            initTestClass()
+
+            underTest.onOpenPdfMessage(message, content)
+
+            underTest.state.test {
+                val navigation =
+                    (awaitItem().openPdfEvent as StateEventWithContentTriggered).content
+                val navKey = (navigation as ChatPdfNavigation.InPlace).navKey
+                assertThat(navKey.contentUri).isEqualTo("https://mega.nz/document.pdf")
+                assertThat(navKey.isLocalContent).isFalse()
+                assertThat(navKey.shouldStopHttpServer).isTrue()
+            }
+        }
 
     @Test
     fun `test that one contact is added to chat room`() = runTest {

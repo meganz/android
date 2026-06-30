@@ -123,6 +123,7 @@ internal fun NavGraphBuilder.chatScreen(
             navigateToNotSentModal = navigateToNotSentModal,
             navigateToConversation = navigateToConversation,
             navigateToWebSite = navigateToWebSite,
+            onNavigate = onNavigate,
             navHostController = navController,
             onNavigateToAddParticipants = { onNavigate(AddChatParticipantsNavKey(uiState.chatId)) },
             onInfoToShowConsumed = viewModel::onInfoToShowEventConsumed,
@@ -143,6 +144,7 @@ internal fun NavGraphBuilder.chatScreen(
             onForwardMessages = viewModel::onForwardMessages,
             consumeDownloadEvent = viewModel::consumeDownloadEvent,
             onActionToManageEventConsumed = viewModel::onActionToManageEventConsumed,
+            onOpenPdfEventConsumed = viewModel::onOpenPdfEventConsumed,
             onVoiceClipRecordEvent = viewModel::onVoiceClipRecordEvent,
             onConsumeShouldUpgradeToProPlan = viewModel::onConsumeShouldUpgradeToProPlan,
         )
