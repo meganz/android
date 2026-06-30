@@ -12,6 +12,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
@@ -40,6 +41,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesEntityMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.home.HomePinnedItemMapper
 import mega.privacy.android.data.mapper.home.HomeWidgetConfigurationMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
@@ -134,6 +136,8 @@ internal class MegaLocalRoomFacadeTest {
     private val transferStateIntMapper = mock<TransferStateIntMapper>()
     private val homeWidgetConfigurationDao = mock<HomeWidgetConfigurationDao>()
     private val homeWidgetConfigurationMapper = mock<HomeWidgetConfigurationMapper>()
+    private val homePinnedItemDao = mock<HomePinnedItemDao>()
+    private val homePinnedItemMapper = mock<HomePinnedItemMapper>()
 
     @BeforeAll
     fun setUp() {
@@ -177,6 +181,8 @@ internal class MegaLocalRoomFacadeTest {
             transferStateIntMapper = transferStateIntMapper,
             homeWidgetConfigurationDao = { homeWidgetConfigurationDao },
             homeWidgetConfigurationMapper = homeWidgetConfigurationMapper,
+            homePinnedItemDao = { homePinnedItemDao },
+            homePinnedItemMapper = homePinnedItemMapper,
         )
     }
 
@@ -214,6 +220,8 @@ internal class MegaLocalRoomFacadeTest {
             transferStateIntMapper,
             homeWidgetConfigurationDao,
             homeWidgetConfigurationMapper,
+            homePinnedItemDao,
+            homePinnedItemMapper,
         )
     }
 

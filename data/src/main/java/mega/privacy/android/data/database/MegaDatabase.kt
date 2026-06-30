@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
@@ -35,6 +36,7 @@ import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.ContactEntity
+import mega.privacy.android.data.database.entity.HomePinnedItemEntity
 import mega.privacy.android.data.database.entity.HomeWidgetConfigurationEntity
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
 import mega.privacy.android.data.database.entity.MediaPlaybackInfoEntity
@@ -76,6 +78,7 @@ import timber.log.Timber
         LastPageViewedInPdfEntity::class,
         MediaPlaybackInfoEntity::class,
         HomeWidgetConfigurationEntity::class,
+        HomePinnedItemEntity::class,
         RecentSearchEntity::class,
         RecentlyUsedTypeEntity::class,
         RecentlyUsedEntity::class,
@@ -125,6 +128,7 @@ import timber.log.Timber
         AutoMigration(116, 117),
         AutoMigration(117, 118, spec = AutoMigrationDeleteActiveTransfersSpec::class),
         AutoMigration(118, 119, spec = AutoMigrationSpec118to119::class),
+        AutoMigration(121, 122),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -158,6 +162,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun mediaPlaybackInfoDao(): MediaPlaybackInfoDao
 
     abstract fun homeWidgetConfigurationDao(): HomeWidgetConfigurationDao
+
+    abstract fun homePinnedItemDao(): HomePinnedItemDao
 
     abstract fun recentSearchDao(): RecentSearchDao
 

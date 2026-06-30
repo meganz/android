@@ -23,21 +23,22 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
 import mega.privacy.android.data.database.dao.OfflineDao
 import mega.privacy.android.data.database.dao.PendingTransferDao
+import mega.privacy.android.data.database.dao.RecentSearchDao
+import mega.privacy.android.data.database.dao.RecentlyUsedDao
+import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
+import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
 import mega.privacy.android.data.database.dao.SyncShownNotificationDao
 import mega.privacy.android.data.database.dao.SyncSolvedIssuesDao
+import mega.privacy.android.data.database.dao.TextEditorScrollDao
 import mega.privacy.android.data.database.dao.TypedMessageDao
 import mega.privacy.android.data.database.dao.UserPausedSyncsDao
 import mega.privacy.android.data.database.dao.VideoRecentlyWatchedDao
-import mega.privacy.android.data.database.dao.RecentSearchDao
-import mega.privacy.android.data.database.dao.RecentlyViewedLinkDao
-import mega.privacy.android.data.database.dao.RecentlyUsedDao
-import mega.privacy.android.data.database.dao.RecentlyUsedTypeDao
-import mega.privacy.android.data.database.dao.TextEditorScrollDao
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import timber.log.Timber
 import java.io.File
@@ -241,6 +242,10 @@ internal object RoomDatabaseModule {
     @Provides
     fun provideHomeWidgetConfigurationDao(database: MegaDatabase): HomeWidgetConfigurationDao =
         database.homeWidgetConfigurationDao()
+
+    @Provides
+    fun provideHomePinnedItemDao(database: MegaDatabase): HomePinnedItemDao =
+        database.homePinnedItemDao()
 
     @Provides
     @Singleton

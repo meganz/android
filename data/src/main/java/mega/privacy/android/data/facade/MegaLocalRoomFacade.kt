@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
 import mega.privacy.android.data.database.dao.MediaPlaybackInfoDao
@@ -32,6 +33,7 @@ import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesEntityMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomPendingChangesModelMapper
 import mega.privacy.android.data.mapper.contact.ContactEntityMapper
 import mega.privacy.android.data.mapper.contact.ContactModelMapper
+import mega.privacy.android.data.mapper.home.HomePinnedItemMapper
 import mega.privacy.android.data.mapper.home.HomeWidgetConfigurationMapper
 import mega.privacy.android.data.mapper.offline.OfflineEntityMapper
 import mega.privacy.android.data.mapper.offline.OfflineModelMapper
@@ -57,6 +59,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
@@ -114,6 +117,8 @@ internal class MegaLocalRoomFacade @Inject constructor(
     private val transferStateIntMapper: TransferStateIntMapper,
     private val homeWidgetConfigurationDao: Lazy<HomeWidgetConfigurationDao>,
     private val homeWidgetConfigurationMapper: HomeWidgetConfigurationMapper,
+    private val homePinnedItemDao: Lazy<HomePinnedItemDao>,
+    private val homePinnedItemMapper: HomePinnedItemMapper,
 ) : MegaLocalRoomGateway {
     override suspend fun insertContact(contact: Contact) {
         contactDao.get().insertOrUpdateContact(contactEntityMapper(contact))
@@ -652,6 +657,27 @@ internal class MegaLocalRoomFacade @Inject constructor(
 
     override suspend fun deleteAllHomeScreenWidgetConfigurations() {
         homeWidgetConfigurationDao.get().deleteAllWidgetConfigurations()
+    }
+
+    override fun monitorPinnedHomeItems() =
+        homePinnedItemDao.get().monitorPinnedItems().map { entities ->
+            entities.map { homePinnedItemMapper(it) }
+        }
+
+    override suspend fun insertPinnedHomeItems(items: List<PinnedHomeItem>) {
+        homePinnedItemDao.get().insertOrUpdatePinnedItems(items.map { homePinnedItemMapper(it) })
+    }
+
+    override suspend fun updatePinnedHomeItemName(nodeHandle: Long, name: String) {
+        homePinnedItemDao.get().updatePinnedItemName(nodeHandle, name)
+    }
+
+    override suspend fun deletePinnedHomeItem(nodeHandle: Long) {
+        homePinnedItemDao.get().deletePinnedItemByHandle(nodeHandle)
+    }
+
+    override suspend fun deleteAllPinnedHomeItems() {
+        homePinnedItemDao.get().deleteAllPinnedItems()
     }
 
     companion object {

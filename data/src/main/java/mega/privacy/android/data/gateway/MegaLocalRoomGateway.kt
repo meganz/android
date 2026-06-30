@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecord
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRecordUploadStatus
 import mega.privacy.android.domain.entity.chat.ChatPendingChanges
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.pdf.LastPageViewedInPdf
 import mega.privacy.android.domain.entity.transfer.ActiveTransferActionGroup
@@ -653,4 +654,38 @@ interface MegaLocalRoomGateway {
      * Delete all home screen widget configurations
      */
     suspend fun deleteAllHomeScreenWidgetConfigurations()
+
+    /**
+     * Monitor home pinned items ordered by their position
+     *
+     * @return a flow of list of [PinnedHomeItem]
+     */
+    fun monitorPinnedHomeItems(): Flow<List<PinnedHomeItem>>
+
+    /**
+     * Insert or update home pinned items
+     *
+     * @param items
+     */
+    suspend fun insertPinnedHomeItems(items: List<PinnedHomeItem>)
+
+    /**
+     * Update only the stored name of a home pinned item, preserving its handle and pin order.
+     *
+     * @param nodeHandle
+     * @param name
+     */
+    suspend fun updatePinnedHomeItemName(nodeHandle: Long, name: String)
+
+    /**
+     * Delete a home pinned item by its node handle
+     *
+     * @param nodeHandle
+     */
+    suspend fun deletePinnedHomeItem(nodeHandle: Long)
+
+    /**
+     * Delete all home pinned items
+     */
+    suspend fun deleteAllPinnedHomeItems()
 }
