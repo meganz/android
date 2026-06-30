@@ -6,6 +6,7 @@ import mega.privacy.android.core.nodecomponents.menu.menuaction.FavouriteMenuAct
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -55,6 +56,22 @@ class AddToFavouritesSelectionMenuItemTest {
         )
 
         assertThat(result).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that shouldDisplay returns false when a node is in backups`() = runTest {
+        val menuItem = AddToFavouritesSelectionMenuItem(mock<FavouriteMenuAction>())
+
+        val result = menuItem.shouldDisplay(
+            hasNodeAccessPermission = true,
+            selectedNodes = listOf(mockNonFavouriteNode),
+            canBeMovedToTarget = true,
+            noNodeInBackups = false,
+            noNodeTakenDown = true,
+            nodeSourceType = NodeSourceType.BACKUPS
+        )
+
+        assertThat(result).isFalse()
     }
 
     companion object {
