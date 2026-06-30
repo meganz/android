@@ -639,10 +639,12 @@ private fun MediaDiscoveryGridView(
                             (photo.isSensitive || photo.isSensitiveInherited)
 
                     MediaGridViewItem(
+                        // Taken-down nodes must not show their original thumbnail; passing null
+                        // data falls back to the generic file-type icon, mirroring the node lists.
                         thumbnailData = ThumbnailRequest(
                             id = NodeId(photo.id),
                             isPublicNode = uiState.fromFolderLink,
-                        ),
+                        ).takeIf { !photo.isTakenDown },
                         defaultImage = fileTypeIconMapper(
                             photo.name.substringAfterLast('.', ""),
                         ),
@@ -661,10 +663,12 @@ private fun MediaDiscoveryGridView(
                             uiState.showHiddenNodes &&
                             (video.isSensitive || video.isSensitiveInherited)
                     MediaGridViewItem(
+                        // Taken-down nodes must not show their original thumbnail; passing null
+                        // data falls back to the generic file-type icon, mirroring the node lists.
                         thumbnailData = ThumbnailRequest(
                             id = NodeId(video.id),
                             isPublicNode = uiState.fromFolderLink,
-                        ),
+                        ).takeIf { !video.isTakenDown },
                         defaultImage = fileTypeIconMapper(
                             video.name.substringAfterLast('.', ""),
                         ),

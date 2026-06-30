@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
@@ -49,6 +50,7 @@ import mega.privacy.android.navigation.contract.state.ReportSelectionMode
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
 import mega.privacy.android.shared.nodes.components.NodesView
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeUiItem
 import mega.privacy.android.shared.resources.R as sharedR
@@ -222,6 +224,7 @@ internal fun RecentsBucketScreenContent(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
 
     when {
         uiState.isLoading -> {
@@ -259,7 +262,13 @@ internal fun RecentsBucketScreenContent(
                         contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding()),
                         nodeUiItems = uiState.items,
                         onItemClicked = { item ->
-                            onItemClicked(item)
+                            // RecentsMediaGridView has no built-in taken-down handling (unlike
+                            // NodesView used by the list path), so guard here.
+                            if (item.shouldDisputeTakenDownOnClick(uiState.isInSelectionMode)) {
+                                showTakenDownDialog = true
+                            } else {
+                                onItemClicked(item)
+                            }
                         },
                         onLongClick = onLongClick,
                     )
@@ -286,4 +295,20 @@ internal fun RecentsBucketScreenContent(
             }
         }
     }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = { showTakenDownDialog = false },
+        )
+    }
 }
+
+/**
+ * Whether tapping this item should open the taken-down dispute dialog instead of the file.
+ *
+ * Only applies outside selection mode (in selection mode a tap toggles selection) and only to
+ * taken-down files — folders are excluded, mirroring how the node lists handle taken-down nodes.
+ */
+internal fun NodeUiItem<*>.shouldDisputeTakenDownOnClick(isInSelectionMode: Boolean): Boolean =
+    !isInSelectionMode && isTakenDown && !isFolderNode

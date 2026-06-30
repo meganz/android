@@ -102,14 +102,16 @@ class NodeThumbnailViewTest {
     }
 
     @Test
-    fun `test that placeholder is not shown for MediaGrid when data is null`() {
+    fun `test that default image is shown for MediaGrid when data is null`() {
         setContent(
             data = null,
             layoutType = ThumbnailLayoutType.MediaGrid
         )
 
+        // Taken-down nodes pass null data; the generic file-type icon must be shown instead of
+        // an empty tile.
         composeTestRule.onNodeWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
-            .assertDoesNotExist()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -150,14 +152,15 @@ class NodeThumbnailViewTest {
     }
 
     @Test
-    fun `test that shimmer is shown for MediaGrid when data is null`() {
+    fun `test that shimmer is not shown for MediaGrid when data is null`() {
         setContent(
             data = null,
             layoutType = ThumbnailLayoutType.MediaGrid
         )
 
+        // Null data now renders the generic file-type icon (taken-down case), not a shimmer.
         composeTestRule.onNodeWithTag(NODE_THUMBNAIL_SHIMMER_TAG)
-            .assertIsDisplayed()
+            .assertDoesNotExist()
     }
 
     @Test
