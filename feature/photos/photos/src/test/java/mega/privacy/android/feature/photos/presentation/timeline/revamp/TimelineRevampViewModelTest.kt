@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -17,10 +18,12 @@ import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
@@ -57,13 +60,21 @@ internal class TimelineRevampViewModelTest {
     private val setTimelineFilterPreferencesUseCase = mock<SetTimelineFilterPreferencesUseCase>()
     private val timelineFilterUiStateMapper = mock<TimelineFilterUiStateMapper>()
     private val getCameraUploadFolderHandlesUseCase = mock<GetCameraUploadFolderHandlesUseCase>()
+    private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
+    private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
 
-    private suspend fun initUnderTest(filterUiState: TimelineFilterUiState = TimelineFilterUiState()) {
+    private suspend fun initUnderTest(
+        filterUiState: TimelineFilterUiState = TimelineFilterUiState(),
+        isHiddenNodesEnabled: Boolean = false,
+        showHiddenItems: Boolean = false,
+    ) {
         whenever(timelineFilterUiStateMapper(anyOrNull<Map<String, String?>>(), any()))
             .thenReturn(filterUiState)
         whenever(timelineFilterUiStateMapper(any<TimelineFilterUiState>(), any()))
             .thenReturn(DEFAULT_FILTER)
         whenever(getCameraUploadFolderHandlesUseCase()).thenReturn(emptyList())
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(isHiddenNodesEnabled))
+        whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(showHiddenItems))
         underTest = TimelineRevampViewModel(
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listMediaNodesByOffsetUseCase = listMediaNodesByOffsetUseCase,
@@ -72,6 +83,8 @@ internal class TimelineRevampViewModelTest {
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
         )
     }
 
@@ -300,6 +313,52 @@ internal class TimelineRevampViewModelTest {
             )
 
             assertThat(awaitItem()).isEqualTo(TimelineRevampUiState.Loading)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that sections are loaded with HideSensitive when hidden nodes are enabled and show-hidden is off`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+            initUnderTest(isHiddenNodesEnabled = true, showHiddenItems = false)
+
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase).invoke(
+                DEFAULT_FILTER.copy(sensitivity = MediaTimelineFilter.Sensitivity.HideSensitive)
+            )
+        }
+
+    @Test
+    fun `test that sections are loaded with ShowAll when hidden nodes are enabled but show-hidden is on`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+            initUnderTest(isHiddenNodesEnabled = true, showHiddenItems = true)
+
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase).invoke(
+                DEFAULT_FILTER.copy(sensitivity = MediaTimelineFilter.Sensitivity.ShowAll)
+            )
+        }
+
+    @Test
+    fun `test that uiState Data exposes whether hidden nodes are enabled`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest(isHiddenNodesEnabled = true, showHiddenItems = true)
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            assertThat(awaitItem().isHiddenNodesEnabled).isTrue()
             cancelAndIgnoreRemainingEvents()
         }
     }

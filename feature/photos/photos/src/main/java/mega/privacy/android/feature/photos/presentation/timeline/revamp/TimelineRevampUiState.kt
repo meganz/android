@@ -29,10 +29,13 @@ sealed interface TimelineRevampUiState {
      * @property loadedNodes the media nodes that have been loaded so far, keyed by their global
      * index across all sections (section 0 occupies indices `0 until count0`, section 1 the next
      * `count1`, and so on). Slots not present in the map are not yet loaded and render as shimmer.
+     * @property isHiddenNodesEnabled whether the hidden-nodes feature is enabled for the account;
+     * drives the sensitive-item blur in the grid.
      */
     data class Data(
         val sections: List<MediaTimelineSection>,
         val sectionStartOffsets: List<Int>,
         val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
+        val isHiddenNodesEnabled: Boolean = false,
     ) : TimelineRevampUiState
 }

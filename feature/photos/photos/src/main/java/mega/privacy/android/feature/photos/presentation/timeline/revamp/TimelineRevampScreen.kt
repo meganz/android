@@ -56,6 +56,7 @@ internal fun TimelineRevampScreen(
                 sections = uiState.sections,
                 sectionStartOffsets = uiState.sectionStartOffsets,
                 loadedNodes = uiState.loadedNodes,
+                isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                 onVisibleRangeChanged = onVisibleRangeChanged,
                 modifier = modifier,
             )
@@ -68,6 +69,7 @@ private fun TimelineRevampContent(
     sections: List<MediaTimelineSection>,
     sectionStartOffsets: List<Int>,
     loadedNodes: Map<Int, PhotosNodeContentItemV2>,
+    isHiddenNodesEnabled: Boolean,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -113,6 +115,7 @@ private fun TimelineRevampContent(
                     node = node,
                     modifier = Modifier.padding(all = 1.dp),
                     shouldShowFavourite = node?.isFavourite == true,
+                    isHiddenNodesEnabled = isHiddenNodesEnabled,
                 )
             }
         }

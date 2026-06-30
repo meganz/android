@@ -35,10 +35,12 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
@@ -70,6 +72,8 @@ class TimelineRevampViewModel @Inject constructor(
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
     private val getCameraUploadFolderHandlesUseCase: GetCameraUploadFolderHandlesUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
 
     private val sections = MutableStateFlow<List<MediaTimelineSection>>(emptyList())
@@ -91,7 +95,7 @@ class TimelineRevampViewModel @Inject constructor(
      * in-session [selectedFilterFlow]; the stored filter is only re-applied on a fresh load when the
      * user previously chose to remember it (handled by [timelineFilterUiStateMapper]).
      */
-    internal val filterUiState: StateFlow<TimelineFilterUiState> by lazy {
+    internal val filterUiState: StateFlow<TimelineFilterUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             flow { emit(getTimelineFilterPreferencesUseCase()) }
                 .catch { Timber.e(it) },
@@ -105,15 +109,36 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * The filter that scopes both the timeline sections and the per-section node pages, derived
-     * reactively from [filterUiState]. Sort, sensitivity and granularity remain at their defaults
-     * until the later parity steps. Eagerly shared so [fetchSectionNodes] can read the current value
-     * synchronously.
+     * Whether the hidden-nodes feature is enabled for the account. Shared (used by both
+     * [currentFilter], to scope sensitivity, and [uiState], to drive the grid blur).
      */
-    private val currentFilter: StateFlow<MediaTimelineFilter> by lazy {
-        filterUiState
-            .map { timelineFilterUiStateMapper(it, getCameraUploadFolderHandles()) }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
+    private val isHiddenNodesEnabled: StateFlow<Boolean> by lazy(LazyThreadSafetyMode.NONE) {
+        monitorHiddenNodesEnabledUseCase()
+            .catch { Timber.e(it, "Unable to monitor hidden nodes enabled") }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    }
+
+    /**
+     * The filter that scopes both the timeline sections and the per-section node pages, derived
+     * reactively from [filterUiState] and the hidden-nodes state. Sensitive nodes are excluded only
+     * when the hidden-nodes feature is enabled and "show hidden items" is off (matching the tab).
+     * Sort and granularity remain at their defaults until the later parity steps. Eagerly shared so
+     * [fetchSectionNodes] can read the current value synchronously.
+     */
+    private val currentFilter: StateFlow<MediaTimelineFilter> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            filterUiState,
+            isHiddenNodesEnabled,
+            monitorShowHiddenItemsUseCase().catch { Timber.e(it); emit(false) },
+        ) { filter, hiddenNodesEnabled, showHiddenItems ->
+            val sensitivity = if (hiddenNodesEnabled && !showHiddenItems) {
+                Sensitivity.HideSensitive
+            } else {
+                Sensitivity.ShowAll
+            }
+            timelineFilterUiStateMapper(filter, getCameraUploadFolderHandles())
+                .copy(sensitivity = sensitivity)
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
     }
 
     /**
@@ -155,10 +180,12 @@ class TimelineRevampViewModel @Inject constructor(
         combine(
             monitorTimelineSections(),
             loadedNodes,
-        ) { sectionsState, loaded ->
+            isHiddenNodesEnabled,
+        ) { sectionsState, loaded, hiddenNodesEnabled ->
             when (sectionsState) {
                 SectionsState.Loading -> TimelineRevampUiState.Loading
-                is SectionsState.Loaded -> toUiState(sectionsState.sections, loaded)
+                is SectionsState.Loaded ->
+                    toUiState(sectionsState.sections, loaded, hiddenNodesEnabled)
             }
         }
             .catch { e -> Timber.e(e, "Failed to load media timeline sections") }
@@ -195,6 +222,7 @@ class TimelineRevampViewModel @Inject constructor(
     private fun toUiState(
         sections: List<MediaTimelineSection>,
         loaded: Map<Int, PhotosNodeContentItemV2>,
+        isHiddenNodesEnabled: Boolean,
     ): TimelineRevampUiState =
         if (sections.isEmpty()) {
             TimelineRevampUiState.Empty
@@ -203,6 +231,7 @@ class TimelineRevampViewModel @Inject constructor(
                 sections = sections,
                 sectionStartOffsets = sectionStartOffsetsOf(sections),
                 loadedNodes = loaded,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
             )
         }
 
