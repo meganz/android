@@ -3069,4 +3069,16 @@
     <string name="park_account_success_message">Your old account has been parked. You can now log in to your new account.</string>
     <!-- Add contacts picker: toolbar title shown when selecting contacts to add as chat participants -->
     <string name="add_participants_title">Add participants</string>
+    <!-- Share link revamp: title of the "Link access" info banner on the Share link screen -->
+    <string name="share_link_access_banner_title">Link access</string>
+    <!-- Share link revamp: body of the "Link access" info banner -->
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Anyone with this link can view and download your data</item>
+        <item quantity="other">Anyone with these links can view and download your data</item>
+    </plurals>
+    <!-- Share link revamp: snackbar shown after the link(s) are created and copied to the clipboard -->
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link created and copied to your clipboard</item>
+        <item quantity="other">Links created and copied to your clipboard</item>
+    </plurals>
 </resources>
