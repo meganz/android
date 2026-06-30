@@ -71,6 +71,7 @@ import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylists
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions.Companion.toLegacySort
@@ -122,6 +123,7 @@ fun MediaMainRoute(
     val selectedPhotosInTypedNodes by timelineViewModel.selectedPhotosInTypedNodesFlow.collectAsStateWithLifecycle()
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
+    val timelineRevampFilterUiState by timelineRevampViewModel.filterUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
     val videosSelectionUiState by videosTabViewModel.selectionUiState.collectAsStateWithLifecycle()
     val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
@@ -301,6 +303,9 @@ fun MediaMainRoute(
         },
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
+        timelineRevampFilterUiState = timelineRevampFilterUiState,
+        onTimelineRevampApplyFilterClick = timelineRevampViewModel::onFilterChange,
+        timelineRevampSelectedTimePeriod = timelineRevampViewModel.selectedTimePeriod,
         onTimelinePhotoSelected = {
             if (it in timelineSelectedPhotoIds) {
                 timelineSelectedPhotoIds.remove(it)
@@ -357,6 +362,9 @@ fun MediaMainScreen(
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
+    timelineRevampFilterUiState: TimelineFilterUiState,
+    onTimelineRevampApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
+    timelineRevampSelectedTimePeriod: MediaTimePeriod,
     navigateToMediaSearch: (NavKey) -> Unit,
     onTimelinePhotoSelected: (id: Long) -> Unit,
     onClearTimelinePhotosSelection: () -> Unit,
@@ -383,6 +391,34 @@ fun MediaMainScreen(
     videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
 ) {
     val mediaMainUiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // When the revamp is enabled the timeline is driven by TimelineRevampViewModel, so the shared
+    // top bar and filter sheet read their inputs from it rather than the (inert) tab ViewModel.
+    // Resolving them here keeps the revamp/tab branching in one place.
+    val isTimelineRevampEnabled = mediaMainUiState.isTimelineRevampEnabled == true
+    val effectiveTimelineFilterUiState =
+        if (isTimelineRevampEnabled) timelineRevampFilterUiState else timelineFilterUiState
+    val effectiveTimelineActionUiState =
+        if (isTimelineRevampEnabled) {
+            TimelineTabActionUiState(
+                isReady = timelineRevampUiState !is TimelineRevampUiState.Loading,
+                // Sort wiring for the revamp comes in a later step; keep it hidden until then.
+                normalModeItem = TimelineTabNormalModeActionUiState(enableSort = false),
+            )
+        } else {
+            timelineTabActionUiState
+        }
+    val effectiveTimelineItemCount =
+        if (isTimelineRevampEnabled) {
+            timelineRevampUiState.mediaItemCount()
+        } else {
+            timelineTabUiState.displayedPhotos.size
+        }
+    val effectiveSelectedTimePeriod =
+        if (isTimelineRevampEnabled) timelineRevampSelectedTimePeriod else selectedTimePeriod
+    val onApplyTimelineFilter =
+        if (isTimelineRevampEnabled) onTimelineRevampApplyFilterClick else onTimelineApplyFilterClick
+
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -445,14 +481,14 @@ fun MediaMainScreen(
                 currentTabIndex = currentTabIndex,
                 selectionModeType = selectionModeType,
                 albumsTabUiState = albumsTabUiState,
-                timelineTabActionUiState = timelineTabActionUiState,
-                timelineFilterUiState = timelineFilterUiState,
+                timelineTabActionUiState = effectiveTimelineActionUiState,
+                timelineFilterUiState = effectiveTimelineFilterUiState,
                 mediaCameraUploadUiState = mediaCameraUploadUiState,
                 videosSelectionUiState = videosSelectionUiState,
                 playlistsTabUiState = playlistsTabUiState,
-                timelineItemCount = timelineTabUiState.displayedPhotos.size,
+                timelineItemCount = effectiveTimelineItemCount,
                 timelineSelectedCount = selectedPhotoIds.size,
-                selectedTimePeriod = selectedTimePeriod,
+                selectedTimePeriod = effectiveSelectedTimePeriod,
                 videosTabQuery = videosTabQuery,
                 playlistsTabQuery = playlistsTabQuery,
                 onClearTimelinePhotosSelection = onClearTimelinePhotosSelection,
@@ -640,9 +676,9 @@ fun MediaMainScreen(
     ) {
         TimelineFilterView(
             modifier = Modifier.fillMaxSize(),
-            currentFilter = timelineFilterUiState,
+            currentFilter = effectiveTimelineFilterUiState,
             onApplyFilterClick = { request ->
-                onTimelineApplyFilterClick(request)
+                onApplyTimelineFilter(request)
                 onTimelineFilterVisibilityChange(false)
             },
             onClose = {
@@ -770,6 +806,13 @@ private fun MediaScreen.MediaContent(
     }
 }
 
+/**
+ * The number of media items currently represented by the revamp timeline (0 unless it has loaded
+ * sections). Used to decide whether the timeline filter action should be shown.
+ */
+private fun TimelineRevampUiState.mediaItemCount(): Int =
+    (this as? TimelineRevampUiState.Data)?.sections?.sumOf { it.count }?.toInt() ?: 0
+
 private fun getSelectionModeType(
     timelineSelectedPhotoCount: Int,
     albumsSelectedUserAlbumsCount: Int,
@@ -802,6 +845,9 @@ private fun PhotosMainScreenPreview() {
             onTimelineGridSizeChange = {},
             onTimelineSortOptionChange = {},
             onTimelineApplyFilterClick = {},
+            timelineRevampFilterUiState = TimelineFilterUiState(),
+            onTimelineRevampApplyFilterClick = {},
+            timelineRevampSelectedTimePeriod = MediaTimePeriod.All,
             onTimelinePhotoSelected = {},
             onClearTimelinePhotosSelection = {},
             onNavigateToTimelinePhotoPreview = {},

@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.photos.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.domain.entity.photos.FilterMediaType
@@ -144,4 +146,62 @@ class TimelineFilterUiStateMapperTest {
         Arguments.of(TimelinePreferencesJSON.JSON_VAL_LOCATION_CAMERA_UPLOAD.value),
         Arguments.of(null),
     )
+
+    @Test
+    fun `test that media type maps to the matching media timeline category`() {
+        val handles = emptyList<NodeId>()
+
+        assertThat(
+            underTest(TimelineFilterUiState(mediaType = FilterMediaType.ALL_MEDIA), handles).category
+        ).isEqualTo(MediaTimelineFilter.Category.All)
+        assertThat(
+            underTest(TimelineFilterUiState(mediaType = FilterMediaType.IMAGES), handles).category
+        ).isEqualTo(MediaTimelineFilter.Category.Photos)
+        assertThat(
+            underTest(TimelineFilterUiState(mediaType = FilterMediaType.VIDEOS), handles).category
+        ).isEqualTo(MediaTimelineFilter.Category.Videos)
+    }
+
+    @Test
+    fun `test that AllPhotos source applies the location scope without any folder handles`() {
+        val result = underTest(
+            TimelineFilterUiState(mediaSource = FilterMediaSource.AllPhotos),
+            listOf(NodeId(PRIMARY_HANDLE), NodeId(SECONDARY_HANDLE)),
+        )
+
+        assertThat(result.location).isEqualTo(MediaTimelineFilter.Location.CloudDriveAndVault)
+        assertThat(result.includeLocationHandles).isEmpty()
+        assertThat(result.excludeLocationHandles).isEmpty()
+    }
+
+    @Test
+    fun `test that CloudDrive source excludes the given folder handles`() {
+        val handles = listOf(NodeId(PRIMARY_HANDLE), NodeId(SECONDARY_HANDLE))
+
+        val result = underTest(
+            TimelineFilterUiState(mediaSource = FilterMediaSource.CloudDrive),
+            handles,
+        )
+
+        assertThat(result.excludeLocationHandles).isEqualTo(handles)
+        assertThat(result.includeLocationHandles).isEmpty()
+    }
+
+    @Test
+    fun `test that CameraUpload source restricts to the given folder handles`() {
+        val handles = listOf(NodeId(PRIMARY_HANDLE), NodeId(SECONDARY_HANDLE))
+
+        val result = underTest(
+            TimelineFilterUiState(mediaSource = FilterMediaSource.CameraUpload),
+            handles,
+        )
+
+        assertThat(result.includeLocationHandles).isEqualTo(handles)
+        assertThat(result.excludeLocationHandles).isEmpty()
+    }
+
+    private companion object {
+        const val PRIMARY_HANDLE = 100L
+        const val SECONDARY_HANDLE = 200L
+    }
 }

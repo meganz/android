@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.photos.mapper
 
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.domain.entity.photos.FilterMediaType
@@ -34,6 +36,46 @@ class TimelineFilterUiStateMapper @Inject constructor() {
                 mediaSource = mediaSource.toFilterMediaSource()
             )
         } else TimelineFilterUiState()
+    }
+
+    /**
+     * Converts a [TimelineFilterUiState] into a [MediaTimelineFilter] for the revamp timeline.
+     *
+     * Media type maps directly to a [MediaTimelineFilter.Category]. Media source maps to folder-handle
+     * scoping using the supplied [cameraUploadFolderHandles] (the Camera Upload / Media Upload folder
+     * handles, already resolved and validated by the caller):
+     * - [FilterMediaSource.AllPhotos] → no handle scoping (the location scope alone).
+     * - [FilterMediaSource.CloudDrive] → exclude those folders.
+     * - [FilterMediaSource.CameraUpload] → restrict to those folders.
+     *
+     * Sort, sensitivity and granularity stay at their defaults until the later parity steps.
+     *
+     * @param filterUiState The current filter UI state.
+     * @param cameraUploadFolderHandles The Camera Upload + Media Upload folder handles.
+     */
+    operator fun invoke(
+        filterUiState: TimelineFilterUiState,
+        cameraUploadFolderHandles: List<NodeId>,
+    ): MediaTimelineFilter {
+        val category = when (filterUiState.mediaType) {
+            FilterMediaType.ALL_MEDIA -> MediaTimelineFilter.Category.All
+            FilterMediaType.IMAGES -> MediaTimelineFilter.Category.Photos
+            FilterMediaType.VIDEOS -> MediaTimelineFilter.Category.Videos
+        }
+        val baseFilter = MediaTimelineFilter(
+            granularity = MediaTimelineFilter.Granularity.Day,
+            category = category,
+            location = MediaTimelineFilter.Location.CloudDriveAndVault,
+            sensitivity = MediaTimelineFilter.Sensitivity.ShowAll,
+        )
+        return when (filterUiState.mediaSource) {
+            FilterMediaSource.AllPhotos -> baseFilter
+            FilterMediaSource.CloudDrive ->
+                baseFilter.copy(excludeLocationHandles = cameraUploadFolderHandles)
+
+            FilterMediaSource.CameraUpload ->
+                baseFilter.copy(includeLocationHandles = cameraUploadFolderHandles)
+        }
     }
 
     private fun String?.toFilterMediaType(): FilterMediaType =

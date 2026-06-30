@@ -3,25 +3,43 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import kotlinx.coroutines.test.advanceUntilIdle
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.photos.FilterMediaType
+import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
+import mega.privacy.android.feature.photos.model.FilterMediaSource
+import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.MediaType
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -35,12 +53,25 @@ internal class TimelineRevampViewModelTest {
     private val getMediaTimelineSectionsUseCase = mock<GetMediaTimelineSectionsUseCase>()
     private val listMediaNodesByOffsetUseCase = mock<ListMediaNodesByOffsetUseCase>()
     private val mediaTimelineNodeUiItemMapper = mock<MediaTimelineNodeUiItemMapper>()
+    private val getTimelineFilterPreferencesUseCase = mock<GetTimelineFilterPreferencesUseCase>()
+    private val setTimelineFilterPreferencesUseCase = mock<SetTimelineFilterPreferencesUseCase>()
+    private val timelineFilterUiStateMapper = mock<TimelineFilterUiStateMapper>()
+    private val getCameraUploadFolderHandlesUseCase = mock<GetCameraUploadFolderHandlesUseCase>()
 
-    private fun initUnderTest() {
+    private suspend fun initUnderTest(filterUiState: TimelineFilterUiState = TimelineFilterUiState()) {
+        whenever(timelineFilterUiStateMapper(anyOrNull<Map<String, String?>>(), any()))
+            .thenReturn(filterUiState)
+        whenever(timelineFilterUiStateMapper(any<TimelineFilterUiState>(), any()))
+            .thenReturn(DEFAULT_FILTER)
+        whenever(getCameraUploadFolderHandlesUseCase()).thenReturn(emptyList())
         underTest = TimelineRevampViewModel(
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listMediaNodesByOffsetUseCase = listMediaNodesByOffsetUseCase,
             mediaTimelineNodeUiItemMapper = mediaTimelineNodeUiItemMapper,
+            getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
+            setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
+            timelineFilterUiStateMapper = timelineFilterUiStateMapper,
+            getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
         )
     }
 
@@ -143,6 +174,136 @@ internal class TimelineRevampViewModelTest {
         )
     }
 
+    @Test
+    fun `test that filterUiState reflects the mapped preferences`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        val expected = TimelineFilterUiState(
+            isRemembered = true,
+            mediaType = FilterMediaType.IMAGES,
+            mediaSource = FilterMediaSource.CloudDrive,
+        )
+        initUnderTest(filterUiState = expected)
+
+        underTest.filterUiState.test {
+            assertThat(awaitItem()).isEqualTo(expected)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onFilterChange persists the selected filter preferences`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.onFilterChange(
+            TimelineFilterRequest(
+                isRemembered = true,
+                mediaType = FilterMediaType.IMAGES,
+                mediaSource = FilterMediaSource.CloudDrive,
+            )
+        )
+        advanceUntilIdle()
+
+        verify(setTimelineFilterPreferencesUseCase).invoke(
+            mapOf(
+                TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to "true",
+                TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to FilterMediaType.IMAGES.toMediaTypeValue(),
+                TimelinePreferencesJSON.JSON_KEY_LOCATION.value to FilterMediaSource.CloudDrive.toLocationValue(),
+            )
+        )
+    }
+
+    @Test
+    fun `test that the filter ui state and resolved camera upload handles are passed to the mapper`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+            val filterUiState = TimelineFilterUiState(mediaSource = FilterMediaSource.CameraUpload)
+            val handles = listOf(NodeId(PRIMARY_HANDLE), NodeId(SECONDARY_HANDLE))
+            initUnderTest(filterUiState = filterUiState)
+            whenever(getCameraUploadFolderHandlesUseCase()).thenReturn(handles)
+
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(timelineFilterUiStateMapper).invoke(filterUiState, handles)
+        }
+
+    @Test
+    fun `test that the timeline still loads when resolving camera upload handles fails`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        val filterUiState = TimelineFilterUiState(mediaSource = FilterMediaSource.CameraUpload)
+        initUnderTest(filterUiState = filterUiState)
+        whenever(getCameraUploadFolderHandlesUseCase()).thenThrow(RuntimeException("boom"))
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            // The pipeline recovers instead of terminating, so Data is still produced.
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Handle resolution failed, so the filter is derived with no source scoping.
+        verify(timelineFilterUiStateMapper).invoke(filterUiState, emptyList())
+    }
+
+    @Test
+    fun `test that selectedTimePeriod defaults to All and updates on selection`() = runTest {
+        initUnderTest()
+
+        assertThat(underTest.selectedTimePeriod).isEqualTo(MediaTimePeriod.All)
+
+        underTest.onMediaTimePeriodSelected(MediaTimePeriod.Months)
+
+        assertThat(underTest.selectedTimePeriod).isEqualTo(MediaTimePeriod.Months)
+    }
+
+    @Test
+    fun `test that uiState resets to Loading when the filter changes`() = runTest {
+        val changedFilter = DEFAULT_FILTER.copy(category = MediaTimelineFilter.Category.Photos)
+        initUnderTest()
+        // Produce a distinct filter once the user changes the selection, so currentFilter actually
+        // changes (null preferences -> default; an applied selection -> a different filter).
+        whenever(timelineFilterUiStateMapper(anyOrNull<Map<String, String?>>(), any())).thenAnswer {
+            if (it.getArgument<Map<String, String?>?>(0) == null) {
+                TimelineFilterUiState()
+            } else {
+                TimelineFilterUiState(mediaType = FilterMediaType.IMAGES)
+            }
+        }
+        whenever(timelineFilterUiStateMapper(any<TimelineFilterUiState>(), any())).thenAnswer {
+            if (it.getArgument<TimelineFilterUiState>(0).mediaType == FilterMediaType.IMAGES) {
+                changedFilter
+            } else {
+                DEFAULT_FILTER
+            }
+        }
+        whenever(getMediaTimelineSectionsUseCase(DEFAULT_FILTER))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        // The changed filter's sections never arrive, so the UI stays in Loading after the change.
+        getMediaTimelineSectionsUseCase.stub {
+            onBlocking { invoke(changedFilter) } doSuspendableAnswer { awaitCancellation() }
+        }
+
+        underTest.uiState.test {
+            var state = awaitItem()
+            while (state !is TimelineRevampUiState.Data) state = awaitItem()
+
+            underTest.onFilterChange(
+                TimelineFilterRequest(
+                    isRemembered = false,
+                    mediaType = FilterMediaType.IMAGES,
+                    mediaSource = FilterMediaSource.AllPhotos,
+                )
+            )
+
+            assertThat(awaitItem()).isEqualTo(TimelineRevampUiState.Loading)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)
 
@@ -163,6 +324,9 @@ internal class TimelineRevampViewModelTest {
     )
 
     private companion object {
+        const val PRIMARY_HANDLE = 100L
+        const val SECONDARY_HANDLE = 200L
+
         val DEFAULT_FILTER = MediaTimelineFilter(
             granularity = MediaTimelineFilter.Granularity.Day,
             category = MediaTimelineFilter.Category.All,

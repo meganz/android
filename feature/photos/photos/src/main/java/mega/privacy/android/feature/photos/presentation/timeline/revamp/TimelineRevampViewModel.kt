@@ -1,5 +1,8 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,16 +10,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
@@ -27,11 +30,21 @@ import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Granularity
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Location
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Sensitivity
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
+import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
+import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
-import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.DEFAULT_FILTER
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
 import timber.log.Timber
@@ -53,6 +66,10 @@ class TimelineRevampViewModel @Inject constructor(
     private val getMediaTimelineSectionsUseCase: GetMediaTimelineSectionsUseCase,
     private val listMediaNodesByOffsetUseCase: ListMediaNodesByOffsetUseCase,
     private val mediaTimelineNodeUiItemMapper: MediaTimelineNodeUiItemMapper,
+    private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
+    private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
+    private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
+    private val getCameraUploadFolderHandlesUseCase: GetCameraUploadFolderHandlesUseCase,
 ) : ViewModel() {
 
     private val sections = MutableStateFlow<List<MediaTimelineSection>>(emptyList())
@@ -61,11 +78,52 @@ class TimelineRevampViewModel @Inject constructor(
     private val mediaLoaderStarted = AtomicBoolean(false)
 
     /**
-     * The filter that scopes both the timeline sections and the per-section node pages. Seeded with
-     * [DEFAULT_FILTER]; the user-controllable options (sort, media type, location, sensitivity,
-     * granularity) update this in later steps and the sections re-load reactively.
+     * The selected media time period (All / Days / Months / Years). Hoisted here — rather than in the
+     * UI state — so it survives navigation and changing it does not trigger a UI-state rebuild.
      */
-    private val currentFilter = MutableStateFlow(DEFAULT_FILTER)
+    var selectedTimePeriod by mutableStateOf(MediaTimePeriod.All)
+        private set
+
+    private val selectedFilterFlow = MutableStateFlow<Map<String, String?>?>(null)
+
+    /**
+     * The filter UI state shown by the filter sheet. Combines the persisted preferences with the
+     * in-session [selectedFilterFlow]; the stored filter is only re-applied on a fresh load when the
+     * user previously chose to remember it (handled by [timelineFilterUiStateMapper]).
+     */
+    internal val filterUiState: StateFlow<TimelineFilterUiState> by lazy {
+        combine(
+            flow { emit(getTimelineFilterPreferencesUseCase()) }
+                .catch { Timber.e(it) },
+            selectedFilterFlow,
+        ) { preferenceMap, newFilter ->
+            timelineFilterUiStateMapper(
+                preferenceMap = newFilter ?: preferenceMap,
+                shouldApplyFilterFromPreference = newFilter != null,
+            )
+        }.asUiStateFlow(viewModelScope, TimelineFilterUiState())
+    }
+
+    /**
+     * The filter that scopes both the timeline sections and the per-section node pages, derived
+     * reactively from [filterUiState]. Sort, sensitivity and granularity remain at their defaults
+     * until the later parity steps. Eagerly shared so [fetchSectionNodes] can read the current value
+     * synchronously.
+     */
+    private val currentFilter: StateFlow<MediaTimelineFilter> by lazy {
+        filterUiState
+            .map { timelineFilterUiStateMapper(it, getCameraUploadFolderHandles()) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
+    }
+
+    /**
+     * Resolves the Camera Upload / Media Upload folder handles, defaulting to empty if resolution
+     * fails so the error can't tear down the reactive [currentFilter] pipeline.
+     */
+    private suspend fun getCameraUploadFolderHandles(): List<NodeId> =
+        runCatching { getCameraUploadFolderHandlesUseCase() }
+            .onFailure { Timber.e(it, "Failed to resolve camera upload folder handles") }
+            .getOrDefault(emptyList())
 
     /**
      * The section layout the cache was built against. When the sections change, the global-index
@@ -93,20 +151,14 @@ class TimelineRevampViewModel @Inject constructor(
         ): Boolean = size > MAX_CACHED_ITEMS
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<TimelineRevampUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             monitorTimelineSections(),
-            loadedNodes.asStateFlow(),
-        ) { sectionItems, loaded ->
-            if (sectionItems.isEmpty()) {
-                TimelineRevampUiState.Empty
-            } else {
-                TimelineRevampUiState.Data(
-                    sections = sectionItems,
-                    sectionStartOffsets = sectionStartOffsetsOf(sectionItems),
-                    loadedNodes = loaded,
-                )
+            loadedNodes,
+        ) { sectionsState, loaded ->
+            when (sectionsState) {
+                SectionsState.Loading -> TimelineRevampUiState.Loading
+                is SectionsState.Loaded -> toUiState(sectionsState.sections, loaded)
             }
         }
             .catch { e -> Timber.e(e, "Failed to load media timeline sections") }
@@ -116,13 +168,52 @@ class TimelineRevampViewModel @Inject constructor(
             )
     }
 
+    /**
+     * For each [currentFilter] change, resets the timeline to loading and re-fetches its sections:
+     * emits [SectionsState.Loading] while clearing the previous filter's sections and loaded media
+     * (the media-loader coroutine clears its own cache when it sees [sections] cleared), then emits
+     * [SectionsState.Loaded] with the freshly-fetched sections (or empty if the fetch fails).
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun monitorTimelineSections(): Flow<List<MediaTimelineSection>> =
-        currentFilter
-            .mapLatest { getMediaTimelineSectionsUseCase(it) }
-            .onEach { newSections ->
-                sections.update { newSections }
+    private fun monitorTimelineSections(): Flow<SectionsState> =
+        currentFilter.flatMapLatest { filter ->
+            flow {
+                emit(SectionsState.Loading)
+                sections.update { emptyList() }
+                loadedNodes.update { emptyMap() }
+
+                val loadedSections = getTimelineSections(filter)
+                sections.update { loadedSections }
+                emit(SectionsState.Loaded(loadedSections))
             }
+        }
+
+    private suspend fun getTimelineSections(filter: MediaTimelineFilter) =
+        runCatching { getMediaTimelineSectionsUseCase(filter) }
+            .getOrDefault(emptyList())
+
+    private fun toUiState(
+        sections: List<MediaTimelineSection>,
+        loaded: Map<Int, PhotosNodeContentItemV2>,
+    ): TimelineRevampUiState =
+        if (sections.isEmpty()) {
+            TimelineRevampUiState.Empty
+        } else {
+            TimelineRevampUiState.Data(
+                sections = sections,
+                sectionStartOffsets = sectionStartOffsetsOf(sections),
+                loadedNodes = loaded,
+            )
+        }
+
+    /**
+     * The loading state of the timeline sections for the current filter, kept separate from the
+     * per-node [loadedNodes] so a filter change can reset to loading immediately.
+     */
+    private sealed interface SectionsState {
+        data object Loading : SectionsState
+        data class Loaded(val sections: List<MediaTimelineSection>) : SectionsState
+    }
 
     /**
      * Called by the screen when the set of visible media slots changes.
@@ -308,6 +399,31 @@ class TimelineRevampViewModel @Inject constructor(
             mediaCache[sectionGlobalStart + localStart + i] = mediaTimelineNodeUiItemMapper(node)
         }
         loadedNodes.update { HashMap(mediaCache) }
+    }
+
+    /**
+     * Updates the selected media time period. Hoisted state, so it does not trigger a UI-state rebuild.
+     */
+    fun onMediaTimePeriodSelected(value: MediaTimePeriod) {
+        selectedTimePeriod = value
+    }
+
+    /**
+     * Persists the chosen filter to the account-level preferences and applies it to the current
+     * session; [currentFilter] then re-derives and the timeline re-loads.
+     */
+    internal fun onFilterChange(request: TimelineFilterRequest) {
+        viewModelScope.launch {
+            runCatching {
+                mapOf(
+                    TimelinePreferencesJSON.JSON_KEY_REMEMBER_PREFERENCES.value to request.isRemembered.toString(),
+                    TimelinePreferencesJSON.JSON_KEY_MEDIA_TYPE.value to request.mediaType.toMediaTypeValue(),
+                    TimelinePreferencesJSON.JSON_KEY_LOCATION.value to request.mediaSource.toLocationValue(),
+                ).also { setTimelineFilterPreferencesUseCase(it) }
+            }.onSuccess { newPreferences ->
+                selectedFilterFlow.update { newPreferences }
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     private companion object {
