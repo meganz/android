@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -59,13 +60,24 @@ fun NodeThumbnailView(
 ) {
     if (data == null) {
         if (layoutType == ThumbnailLayoutType.MediaGrid) {
-            // For media grid, show solid color placeholder while loading
+            // No thumbnail to load (e.g. a taken-down node): show the generic file-type icon
+            // centered on the media-grid surface, instead of leaving an empty grey tile. The
+            // genuine loading state is handled in the non-null branch below.
             Box(
                 modifier = Modifier
                     .background(DSTokens.colors.background.surface2)
-                    .fillMaxSize()
-                    .testTag(NODE_THUMBNAIL_SHIMMER_TAG)
-            )
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    painter = painterResource(id = defaultImage),
+                    contentDescription = contentDescription,
+                    modifier = modifier
+                        .size(layoutType.placeholderSize)
+                        .testTag(NODE_THUMBNAIL_PLACEHOLDER_TAG),
+                    contentScale = ContentScale.Fit,
+                )
+            }
         } else {
             // Show default image when no data is provided for list and node grid type
             Image(
