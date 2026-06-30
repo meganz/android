@@ -1,16 +1,12 @@
 package mega.privacy.android.feature.documentscanner.presentation.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import mega.android.core.ui.components.indicators.LargeInfiniteSpinnerIndicator
-import mega.android.core.ui.tokens.theme.DSTokens
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.documentscanner.presentation.ScannerRouterViewModel
 import mega.privacy.android.feature.documentscanner.presentation.component.ScannerDownloadConfirmationDialog
@@ -63,23 +59,19 @@ internal fun ScannerRouterScreen(
         ScannerRoute.PreparingDownload -> PrepareScannerScreen(
             onModelReady = viewModel::onModelReady,
             onUseLegacy = viewModel::onPrepareUseLegacy,
+            onClose = { navigationHandler.back() },
         )
 
+        // Launch-mode resolution is near-instant. Render a transparent, touch-blocking
+        // placeholder rather than an opaque loading screen: an opaque fill would flash
+        // before the confirmation dialog dims the screen behind this transparent entry.
         ScannerRoute.Resolving -> {
-            Timber.d("[DocScanner] Router showing loading for route: $current")
-            LoadingState()
+            Timber.d("[DocScanner] Router resolving route: $current")
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blockTouchPassThrough(),
+            )
         }
-    }
-}
-
-@Composable
-private fun LoadingState() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DSTokens.colors.background.pageBackground),
-        contentAlignment = Alignment.Center,
-    ) {
-        LargeInfiniteSpinnerIndicator()
     }
 }

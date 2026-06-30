@@ -11,9 +11,13 @@ import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelDow
  * @property downloadState the latest observed state of the background download.
  * @property modelReadyEvent one-shot event fired when the download completes — the
  *   screen should navigate to the camera on receipt and call [onModelReadyConsumed].
+ * @property isConnected whether the device currently has connectivity. When false
+ *   the download is paused by WorkManager until the network returns, so the screen
+ *   shows a "waiting for connection" hint instead of normal progress copy.
  */
 @Stable
 data class PrepareScannerUiState(
     val downloadState: ScannerModelDownloadState = ScannerModelDownloadState.Pending,
     val modelReadyEvent: StateEvent = consumed,
+    val isConnected: Boolean = true,
 )

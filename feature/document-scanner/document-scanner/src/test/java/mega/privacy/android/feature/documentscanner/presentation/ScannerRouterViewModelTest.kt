@@ -3,12 +3,15 @@ package mega.privacy.android.feature.documentscanner.presentation
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.feature.documentscanner.domain.launchmode.CellularConsentRequiredException
 import mega.privacy.android.feature.documentscanner.domain.launchmode.LegacyReason
 import mega.privacy.android.feature.documentscanner.domain.launchmode.ScannerLaunchMode
+import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelDownloadState
 import mega.privacy.android.feature.documentscanner.domain.usecase.GetScannerLaunchModeUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.GrantScannerCellularConsentUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.MonitorScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.StartScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import org.junit.jupiter.api.BeforeEach
@@ -30,10 +33,19 @@ class ScannerRouterViewModelTest {
     private val getScannerLaunchMode = mock<GetScannerLaunchModeUseCase>()
     private val grantScannerCellularConsent = mock<GrantScannerCellularConsentUseCase>()
     private val startScannerModelDownload = mock<StartScannerModelDownloadUseCase>()
+    private val monitorScannerModelDownload = mock<MonitorScannerModelDownloadUseCase>()
 
     @BeforeEach
     fun resetMocks() {
-        reset(getScannerLaunchMode, grantScannerCellularConsent, startScannerModelDownload)
+        reset(
+            getScannerLaunchMode,
+            grantScannerCellularConsent,
+            startScannerModelDownload,
+            monitorScannerModelDownload,
+        )
+        // Default: no download in flight, so routing falls through to launch-mode resolution.
+        whenever(monitorScannerModelDownload())
+            .thenReturn(flowOf(ScannerModelDownloadState.NotStarted))
     }
 
     private fun initTestSubject() {
@@ -41,6 +53,7 @@ class ScannerRouterViewModelTest {
             getScannerLaunchMode,
             grantScannerCellularConsent,
             startScannerModelDownload,
+            monitorScannerModelDownload,
         )
     }
 
@@ -175,6 +188,49 @@ class ScannerRouterViewModelTest {
             verify(startScannerModelDownload).invoke(requireUnmeteredNetwork = true)
             verifyNoInteractions(grantScannerCellularConsent)
         }
+
+    @Test
+    fun `test that route resumes to PreparingDownload when a download is already pending`() =
+        runTest {
+            whenever(monitorScannerModelDownload())
+                .thenReturn(flowOf(ScannerModelDownloadState.Pending))
+
+            initTestSubject()
+
+            underTest.route.test {
+                assertThat(awaitItem()).isEqualTo(ScannerRoute.PreparingDownload)
+            }
+            verifyNoInteractions(getScannerLaunchMode)
+        }
+
+    @Test
+    fun `test that route resumes to PreparingDownload when a download is already in progress`() =
+        runTest {
+            whenever(monitorScannerModelDownload()).thenReturn(
+                flowOf(ScannerModelDownloadState.Downloading(bytesDownloaded = 10L, totalBytes = 100L))
+            )
+
+            initTestSubject()
+
+            underTest.route.test {
+                assertThat(awaitItem()).isEqualTo(ScannerRoute.PreparingDownload)
+            }
+            verifyNoInteractions(getScannerLaunchMode)
+        }
+
+    @Test
+    fun `test that route falls through to launch mode when no download is in flight`() = runTest {
+        whenever(monitorScannerModelDownload())
+            .thenReturn(flowOf(ScannerModelDownloadState.NotStarted))
+        whenever(getScannerLaunchMode()).thenReturn(ScannerLaunchMode.New)
+
+        initTestSubject()
+
+        underTest.route.test {
+            assertThat(awaitItem()).isEqualTo(ScannerRoute.LaunchCamera)
+        }
+        verify(getScannerLaunchMode).invoke()
+    }
 
     @Test
     fun `test that onModelReady moves the route to LaunchCamera`() = runTest {

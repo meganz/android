@@ -3047,6 +3047,10 @@
     <string name="document_scanner_prepare_title">Setting up document scanner</string>
     <!-- Message shown on the loading screen while the document scanner downloads, reassuring the user it is a one-time setup -->
     <string name="document_scanner_prepare_message">This only happens once. You can keep using your device while it downloads.</string>
+    <!-- Message shown on the document scanner loading screen when the device is offline; the download resumes automatically once back online -->
+    <string name="document_scanner_prepare_waiting_for_connection">Waiting for connection. The download resumes automatically once you\'re back online.</string>
+    <!-- Message shown on the document scanner loading screen while the download recovers from a temporary connection problem -->
+    <string name="document_scanner_prepare_reconnecting">Reconnecting…</string>
     <!-- Title of the error state shown when the document scanner download fails -->
     <string name="document_scanner_prepare_error_title">Couldn\'t set up the document scanner</string>
     <!-- Error description shown when the download fails for a reason that may be fixed by retrying, such as a lost connection -->

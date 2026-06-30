@@ -7,6 +7,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelDownloadState
 import mega.privacy.android.feature.documentscanner.domain.usecase.MonitorScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.StartScannerModelDownloadUseCase
@@ -28,14 +29,20 @@ class PrepareScannerViewModelTest {
 
     private val monitorScannerModelDownload = mock<MonitorScannerModelDownloadUseCase>()
     private val startScannerModelDownload = mock<StartScannerModelDownloadUseCase>()
+    private val monitorConnectivity = mock<MonitorConnectivityUseCase>()
 
     @BeforeEach
     fun resetMocks() {
-        reset(monitorScannerModelDownload, startScannerModelDownload)
+        reset(monitorScannerModelDownload, startScannerModelDownload, monitorConnectivity)
+        whenever(monitorConnectivity()).thenReturn(flowOf(true))
     }
 
     private fun initTestSubject() {
-        underTest = PrepareScannerViewModel(monitorScannerModelDownload, startScannerModelDownload)
+        underTest = PrepareScannerViewModel(
+            monitorScannerModelDownload,
+            startScannerModelDownload,
+            monitorConnectivity,
+        )
     }
 
     @Test
@@ -77,6 +84,18 @@ class PrepareScannerViewModelTest {
         underTest.uiState.test {
             assertThat(awaitItem().downloadState)
                 .isEqualTo(ScannerModelDownloadState.Failed(permanent = true))
+        }
+    }
+
+    @Test
+    fun `test that uiState reflects the device being offline`() = runTest {
+        whenever(monitorScannerModelDownload()).thenReturn(flowOf(ScannerModelDownloadState.Pending))
+        whenever(monitorConnectivity()).thenReturn(flowOf(false))
+
+        initTestSubject()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isConnected).isFalse()
         }
     }
 

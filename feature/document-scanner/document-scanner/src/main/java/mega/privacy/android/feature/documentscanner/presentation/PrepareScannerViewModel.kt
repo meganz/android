@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelDownloadState
 import mega.privacy.android.feature.documentscanner.domain.usecase.MonitorScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.StartScannerModelDownloadUseCase
@@ -33,6 +34,7 @@ import javax.inject.Inject
 internal class PrepareScannerViewModel @Inject constructor(
     private val monitorScannerModelDownload: MonitorScannerModelDownloadUseCase,
     private val startScannerModelDownload: StartScannerModelDownloadUseCase,
+    private val monitorConnectivity: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     private val modelReadyChannel = Channel<StateEvent>(Channel.BUFFERED)
@@ -42,8 +44,13 @@ internal class PrepareScannerViewModel @Inject constructor(
             monitorScannerModelDownload()
                 .onEach { if (it is ScannerModelDownloadState.Completed) modelReadyChannel.trySend(triggered) },
             modelReadyChannel.receiveAsFlow().onStart { emit(consumed) },
-        ) { downloadState, modelReadyEvent ->
-            PrepareScannerUiState(downloadState = downloadState, modelReadyEvent = modelReadyEvent)
+            monitorConnectivity(),
+        ) { downloadState, modelReadyEvent, isConnected ->
+            PrepareScannerUiState(
+                downloadState = downloadState,
+                modelReadyEvent = modelReadyEvent,
+                isConnected = isConnected,
+            )
         }
             .catch { Timber.e(it, "[DocScanner] Failed to observe model download") }
             .asUiStateFlow(viewModelScope, PrepareScannerUiState())

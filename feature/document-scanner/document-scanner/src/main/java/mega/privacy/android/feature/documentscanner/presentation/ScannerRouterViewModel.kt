@@ -6,12 +6,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import mega.privacy.android.feature.documentscanner.domain.launchmode.CellularConsentRequiredException
 import mega.privacy.android.feature.documentscanner.domain.launchmode.LegacyReason
 import mega.privacy.android.feature.documentscanner.domain.launchmode.ScannerLaunchMode
+import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelDownloadState
 import mega.privacy.android.feature.documentscanner.domain.usecase.GetScannerLaunchModeUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.GrantScannerCellularConsentUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.MonitorScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.StartScannerModelDownloadUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRoute
 import timber.log.Timber
@@ -33,6 +36,7 @@ class ScannerRouterViewModel @Inject constructor(
     private val getScannerLaunchMode: GetScannerLaunchModeUseCase,
     private val grantScannerCellularConsent: GrantScannerCellularConsentUseCase,
     private val startScannerModelDownload: StartScannerModelDownloadUseCase,
+    private val monitorScannerModelDownload: MonitorScannerModelDownloadUseCase,
 ) : ViewModel() {
 
     private val _route = MutableStateFlow<ScannerRoute>(ScannerRoute.Resolving)
@@ -44,6 +48,13 @@ class ScannerRouterViewModel @Inject constructor(
 
     private fun resolveRoute() {
         viewModelScope.launch {
+            // If a download is already in flight (the user started it, then left and
+            // came back), resume straight to the loading screen instead of asking
+            // again — the WorkManager job kept running in the background.
+            if (isDownloadInFlight()) {
+                _route.value = ScannerRoute.PreparingDownload
+                return@launch
+            }
             _route.value = runCatching { getScannerLaunchMode() }.fold(
                 onSuccess = { mode ->
                     when (mode) {
@@ -62,6 +73,18 @@ class ScannerRouterViewModel @Inject constructor(
                 },
             )
         }
+    }
+
+    /**
+     * Whether a model download is currently enqueued or running. Reads the latest
+     * WorkInfo-backed state once; failures are treated as "not in flight" so a faulty
+     * read falls through to the normal launch-mode decision rather than getting stuck.
+     */
+    private suspend fun isDownloadInFlight(): Boolean {
+        val state = runCatching { monitorScannerModelDownload().first() }.getOrNull()
+        return state is ScannerModelDownloadState.Pending ||
+                state is ScannerModelDownloadState.Retrying ||
+                state is ScannerModelDownloadState.Downloading
     }
 
     /**
@@ -116,8 +139,8 @@ class ScannerRouterViewModel @Inject constructor(
     }
 
     /**
-     * The user left the prepare screen via "Use old scanner"; fall back to legacy.
-     * The download keeps running in the background.
+     * The user left the prepare screen via "Use old scanner" (or hit a permanent
+     * failure); fall back to legacy. The download keeps running in the background.
      */
     fun onPrepareUseLegacy() {
         _route.value = ScannerRoute.UseLegacy(LegacyReason.UserDeclined)
