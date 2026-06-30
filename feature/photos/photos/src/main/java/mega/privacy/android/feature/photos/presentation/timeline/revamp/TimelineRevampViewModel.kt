@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -43,10 +44,13 @@ import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
+import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
@@ -91,6 +95,13 @@ class TimelineRevampViewModel @Inject constructor(
      * [uiState] (not [currentFilter]) — changing it must not reload the timeline.
      */
     private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
+
+    /**
+     * Whether the sort toolbar action is enabled. Mirrors the tab: disabled when there is no content
+     * to sort, or when the Camera Uploads promo page is showing for a non-Cloud-Drive source. Driven
+     * imperatively by [updateSortActionEnablement] / [updateSortActionBasedOnCUPageEnablement].
+     */
+    private val sortActionEnabledFlow = MutableStateFlow(true)
 
     /**
      * The selected media time period (All / Days / Months / Years). Hoisted here — rather than in the
@@ -205,6 +216,23 @@ class TimelineRevampViewModel @Inject constructor(
                 viewModelScope,
                 TimelineRevampUiState.Loading,
             )
+    }
+
+    /**
+     * Toolbar action state for the shared top bar (same type as the tab). [TimelineTabActionUiState.isReady]
+     * follows the loading state reactively (ready once sections finish loading), while
+     * [TimelineTabNormalModeActionUiState.enableSort] is driven by [sortActionEnabledFlow].
+     */
+    internal val actionUiState: StateFlow<TimelineTabActionUiState> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(
+            uiState.map { it !is TimelineRevampUiState.Loading }.distinctUntilChanged(),
+            sortActionEnabledFlow,
+        ) { isReady, enableSort ->
+            TimelineTabActionUiState(
+                isReady = isReady,
+                normalModeItem = TimelineTabNormalModeActionUiState(enableSort = enableSort),
+            )
+        }.asUiStateFlow(viewModelScope, TimelineTabActionUiState())
     }
 
     /**
@@ -480,6 +508,50 @@ class TimelineRevampViewModel @Inject constructor(
         if (index < TimelineGridSize.entries.lastIndex) {
             onGridSizeChange(TimelineGridSize.entries[index + 1])
         }
+    }
+
+    /**
+     * Disables the sort action when the Camera Uploads promo page is showing for a non-Cloud-Drive
+     * source; otherwise defers to [updateSortActionEnablement]. Mirrors the tab.
+     */
+    internal fun updateSortActionBasedOnCUPageEnablement(
+        isEnableCameraUploadPageShowing: Boolean,
+        mediaSource: FilterMediaSource,
+        isCUPageEnabled: Boolean,
+    ) {
+        if (isCUPageEnabled && mediaSource != FilterMediaSource.CloudDrive) {
+            disableSortToolbarMenuAction()
+        } else {
+            updateSortActionEnablement(
+                isEnableCameraUploadPageShowing = isEnableCameraUploadPageShowing,
+                mediaSource = mediaSource,
+            )
+        }
+    }
+
+    /**
+     * Enables the sort action when there is content to sort, unless the Camera Uploads promo page is
+     * showing for a non-Cloud-Drive source. Uses the revamp's loaded-state as the empty signal in
+     * place of the tab's `displayedPhotos.isEmpty()`.
+     */
+    internal fun updateSortActionEnablement(
+        isEnableCameraUploadPageShowing: Boolean,
+        mediaSource: FilterMediaSource,
+    ) {
+        val hasNoContent = uiState.value !is TimelineRevampUiState.Data
+        if (hasNoContent || (isEnableCameraUploadPageShowing && mediaSource != FilterMediaSource.CloudDrive)) {
+            disableSortToolbarMenuAction()
+        } else {
+            enableSortToolbarMenuAction()
+        }
+    }
+
+    private fun disableSortToolbarMenuAction() {
+        sortActionEnabledFlow.update { false }
+    }
+
+    private fun enableSortToolbarMenuAction() {
+        sortActionEnabledFlow.update { true }
     }
 
     private fun trackGridSizeSelection(gridSize: TimelineGridSize) {

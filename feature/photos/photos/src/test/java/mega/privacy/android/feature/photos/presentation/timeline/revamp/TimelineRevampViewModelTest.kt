@@ -473,6 +473,112 @@ internal class TimelineRevampViewModelTest {
         }
     }
 
+    @Test
+    fun `test that actionUiState isReady becomes true once the sections finish loading`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.actionUiState.test {
+            var state = awaitItem()
+            while (!state.isReady) state = awaitItem()
+            assertThat(state.isReady).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the sort action is disabled when there is no content`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.actionUiState.test {
+            awaitItem()
+            advanceUntilIdle()
+            underTest.updateSortActionEnablement(
+                isEnableCameraUploadPageShowing = false,
+                mediaSource = FilterMediaSource.AllPhotos,
+            )
+            var state = awaitItem()
+            while (state.normalModeItem.enableSort) state = awaitItem()
+            assertThat(state.normalModeItem.enableSort).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that the sort action is disabled when the CU page is showing for a non Cloud Drive source`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any()))
+                .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+            initUnderTest()
+
+            underTest.actionUiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                underTest.updateSortActionEnablement(
+                    isEnableCameraUploadPageShowing = true,
+                    mediaSource = FilterMediaSource.CameraUpload,
+                )
+                var state = awaitItem()
+                while (state.normalModeItem.enableSort) state = awaitItem()
+                assertThat(state.normalModeItem.enableSort).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the sort action is re-enabled when content is present and the CU page is not showing`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any()))
+                .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+            initUnderTest()
+
+            underTest.actionUiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                // Disable first.
+                underTest.updateSortActionEnablement(
+                    isEnableCameraUploadPageShowing = true,
+                    mediaSource = FilterMediaSource.CameraUpload,
+                )
+                var disabled = awaitItem()
+                while (disabled.normalModeItem.enableSort) disabled = awaitItem()
+
+                // Then re-enable.
+                underTest.updateSortActionEnablement(
+                    isEnableCameraUploadPageShowing = false,
+                    mediaSource = FilterMediaSource.AllPhotos,
+                )
+                var enabled = awaitItem()
+                while (!enabled.normalModeItem.enableSort) enabled = awaitItem()
+                assertThat(enabled.normalModeItem.enableSort).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that updateSortActionBasedOnCUPageEnablement disables sort when the CU page is enabled for a non Cloud Drive source`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any()))
+                .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+            initUnderTest()
+
+            underTest.actionUiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                underTest.updateSortActionBasedOnCUPageEnablement(
+                    isEnableCameraUploadPageShowing = false,
+                    mediaSource = FilterMediaSource.CameraUpload,
+                    isCUPageEnabled = true,
+                )
+                var state = awaitItem()
+                while (state.normalModeItem.enableSort) state = awaitItem()
+                assertThat(state.normalModeItem.enableSort).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)
 

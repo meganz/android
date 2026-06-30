@@ -71,7 +71,6 @@ import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylists
 import mega.privacy.android.feature.photos.presentation.playlists.view.VideoPlaylistsTrashMenuAction
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
-import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabRoute
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions.Companion.toLegacySort
@@ -122,6 +121,7 @@ fun MediaMainRoute(
     val timelineRevampUiState by timelineRevampViewModel.uiState.collectAsStateWithLifecycle()
     val selectedPhotosInTypedNodes by timelineViewModel.selectedPhotosInTypedNodesFlow.collectAsStateWithLifecycle()
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
+    val timelineRevampActionUiState by timelineRevampViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
     val timelineRevampFilterUiState by timelineRevampViewModel.filterUiState.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
@@ -221,6 +221,21 @@ fun MediaMainRoute(
         updateSortActionEnablement = timelineViewModel::updateSortActionEnablement
     )
 
+    // The tab's MediaMainEffects above is keyed on the tab ui state, which stays loading while the
+    // revamp drives the timeline. Mirror the same sort-enablement effect off the revamp's own state.
+    LaunchedEffect(
+        timelineRevampUiState,
+        mediaCameraUploadUiState.enableCameraUploadPageShowing,
+        timelineRevampFilterUiState.mediaSource,
+    ) {
+        if (timelineRevampUiState !is TimelineRevampUiState.Loading) {
+            timelineRevampViewModel.updateSortActionEnablement(
+                isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
+                mediaSource = timelineRevampFilterUiState.mediaSource,
+            )
+        }
+    }
+
     MediaNodeActionEffects(
         nodeActionState = nodeActionUiState,
         onDismissRequest = {
@@ -276,6 +291,7 @@ fun MediaMainRoute(
         onTimelineRevampZoomIn = timelineRevampViewModel::onZoomIn,
         onTimelineRevampZoomOut = timelineRevampViewModel::onZoomOut,
         timelineTabActionUiState = timelineTabActionUiState,
+        timelineRevampActionUiState = timelineRevampActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
         timelineFilterUiState = timelineFilterUiState,
         videosSelectionUiState = videosSelectionUiState,
@@ -294,6 +310,12 @@ fun MediaMainRoute(
             timelineViewModel.updateSortActionBasedOnCUPageEnablement(
                 isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
                 mediaSource = timelineFilterUiState.mediaSource,
+                isCUPageEnabled = shouldShow
+            )
+            // Drive the revamp VM's sort action too; only the active VM's actionUiState is consumed.
+            timelineRevampViewModel.updateSortActionBasedOnCUPageEnablement(
+                isEnableCameraUploadPageShowing = mediaCameraUploadUiState.enableCameraUploadPageShowing,
+                mediaSource = timelineRevampFilterUiState.mediaSource,
                 isCUPageEnabled = shouldShow
             )
         },
@@ -352,6 +374,7 @@ fun MediaMainScreen(
     onTimelineRevampZoomIn: () -> Unit,
     onTimelineRevampZoomOut: () -> Unit,
     timelineTabActionUiState: TimelineTabActionUiState,
+    timelineRevampActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     videosSelectionUiState: VideosTabUiState.Selection,
     playlistsTabUiState: VideoPlaylistsTabUiState,
@@ -405,15 +428,7 @@ fun MediaMainScreen(
     val effectiveTimelineFilterUiState =
         if (isTimelineRevampEnabled) timelineRevampFilterUiState else timelineFilterUiState
     val effectiveTimelineActionUiState =
-        if (isTimelineRevampEnabled) {
-            TimelineTabActionUiState(
-                isReady = timelineRevampUiState !is TimelineRevampUiState.Loading,
-                // Sort wiring for the revamp comes in a later step; keep it hidden until then.
-                normalModeItem = TimelineTabNormalModeActionUiState(enableSort = false),
-            )
-        } else {
-            timelineTabActionUiState
-        }
+        if (isTimelineRevampEnabled) timelineRevampActionUiState else timelineTabActionUiState
     val effectiveTimelineItemCount =
         if (isTimelineRevampEnabled) {
             timelineRevampUiState.mediaItemCount()
@@ -853,6 +868,7 @@ private fun PhotosMainScreenPreview() {
             onTimelineRevampZoomIn = {},
             onTimelineRevampZoomOut = {},
             timelineTabActionUiState = TimelineTabActionUiState(),
+            timelineRevampActionUiState = TimelineTabActionUiState(),
             timelineFilterUiState = TimelineFilterUiState(),
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
             selectedPhotoIds = setOf(),

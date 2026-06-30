@@ -149,6 +149,7 @@ class MediaMainScreenAnalyticsTest {
                     onTimelineRevampZoomIn = {},
                     onTimelineRevampZoomOut = {},
                     timelineTabActionUiState = timelineTabActionUiState,
+                    timelineRevampActionUiState = timelineTabActionUiState,
                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                     videosSelectionUiState = videosSelectionUiState,
                     playlistsTabUiState = VideoPlaylistsTabUiState.Loading,
