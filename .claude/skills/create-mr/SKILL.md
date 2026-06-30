@@ -230,6 +230,47 @@ work and reviewers can see the component. Do this here — not as an after-the-f
    in this project, id 379). Remember this and add it as an extra `-o "merge_request.label=Weblate strings resource"`
    push option in Step 4. Do NOT add the label when no new strings were detected.
 
+### Step 3.6 — Comment-quality check (auto-strip offer, advisory)
+
+Backstop for the CLAUDE.md rule "Never narrate refactoring in comments". Scan the
+branch's **added** lines for change-narration comments and offer to strip them before the
+MR goes out. This is **advisory** — it never hard-halts the MR; the user decides.
+
+1. **Detect** change-narration comments in added Kotlin/Java lines vs `origin/develop`:
+   ```bash
+   git fetch -q origin develop
+   git diff origin/develop...HEAD -- '*.kt' '*.java' \
+     | grep -nE '^\+.*//.*(renamed|moved|extracted|refactor(ed)?|now uses?|previously|formerly|instead of|used to|changed (to|from)|was )' \
+     || true
+   ```
+   - If the output is **empty** → skip this step silently and continue to Step 4.
+   - If **non-empty** → continue below.
+
+2. **Classify** each hit, because stripping must be safe:
+   - **Comment-only line** — after the leading `+`, the trimmed content starts with `//`.
+     These are safe to auto-strip (removing the whole line deletes no code).
+   - **Trailing comment** — code precedes the `//` on the same line. Do **not** auto-strip
+     (that would delete code). Flag these for the user to fix manually.
+
+3. **Show** the user the grouped hits (file:line + the comment text), separating
+   "safe to auto-strip" from "manual — trailing comment".
+
+4. **Prompt** with `AskUserQuestion`:
+   - **Question**: `Found comments that look like refactoring narration. Strip the safe ones before creating the MR?`
+   - **Options**:
+     - `Strip & commit` — delete the comment-only lines, then commit the cleanup as a
+       **signed** commit (consistent with Step 1):
+       ```bash
+       git add -A
+       git commit -S -m "Remove refactoring-narration comments"
+       ```
+       Leave trailing-comment hits untouched and remind the user to review them.
+     - `Keep all` — change nothing; proceed to Step 4.
+     - `Let me fix manually` — halt so the user can edit, then re-run `/create-mr`.
+
+5. **Never block on this step.** If the grep errors, or signing the cleanup commit fails,
+   surface the issue and continue to Step 4 — the check is a convenience, not a gate.
+
 ### Step 4 — Push and create MR
 
 Run `git push` using the Bash tool with GitLab push options.

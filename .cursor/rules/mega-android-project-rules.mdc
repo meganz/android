@@ -284,7 +284,9 @@ alwaysApply: true
 
 ### Documentation
 - **KDoc**: Use KDoc for public API documentation
-- **Code comments**: Write concise code comments when they add meaningful context. Do not add comments for self-explanatory code or repeat what is already obvious from names, structure, or logic.
+- **Code comments**: Comment **why**, never **what**. If the behavior is clear from names and structure, add no comment. Do not restate the next line, mark section headers inside functions, or explain standard Kotlin/Android idioms.
+- **Never narrate refactoring in comments**: Do not write comments describing what changed, what was renamed from, what was moved, or why code was restructured (e.g. `// Extracted from X`, `// Now uses Y`, `// Moved out of loop`, `// Renamed from oldName`). That context belongs in the commit message / MR description, not in source.
+- **Match surrounding comment density**: When editing existing code, do not introduce new comments unless documenting genuinely non-obvious logic. If the file has few comments, keep it that way. Prefer KDoc on public APIs over inline comments for explaining intent.
 - **README**: Maintain comprehensive README files
 - **Architecture Docs**: Document architectural decisions and patterns
 
