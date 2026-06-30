@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
@@ -44,11 +45,15 @@ import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
@@ -80,6 +85,12 @@ class TimelineRevampViewModel @Inject constructor(
     private val loadedNodes = MutableStateFlow<Map<Int, PhotosNodeContentItemV2>>(emptyMap())
     private val targetRange = MutableStateFlow(IntRange.EMPTY)
     private val mediaLoaderStarted = AtomicBoolean(false)
+
+    /**
+     * The grid size (Compact / Default / Large). Drives only the grid column count, so it lives in
+     * [uiState] (not [currentFilter]) — changing it must not reload the timeline.
+     */
+    private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
 
     /**
      * The selected media time period (All / Days / Months / Years). Hoisted here — rather than in the
@@ -181,11 +192,12 @@ class TimelineRevampViewModel @Inject constructor(
             monitorTimelineSections(),
             loadedNodes,
             isHiddenNodesEnabled,
-        ) { sectionsState, loaded, hiddenNodesEnabled ->
+            gridSizeFlow,
+        ) { sectionsState, loaded, hiddenNodesEnabled, gridSize ->
             when (sectionsState) {
                 SectionsState.Loading -> TimelineRevampUiState.Loading
                 is SectionsState.Loaded ->
-                    toUiState(sectionsState.sections, loaded, hiddenNodesEnabled)
+                    toUiState(sectionsState.sections, loaded, hiddenNodesEnabled, gridSize)
             }
         }
             .catch { e -> Timber.e(e, "Failed to load media timeline sections") }
@@ -223,6 +235,7 @@ class TimelineRevampViewModel @Inject constructor(
         sections: List<MediaTimelineSection>,
         loaded: Map<Int, PhotosNodeContentItemV2>,
         isHiddenNodesEnabled: Boolean,
+        gridSize: TimelineGridSize,
     ): TimelineRevampUiState =
         if (sections.isEmpty()) {
             TimelineRevampUiState.Empty
@@ -232,6 +245,7 @@ class TimelineRevampViewModel @Inject constructor(
                 sectionStartOffsets = sectionStartOffsetsOf(sections),
                 loadedNodes = loaded,
                 isHiddenNodesEnabled = isHiddenNodesEnabled,
+                gridSize = gridSize,
             )
         }
 
@@ -435,6 +449,46 @@ class TimelineRevampViewModel @Inject constructor(
      */
     fun onMediaTimePeriodSelected(value: MediaTimePeriod) {
         selectedTimePeriod = value
+    }
+
+    /**
+     * Updates the grid size (and tracks the selection). Only changes the grid column count — it does
+     * not reload the timeline.
+     */
+    fun onGridSizeChange(size: TimelineGridSize) {
+        gridSizeFlow.update { size }
+        trackGridSizeSelection(size)
+    }
+
+    /**
+     * Pinch-zoom in: steps the grid towards larger tiles (fewer columns), stopping at the largest
+     * size. No-op when already at the largest size.
+     */
+    fun onZoomIn() {
+        val index = TimelineGridSize.entries.indexOf(gridSizeFlow.value)
+        if (index > 0) {
+            onGridSizeChange(TimelineGridSize.entries[index - 1])
+        }
+    }
+
+    /**
+     * Pinch-zoom out: steps the grid towards smaller tiles (more columns), stopping at the smallest
+     * size. No-op when already at the smallest size.
+     */
+    fun onZoomOut() {
+        val index = TimelineGridSize.entries.indexOf(gridSizeFlow.value)
+        if (index < TimelineGridSize.entries.lastIndex) {
+            onGridSizeChange(TimelineGridSize.entries[index + 1])
+        }
+    }
+
+    private fun trackGridSizeSelection(gridSize: TimelineGridSize) {
+        val event = when (gridSize) {
+            TimelineGridSize.Compact -> MediaScreenGridSizeCompactSelectedEvent
+            TimelineGridSize.Default -> MediaScreenGridSizeDefaultSelectedEvent
+            TimelineGridSize.Large -> MediaScreenGridSizeLargeSelectedEvent
+        }
+        Analytics.tracker.trackEvent(event)
     }
 
     /**

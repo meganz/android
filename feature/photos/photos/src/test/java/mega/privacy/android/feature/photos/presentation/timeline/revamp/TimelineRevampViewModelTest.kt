@@ -7,6 +7,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import kotlinx.coroutines.test.advanceUntilIdle
 import mega.privacy.android.domain.entity.SortOrder
@@ -30,6 +31,7 @@ import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toL
 import mega.privacy.android.feature.photos.model.MediaType
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
+import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
@@ -37,6 +39,10 @@ import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.M
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
+import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doSuspendableAnswer
@@ -363,6 +369,110 @@ internal class TimelineRevampViewModelTest {
         }
     }
 
+    @Test
+    fun `test that uiState Data defaults the grid size to Default`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            assertThat(awaitItem().gridSize).isEqualTo(TimelineGridSize.Default)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onGridSizeChange updates the grid size in uiState`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.onGridSizeChange(TimelineGridSize.Compact)
+            assertThat(awaitItem().gridSize).isEqualTo(TimelineGridSize.Compact)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onGridSizeChange tracks the corresponding analytics event`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.onGridSizeChange(TimelineGridSize.Compact)
+        underTest.onGridSizeChange(TimelineGridSize.Default)
+        underTest.onGridSizeChange(TimelineGridSize.Large)
+
+        assertThat(analyticsExtension.events).containsAtLeast(
+            MediaScreenGridSizeCompactSelectedEvent,
+            MediaScreenGridSizeDefaultSelectedEvent,
+            MediaScreenGridSizeLargeSelectedEvent,
+        )
+    }
+
+    @Test
+    fun `test that onZoomIn steps the grid towards a larger size`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem() // Default
+            underTest.onZoomIn()
+            // Default -> Large (larger tiles, fewer columns)
+            assertThat(awaitItem().gridSize).isEqualTo(TimelineGridSize.Large)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onZoomOut steps the grid towards a smaller size`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem() // Default
+            underTest.onZoomOut()
+            // Default -> Compact (smaller tiles, more columns)
+            assertThat(awaitItem().gridSize).isEqualTo(TimelineGridSize.Compact)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onZoomIn is a no-op when already at the largest size`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem() // Default
+            underTest.onGridSizeChange(TimelineGridSize.Large)
+            assertThat(awaitItem().gridSize).isEqualTo(TimelineGridSize.Large)
+            underTest.onZoomIn()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onZoomOut is a no-op when already at the smallest size`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem() // Default
+            underTest.onGridSizeChange(TimelineGridSize.Compact)
+            assertThat(awaitItem().gridSize).isEqualTo(TimelineGridSize.Compact)
+            underTest.onZoomOut()
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)
 
@@ -382,7 +492,11 @@ internal class TimelineRevampViewModelTest {
         isSensitive = false,
     )
 
-    private companion object {
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
+
         const val PRIMARY_HANDLE = 100L
         const val SECONDARY_HANDLE = 200L
 

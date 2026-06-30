@@ -3,6 +3,7 @@ package mega.privacy.android.feature.photos.presentation.timeline.revamp
 import androidx.compose.runtime.Stable
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.TimelineGridSize
 
 /**
  * UI state for the Timeline Revamp screen
@@ -31,11 +32,13 @@ sealed interface TimelineRevampUiState {
      * `count1`, and so on). Slots not present in the map are not yet loaded and render as shimmer.
      * @property isHiddenNodesEnabled whether the hidden-nodes feature is enabled for the account;
      * drives the sensitive-item blur in the grid.
+     * @property gridSize the selected grid size, driving the number of columns in the grid.
      */
     data class Data(
         val sections: List<MediaTimelineSection>,
         val sectionStartOffsets: List<Int>,
         val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
         val isHiddenNodesEnabled: Boolean = false,
+        val gridSize: TimelineGridSize = TimelineGridSize.Default,
     ) : TimelineRevampUiState
 }

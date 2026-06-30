@@ -52,11 +52,34 @@ class TimelineRevampScreenTest {
         composeRule.onNodeWithTag(TIMELINE_REVAMP_CONTENT_GRID_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the grid size selector is displayed when state is Data`() {
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "May 2026",
+                        startDate = 0L,
+                        endDate = 0L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = emptyMap(),
+            )
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_GRID_SIZE_ICON_TAG).assertIsDisplayed()
+    }
+
     private fun ComposeContentTestRule.setScreen(uiState: TimelineRevampUiState) {
         setContent {
             TimelineRevampScreen(
                 uiState = uiState,
                 onVisibleRangeChanged = { _, _ -> },
+                onGridSizeChange = {},
+                onZoomIn = {},
+                onZoomOut = {},
             )
         }
     }
