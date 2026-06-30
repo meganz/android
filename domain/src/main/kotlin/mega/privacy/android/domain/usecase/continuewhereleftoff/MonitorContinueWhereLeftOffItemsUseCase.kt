@@ -98,7 +98,7 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
                     resumableItems.filterNot { it.nodeHandle in hiddenHandles }
                 }
             }
-            visibleItems.withRefreshedTitles()
+            visibleItems.withRefreshedNodeInfo()
         }.distinctUntilChanged()
 
     private fun relevantNodeChanges(): Flow<NodeUpdate> =
@@ -111,18 +111,25 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
             .onStart { emit(NodeUpdate(emptyMap())) }
 
     /**
-     * Replaces each item's title with the current node name. The recently-used table only stores
-     * the name captured when the item was opened, so a later rename would otherwise leave a stale
-     * title. A lookup failure or a blank name keeps the stored title, so a transient error never
-     * blanks a title.
+     * Refreshes each item from its current node in a single lookup:
+     *
+     * - **Title:** the recently-used table only stores the name captured when the item was opened,
+     *   so a later rename would otherwise leave a stale title. A lookup failure or a blank name
+     *   keeps the stored title, so a transient error never blanks a title.
+     * - **Taken-down:** the table has no taken-down flag, so it is resolved from the live node here
+     *   ([ContinueWhereLeftOffItem.isTakenDown]); the carousel and list use it to show the generic
+     *   file-type icon instead of the original thumbnail. A lookup failure keeps the stored flag.
      */
-    private suspend fun List<ContinueWhereLeftOffItem>.withRefreshedTitles(): List<ContinueWhereLeftOffItem> =
+    private suspend fun List<ContinueWhereLeftOffItem>.withRefreshedNodeInfo(): List<ContinueWhereLeftOffItem> =
         coroutineScope {
             map { item ->
                 async {
-                    val currentName = runCatching { getNodeByIdUseCase(NodeId(item.nodeHandle)) }
-                        .getOrNull()?.name?.takeIf { it.isNotBlank() }
-                    currentName?.let { item.copy(title = it) } ?: item
+                    val node = runCatching { getNodeByIdUseCase(NodeId(item.nodeHandle)) }.getOrNull()
+                    val currentName = node?.name?.takeIf { it.isNotBlank() }
+                    item.copy(
+                        title = currentName ?: item.title,
+                        isTakenDown = node?.isTakenDown ?: item.isTakenDown,
+                    )
                 }
             }.awaitAll()
         }

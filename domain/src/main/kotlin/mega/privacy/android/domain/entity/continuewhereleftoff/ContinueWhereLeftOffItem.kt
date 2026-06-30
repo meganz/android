@@ -14,6 +14,9 @@ package mega.privacy.android.domain.entity.continuewhereleftoff
  * the user is showing hidden items; the carousel uses it to blur the thumbnail, mirroring how
  * the node lists render sensitive items. When hidden items are not being shown they are removed
  * from the list entirely, so a surviving item is never flagged sensitive in that case.
+ * @property isTakenDown whether the node has been taken down (e.g. for a copyright violation).
+ * Taken-down nodes must not show their original thumbnail; the carousel and list show the
+ * generic file-type icon instead, mirroring how the node lists render taken-down content.
  */
 data class ContinueWhereLeftOffItem(
     val nodeHandle: Long,
@@ -22,4 +25,5 @@ data class ContinueWhereLeftOffItem(
     val lastAccessedTimestamp: Long,
     val duration: String? = null,
     val isSensitive: Boolean = false,
+    val isTakenDown: Boolean = false,
 )
