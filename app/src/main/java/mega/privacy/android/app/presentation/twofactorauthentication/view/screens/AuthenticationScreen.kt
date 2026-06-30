@@ -72,6 +72,7 @@ internal fun AuthenticationScreen(
                     .focusRequester(focusRequester),
                 value = uiState.twoFAPin,
                 isCodeCorrect = if (isError) false else null,
+                cursorIndex = if (isError) 0 else -1,
                 errorText = stringResource(id = R.string.pin_error_2fa),
                 onValueChange = on2FAChanged,
             )

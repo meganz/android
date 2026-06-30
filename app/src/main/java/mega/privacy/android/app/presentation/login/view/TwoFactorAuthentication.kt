@@ -66,7 +66,6 @@ fun NewTwoFactorAuthentication(
     }
     LaunchedEffect(state.multiFactorAuthState) {
         if (state.multiFactorAuthState == MultiFactorAuthState.Failed) {
-            code = ""
             request.requestFocus()
             softKeyboard?.show()
         }
@@ -107,6 +106,7 @@ fun NewTwoFactorAuthentication(
                         it != MultiFactorAuthState.Checking
                                 && it != MultiFactorAuthState.Fixed
                     }?.let { it == MultiFactorAuthState.Passed },
+                    cursorIndex = if (state.multiFactorAuthState == MultiFactorAuthState.Failed) 0 else -1,
                     errorText = stringResource(sharedR.string.multi_factor_auth_login_verification_input_error_text),
                     onValueChange = {
                         code = it
