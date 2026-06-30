@@ -27,6 +27,7 @@ class RemoveFavouriteBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
             && node.isFavourite
+            && isInBackups.not()
 
     override val groupId: Int
         get() = 3

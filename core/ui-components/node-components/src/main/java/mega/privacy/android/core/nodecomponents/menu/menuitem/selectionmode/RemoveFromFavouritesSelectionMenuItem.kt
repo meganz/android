@@ -23,7 +23,7 @@ class RemoveFromFavouritesSelectionMenuItem @Inject constructor(
         nodeSourceType: NodeSourceType,
     ): Boolean {
         if (!noNodeTakenDown || selectedNodes.isEmpty()) return false
-        return selectedNodes.all { it.isFavourite } && hasNodeAccessPermission
+        return selectedNodes.all { it.isFavourite } && hasNodeAccessPermission && noNodeInBackups
     }
 
     override val showAsActionOrder: Int?

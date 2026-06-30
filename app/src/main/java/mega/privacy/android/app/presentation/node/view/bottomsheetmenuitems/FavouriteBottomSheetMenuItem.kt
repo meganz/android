@@ -33,7 +33,7 @@ class FavouriteBottomSheetMenuItem @Inject constructor(
             && isNodeInRubbish.not()
             && accessPermission == AccessPermission.OWNER
             && node.isFavourite.not()
-            && node.isNodeKeyDecrypted
+            && isInBackups.not() && node.isNodeKeyDecrypted
 
 
     override fun getOnClickFunction(

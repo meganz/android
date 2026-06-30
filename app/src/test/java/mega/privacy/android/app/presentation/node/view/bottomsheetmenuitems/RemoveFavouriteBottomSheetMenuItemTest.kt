@@ -87,6 +87,17 @@ class RemoveFavouriteBottomSheetMenuItemTest {
             },
             false,
             true,
+        ),
+        Arguments.of(
+            false,
+            AccessPermission.OWNER,
+            true,
+            mock<TypedFolderNode> {
+                on { isTakenDown } doReturn false
+                on { isFavourite } doReturn true
+            },
+            false,
+            false,
         )
     )
 }

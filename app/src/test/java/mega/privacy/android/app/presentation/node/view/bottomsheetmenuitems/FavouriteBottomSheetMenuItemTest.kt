@@ -115,7 +115,7 @@ class FavouriteBottomSheetMenuItemTest {
                 on { isNodeKeyDecrypted } doReturn true
             },
             false,
-            true,
+            false,
         )
     )
 }

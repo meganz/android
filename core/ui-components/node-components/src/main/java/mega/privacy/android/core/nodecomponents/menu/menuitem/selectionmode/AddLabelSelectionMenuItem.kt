@@ -17,5 +17,5 @@ class AddLabelSelectionMenuItem @Inject constructor(
         noNodeInBackups: Boolean,
         noNodeTakenDown: Boolean,
         nodeSourceType: NodeSourceType,
-    ): Boolean = noNodeTakenDown && hasNodeAccessPermission
+    ): Boolean = noNodeTakenDown && hasNodeAccessPermission && noNodeInBackups
 }
