@@ -24,6 +24,8 @@ import mega.privacy.android.data.mapper.AppVersionMapper
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
@@ -542,6 +544,39 @@ internal class DefaultSettingsRepositoryTest {
                 assertThat(awaitItem()).isEqualTo(expected)
             }
         }
+
+    @Test
+    fun `test that monitorPinnedHomeItems returns the values from the gateway`() =
+        runTest {
+            val expected = listOf(mock<PinnedHomeItem>())
+            megaLocalRoomGateway.stub {
+                on { monitorPinnedHomeItems() }.thenReturn(flow {
+                    emit(expected)
+                    awaitCancellation()
+                }
+                )
+            }
+
+            underTest.monitorPinnedHomeItems().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that addPinnedHomeItems delegates to the gateway`() = runTest {
+        val items = listOf(mock<PinnedHomeItem>())
+
+        underTest.addPinnedHomeItems(items)
+
+        verify(megaLocalRoomGateway).insertPinnedHomeItems(items)
+    }
+
+    @Test
+    fun `test that removePinnedHomeItem delegates to the gateway with the node handle`() = runTest {
+        underTest.removePinnedHomeItem(NodeId(123L))
+
+        verify(megaLocalRoomGateway).deletePinnedHomeItem(123L)
+    }
 
     @ParameterizedTest(name = "flag: {0}")
     @ValueSource(booleans = [true, false])

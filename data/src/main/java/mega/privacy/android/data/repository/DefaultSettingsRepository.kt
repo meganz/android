@@ -43,8 +43,10 @@ import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_ANDROID
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_SENSITIVES
@@ -696,6 +698,16 @@ internal class DefaultSettingsRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalRoomGateway.deleteAllHomeScreenWidgetConfigurations()
         }
+    }
+
+    override fun monitorPinnedHomeItems(): Flow<List<PinnedHomeItem>> =
+        megaLocalRoomGateway.monitorPinnedHomeItems()
+
+    override suspend fun addPinnedHomeItems(items: List<PinnedHomeItem>) =
+        megaLocalRoomGateway.insertPinnedHomeItems(items)
+
+    override suspend fun removePinnedHomeItem(nodeId: NodeId) {
+        megaLocalRoomGateway.deletePinnedHomeItem(nodeId.longValue)
     }
 
     override suspend fun getLastVersionNewFeatureShown(): AppVersion? =

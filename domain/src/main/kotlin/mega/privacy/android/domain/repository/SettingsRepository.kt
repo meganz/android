@@ -8,8 +8,10 @@ import mega.privacy.android.domain.entity.CallsSoundEnabledState
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
+import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import java.io.File
@@ -603,6 +605,27 @@ interface SettingsRepository {
      * Typically used on logout to restore the default home layout for the next session.
      */
     suspend fun resetHomeScreenWidgetConfigurations()
+
+    /**
+     * Monitor the pinned home items, ordered oldest-pinned first.
+     *
+     * @return a flow of the list of [PinnedHomeItem]
+     */
+    fun monitorPinnedHomeItems(): Flow<List<PinnedHomeItem>>
+
+    /**
+     * Add pinned home items.
+     *
+     * @param items the [PinnedHomeItem]s to persist
+     */
+    suspend fun addPinnedHomeItems(items: List<PinnedHomeItem>)
+
+    /**
+     * Remove a pinned home item.
+     *
+     * @param nodeId the [NodeId] of the item to remove
+     */
+    suspend fun removePinnedHomeItem(nodeId: NodeId)
 
     /**
      * Get the last version feature shown to the user

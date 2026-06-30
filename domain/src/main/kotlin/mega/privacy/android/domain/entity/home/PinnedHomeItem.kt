@@ -10,5 +10,5 @@ data class PinnedHomeItem(
     val nodeId: NodeId,
     val name: String,
     val isFolder: Boolean,
-    val pinnedAt: Long,
+    val pinnedAt: Long = System.currentTimeMillis(),
 )
