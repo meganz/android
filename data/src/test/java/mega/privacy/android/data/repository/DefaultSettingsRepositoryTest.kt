@@ -578,6 +578,21 @@ internal class DefaultSettingsRepositoryTest {
         verify(megaLocalRoomGateway).deletePinnedHomeItem(123L)
     }
 
+    @Test
+    fun `test that updatePinnedHomeItemName delegates to the gateway with the node handle`() =
+        runTest {
+            underTest.updatePinnedHomeItemName(NodeId(123L), "Renamed")
+
+            verify(megaLocalRoomGateway).updatePinnedHomeItemName(123L, "Renamed")
+        }
+
+    @Test
+    fun `test that clearPinnedHomeItems delegates to the gateway`() = runTest {
+        underTest.clearPinnedHomeItems()
+
+        verify(megaLocalRoomGateway).deleteAllPinnedHomeItems()
+    }
+
     @ParameterizedTest(name = "flag: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that getContactLinksOption returns the request flag when the request succeeds`(

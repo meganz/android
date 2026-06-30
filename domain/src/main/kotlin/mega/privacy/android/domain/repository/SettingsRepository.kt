@@ -628,6 +628,19 @@ interface SettingsRepository {
     suspend fun removePinnedHomeItem(nodeId: NodeId)
 
     /**
+     * Update the stored name of a pinned home item, preserving its order.
+     *
+     * @param nodeId the [NodeId] of the item
+     * @param name the new name
+     */
+    suspend fun updatePinnedHomeItemName(nodeId: NodeId, name: String)
+
+    /**
+     * Remove all pinned home items.
+     */
+    suspend fun clearPinnedHomeItems()
+
+    /**
      * Get the last version feature shown to the user
      */
     suspend fun getLastVersionNewFeatureShown(): AppVersion?

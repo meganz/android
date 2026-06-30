@@ -710,6 +710,14 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalRoomGateway.deletePinnedHomeItem(nodeId.longValue)
     }
 
+    override suspend fun updatePinnedHomeItemName(nodeId: NodeId, name: String) {
+        megaLocalRoomGateway.updatePinnedHomeItemName(nodeId.longValue, name)
+    }
+
+    override suspend fun clearPinnedHomeItems() {
+        megaLocalRoomGateway.deleteAllPinnedHomeItems()
+    }
+
     override suspend fun getLastVersionNewFeatureShown(): AppVersion? =
         withContext(ioDispatcher) {
             uiPreferencesGateway
