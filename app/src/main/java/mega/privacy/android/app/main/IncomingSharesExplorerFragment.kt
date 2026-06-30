@@ -628,10 +628,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                         fileExplorerActivity.hideTabs(true, INCOMING_FRAGMENT)
 
                         if (modeCloud == COPY || modeCloud == MOVE) {
-                            when {
-                                adapter.itemCount == 0 -> activateButton(true)
-                                fileExplorerActivity.deepBrowserTree > 0 -> checkCopyMoveButton()
-                            }
+                            activateButton(true)
                         }
                     }
                 }
@@ -712,7 +709,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                                 updateNodesByAdapter(originalData)
 
                                 if (modeCloud == COPY || modeCloud == MOVE) {
-                                    checkCopyMoveButton()
+                                    activateButton(true)
                                 }
 
                                 val lastVisiblePosition = if (lastPositionStack.isNotEmpty()) {
@@ -796,7 +793,13 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
         if (modeCloud == FileExplorerActivity.SELECT)
             binding.fabSelect.isVisible = selectFile && show
         else
-            binding.actionText.isEnabled = hasWritePermissions && show
+            binding.actionText.isEnabled = hasWritePermissions && show && !isMovingToSameParent()
+
+    /**
+     * Returns true if moving to the same parent folder, in which case the move button should be disabled.
+     */
+    private fun isMovingToSameParent(): Boolean =
+        modeCloud == MOVE && fileExplorerActivity.parentMoveCopy()?.handle == parentHandle
 
     /**
      * Select all items
@@ -949,19 +952,6 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
      * @return true is empty, otherwise is false
      */
     fun isFolderEmpty() = if (::adapter.isInitialized) adapter.itemCount <= 0 else true
-
-    /**
-     * Checks if copy or move button should be shown or hidden depending on the current navigation level.
-     * Shows it if the current navigation level is not the parent of moving/copying nodes.
-     * Hides it otherwise.
-     */
-    private fun checkCopyMoveButton() {
-        fileExplorerActivity.parentMoveCopy().let { parentNode ->
-            activateButton(
-                modeCloud == COPY || parentNode == null || parentNode.handle != parentHandle
-            )
-        }
-    }
 
     companion object {
         private const val SPAN_COUNT = 2
