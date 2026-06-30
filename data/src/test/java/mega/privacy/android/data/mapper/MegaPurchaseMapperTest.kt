@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper
 
+import com.android.billingclient.api.AccountIdentifiers
 import com.android.billingclient.api.Purchase
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,12 +16,17 @@ internal class MegaPurchaseMapperTest {
         val expectedState = 1
         val expectedToken = "expectedToken"
         val expectedAutoRenewing = true
+        val expectedObfuscatedAccountId = "expectedObfuscatedAccountId"
+        val accountIdentifiers = mock<AccountIdentifiers> {
+            on { obfuscatedAccountId }.thenReturn(expectedObfuscatedAccountId)
+        }
         val purchase = mock<Purchase> {
             on { products }.thenReturn(listOf(expectedSku))
             on { originalJson }.thenReturn(expectedRecipe)
             on { purchaseState }.thenReturn(expectedState)
             on { purchaseToken }.thenReturn(expectedToken)
             on { isAutoRenewing }.thenReturn(expectedAutoRenewing)
+            on { this.accountIdentifiers }.thenReturn(accountIdentifiers)
         }
         val megaPurchase = underTest(purchase)
         assertEquals(megaPurchase.sku, expectedSku)
@@ -28,5 +34,6 @@ internal class MegaPurchaseMapperTest {
         assertEquals(megaPurchase.state, expectedState)
         assertEquals(megaPurchase.token, expectedToken)
         assertEquals(megaPurchase.isAutoRenewing, expectedAutoRenewing)
+        assertEquals(megaPurchase.obfuscatedAccountId, expectedObfuscatedAccountId)
     }
 }

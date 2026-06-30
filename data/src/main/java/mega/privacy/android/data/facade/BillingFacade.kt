@@ -209,9 +209,17 @@ internal class BillingFacade @Inject constructor(
                         .build()
                 )
             }
+            // Fix DEVELOPER_ERROR Account identifiers don't match the previous subscription,
+            val obfuscatedAccountIdForFlow = if (isActiveSubscription) {
+                oldSubscription?.obfuscatedAccountId?.takeUnless { it.isEmpty() }
+                    ?: newObfuscatedAccountId
+            } else {
+                newObfuscatedAccountId
+            }
+            Timber.d("Obfuscated account id used for flow is:%s", obfuscatedAccountIdForFlow)
             val purchaseParamsBuilder = BillingFlowParams.newBuilder()
                 .setProductDetailsParamsList(listOf(productDetailsParamsBuilder.build()))
-                .setObfuscatedAccountId(newObfuscatedAccountId.orEmpty())
+                .setObfuscatedAccountId(obfuscatedAccountIdForFlow.orEmpty())
             if (isActiveSubscription) {
                 val builder = SubscriptionUpdateParams.newBuilder()
                     .setOldPurchaseToken(purchaseToken.orEmpty())

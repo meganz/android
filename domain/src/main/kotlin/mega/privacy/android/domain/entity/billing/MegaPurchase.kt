@@ -42,6 +42,11 @@ data class MegaPurchase(
      * Whether the subscription is set to auto-renew.
      */
     val isAutoRenewing: Boolean = false,
+
+    /**
+     * Obfuscated account id stored on this purchase, reused when replacing the subscription.
+     */
+    val obfuscatedAccountId: String? = null,
 ) {
     /**
      * product level

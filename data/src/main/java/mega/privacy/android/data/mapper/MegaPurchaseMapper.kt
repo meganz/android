@@ -17,5 +17,6 @@ internal fun toMegaPurchase(purchase: Purchase) = MegaPurchase(
     },
     token = purchase.purchaseToken,
     time = purchase.purchaseTime,
-    isAutoRenewing = purchase.isAutoRenewing
+    isAutoRenewing = purchase.isAutoRenewing,
+    obfuscatedAccountId = purchase.accountIdentifiers?.obfuscatedAccountId
 )
