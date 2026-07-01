@@ -9,7 +9,6 @@ import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerPickerRestrictions
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
-import mega.privacy.android.shared.sync.folderpicker.SyncFolderPickerRestrictedNode
 import mega.privacy.android.shared.sync.ui.permissions.SyncPermissionsManager
 import mega.privacy.mobile.analytics.event.SyncMegaPickerFolderDisabledEvent
 
@@ -60,10 +59,7 @@ internal fun rememberSyncFolderPicker(
                 restrictedNodeIds = it.restrictedNodes.keys,
                 isPickEnabled = syncFolderPickEnabled(
                     explorerMode = explorerMode,
-                    // The entry screen resolves the root (INVALID_FOLDER_HANDLE); inner screens
-                    // are always navigated into a real folder.
-                    isAtRoot = folderHandle == SelectSyncFolderViewModel.INVALID_FOLDER_HANDLE,
-                    restrictedNodes = it.restrictedNodes.values,
+                    isSelectEnabled = it.isSelectEnabled,
                 ),
                 onRestrictedNodeClick = { nodeId ->
                     Analytics.tracker.trackEvent(SyncMegaPickerFolderDisabledEvent)
@@ -96,15 +92,14 @@ internal class SyncFolderPicker(
  *
  * - Stop backup can move into any folder; a destination name clash is validated on selection
  *   (and surfaced to the user) rather than disabling the action.
- * - The cloud drive root itself cannot be synced.
- * - Otherwise a folder is selectable while none of its children is already used by a sync or backup.
+ * - For a new sync, [isSelectEnabled] comes from the sync domain logic and is already false at the
+ *   root, when a child is used by a sync/backup, or when the folder is an ancestor of an existing
+ *   sync/backup (selecting it would nest the existing one).
  */
 internal fun syncFolderPickEnabled(
     explorerMode: ExplorerMode,
-    isAtRoot: Boolean,
-    restrictedNodes: Collection<SyncFolderPickerRestrictedNode>,
-): Boolean = when {
-    explorerMode == ExplorerMode.SelectStopBackupDestination -> true
-    isAtRoot -> false
-    else -> restrictedNodes.none { it.isUsedBySyncOrBackup }
+    isSelectEnabled: Boolean,
+): Boolean = when (explorerMode) {
+    ExplorerMode.SelectStopBackupDestination -> true
+    else -> isSelectEnabled
 }

@@ -139,6 +139,7 @@ internal class SelectSyncFolderViewModelTest {
                 assertThat(data.currentFolderId).isEqualTo(rootFolderId)
                 assertThat(data.restrictedNodes)
                     .containsExactly(restrictedNode.nodeId, restrictedNode)
+                assertThat(data.isSelectEnabled).isFalse()
             }
             verify(syncFolderPickerHandler).monitorPickerNodes(
                 folderId = rootFolderId,
@@ -155,6 +156,7 @@ internal class SelectSyncFolderViewModelTest {
 
             assertUiState { state ->
                 assertThat(state.data().currentFolderId).isEqualTo(folderId)
+                assertThat(state.data().isSelectEnabled).isTrue()
             }
             verifyNoInteractions(getRootNodeIdUseCase)
             verify(syncFolderPickerHandler).monitorPickerNodes(

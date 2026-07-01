@@ -105,6 +105,7 @@ internal class SelectSyncFolderViewModel @AssistedInject constructor(
                 SyncFolderPickerNodes(
                     currentFolderId = folderId,
                     restrictedNodes = result.restrictedNodes,
+                    isSelectEnabled = result.isSelectEnabled,
                 )
             }
         )
@@ -121,6 +122,7 @@ internal class SelectSyncFolderViewModel @AssistedInject constructor(
             SelectSyncFolderUiState.Data(
                 currentFolderId = picker.currentFolderId,
                 restrictedNodes = picker.restrictedNodes,
+                isSelectEnabled = picker.isSelectEnabled,
                 removeConnectionNode = selection.removeConnectionNode,
                 isProcessing = selection.isProcessing,
                 disableBatteryOptimizationsEvent = batteryEvent,

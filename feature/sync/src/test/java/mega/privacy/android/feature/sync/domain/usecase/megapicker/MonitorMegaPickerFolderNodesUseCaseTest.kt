@@ -140,6 +140,91 @@ internal class MonitorMegaPickerFolderNodesUseCaseTest {
     }
 
     @Test
+    fun `test that isSelectEnabled is false when the current folder is an ancestor of an existing sync`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val ancestorFolderId = NodeId(456L)
+            val syncedNodeId = NodeId(789L)
+            val ancestorFolder: FolderNode = mock { on { id } doReturn ancestorFolderId }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(false)
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(listOf(syncedNodeId))
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getTypedNodesFromFolder(ancestorFolderId)).thenReturn(flowOf(emptyList()))
+            whenever(getFullNodePathByIdUseCase(ancestorFolderId)).thenReturn("/ROOT/A")
+            whenever(getFullNodePathByIdUseCase(syncedNodeId)).thenReturn("/ROOT/A/B/C")
+
+            underTest(ancestorFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                assertThat(result.isSelectEnabled).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isSelectEnabled is true when an existing sync is not below the current folder`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val siblingFolderId = NodeId(456L)
+            val syncedNodeId = NodeId(789L)
+            val siblingFolder: FolderNode = mock { on { id } doReturn siblingFolderId }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(false)
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(listOf(syncedNodeId))
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(false)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getTypedNodesFromFolder(siblingFolderId)).thenReturn(flowOf(emptyList()))
+            whenever(getFullNodePathByIdUseCase(siblingFolderId)).thenReturn("/ROOT/X")
+            whenever(getFullNodePathByIdUseCase(syncedNodeId)).thenReturn("/ROOT/A/B/C")
+
+            underTest(siblingFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                assertThat(result.isSelectEnabled).isTrue()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isSelectEnabled is false when the current folder is an ancestor of a reserved folder`() =
+        runTest {
+            val rootFolderId = NodeId(123L)
+            val ancestorFolderId = NodeId(456L)
+            val cameraUploadsFolderId = NodeId(789L)
+            val ancestorFolder: FolderNode = mock { on { id } doReturn ancestorFolderId }
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.DCIMSelectionAsSyncBackup))
+                .thenReturn(false)
+            whenever(getSyncedNodeIdsUseCase()).thenReturn(emptyList())
+            whenever(getDeviceIdUseCase()).thenReturn(null)
+            whenever(getDeviceIdAndNameMapUseCase()).thenReturn(emptyMap())
+            whenever(isCameraUploadsEnabledUseCase()).thenReturn(true)
+            whenever(isMediaUploadsEnabledUseCase()).thenReturn(false)
+            whenever(getCameraUploadsFolderHandleUseCase())
+                .thenReturn(cameraUploadsFolderId.longValue)
+            whenever(getMediaUploadsFolderHandleUseCase()).thenReturn(null)
+            whenever(getMyChatsFilesFolderIdUseCase()).thenReturn(NodeId(-1L))
+            whenever(getTypedNodesFromFolder(ancestorFolderId)).thenReturn(flowOf(emptyList()))
+            whenever(getFullNodePathByIdUseCase(ancestorFolderId)).thenReturn("/ROOT/A")
+            whenever(getFullNodePathByIdUseCase(cameraUploadsFolderId))
+                .thenReturn("/ROOT/A/Camera uploads")
+
+            underTest(ancestorFolder, rootFolderId, false, null).test {
+                val result = awaitItem()
+                assertThat(result.isSelectEnabled).isFalse()
+                awaitComplete()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that node in exclude list at root is disabled`() = runTest {
         val rootFolderId = NodeId(123L)
         val cuFolderId = NodeId(146L)

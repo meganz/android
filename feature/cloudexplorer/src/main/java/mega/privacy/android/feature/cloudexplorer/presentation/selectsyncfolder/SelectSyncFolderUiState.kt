@@ -25,6 +25,9 @@ internal sealed interface SelectSyncFolderUiState {
      * the entry screen).
      * @property restrictedNodes The children that cannot be selected because they are already used
      * by a sync or backup, keyed by node id.
+     * @property isSelectEnabled Whether the current folder itself can be selected as the sync
+     * target. False at the root, when a child is used by a sync/backup, or when the current folder
+     * is an ancestor of an existing sync/backup.
      * @property removeConnectionNode The restricted node whose folder connection the user is asked
      * to remove, or null when no removal is in progress. Holds the backup id used by the action.
      * @property isProcessing Whether a folder selection is being validated and saved, used to block
@@ -38,6 +41,7 @@ internal sealed interface SelectSyncFolderUiState {
     data class Data(
         val currentFolderId: NodeId,
         val restrictedNodes: Map<NodeId, SyncFolderPickerRestrictedNode>,
+        val isSelectEnabled: Boolean,
         val removeConnectionNode: SyncFolderPickerRestrictedNode?,
         val isProcessing: Boolean,
         val disableBatteryOptimizationsEvent: StateEvent,
@@ -52,4 +56,5 @@ internal sealed interface SelectSyncFolderUiState {
 internal data class SyncFolderPickerNodes(
     val currentFolderId: NodeId,
     val restrictedNodes: Map<NodeId, SyncFolderPickerRestrictedNode> = emptyMap(),
+    val isSelectEnabled: Boolean = false,
 )

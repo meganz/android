@@ -107,20 +107,13 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             Timber.e(it, "Error getting synced node ids")
             emptyList()
         }
-        val excludeFolders = if (currentFolder.id == rootFolderId) {
-            runCatching {
-                buildExcludeFoldersAtRoot(syncedNodeIds)
-            }.onFailure {
-                Timber.e(it, "Error getting handles of CU and MyChat files")
-            }.getOrNull()
-        } else {
-            null
-        }
-        // Check if RestrictSyncAcrossDevices feature flag is enabled
-        // When disabled (default), folders used by Sync/Backup on OTHER devices are allowed to be selected
-        // (Sync-Sync across devices is allowed), but folders used by Camera/Media Uploads on
-        // other devices are still blocked
-        // When enabled, reverts to old behavior (blocks Sync-Sync across devices)
+        val reservedFolderIds = runCatching {
+            getReservedFolderIds()
+        }.onFailure {
+            Timber.e(it, "Error getting handles of CU and MyChat files")
+        }.getOrDefault(emptyList())
+        val excludeFolders = (reservedFolderIds + syncedNodeIds).ifEmpty { null }
+
         val restrictSyncAcrossDevices = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.RestrictSyncAcrossDevices)
         }.getOrElse { false }
@@ -170,6 +163,14 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
                     }
                 }.getOrNull()
             }.toMap()
+
+        // Used to detect if the current folder is an ancestor of an existing sync/backup below
+        val (currentFolderPath, usedNodePaths) = getCurrentFolderAndUsedNodePaths(
+            currentFolder = currentFolder,
+            syncedNodeIds = syncedNodeIds,
+            reservedFolderIds = reservedFolderIds,
+            backupPaths = backupPaths,
+        )
         getTypedNodesFromFolder(currentFolder.id)
             .catch {
                 Timber.d(it, "Error getting child folders of current folder ${currentFolder.name}")
@@ -200,7 +201,15 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
 
                 val notAtRoot = currentFolder.id != rootFolderId
                 val noChildUsedBySyncOrBackup = !nodes.any { it.isUsedBySyncOrBackup }
-                val isSelectEnabled = notAtRoot && noChildUsedBySyncOrBackup
+                // The current folder is an ancestor of an existing sync/backup when one of the used
+                // node paths is the current folder itself or sits below it.
+                val noSyncOrBackupAtOrBelow =
+                    currentFolderPath == null || usedNodePaths.none { used ->
+                        used == currentFolderPath ||
+                                UriPath(used).isSubPathOf(UriPath(currentFolderPath))
+                    }
+                val isSelectEnabled =
+                    notAtRoot && noChildUsedBySyncOrBackup && noSyncOrBackupAtOrBelow
 
                 emit(
                     MegaPickerFolderResult(
@@ -212,22 +221,52 @@ internal class MonitorMegaPickerFolderNodesUseCase @Inject constructor(
             }
     }
 
-    private suspend fun buildExcludeFoldersAtRoot(syncedNodeIds: List<NodeId>): List<NodeId>? =
-        coroutineScope {
-            val cameraUploadsFolderHandle =
-                async { getCameraUploadsFolderHandleUseCase().takeIf { isCameraUploadsEnabledUseCase() } }
-            val mediaUploadsFolderHandle =
-                async { getMediaUploadsFolderHandleUseCase()?.id.takeIf { isMediaUploadsEnabledUseCase() } }
-            val myChatsUploadsFolderHandle = async { getMyChatsFilesFolderIdUseCase() }
-
-            val list = listOfNotNull(
-                cameraUploadsFolderHandle.await()?.let { NodeId(it) },
-                mediaUploadsFolderHandle.await(),
-                myChatsUploadsFolderHandle.await(),
-            ).filterNot { it == NodeId(-1L) }.plus(syncedNodeIds)
-
-            return@coroutineScope list.ifEmpty { null }
+    /**
+     * Resolves the reserved folders that cannot be synced: Camera Uploads and Media Uploads
+     * (when enabled) and My Chat files.
+     */
+    private suspend fun getReservedFolderIds(): List<NodeId> = coroutineScope {
+        val cameraUploadsId = async {
+            if (isCameraUploadsEnabledUseCase()) {
+                getCameraUploadsFolderHandleUseCase().let(::NodeId)
+            } else null
         }
+        val mediaUploadsId = async {
+            if (isMediaUploadsEnabledUseCase()) {
+                getMediaUploadsFolderHandleUseCase()?.id
+            } else null
+        }
+        val myChatsFolderId = async { getMyChatsFilesFolderIdUseCase() }
+
+        listOfNotNull(
+            cameraUploadsId.await(),
+            mediaUploadsId.await(),
+            myChatsFolderId.await(),
+        ).filterNot { it == NodeId(-1L) }
+    }
+
+    /**
+     * Resolves the current folder's path and the paths of every node already used by a
+     * sync/backup or reserved folder, so an ancestor-of-existing-usage check can be done by
+     * comparing paths instead of node ids.
+     */
+    private suspend fun getCurrentFolderAndUsedNodePaths(
+        currentFolder: Node,
+        syncedNodeIds: List<NodeId>,
+        reservedFolderIds: List<NodeId>,
+        backupPaths: Map<NodeId, String>,
+    ): Pair<String?, List<String>> {
+        val currentFolderPath = runCatching { getFullNodePathByIdUseCase(currentFolder.id) }
+            .onFailure { Timber.d(it, "Error getting current folder path") }
+            .getOrNull()
+            ?.trimEnd('/')
+        val usedNodePaths = (
+                (syncedNodeIds + reservedFolderIds).mapNotNull { usedNodeId ->
+                    runCatching { getFullNodePathByIdUseCase(usedNodeId) }.getOrNull()
+                } + backupPaths.values
+                ).map { it.trimEnd('/') }
+        return currentFolderPath to usedNodePaths
+    }
 
     private fun mapNodeToMegaPickerNodeInfo(
         node: TypedNode,

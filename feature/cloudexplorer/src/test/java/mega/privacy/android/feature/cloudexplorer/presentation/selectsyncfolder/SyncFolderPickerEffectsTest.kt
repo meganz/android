@@ -41,6 +41,7 @@ internal class SyncFolderPickerEffectsTest {
     ) = SelectSyncFolderUiState.Data(
         currentFolderId = NodeId(1L),
         restrictedNodes = emptyMap(),
+        isSelectEnabled = true,
         removeConnectionNode = removeConnectionNode,
         isProcessing = false,
         disableBatteryOptimizationsEvent = disableBatteryOptimizationsEvent,
