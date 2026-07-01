@@ -1,11 +1,13 @@
 package mega.privacy.android.app.presentation.twofactorauthentication.view.screens
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -15,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -23,10 +26,13 @@ import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.inputfields.VerificationTextInputField
 import mega.android.core.ui.extensions.safeRequestFocus
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.devicetype.DeviceType
+import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.view.TWO_FA_PROGRESS_TEST_TAG
+import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -44,6 +50,16 @@ internal fun AuthenticationScreen(
     val spacing = LocalSpacing.current
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val orientation = LocalConfiguration.current.orientation
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val contentModifier = if (isTablet || isPhoneLandscape) {
+        Modifier.width(tabletScreenWidth(orientation))
+    } else {
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacing.x16)
+    }
 
     LaunchedEffect(Unit) {
         focusRequester.safeRequestFocus()
@@ -53,29 +69,33 @@ internal fun AuthenticationScreen(
     Box(modifier = modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = spacing.x16),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Top,
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            MegaText(
-                modifier = Modifier.padding(top = spacing.x24, bottom = spacing.x24),
-                text = stringResource(id = sharedR.string.multi_factor_auth_login_verification_content),
-                textColor = TextColor.Secondary,
-                style = AppTheme.typography.bodyLarge,
-            )
-            VerificationTextInputField(
-                modifier = Modifier
-                    .testTag(AUTHENTICATION_SCREEN_PIN_FIELD_TAG)
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                value = uiState.twoFAPin,
-                isCodeCorrect = if (isError) false else null,
-                cursorIndex = if (isError) 0 else -1,
-                errorText = stringResource(id = R.string.pin_error_2fa),
-                onValueChange = on2FAChanged,
-            )
+            Column(
+                modifier = contentModifier,
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Top,
+            ) {
+                MegaText(
+                    modifier = Modifier.padding(top = spacing.x24, bottom = spacing.x24),
+                    text = stringResource(id = sharedR.string.multi_factor_auth_login_verification_content),
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyLarge,
+                )
+                VerificationTextInputField(
+                    modifier = Modifier
+                        .testTag(AUTHENTICATION_SCREEN_PIN_FIELD_TAG)
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    value = uiState.twoFAPin,
+                    isCodeCorrect = if (isError) false else null,
+                    cursorIndex = if (isError) 0 else -1,
+                    errorText = stringResource(id = R.string.pin_error_2fa),
+                    onValueChange = on2FAChanged,
+                )
+            }
         }
         if (isChecking) {
             LargeHUD(

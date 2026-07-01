@@ -221,6 +221,7 @@ class SettingsFragment :
 
     private fun refreshSummaries() {
         viewModel.refreshCameraUploadsOn()
+        viewModel.refreshMultiFactorAuthSetting()
     }
 
     private fun updatePasscodeLockSummary(enabled: Boolean) {

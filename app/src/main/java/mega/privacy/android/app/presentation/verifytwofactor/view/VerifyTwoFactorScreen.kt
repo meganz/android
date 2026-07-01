@@ -2,9 +2,10 @@ package mega.privacy.android.app.presentation.verifytwofactor.view
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
+import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorViewModel
 import mega.privacy.android.app.presentation.verifytwofactor.model.PasswordChangedAction
 
@@ -27,7 +28,7 @@ fun VerifyTwoFactorScreen(
     onNavigateToMyAccount: (resultCode: Int) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
 
     EventEffect(uiState.disableSuccessEvent, viewModel::onDisableSuccessEventConsumed) {
         onDisableSuccess()
@@ -48,7 +49,7 @@ fun VerifyTwoFactorScreen(
         state = uiState,
         onBack = onFinish,
         onPinChanged = viewModel::onPinChanged,
-        onLostAuthenticatorDevice = { uriHandler.openUri(uiState.recoveryUrl) },
+        onLostAuthenticatorDevice = { context.launchUrl(uiState.recoveryUrl) },
         onResultDismissed = {
             viewModel.onResultEventConsumed()
             onFinish()

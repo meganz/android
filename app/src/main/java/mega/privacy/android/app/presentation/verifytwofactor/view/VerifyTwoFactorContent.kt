@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.verifytwofactor.view
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -17,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -26,9 +29,12 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.indicators.LargeHUD
 import mega.android.core.ui.components.inputfields.VerificationTextInputField
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.devicetype.DeviceType
+import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.spacing.LocalSpacing
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.login.view.tabletScreenWidth
 import mega.privacy.android.app.presentation.verifytwofactor.model.VerifyTwoFactorUiState
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_2FA
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
@@ -101,6 +107,16 @@ private fun VerifyTwoFactorBody(
     val spacing = LocalSpacing.current
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val orientation = LocalConfiguration.current.orientation
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+    val isPhoneLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE && !isTablet
+    val contentModifier = if (isTablet || isPhoneLandscape) {
+        Modifier.width(tabletScreenWidth(orientation))
+    } else {
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = spacing.x16)
+    }
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
         keyboardController?.show()
@@ -114,36 +130,41 @@ private fun VerifyTwoFactorBody(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = spacing.x16),
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            MegaText(
-                modifier = Modifier.padding(vertical = spacing.x24),
-                text = stringResource(R.string.explain_confirm_2fa),
-                textColor = TextColor.Secondary,
-                style = AppTheme.typography.bodyLarge,
-            )
-            VerificationTextInputField(
-                modifier = Modifier
-                    .testTag(VERIFY_2FA_PIN_FIELD_TAG)
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                value = state.pin,
-                isCodeCorrect = if (state.isPinError) false else null,
-                cursorIndex = if (state.isPinError) 0 else -1,
-                errorText = stringResource(R.string.pin_error_2fa),
-                onValueChange = onPinChanged,
-            )
-            MegaClickableText(
-                modifier = Modifier
-                    .testTag(VERIFY_2FA_LOST_DEVICE_TAG)
-                    .padding(top = spacing.x24),
-                text = stringResource(R.string.lost_your_authenticator_device),
-                style = AppTheme.typography.bodyMedium,
-                onClick = onLostAuthenticatorDevice,
-            )
+            Column(
+                modifier = contentModifier,
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start,
+            ) {
+                MegaText(
+                    modifier = Modifier.padding(vertical = spacing.x24),
+                    text = stringResource(R.string.explain_confirm_2fa),
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyLarge,
+                )
+                VerificationTextInputField(
+                    modifier = Modifier
+                        .testTag(VERIFY_2FA_PIN_FIELD_TAG)
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    value = state.pin,
+                    isCodeCorrect = if (state.isPinError) false else null,
+                    cursorIndex = if (state.isPinError) 0 else -1,
+                    errorText = stringResource(R.string.pin_error_2fa),
+                    onValueChange = onPinChanged,
+                )
+                MegaClickableText(
+                    modifier = Modifier
+                        .testTag(VERIFY_2FA_LOST_DEVICE_TAG)
+                        .padding(top = spacing.x24),
+                    text = stringResource(R.string.lost_your_authenticator_device),
+                    style = AppTheme.typography.bodyMedium,
+                    onClick = onLostAuthenticatorDevice,
+                )
+            }
         }
         if (state.isLoading) {
             LargeHUD(
