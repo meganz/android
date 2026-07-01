@@ -138,4 +138,26 @@ internal class ResumeSyncsAfterStorageStateEventInitialiserTest {
             verify(resumeSyncsSuspendedByStorageOverquotaUseCase, times(3)).invoke()
             job.cancel()
         }
+
+    @Test
+    fun `test that syncs are resumed again when storage recovers to a desired state after overquota`() =
+        runTest {
+            val job = launch {
+                underTest("test-session", false)
+            }
+            advanceUntilIdle()
+
+            listOf(StorageState.Green, StorageState.Red, StorageState.Green).forEach { state ->
+                monitorMyAccountUpdateFakeFlow.emit(
+                    MyAccountUpdate(
+                        action = MyAccountUpdate.Action.STORAGE_STATE_CHANGED,
+                        storageState = state,
+                    )
+                )
+            }
+            advanceUntilIdle()
+
+            verify(resumeSyncsSuspendedByStorageOverquotaUseCase, times(2)).invoke()
+            job.cancel()
+        }
 }

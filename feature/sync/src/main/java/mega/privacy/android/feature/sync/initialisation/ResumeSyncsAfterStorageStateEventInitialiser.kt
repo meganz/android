@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sync.initialisation
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.ResumeSyncsSuspendedByStorageOverquotaUseCase
@@ -21,10 +22,11 @@ internal class ResumeSyncsAfterStorageStateEventInitialiser @Inject constructor(
     action = { _, _ ->
         monitorMyAccountUpdateUseCase()
             .catch { Timber.e(it, "Failed to monitor my account update event") }
-            .filter {
-                it.storageState == StorageState.Green || it.storageState == StorageState.Orange
-            }
+            .mapNotNull { it.storageState }
             .distinctUntilChanged()
+            .filter {
+                it == StorageState.Green || it == StorageState.Orange
+            }
             .collect {
                 runCatching {
                     resumeSyncsSuspendedByStorageOverquotaUseCase()
