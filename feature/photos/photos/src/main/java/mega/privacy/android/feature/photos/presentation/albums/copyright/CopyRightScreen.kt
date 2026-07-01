@@ -51,13 +51,8 @@ fun CopyRightScreen(
                 .padding(horizontal = 24.dp, vertical = 20.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            Spacer(
-                modifier = Modifier
-                    .height(48.dp)
-                    .fillMaxWidth()
-            )
-
             // Legacy icon for now, will be updated later
             MegaIcon(
                 painter = painterResource(R.drawable.ic_copyright),
