@@ -2,7 +2,6 @@ package mega.privacy.android.app.meeting.fragments
 
 import android.Manifest
 import android.app.Dialog
-import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Build
@@ -52,8 +51,6 @@ import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.listeners.AutoJoinPublicChatListener
 import mega.privacy.android.app.listeners.ChatChangeVideoStreamListener
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
-import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.pauseAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService.Companion.resumeAudioPlayerIfNotInCall
 import mega.privacy.android.app.meeting.AnimationTool.fadeInOut
@@ -85,13 +82,6 @@ import mega.privacy.android.app.presentation.meeting.view.sheet.MoreCallOptionsB
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
-import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
@@ -2826,30 +2816,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
             dialog.show(childFragmentManager, dialog.tag)
         } else {
-            val inviteParticipantIntent =
-                if (inMeetingViewModel.state.value.isContactsComposeUIEnabled) {
-                    AddParticipantsComposeActivity.getMeetingIntent(
-                        context = meetingActivity,
-                        chatId = inMeetingViewModel.getChatId(),
-                    )
-                } else {
-                    Intent(meetingActivity, AddContactActivity::class.java).apply {
-                        putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                        putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                        putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
-                        putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.getChatId())
-                        putExtra(
-                            INTENT_EXTRA_KEY_MAX_USER,
-                            inMeetingViewModel.state.value.call?.callUsersLimit
-                        )
-                        putExtra(
-                            INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                            getString(R.string.invite_participants)
-                        )
-                    }
-                }
-            meetingActivity.startActivityForResult(
-                inviteParticipantIntent, REQUEST_ADD_PARTICIPANTS
+            megaNavigator.openAddMeetingParticipantsForResult(
+                activity = meetingActivity,
+                chatId = inMeetingViewModel.getChatId(),
+                callUsersLimit = inMeetingViewModel.state.value.call?.callUsersLimit,
+                requestCode = REQUEST_ADD_PARTICIPANTS,
             )
         }
     }

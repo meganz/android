@@ -592,5 +592,18 @@ interface AppNavigator {
      * @param msgId   The ID of a message.
      */
     fun openContactAttachmentActivity(context: Context, chatId: Long, msgId: Long)
+
+    /**
+     * Opens the meeting "add participants" picker for a result, choosing the Compose contacts UI
+     * or the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered
+     * to [activity]'s onActivityResult under [requestCode], mirroring the legacy AddContactActivity
+     * contract (RESULT_OK + EXTRA_CONTACTS).
+     */
+    fun openAddMeetingParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        callUsersLimit: Int?,
+        requestCode: Int,
+    )
 }
 

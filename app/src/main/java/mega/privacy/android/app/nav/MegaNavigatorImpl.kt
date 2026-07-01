@@ -1,5 +1,6 @@
 package mega.privacy.android.app.nav
 
+import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -19,8 +20,10 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
+import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
@@ -34,8 +37,8 @@ import mega.privacy.android.app.presentation.meeting.chat.model.EXTRA_LINK
 import mega.privacy.android.app.presentation.pdfviewer.PdfViewerActivity
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
-import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
+import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.presentation.zipbrowser.ZipBrowserComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -43,21 +46,27 @@ import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_PATH_ZIP
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_IS_FROM_MEETING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MAX_USER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -83,6 +92,7 @@ import mega.privacy.android.feature.payment.presentation.cancelaccountplan.Cance
 import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountActivity
 import mega.privacy.android.feature.sync.navigation.SyncNewFolder
 import mega.privacy.android.feature.sync.ui.SyncHostActivity
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
@@ -927,6 +937,43 @@ internal class MegaNavigatorImpl @Inject constructor(
                 messageId = msgId
             )
         )
+    }
+
+    @Suppress("deprecation")
+    override fun openAddMeetingParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        callUsersLimit: Int?,
+        requestCode: Int,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddParticipantsComposeActivity.getMeetingIntent(
+                    context = activity,
+                    chatId = chatId,
+                )
+            } else {
+                Intent(activity, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(INTENT_EXTRA_IS_FROM_MEETING, true)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                    putExtra(INTENT_EXTRA_KEY_MAX_USER, callUsersLimit)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        activity.getString(R.string.invite_participants)
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
     }
 
     override fun openHomeScreen(context: Context) {
