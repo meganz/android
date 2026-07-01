@@ -2,11 +2,14 @@ package mega.privacy.android.shared.nodes.components
 
 import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.filterToOne
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.icon.pack.R
@@ -41,6 +44,7 @@ class NodeListViewItemTest {
         onInfoClicked: (() -> Unit)? = null,
         onItemClicked: () -> Unit = {},
         onLongClicked: (() -> Unit)? = null,
+        onSelectionCheckedChange: ((Boolean) -> Unit)? = null,
         isInSelectionMode: Boolean = false,
         isSelected: Boolean = false,
     ) {
@@ -64,6 +68,7 @@ class NodeListViewItemTest {
                 onInfoClicked = onInfoClicked,
                 onItemClicked = onItemClicked,
                 onLongClicked = onLongClicked,
+                onSelectionCheckedChange = onSelectionCheckedChange,
                 isInSelectionMode = isInSelectionMode,
                 isSelected = isSelected,
             )
@@ -488,6 +493,22 @@ class NodeListViewItemTest {
             )
         )
         // Note: The actual unchecked state would need to be verified through the checkbox's internal state
+    }
+
+    @Test
+    fun `test that clicking the checkbox invokes onSelectionCheckedChange when provided`() {
+        var toggled = false
+        setContent(
+            isInSelectionMode = true,
+            isSelected = false,
+            onSelectionCheckedChange = { toggled = true },
+        )
+
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true)
+            .filterToOne(hasClickAction())
+            .performClick()
+
+        org.junit.Assert.assertTrue(toggled)
     }
 
     @Test

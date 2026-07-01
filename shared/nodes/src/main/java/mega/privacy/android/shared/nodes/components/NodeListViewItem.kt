@@ -108,6 +108,7 @@ fun NodeListViewItem(
     onMoreClicked: (() -> Unit)? = null,
     onInfoClicked: (() -> Unit)? = null,
     onLongClicked: (() -> Unit)? = null,
+    onSelectionCheckedChange: ((Boolean) -> Unit)? = null,
     onItemClicked: () -> Unit,
 ) {
     GenericListItem(
@@ -306,9 +307,9 @@ fun NodeListViewItem(
                 ) {
                     Checkbox(
                         checked = isSelected,
-                        onCheckStateChanged = { },
-                        tapTargetArea = false,
-                        clickable = false,
+                        onCheckStateChanged = { onSelectionCheckedChange?.invoke(it) },
+                        tapTargetArea = onSelectionCheckedChange != null,
+                        clickable = onSelectionCheckedChange != null,
                         modifier = Modifier.testTag(CHECKBOX_TAG),
                     )
                 }
