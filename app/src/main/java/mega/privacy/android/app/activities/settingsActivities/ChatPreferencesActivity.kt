@@ -33,6 +33,9 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (shouldRefreshSessionDueToSDK(true) || shouldRefreshSessionDueToKarere()) {
+            return
+        }
         binding.toolbarSettings.title = getString(sharedR.string.general_chat)
         sttChat = SettingsChatFragment()
         sttChat?.let { replaceFragment(it) }

@@ -230,8 +230,4 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun shouldShowCopyright(): Boolean = withContext(databaseDispatcher) {
         dbHandler.get().shouldShowCopyright
     }
-
-    override suspend fun getChatVideoQuality(): Int = withContext(databaseDispatcher) {
-        dbHandler.get().chatVideoQuality
-    }
 }

@@ -15,11 +15,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.ChatSettingsPreferenceGateway
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import java.io.IOException
 import javax.inject.Inject
@@ -40,7 +41,7 @@ internal class ChatPreferencesDataStore @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityMapper: VideoQualityMapper,
-    private val localStorageGateway: MegaLocalStorageGateway,
+    private val chatSettingsPreferenceGateway: ChatSettingsPreferenceGateway,
 ) : ChatPreferencesGateway {
     private val chatImageQualityPreferenceKey = stringPreferencesKey("CHAT_IMAGE_QUALITY")
     private val lastContactPermissionRequestedTimePreferenceKey =
@@ -60,8 +61,11 @@ internal class ChatPreferencesDataStore @Inject constructor(
                 )
             }
 
-    override suspend fun getChatVideoQualityPreference(): VideoQuality =
-        videoQualityMapper(localStorageGateway.getChatVideoQuality()) ?: VideoQuality.ORIGINAL
+    override suspend fun getChatVideoQualityPreference(): VideoQuality {
+        val videoQuality = chatSettingsPreferenceGateway.getChatSettings()?.videoQuality
+            ?: ChatSettings().videoQuality
+        return videoQualityMapper(videoQuality.toIntOrNull()) ?: VideoQuality.ORIGINAL
+    }
 
 
     override suspend fun setChatImageQualityPreference(quality: ChatImageQuality) {

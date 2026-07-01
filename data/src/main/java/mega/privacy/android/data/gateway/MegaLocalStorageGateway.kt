@@ -262,11 +262,4 @@ interface MegaLocalStorageGateway {
      * Should show copyright
      */
     suspend fun shouldShowCopyright(): Boolean
-
-    /**
-     * Get chat video quality
-     *
-     * @return chat video quality as [Int]
-     */
-    suspend fun getChatVideoQuality(): Int
 }

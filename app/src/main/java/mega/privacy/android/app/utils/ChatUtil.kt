@@ -28,7 +28,6 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
 import mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected
 import mega.privacy.android.app.utils.TimeUtils.isUntilThisMorning
-import mega.privacy.android.domain.entity.settings.ChatSettings
 import mega.privacy.android.navigation.MegaNavigatorEntryPoint
 import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
@@ -479,16 +478,10 @@ object ChatUtil {
      */
     @JvmStatic
     fun getGeneralNotification(): String {
-        val app = MegaApplication.getInstance()
         val pushNotificationSettings = MegaApplication.getPushNotificationSettingManagement().pushNotificationSetting
 
         if (!pushNotificationSettings.isGlobalChatsDndEnabled || pushNotificationSettings.globalChatsDnd == -1L) {
-            var chatSettings = app.dbH.chatSettings
-            if (chatSettings == null) {
-                chatSettings = ChatSettings()
-                app.dbH.chatSettings = chatSettings
-            }
-
+            // Chat settings defaults are ensured by ResetChatSettingsUseCase (app start + login flows).
             return Constants.NOTIFICATIONS_ENABLED
         }
 

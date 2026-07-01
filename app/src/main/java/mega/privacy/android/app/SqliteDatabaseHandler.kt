@@ -414,82 +414,6 @@ class SqliteDatabaseHandler @Inject constructor(
         db.insert(TABLE_CHAT_SETTINGS, SQLiteDatabase.CONFLICT_NONE, values)
     }
     /**
-     * Gets the chat video quality value.
-     *
-     * @return The chat video quality.
-     */
-    /**
-     * Sets the chat video quality value.
-     * There are four possible values for this setting: VIDEO_QUALITY_ORIGINAL, VIDEO_QUALITY_HIGH,
-     * VIDEO_QUALITY_MEDIUM or VIDEO_QUALITY_LOW.
-     *
-     * @param chatVideoQuality The new chat video quality.
-     */
-    override var chatVideoQuality: Int
-        get() {
-            Timber.d("getChatVideoQuality")
-            return getIntValue(
-                TABLE_CHAT_SETTINGS,
-                KEY_CHAT_VIDEO_QUALITY,
-                VideoQuality.MEDIUM.value
-            )
-        }
-        set(chatVideoQuality) {
-            Timber.d("setChatVideoQuality")
-            setIntValue(TABLE_CHAT_SETTINGS, KEY_CHAT_VIDEO_QUALITY, chatVideoQuality)
-        }
-
-    override fun setNotificationSoundChat(sound: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_CHAT_SETTINGS SET $KEY_CHAT_SOUND_NOTIFICATIONS= '${
-                            encrypt(sound)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CHAT_SOUND_NOTIFICATIONS, encrypt(sound))
-                    writableDatabase.insert(
-                        TABLE_CHAT_SETTINGS,
-                        SQLiteDatabase.CONFLICT_NONE,
-                        values
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    override fun setVibrationEnabledChat(enabled: String?) {
-        val selectQuery = "SELECT * FROM $TABLE_CHAT_SETTINGS"
-        val values = ContentValues()
-        try {
-            readableDatabase.query(selectQuery).use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val UPDATE_PREFERENCES_TABLE =
-                        "UPDATE $TABLE_CHAT_SETTINGS SET $KEY_CHAT_VIBRATION_ENABLED= '${
-                            encrypt(enabled)
-                        }' WHERE $KEY_ID = '1'"
-                    writableDatabase.execSQL(UPDATE_PREFERENCES_TABLE)
-                } else {
-                    values.put(KEY_CHAT_VIBRATION_ENABLED, encrypt(enabled))
-                    writableDatabase.insert(
-                        TABLE_CHAT_SETTINGS,
-                        SQLiteDatabase.CONFLICT_NONE,
-                        values
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-    }
-
-    /**
      * Saves attributes in DB.
      *
      * @param db   DB object to save the attributes.
@@ -1390,11 +1314,6 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun clearChatItems() {
         writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_ITEMS")
-        legacyDatabaseMigration.onCreate(writableDatabase)
-    }
-
-    override fun clearChatSettings() {
-        writableDatabase.execSQL("DROP TABLE IF EXISTS $TABLE_CHAT_SETTINGS")
         legacyDatabaseMigration.onCreate(writableDatabase)
     }
 

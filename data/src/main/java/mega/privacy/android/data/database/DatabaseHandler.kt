@@ -31,14 +31,6 @@ interface DatabaseHandler {
     var chatSettings: ChatSettings?
 
     /**
-     * Sets the chat video quality value.
-     * There are four possible values for this setting: VIDEO_QUALITY_ORIGINAL, VIDEO_QUALITY_HIGH,
-     * VIDEO_QUALITY_MEDIUM or VIDEO_QUALITY_LOW.
-     *
-     * @param chatVideoQuality The new chat video quality.
-     */
-    var chatVideoQuality: Int
-    /**
      * Sets the flag to indicate if should ask the user about set the current path as default download location.
      *
      * @param askSetDownloadLocation true if should ask, false otherwise.
@@ -79,8 +71,6 @@ interface DatabaseHandler {
      */
     var attributes: MegaAttributes?
 
-    fun setNotificationSoundChat(sound: String?)
-    fun setVibrationEnabledChat(enabled: String?)
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
@@ -112,7 +102,6 @@ interface DatabaseHandler {
     fun clearContacts()
     fun clearNonContacts()
     fun clearChatItems()
-    fun clearChatSettings()
 
     fun setAutoPlayEnabled(enabled: String)
     fun findNonContactByHandle(handle: String): NonContactInfo?

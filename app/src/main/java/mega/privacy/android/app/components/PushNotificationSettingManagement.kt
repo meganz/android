@@ -10,6 +10,7 @@ import mega.privacy.android.data.repository.LegacyNotificationRepository
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaPushNotificationSettings
+import timber.log.Timber
 import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,50 +60,53 @@ class PushNotificationSettingManagement @Inject constructor(
         chatIds: List<Long>?
     ) {
         applicationScope.launch {
-            when (option) {
-                Constants.NOTIFICATIONS_DISABLED -> {
-                    chatIds?.forEach { chatId ->
-                        notificationsRepository.setChatEnabled(chatId, false)
-                    } ?: run {
-                        notificationsRepository.setChatsEnabled(false)
-                    }
-                }
-
-                Constants.NOTIFICATIONS_ENABLED ->
-                    chatIds?.forEach { chatId ->
-                        notificationsRepository.setChatEnabled(chatId, true)
-                    } ?: run {
-                        notificationsRepository.setChatsEnabled(true)
-                    }
-
-                Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING, Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING -> {
-                    val timestamp = TimeUtils.getCalendarSpecificTime(option).timeInMillis / 1000
-                    chatIds?.forEach { chatId ->
-                        notificationsRepository.setChatDoNotDisturb(chatId, timestamp)
-                    } ?: run {
-                        notificationsRepository.setChatsDoNotDisturb(timestamp)
-                    }
-                }
-
-                else -> {
-                    val time = Calendar.getInstance().apply {
-                        timeInMillis = System.currentTimeMillis()
-                        when (option) {
-                            Constants.NOTIFICATIONS_30_MINUTES -> add(Calendar.MINUTE, 30)
-                            Constants.NOTIFICATIONS_1_HOUR -> add(Calendar.HOUR, 1)
-                            Constants.NOTIFICATIONS_6_HOURS -> add(Calendar.HOUR, 6)
-                            Constants.NOTIFICATIONS_24_HOURS -> add(Calendar.HOUR, 24)
+            runCatching {
+                when (option) {
+                    Constants.NOTIFICATIONS_DISABLED -> {
+                        chatIds?.forEach { chatId ->
+                            notificationsRepository.setChatEnabled(chatId, false)
+                        } ?: run {
+                            notificationsRepository.setChatsEnabled(false)
                         }
-                    }.timeInMillis / 1000
+                    }
 
-                    chatIds?.forEach { chatId ->
-                        notificationsRepository.setChatDoNotDisturb(chatId, time)
-                    } ?: run {
-                        notificationsRepository.setChatsDoNotDisturb(time)
+                    Constants.NOTIFICATIONS_ENABLED ->
+                        chatIds?.forEach { chatId ->
+                            notificationsRepository.setChatEnabled(chatId, true)
+                        } ?: run {
+                            notificationsRepository.setChatsEnabled(true)
+                        }
+
+                    Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING, Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING -> {
+                        val timestamp =
+                            TimeUtils.getCalendarSpecificTime(option).timeInMillis / 1000
+                        chatIds?.forEach { chatId ->
+                            notificationsRepository.setChatDoNotDisturb(chatId, timestamp)
+                        } ?: run {
+                            notificationsRepository.setChatsDoNotDisturb(timestamp)
+                        }
+                    }
+
+                    else -> {
+                        val time = Calendar.getInstance().apply {
+                            timeInMillis = System.currentTimeMillis()
+                            when (option) {
+                                Constants.NOTIFICATIONS_30_MINUTES -> add(Calendar.MINUTE, 30)
+                                Constants.NOTIFICATIONS_1_HOUR -> add(Calendar.HOUR, 1)
+                                Constants.NOTIFICATIONS_6_HOURS -> add(Calendar.HOUR, 6)
+                                Constants.NOTIFICATIONS_24_HOURS -> add(Calendar.HOUR, 24)
+                            }
+                        }.timeInMillis / 1000
+
+                        chatIds?.forEach { chatId ->
+                            notificationsRepository.setChatDoNotDisturb(chatId, time)
+                        } ?: run {
+                            notificationsRepository.setChatsDoNotDisturb(time)
+                        }
                     }
                 }
-            }
-            option?.let { chatController.muteChat(it) }
+                option?.let { chatController.muteChat(it) }
+            }.onFailure { Timber.e(it, "Failed to update push notification settings") }
         }
     }
 }
