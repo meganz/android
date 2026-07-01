@@ -259,9 +259,11 @@ class SettingsViewModel @Inject constructor(
      */
     fun refreshMultiFactorAuthSetting() {
         viewModelScope.launch {
-            state.update {
-                it.copy(multiFactorAuthChecked = isMultiFactorAuthEnabledUseCase())
-            }
+            runCatching { isMultiFactorAuthEnabledUseCase() }
+                .onSuccess { enabled ->
+                    state.update { it.copy(multiFactorAuthChecked = enabled) }
+                }
+                .onFailure { Timber.w(it, "Failed to refresh 2FA setting") }
         }
     }
 
