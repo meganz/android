@@ -330,6 +330,7 @@ class TimelineTabViewModel @Inject constructor(
                         extension = node.type.extension,
                         isFavourite = node.isFavourite,
                         isSensitive = isSensitive,
+                        isTakenDown = node.isTakenDown,
                         duration = duration
                     )
                 )
@@ -350,6 +351,7 @@ class TimelineTabViewModel @Inject constructor(
                     extension = node.type.extension,
                     isFavourite = node.isFavourite,
                     isSensitive = isSensitive,
+                    isTakenDown = node.isTakenDown,
                     duration = duration
                 )
             )

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.photos.components
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +24,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,6 +44,7 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R
 
 @Composable
 fun ImagePhotosNode(
@@ -51,6 +54,8 @@ fun ImagePhotosNode(
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isTakenDown: Boolean = false,
+    @DrawableRes defaultImage: Int = R.drawable.ic_image_medium_solid,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
@@ -61,6 +66,8 @@ fun ImagePhotosNode(
         isSelected = isSelected,
         shouldShowFavourite = shouldShowFavourite,
         enabled = enabled,
+        isTakenDown = isTakenDown,
+        defaultImage = defaultImage,
         onClick = onClick,
         onLongClick = onLongClick,
     )
@@ -75,6 +82,8 @@ fun VideoPhotosNode(
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isTakenDown: Boolean = false,
+    @DrawableRes defaultImage: Int = R.drawable.ic_image_medium_solid,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
@@ -86,6 +95,8 @@ fun VideoPhotosNode(
             isSelected = isSelected,
             shouldShowFavourite = shouldShowFavourite,
             enabled = enabled,
+            isTakenDown = isTakenDown,
+            defaultImage = defaultImage,
             onClick = onClick,
             onLongClick = onLongClick,
         )
@@ -122,6 +133,8 @@ private fun BasicPhotosNode(
     shouldShowFavourite: Boolean,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    isTakenDown: Boolean = false,
+    @DrawableRes defaultImage: Int = R.drawable.ic_image_medium_solid,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
 ) {
@@ -132,8 +145,11 @@ private fun BasicPhotosNode(
             .crossfade(enable = true)
             .build()
     }
-    val painter = rememberAsyncImagePainter(model = request)
-    val state by painter.state.collectAsStateWithLifecycle()
+    val asyncPainter = rememberAsyncImagePainter(model = request)
+    val state by asyncPainter.state.collectAsStateWithLifecycle()
+    // Taken-down nodes must not show their original thumbnail; render the generic file-type icon
+    // (centered) instead, mirroring the node lists.
+    val painter = if (isTakenDown) painterResource(defaultImage) else asyncPainter
     Box(
         modifier = modifier
             .aspectRatio(1f)
@@ -162,7 +178,7 @@ private fun BasicPhotosNode(
                 .conditional(!enabled) {
                     this.alpha(0.5f)
                 }
-                .conditional(isSensitive) {
+                .conditional(isSensitive && !isTakenDown) {
                     this
                         .alpha(0.5f)
                         .blur(16.dp)
@@ -170,8 +186,11 @@ private fun BasicPhotosNode(
                 .testTag(BASIC_PHOTOS_NODE_IMAGE_THUMBNAIL_FILE_TAG),
             painter = painter,
             contentDescription = null,
-            contentScale = when (state) {
-                is AsyncImagePainter.State.Success if (state as AsyncImagePainter.State.Success).result.dataSource == DataSource.MEMORY -> {
+            contentScale = when {
+                isTakenDown -> ContentScale.Inside
+
+                state is AsyncImagePainter.State.Success &&
+                        (state as AsyncImagePainter.State.Success).result.dataSource == DataSource.MEMORY -> {
                     ContentScale.Inside
                 }
 

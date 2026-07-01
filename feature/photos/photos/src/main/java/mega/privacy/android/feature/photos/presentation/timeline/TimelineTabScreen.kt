@@ -80,6 +80,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNod
 import mega.privacy.android.feature.photos.presentation.timeline.state.rememberTimelineLazyListState
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.MediaScreenAllFilterSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenDaysFilterSelectedEvent
@@ -413,6 +414,11 @@ private fun TimelineTabContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
+    val isTakenDown = { id: Long ->
+        uiState.displayedPhotos.firstOrNull { it.id == id }?.isTakenDown == true
+    }
+
     Box(
         modifier = modifier.padding(
             start = contentPadding.calculateStartPadding(LayoutDirection.Ltr),
@@ -438,8 +444,24 @@ private fun TimelineTabContent(
                     selectedPhotoIds = selectedPhotoIds,
                     gridSize = uiState.gridSize,
                     onGridSizeChange = onGridSizeChange,
-                    onClick = onPhotoClick,
-                    onLongClick = onPhotoSelected,
+                    onClick = { id ->
+                        // Taken-down nodes must not be opened/previewed; show the dispute dialog
+                        // instead, mirroring the node lists.
+                        if (isTakenDown(id)) {
+                            showTakenDownDialog = true
+                        } else {
+                            onPhotoClick(id)
+                        }
+                    },
+                    onLongClick = { id ->
+                        // Taken-down nodes must not be selectable for bulk actions either; show
+                        // the dispute dialog instead of adding them to the selection.
+                        if (isTakenDown(id)) {
+                            showTakenDownDialog = true
+                        } else {
+                            onPhotoSelected(id)
+                        }
+                    },
                     header = {
                         if (selectedPhotoIds.isEmpty()) {
                             CameraUploadsBanner(
@@ -502,6 +524,13 @@ private fun TimelineTabContent(
                 onMediaTimePeriodSelected = onMediaTimePeriodSelected
             )
         }
+    }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = { showTakenDownDialog = false },
+        )
     }
 }
 
