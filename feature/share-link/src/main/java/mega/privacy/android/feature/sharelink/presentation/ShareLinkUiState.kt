@@ -1,15 +1,49 @@
 package mega.privacy.android.feature.sharelink.presentation
 
+import androidx.compose.runtime.Stable
+import mega.privacy.android.domain.entity.AccountType
+
 /**
- * UI state for the revamped Share link screen.
+ * UI state for the revamped Share link result screen (single node).
  *
- * MR0 foundation stub — fleshed out in MR1 (AND-24035) with the link, key, password,
- * expiry and account-type fields backed by the existing export/password use cases.
- *
- * @property handles Node handles whose link is being shared.
- * @property isLoading Whether the screen is loading the link details.
+ * Multi-node "Share links" is added later (AND-24043); password / expiry / separate-key
+ * fields are added by their respective MRs.
  */
-data class ShareLinkUiState(
-    val handles: List<Long> = emptyList(),
-    val isLoading: Boolean = true,
-)
+@Stable
+sealed interface ShareLinkUiState {
+
+    /**
+     * Shown while the node and its link are being resolved.
+     */
+    data object Loading : ShareLinkUiState
+
+    /**
+     * Shown when the node could not be loaded or its link could not be created.
+     */
+    data object Error : ShareLinkUiState
+
+    /**
+     * Loaded state with the node details and its public link.
+     *
+     * @property handles Node handles whose link is being shared.
+     * @property nodeName Display name of the node.
+     * @property isFolder Whether the node is a folder (drives the header icon).
+     * @property sizeInBytes File size in bytes for the header, or null for folders.
+     * @property modificationTime File modification time (seconds since epoch), or null for folders.
+     * @property link The full public link including the decryption key.
+     * @property linkWithoutKey The public link with the decryption key stripped, or null.
+     * @property key The decryption key split from the link, or null.
+     * @property accountType The current account type, used for Pro gating of link settings.
+     */
+    data class Data(
+        val handles: List<Long>,
+        val nodeName: String,
+        val isFolder: Boolean,
+        val sizeInBytes: Long?,
+        val modificationTime: Long?,
+        val link: String,
+        val linkWithoutKey: String?,
+        val key: String?,
+        val accountType: AccountType?,
+    ) : ShareLinkUiState
+}

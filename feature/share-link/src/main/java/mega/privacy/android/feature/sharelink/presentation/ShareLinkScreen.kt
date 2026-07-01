@@ -30,6 +30,12 @@ fun ShareLinkScreen(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        Text(text = "Share link (${uiState.handles.size})")
+        Text(
+            text = when (uiState) {
+                ShareLinkUiState.Loading -> "Loading…"
+                ShareLinkUiState.Error -> "Error"
+                is ShareLinkUiState.Data -> "Share link (${uiState.handles.size})"
+            }
+        )
     }
 }
