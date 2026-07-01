@@ -383,6 +383,7 @@ internal fun ExplorerScreen(
                     onRestrictedNodeClick = {
                         pickerRestrictions?.onRestrictedNodeClick?.invoke(it)
                     },
+                    allowsFolderSelection = explorerMode.allowsFolderSelection,
                 )
                 if (!isInnerNavigation && explorerMode.isIncomingAvailable) {
                     IncomingExplorerTab(
@@ -396,6 +397,10 @@ internal fun ExplorerScreen(
                         protectedUserTap = protectedUserTap,
                         onNavigate = onConnectedNavigate,
                         onNavigateBack = onNavigateBack,
+                        selectionState = nodeSelectionState,
+                        isSelectionModeEnabled = !explorerMode.isFolderPicker,
+                        allowsFolderSelection = explorerMode.allowsFolderSelection,
+                        disabledNodeIds = disabledNodeIds,
                     )
                 }
                 if (!isInnerNavigation) {

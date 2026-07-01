@@ -134,7 +134,7 @@ enum class ExplorerMode(
     /** Select a mix of folders and files to pin to the Home screen. */
     PinToHome(
         isFolderPicker = false,
-        isIncomingAvailable = false,
+        isIncomingAvailable = true,
         isChatAvailable = false,
         isVideoPicker = false,
         allowsFolderSelection = true,

@@ -43,6 +43,7 @@ internal fun NodeExplorerUiState.toTabSignal(
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
     isFileSelectionEnabled: Boolean = false,
+    allowsFolderSelection: Boolean = false,
 ): TabSignal =
     when (this) {
         NodeExplorerUiState.Loading -> TabSignal(isLoading = true)
@@ -55,6 +56,7 @@ internal fun NodeExplorerUiState.toTabSignal(
                     items = visibleNodeItems(items, showHiddenNodes, isHiddenNodesEnabled),
                     disabledNodeIds = disabledNodeIds,
                     videosOnly = videosOnly,
+                    allowsFolderSelection = allowsFolderSelection,
                 )
             } else emptySet(),
             nodesLoadingState = nodesLoadingState,
