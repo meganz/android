@@ -33,6 +33,7 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AppVersionMapper
+import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.AccountType
@@ -44,9 +45,11 @@ import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.home.PinnedHomeItem
+import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_ANDROID
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_SENSITIVES
@@ -104,6 +107,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     @FileVersionsOption private val fileVersionsOptionCache: Cache<Boolean>,
     private val megaLocalRoomGateway: MegaLocalRoomGateway,
     private val appVersionMapper: AppVersionMapper,
+    private val pinnedItemsSortPreferenceDataStore: PinnedItemsSortPreferenceDataStore,
 ) : SettingsRepository {
     private val showHiddenNodesFlow: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
@@ -717,6 +721,14 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun clearPinnedHomeItems() {
         megaLocalRoomGateway.deleteAllPinnedHomeItems()
     }
+
+    override fun monitorPinnedItemsSortPreference() =
+        pinnedItemsSortPreferenceDataStore.monitorSortPreference().flowOn(ioDispatcher)
+
+    override suspend fun setPinnedItemsSortPreference(
+        sortField: PinnedHomeItemsSortField,
+        sortDirection: SortDirection,
+    ) = pinnedItemsSortPreferenceDataStore.setSortPreference(sortField, sortDirection)
 
     override suspend fun getLastVersionNewFeatureShown(): AppVersion? =
         withContext(ioDispatcher) {
