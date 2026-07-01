@@ -270,7 +270,15 @@ internal fun RecentsBucketScreenContent(
                                 onItemClicked(item)
                             }
                         },
-                        onLongClick = onLongClick,
+                        onLongClick = { item ->
+                            // Taken-down files must not be selectable for bulk actions either;
+                            // show the dispute dialog instead of starting/extending a selection.
+                            if (item.isTakenDownFile) {
+                                showTakenDownDialog = true
+                            } else {
+                                onLongClick(item)
+                            }
+                        },
                     )
                 } else {
                     NodesView(
@@ -305,10 +313,16 @@ internal fun RecentsBucketScreenContent(
 }
 
 /**
+ * Whether this item is a taken-down file (folders excluded), mirroring how the node lists
+ * handle taken-down nodes.
+ */
+internal val NodeUiItem<*>.isTakenDownFile: Boolean
+    get() = isTakenDown && !isFolderNode
+
+/**
  * Whether tapping this item should open the taken-down dispute dialog instead of the file.
  *
- * Only applies outside selection mode (in selection mode a tap toggles selection) and only to
- * taken-down files — folders are excluded, mirroring how the node lists handle taken-down nodes.
+ * Only applies outside selection mode (in selection mode a tap toggles selection).
  */
 internal fun NodeUiItem<*>.shouldDisputeTakenDownOnClick(isInSelectionMode: Boolean): Boolean =
-    !isInSelectionMode && isTakenDown && !isFolderNode
+    !isInSelectionMode && isTakenDownFile
