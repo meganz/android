@@ -33,6 +33,7 @@ import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
@@ -97,7 +98,7 @@ internal class TimelineRevampViewModelTest {
     @Test
     fun `test that sections are emitted as Data with no loaded nodes initially`() = runTest {
         val sections = listOf(section(groupId = "May 2026", count = 5))
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(sections)
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
         initUnderTest()
 
         underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
@@ -113,7 +114,7 @@ internal class TimelineRevampViewModelTest {
         val sections = listOf(section(groupId = "May 2026", count = 5))
         val nodes = (0 until 5).map { mock<TypedFileNode>() }
         val items = (0 until 5).map { item(id = it.toLong()) }
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(sections)
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
         whenever(
             listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any())
         ).thenReturn(nodes)
@@ -142,7 +143,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that uiState emits Empty when sections are empty`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         initUnderTest()
 
         underTest.uiState.filterIsInstance<TimelineRevampUiState.Empty>().test {
@@ -153,7 +154,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that getMediaTimelineSectionsUseCase is invoked with the default filter`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         initUnderTest()
 
         underTest.uiState.test {
@@ -161,14 +162,15 @@ internal class TimelineRevampViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        verify(getMediaTimelineSectionsUseCase).invoke(DEFAULT_FILTER)
+        verify(getMediaTimelineSectionsUseCase)
+            .invoke(DEFAULT_FILTER, SortOrder.ORDER_MODIFICATION_DESC)
     }
 
     @Test
     fun `test that listMediaNodesByOffsetUseCase is invoked with the default filter`() = runTest {
         val sections = listOf(section(groupId = "May 2026", count = 5))
         val nodes = (0 until 5).map { mock<TypedFileNode>() }
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(sections)
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
         whenever(
             listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any())
         ).thenReturn(nodes)
@@ -195,7 +197,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that filterUiState reflects the mapped preferences`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         val expected = TimelineFilterUiState(
             isRemembered = true,
             mediaType = FilterMediaType.IMAGES,
@@ -211,7 +213,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that onFilterChange persists the selected filter preferences`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         initUnderTest()
 
         underTest.onFilterChange(
@@ -235,7 +237,7 @@ internal class TimelineRevampViewModelTest {
     @Test
     fun `test that the filter ui state and resolved camera upload handles are passed to the mapper`() =
         runTest {
-            whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
             val filterUiState = TimelineFilterUiState(mediaSource = FilterMediaSource.CameraUpload)
             val handles = listOf(NodeId(PRIMARY_HANDLE), NodeId(SECONDARY_HANDLE))
             initUnderTest(filterUiState = filterUiState)
@@ -252,7 +254,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that the timeline still loads when resolving camera upload handles fails`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         val filterUiState = TimelineFilterUiState(mediaSource = FilterMediaSource.CameraUpload)
         initUnderTest(filterUiState = filterUiState)
@@ -299,11 +301,11 @@ internal class TimelineRevampViewModelTest {
                 DEFAULT_FILTER
             }
         }
-        whenever(getMediaTimelineSectionsUseCase(DEFAULT_FILTER))
+        whenever(getMediaTimelineSectionsUseCase(eq(DEFAULT_FILTER), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         // The changed filter's sections never arrive, so the UI stays in Loading after the change.
         getMediaTimelineSectionsUseCase.stub {
-            onBlocking { invoke(changedFilter) } doSuspendableAnswer { awaitCancellation() }
+            onBlocking { invoke(eq(changedFilter), any()) } doSuspendableAnswer { awaitCancellation() }
         }
 
         underTest.uiState.test {
@@ -326,7 +328,7 @@ internal class TimelineRevampViewModelTest {
     @Test
     fun `test that sections are loaded with HideSensitive when hidden nodes are enabled and show-hidden is off`() =
         runTest {
-            whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
             initUnderTest(isHiddenNodesEnabled = true, showHiddenItems = false)
 
             underTest.uiState.test {
@@ -336,14 +338,15 @@ internal class TimelineRevampViewModelTest {
             }
 
             verify(getMediaTimelineSectionsUseCase).invoke(
-                DEFAULT_FILTER.copy(sensitivity = MediaTimelineFilter.Sensitivity.HideSensitive)
+                eq(DEFAULT_FILTER.copy(sensitivity = MediaTimelineFilter.Sensitivity.HideSensitive)),
+                any(),
             )
         }
 
     @Test
     fun `test that sections are loaded with ShowAll when hidden nodes are enabled but show-hidden is on`() =
         runTest {
-            whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
             initUnderTest(isHiddenNodesEnabled = true, showHiddenItems = true)
 
             underTest.uiState.test {
@@ -353,13 +356,14 @@ internal class TimelineRevampViewModelTest {
             }
 
             verify(getMediaTimelineSectionsUseCase).invoke(
-                DEFAULT_FILTER.copy(sensitivity = MediaTimelineFilter.Sensitivity.ShowAll)
+                eq(DEFAULT_FILTER.copy(sensitivity = MediaTimelineFilter.Sensitivity.ShowAll)),
+                any(),
             )
         }
 
     @Test
     fun `test that uiState Data exposes whether hidden nodes are enabled`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest(isHiddenNodesEnabled = true, showHiddenItems = true)
 
@@ -371,7 +375,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that uiState Data defaults the grid size to Default`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
@@ -383,7 +387,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that onGridSizeChange updates the grid size in uiState`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
@@ -397,7 +401,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that onGridSizeChange tracks the corresponding analytics event`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         initUnderTest()
 
         underTest.onGridSizeChange(TimelineGridSize.Compact)
@@ -413,7 +417,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that onZoomIn steps the grid towards a larger size`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
@@ -428,7 +432,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that onZoomOut steps the grid towards a smaller size`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
@@ -443,7 +447,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that onZoomIn is a no-op when already at the largest size`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
@@ -459,7 +463,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that onZoomOut is a no-op when already at the smallest size`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
@@ -475,7 +479,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that actionUiState isReady becomes true once the sections finish loading`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any()))
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
             .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
         initUnderTest()
 
@@ -489,7 +493,7 @@ internal class TimelineRevampViewModelTest {
 
     @Test
     fun `test that the sort action is disabled when there is no content`() = runTest {
-        whenever(getMediaTimelineSectionsUseCase(any())).thenReturn(emptyList())
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
         initUnderTest()
 
         underTest.actionUiState.test {
@@ -509,7 +513,7 @@ internal class TimelineRevampViewModelTest {
     @Test
     fun `test that the sort action is disabled when the CU page is showing for a non Cloud Drive source`() =
         runTest {
-            whenever(getMediaTimelineSectionsUseCase(any()))
+            whenever(getMediaTimelineSectionsUseCase(any(), any()))
                 .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
             initUnderTest()
 
@@ -530,7 +534,7 @@ internal class TimelineRevampViewModelTest {
     @Test
     fun `test that the sort action is re-enabled when content is present and the CU page is not showing`() =
         runTest {
-            whenever(getMediaTimelineSectionsUseCase(any()))
+            whenever(getMediaTimelineSectionsUseCase(any(), any()))
                 .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
             initUnderTest()
 
@@ -560,7 +564,7 @@ internal class TimelineRevampViewModelTest {
     @Test
     fun `test that updateSortActionBasedOnCUPageEnablement disables sort when the CU page is enabled for a non Cloud Drive source`() =
         runTest {
-            whenever(getMediaTimelineSectionsUseCase(any()))
+            whenever(getMediaTimelineSectionsUseCase(any(), any()))
                 .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
             initUnderTest()
 
@@ -578,6 +582,78 @@ internal class TimelineRevampViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that uiState Data defaults the sort option to Newest`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            assertThat(awaitItem().currentSort).isEqualTo(TimelineTabSortOptions.Newest)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that onSortOptionsChange updates the sort option in uiState`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "May 2026", count = 3)))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.onSortOptionsChange(TimelineTabSortOptions.Oldest)
+            var data = awaitItem()
+            while (data.currentSort != TimelineTabSortOptions.Oldest) data = awaitItem()
+            assertThat(data.currentSort).isEqualTo(TimelineTabSortOptions.Oldest)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that changing sort to Oldest reloads the sections with ascending order`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.uiState.test {
+            awaitItem()
+            advanceUntilIdle()
+            underTest.onSortOptionsChange(TimelineTabSortOptions.Oldest)
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(getMediaTimelineSectionsUseCase)
+            .invoke(any(), eq(SortOrder.ORDER_MODIFICATION_ASC))
+    }
+
+    @Test
+    fun `test that the per-section page query uses the selected sort order`() = runTest {
+        val sections = listOf(section(groupId = "May 2026", count = 5))
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(sections)
+        whenever(
+            listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any())
+        ).thenReturn(emptyList())
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem()
+            underTest.onSortOptionsChange(TimelineTabSortOptions.Oldest)
+            advanceUntilIdle()
+            underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 4)
+            advanceUntilIdle()
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(listMediaNodesByOffsetUseCase).invoke(
+            filter = any(),
+            section = any(),
+            order = eq(SortOrder.ORDER_MODIFICATION_ASC),
+            maxElements = any(),
+            offset = any(),
+        )
+    }
 
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)

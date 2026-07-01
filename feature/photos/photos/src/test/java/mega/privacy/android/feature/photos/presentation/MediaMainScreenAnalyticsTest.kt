@@ -164,6 +164,7 @@ class MediaMainScreenAnalyticsTest {
                     setEnableCUPage = {},
                     onTimelineGridSizeChange = {},
                     onTimelineSortOptionChange = {},
+                    onTimelineRevampSortOptionChange = {},
                     onTimelineApplyFilterClick = {},
                     timelineRevampFilterUiState = TimelineFilterUiState(),
                     onTimelineRevampApplyFilterClick = {},

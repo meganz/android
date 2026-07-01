@@ -4,6 +4,7 @@ import androidx.compose.runtime.Stable
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 
 /**
  * UI state for the Timeline Revamp screen
@@ -33,6 +34,8 @@ sealed interface TimelineRevampUiState {
      * @property isHiddenNodesEnabled whether the hidden-nodes feature is enabled for the account;
      * drives the sensitive-item blur in the grid.
      * @property gridSize the selected grid size, driving the number of columns in the grid.
+     * @property currentSort the selected sort option (Newest / Oldest), shown as the checked option in
+     * the sort dialog.
      */
     data class Data(
         val sections: List<MediaTimelineSection>,
@@ -40,5 +43,6 @@ sealed interface TimelineRevampUiState {
         val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
         val isHiddenNodesEnabled: Boolean = false,
         val gridSize: TimelineGridSize = TimelineGridSize.Default,
+        val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
     ) : TimelineRevampUiState
 }

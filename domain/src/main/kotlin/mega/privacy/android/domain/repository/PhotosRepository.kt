@@ -287,8 +287,14 @@ interface PhotosRepository {
 
     /**
      * Get media timeline sections
+     *
+     * @param filter the [MediaTimelineFilter] describing the scope and granularity of the sections
+     * @param order the [SortOrder] determining the order of the returned sections
      */
-    suspend fun getMediaTimelineSections(filter: MediaTimelineFilter): List<MediaTimelineSection>
+    suspend fun getMediaTimelineSections(
+        filter: MediaTimelineFilter,
+        order: SortOrder,
+    ): List<MediaTimelineSection>
 
     /**
      * List media timeline nodes for a single [section] using offset-based pagination.

@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.photos
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Category
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Granularity
@@ -59,17 +60,18 @@ class GetMediaTimelineSectionsUseCaseTest {
                 count = 3L
             ),
         )
-        whenever(photosRepository.getMediaTimelineSections(filter)).thenReturn(sections)
+        whenever(photosRepository.getMediaTimelineSections(filter, SortOrder.ORDER_MODIFICATION_DESC))
+            .thenReturn(sections)
 
-        assertThat(underTest(filter)).isEqualTo(sections)
+        assertThat(underTest(filter, SortOrder.ORDER_MODIFICATION_DESC)).isEqualTo(sections)
     }
 
     @Test
-    fun `test that invoke forwards the filter to the repository`() = runTest {
-        whenever(photosRepository.getMediaTimelineSections(any())).thenReturn(emptyList())
+    fun `test that invoke forwards the filter and order to the repository`() = runTest {
+        whenever(photosRepository.getMediaTimelineSections(any(), any())).thenReturn(emptyList())
 
-        underTest(filter)
+        underTest(filter, SortOrder.ORDER_MODIFICATION_ASC)
 
-        verify(photosRepository).getMediaTimelineSections(filter)
+        verify(photosRepository).getMediaTimelineSections(filter, SortOrder.ORDER_MODIFICATION_ASC)
     }
 }

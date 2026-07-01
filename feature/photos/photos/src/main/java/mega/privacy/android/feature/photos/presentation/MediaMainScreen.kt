@@ -77,6 +77,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSort
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabViewModel
 import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineFilterView
+import mega.privacy.android.feature.photos.presentation.timeline.component.TimelineSortDialog
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampScreen
@@ -327,6 +328,7 @@ fun MediaMainRoute(
             )
         },
         onTimelineSortOptionChange = timelineViewModel::onSortOptionsChange,
+        onTimelineRevampSortOptionChange = timelineRevampViewModel::onSortOptionsChange,
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
         timelineRevampFilterUiState = timelineRevampFilterUiState,
         onTimelineRevampApplyFilterClick = timelineRevampViewModel::onFilterChange,
@@ -390,6 +392,7 @@ fun MediaMainScreen(
     setEnableCUPage: (Boolean) -> Unit,
     onTimelineGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
+    onTimelineRevampSortOptionChange: (value: TimelineTabSortOptions) -> Unit,
     onTimelineApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
     timelineRevampFilterUiState: TimelineFilterUiState,
     onTimelineRevampApplyFilterClick: (request: TimelineFilterRequest) -> Unit,
@@ -439,6 +442,8 @@ fun MediaMainScreen(
         if (isTimelineRevampEnabled) timelineRevampSelectedTimePeriod else selectedTimePeriod
     val onApplyTimelineFilter =
         if (isTimelineRevampEnabled) onTimelineRevampApplyFilterClick else onTimelineApplyFilterClick
+    val effectiveOnSortOptionChange =
+        if (isTimelineRevampEnabled) onTimelineRevampSortOptionChange else onTimelineSortOptionChange
 
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -640,7 +645,7 @@ fun MediaMainScreen(
                                         showTimelineSortDialog = false
                                     },
                                     onTimelineSortOptionChange = {
-                                        onTimelineSortOptionChange(it)
+                                        effectiveOnSortOptionChange(it)
                                         showTimelineSortDialog = false
                                     },
                                     onTimelinePhotoClick = {
@@ -771,6 +776,15 @@ private fun MediaScreen.MediaContent(
                         onZoomIn = onTimelineRevampZoomIn,
                         onZoomOut = onTimelineRevampZoomOut,
                     )
+
+                    if (showTimelineSortDialog) {
+                        TimelineSortDialog(
+                            selected = (timelineRevampUiState as? TimelineRevampUiState.Data)
+                                ?.currentSort ?: TimelineTabSortOptions.Newest,
+                            onDismissRequest = onTimelineSortDialogDismissed,
+                            onOptionSelected = onTimelineSortOptionChange,
+                        )
+                    }
                 }
 
                 false -> {
@@ -878,6 +892,7 @@ private fun PhotosMainScreenPreview() {
             setEnableCUPage = {},
             onTimelineGridSizeChange = {},
             onTimelineSortOptionChange = {},
+            onTimelineRevampSortOptionChange = {},
             onTimelineApplyFilterClick = {},
             timelineRevampFilterUiState = TimelineFilterUiState(),
             onTimelineRevampApplyFilterClick = {},

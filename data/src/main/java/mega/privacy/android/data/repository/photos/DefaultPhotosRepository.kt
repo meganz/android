@@ -322,18 +322,20 @@ internal class DefaultPhotosRepository @Inject constructor(
             replay = 1
         )
 
-    override suspend fun getMediaTimelineSections(filter: MediaTimelineFilter) =
-        withContext(ioDispatcher) {
-            val sections = megaApiFacade
-                .groupAllNodesByDate(
-                    mediaTimelineFilterMapper(filter),
-                    MegaApiJava.ORDER_MODIFICATION_DESC,
-                    MegaCancelToken.createInstance()
-                ) ?: return@withContext emptyList()
+    override suspend fun getMediaTimelineSections(
+        filter: MediaTimelineFilter,
+        order: SortOrder,
+    ) = withContext(ioDispatcher) {
+        val sections = megaApiFacade
+            .groupAllNodesByDate(
+                mediaTimelineFilterMapper(filter),
+                sortOrderIntMapper(order),
+                MegaCancelToken.createInstance()
+            ) ?: return@withContext emptyList()
 
 
-            mediaTimelineSectionMapper(sections)
-        }
+        mediaTimelineSectionMapper(sections)
+    }
 
     override suspend fun listMediaNodesByPage(
         filter: MediaTimelineFilter,

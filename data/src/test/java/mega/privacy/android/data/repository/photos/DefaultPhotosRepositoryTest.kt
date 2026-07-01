@@ -432,7 +432,10 @@ class DefaultPhotosRepositoryTest {
             val result = mockStatic(MegaCancelToken::class.java).use { mockedStatic ->
                 mockedStatic.`when`<MegaCancelToken> { MegaCancelToken.createInstance() }
                     .thenReturn(mock())
-                underTest.getMediaTimelineSections(mediaTimelineFilter)
+                underTest.getMediaTimelineSections(
+                    mediaTimelineFilter,
+                    SortOrder.ORDER_MODIFICATION_DESC,
+                )
             }
 
             assertThat(result).isEqualTo(sections)
@@ -451,11 +454,37 @@ class DefaultPhotosRepositoryTest {
             val result = mockStatic(MegaCancelToken::class.java).use { mockedStatic ->
                 mockedStatic.`when`<MegaCancelToken> { MegaCancelToken.createInstance() }
                     .thenReturn(mock())
-                underTest.getMediaTimelineSections(mediaTimelineFilter)
+                underTest.getMediaTimelineSections(
+                    mediaTimelineFilter,
+                    SortOrder.ORDER_MODIFICATION_DESC,
+                )
             }
 
             assertThat(result).isEmpty()
             verify(mediaTimelineSectionMapper, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that getMediaTimelineSections passes the mapped sort order to the gateway`() =
+        runTest {
+            val sdkFilter = mock<MegaGroupNodesByDateFilter>()
+            whenever(mediaTimelineFilterMapper(mediaTimelineFilter)).thenReturn(sdkFilter)
+            whenever(sortOrderIntMapper(SortOrder.ORDER_MODIFICATION_ASC)).thenReturn(9)
+            whenever(
+                megaApiGateway.groupAllNodesByDate(eq(sdkFilter), any(), anyOrNull())
+            ).thenReturn(null)
+            underTest = createUnderTest()
+
+            mockStatic(MegaCancelToken::class.java).use { mockedStatic ->
+                mockedStatic.`when`<MegaCancelToken> { MegaCancelToken.createInstance() }
+                    .thenReturn(mock())
+                underTest.getMediaTimelineSections(
+                    mediaTimelineFilter,
+                    SortOrder.ORDER_MODIFICATION_ASC,
+                )
+            }
+
+            verify(megaApiGateway).groupAllNodesByDate(eq(sdkFilter), eq(9), anyOrNull())
         }
 
     @Test

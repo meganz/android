@@ -51,6 +51,7 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
@@ -95,6 +96,12 @@ class TimelineRevampViewModel @Inject constructor(
      * [uiState] (not [currentFilter]) — changing it must not reload the timeline.
      */
     private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
+
+    /**
+     * The selected sort option (Newest / Oldest). Drives the section order and the per-section page
+     * order; changing it reloads the timeline (via [monitorTimelineSections]).
+     */
+    private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
 
     /**
      * Whether the sort toolbar action is enabled. Mirrors the tab: disabled when there is no content
@@ -204,11 +211,18 @@ class TimelineRevampViewModel @Inject constructor(
             loadedNodes,
             isHiddenNodesEnabled,
             gridSizeFlow,
-        ) { sectionsState, loaded, hiddenNodesEnabled, gridSize ->
+            sortOptionsFlow,
+        ) { sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort ->
             when (sectionsState) {
                 SectionsState.Loading -> TimelineRevampUiState.Loading
                 is SectionsState.Loaded ->
-                    toUiState(sectionsState.sections, loaded, hiddenNodesEnabled, gridSize)
+                    toUiState(
+                        sections = sectionsState.sections,
+                        loaded = loaded,
+                        isHiddenNodesEnabled = hiddenNodesEnabled,
+                        gridSize = gridSize,
+                        currentSort = currentSort
+                    )
             }
         }
             .catch { e -> Timber.e(e, "Failed to load media timeline sections") }
@@ -236,27 +250,29 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * For each [currentFilter] change, resets the timeline to loading and re-fetches its sections:
-     * emits [SectionsState.Loading] while clearing the previous filter's sections and loaded media
-     * (the media-loader coroutine clears its own cache when it sees [sections] cleared), then emits
-     * [SectionsState.Loaded] with the freshly-fetched sections (or empty if the fetch fails).
+     * For each [currentFilter] or [sortOptionsFlow] change, resets the timeline to loading and
+     * re-fetches its sections: emits [SectionsState.Loading] while clearing the previous sections and
+     * loaded media (the media-loader coroutine clears its own cache when it sees [sections] cleared),
+     * then emits [SectionsState.Loaded] with the freshly-fetched sections (or empty if the fetch fails).
+     * The sort order also flips the section orientation (newest-first vs oldest-first).
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun monitorTimelineSections(): Flow<SectionsState> =
-        currentFilter.flatMapLatest { filter ->
-            flow {
-                emit(SectionsState.Loading)
-                sections.update { emptyList() }
-                loadedNodes.update { emptyMap() }
+        combine(currentFilter, sortOptionsFlow) { filter, sort -> filter to sort }
+            .flatMapLatest { (filter, sort) ->
+                flow {
+                    emit(SectionsState.Loading)
+                    sections.update { emptyList() }
+                    loadedNodes.update { emptyMap() }
 
-                val loadedSections = getTimelineSections(filter)
-                sections.update { loadedSections }
-                emit(SectionsState.Loaded(loadedSections))
+                    val loadedSections = getTimelineSections(filter, sort.sortOrder)
+                    sections.update { loadedSections }
+                    emit(SectionsState.Loaded(loadedSections))
+                }
             }
-        }
 
-    private suspend fun getTimelineSections(filter: MediaTimelineFilter) =
-        runCatching { getMediaTimelineSectionsUseCase(filter) }
+    private suspend fun getTimelineSections(filter: MediaTimelineFilter, order: SortOrder) =
+        runCatching { getMediaTimelineSectionsUseCase(filter, order) }
             .getOrDefault(emptyList())
 
     private fun toUiState(
@@ -264,6 +280,7 @@ class TimelineRevampViewModel @Inject constructor(
         loaded: Map<Int, PhotosNodeContentItemV2>,
         isHiddenNodesEnabled: Boolean,
         gridSize: TimelineGridSize,
+        currentSort: TimelineTabSortOptions,
     ): TimelineRevampUiState =
         if (sections.isEmpty()) {
             TimelineRevampUiState.Empty
@@ -274,6 +291,7 @@ class TimelineRevampViewModel @Inject constructor(
                 loadedNodes = loaded,
                 isHiddenNodesEnabled = isHiddenNodesEnabled,
                 gridSize = gridSize,
+                currentSort = currentSort,
             )
         }
 
@@ -444,7 +462,7 @@ class TimelineRevampViewModel @Inject constructor(
             listMediaNodesByOffsetUseCase(
                 filter = currentFilter.value,
                 section = section,
-                order = SortOrder.ORDER_MODIFICATION_DESC,
+                order = sortOptionsFlow.value.sortOrder,
                 maxElements = localRange.last - localRange.first + 1,
                 offset = localRange.first.toLong(),
             )
@@ -508,6 +526,14 @@ class TimelineRevampViewModel @Inject constructor(
         if (index < TimelineGridSize.entries.lastIndex) {
             onGridSizeChange(TimelineGridSize.entries[index + 1])
         }
+    }
+
+    /**
+     * Updates the sort option (Newest / Oldest). Changing it reloads the timeline through
+     * [monitorTimelineSections], flipping the section order and the per-section page order.
+     */
+    fun onSortOptionsChange(value: TimelineTabSortOptions) {
+        sortOptionsFlow.update { value }
     }
 
     /**
