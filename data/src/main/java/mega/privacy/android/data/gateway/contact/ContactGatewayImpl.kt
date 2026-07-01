@@ -2,6 +2,7 @@ package mega.privacy.android.data.gateway.contact
 
 import android.content.Context
 import android.provider.ContactsContract
+import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -48,6 +49,50 @@ class ContactGatewayImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun getLocalContactsFromUri(uriPath: UriPath): List<LocalContact> {
+        val uri = uriPath.value.toUri()
+        val projection = arrayOf(
+            ContactsContract.Data.LOOKUP_KEY,
+            ContactsContract.Data.DISPLAY_NAME_PRIMARY,
+            ContactsContract.Data.MIMETYPE,
+            ContactsContract.Data.DATA1,
+        )
+        // The Android contact picker session Uri rejects selection/selectionArgs.
+        val cursor = context.contentResolver.query(
+            uri,
+            projection,
+            null,
+            null,
+            null
+        )
+
+        val namesByLookupKey = mutableMapOf<String, String>()
+        val emailsByLookupKey = mutableMapOf<String, MutableList<String>>()
+        cursor?.use {
+            Timber.d("getting local contacts from picker uri")
+            while (it.moveToNext()) {
+                val lookupKey = it.getString(0) ?: continue
+                val name = it.getString(1).orEmpty()
+                val mimeType = it.getString(2)
+                val data = it.getString(3)
+
+                if (mimeType != ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE) continue
+                if (data.isNullOrEmpty()) continue
+
+                namesByLookupKey.putIfAbsent(lookupKey, name)
+                emailsByLookupKey.getOrPut(lookupKey) { mutableListOf() }.add(data)
+            }
+        }
+
+        return emailsByLookupKey.map { (lookupKey, emails) ->
+            LocalContact(
+                id = lookupKey.hashCode().toLong(),
+                name = namesByLookupKey[lookupKey].orEmpty(),
+                emails = emails
+            )
+        }
+    }
 
     override suspend fun getLocalContactNumbers(): List<LocalContact> {
         val projection = arrayOf(

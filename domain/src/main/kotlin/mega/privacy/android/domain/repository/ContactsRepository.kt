@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -468,6 +469,14 @@ interface ContactsRepository {
      * @return List of [LocalContact]
      */
     suspend fun getLocalContacts(): List<LocalContact>
+
+    /**
+     * Get list of local contacts from a contact picker session [UriPath].
+     *
+     * @param uriPath The [UriPath] returned by the contact picker.
+     * @return List of [LocalContact]
+     */
+    suspend fun getLocalContactsFromUri(uriPath: UriPath): List<LocalContact>
 
     /**
      * Get list of local contact's numbers from the ContactGateway

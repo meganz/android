@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.android.core.ui.R
@@ -121,6 +122,13 @@ class NodeThumbnailViewTest {
             layoutType = ThumbnailLayoutType.MediaGrid
         )
 
+        // The image load fails asynchronously; wait for the painter to reach its error state
+        // (placeholder) instead of racing the transient Loading state, which renders a shimmer
+        // for MediaGrid.
+        composeTestRule.waitUntil {
+            composeTestRule.onAllNodesWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
+                .fetchSemanticsNodes().size == 1
+        }
         composeTestRule.onNodeWithTag(NODE_THUMBNAIL_PLACEHOLDER_TAG)
             .assertIsDisplayed()
     }

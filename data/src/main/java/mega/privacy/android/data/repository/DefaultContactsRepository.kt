@@ -64,6 +64,7 @@ import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.contacts.User
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -1042,6 +1043,11 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getLocalContacts(): List<LocalContact> = withContext(ioDispatcher) {
         contactGateway.getLocalContacts()
     }
+
+    override suspend fun getLocalContactsFromUri(uriPath: UriPath): List<LocalContact> =
+        withContext(ioDispatcher) {
+            contactGateway.getLocalContactsFromUri(uriPath)
+        }
 
     override suspend fun getLocalContactNumbers(): List<LocalContact> = withContext(ioDispatcher) {
         contactGateway.getLocalContactNumbers()
