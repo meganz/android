@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
 import androidx.compose.runtime.Stable
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -36,6 +38,8 @@ sealed interface TimelineRevampUiState {
      * @property gridSize the selected grid size, driving the number of columns in the grid.
      * @property currentSort the selected sort option (Newest / Oldest), shown as the checked option in
      * the sort dialog.
+     * @property takenDownDialogEvent triggered when a taken-down node is tapped, so the screen can
+     * show the dispute dialog.
      */
     data class Data(
         val sections: List<MediaTimelineSection>,
@@ -44,5 +48,6 @@ sealed interface TimelineRevampUiState {
         val isHiddenNodesEnabled: Boolean = false,
         val gridSize: TimelineGridSize = TimelineGridSize.Default,
         val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
+        val takenDownDialogEvent: StateEvent = consumed,
     ) : TimelineRevampUiState
 }

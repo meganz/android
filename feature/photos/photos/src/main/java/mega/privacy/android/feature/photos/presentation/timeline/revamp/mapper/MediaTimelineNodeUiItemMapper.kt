@@ -39,6 +39,7 @@ class MediaTimelineNodeUiItemMapper @Inject constructor(
             extension = node.type.extension,
             isFavourite = node.isFavourite,
             isSensitive = node.isMarkedSensitive || node.isSensitiveInherited,
+            isTakenDown = node.isTakenDown,
             duration = duration,
         )
     }

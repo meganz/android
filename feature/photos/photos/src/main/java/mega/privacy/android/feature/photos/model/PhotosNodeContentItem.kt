@@ -32,6 +32,7 @@ data class PhotosNodeContentItemV2(
     val extension: String,
     val isFavourite: Boolean,
     val isSensitive: Boolean,
+    val isTakenDown: Boolean = false,
     val duration: String = "",
 )
 

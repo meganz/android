@@ -53,6 +53,7 @@ import mega.privacy.android.feature.photos.extensions.toTrackingEvent
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabRoute
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
@@ -291,6 +292,8 @@ fun MediaMainRoute(
         onTimelineRevampGridSizeChange = timelineRevampViewModel::onGridSizeChange,
         onTimelineRevampZoomIn = timelineRevampViewModel::onZoomIn,
         onTimelineRevampZoomOut = timelineRevampViewModel::onZoomOut,
+        onTimelineRevampNodeClicked = timelineRevampViewModel::onNodeClicked,
+        onTimelineRevampTakenDownDialogConsumed = timelineRevampViewModel::onTakenDownDialogEventConsumed,
         timelineTabActionUiState = timelineTabActionUiState,
         timelineRevampActionUiState = timelineRevampActionUiState,
         mediaCameraUploadUiState = mediaCameraUploadUiState,
@@ -375,6 +378,8 @@ fun MediaMainScreen(
     onTimelineRevampGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineRevampZoomIn: () -> Unit,
     onTimelineRevampZoomOut: () -> Unit,
+    onTimelineRevampNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
+    onTimelineRevampTakenDownDialogConsumed: () -> Unit,
     timelineTabActionUiState: TimelineTabActionUiState,
     timelineRevampActionUiState: TimelineTabActionUiState,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
@@ -633,6 +638,8 @@ fun MediaMainScreen(
                                     onTimelineRevampGridSizeChange = onTimelineRevampGridSizeChange,
                                     onTimelineRevampZoomIn = onTimelineRevampZoomIn,
                                     onTimelineRevampZoomOut = onTimelineRevampZoomOut,
+                                    onTimelineRevampNodeClicked = onTimelineRevampNodeClicked,
+                                    onTimelineRevampTakenDownDialogConsumed = onTimelineRevampTakenDownDialogConsumed,
                                     timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                                     videosSelectionUiState = videosSelectionUiState,
@@ -735,6 +742,8 @@ private fun MediaScreen.MediaContent(
     onTimelineRevampGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineRevampZoomIn: () -> Unit,
     onTimelineRevampZoomOut: () -> Unit,
+    onTimelineRevampNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
+    onTimelineRevampTakenDownDialogConsumed: () -> Unit,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
     videosSelectionUiState: VideosTabUiState.Selection,
@@ -775,6 +784,8 @@ private fun MediaScreen.MediaContent(
                         onGridSizeChange = onTimelineRevampGridSizeChange,
                         onZoomIn = onTimelineRevampZoomIn,
                         onZoomOut = onTimelineRevampZoomOut,
+                        onNodeClicked = onTimelineRevampNodeClicked,
+                        onTakenDownDialogEventConsumed = onTimelineRevampTakenDownDialogConsumed,
                     )
 
                     if (showTimelineSortDialog) {
@@ -881,6 +892,8 @@ private fun PhotosMainScreenPreview() {
             onTimelineRevampGridSizeChange = {},
             onTimelineRevampZoomIn = {},
             onTimelineRevampZoomOut = {},
+            onTimelineRevampNodeClicked = {},
+            onTimelineRevampTakenDownDialogConsumed = {},
             timelineTabActionUiState = TimelineTabActionUiState(),
             timelineRevampActionUiState = TimelineTabActionUiState(),
             timelineFilterUiState = TimelineFilterUiState(),

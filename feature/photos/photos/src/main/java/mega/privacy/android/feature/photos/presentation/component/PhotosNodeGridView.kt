@@ -612,6 +612,8 @@ internal fun PhotoNodeBodyV2(
                 isSelected = isSelected,
                 shouldShowFavourite = shouldShowFavourite,
                 enabled = enabled,
+                isTakenDown = node.isTakenDown,
+                defaultImage = R.drawable.ic_image_medium_solid,
                 onClick = onClick,
                 onLongClick = onLongClick,
             )
@@ -629,6 +631,8 @@ internal fun PhotoNodeBodyV2(
                 isSelected = isSelected,
                 shouldShowFavourite = shouldShowFavourite,
                 enabled = enabled,
+                isTakenDown = node.isTakenDown,
+                defaultImage = R.drawable.ic_video_medium_solid,
                 onClick = onClick,
                 onLongClick = onLongClick,
             )

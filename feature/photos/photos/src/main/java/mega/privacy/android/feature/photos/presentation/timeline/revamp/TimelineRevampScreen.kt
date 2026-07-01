@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -28,6 +29,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
+import de.palm.composestateevents.consumed
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -47,6 +50,7 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.component.PhotoNodeBodyV2
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -56,8 +60,17 @@ internal fun TimelineRevampScreen(
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
+    onTakenDownDialogEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
+    val takenDownDialogEvent =
+        (uiState as? TimelineRevampUiState.Data)?.takenDownDialogEvent ?: consumed
+    EventEffect(event = takenDownDialogEvent, onConsumed = onTakenDownDialogEventConsumed) {
+        showTakenDownDialog = true
+    }
+
     when (uiState) {
         is TimelineRevampUiState.Loading -> {
             MediaSkeletonView(
@@ -84,9 +97,17 @@ internal fun TimelineRevampScreen(
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
+                onNodeClicked = onNodeClicked,
                 modifier = modifier,
             )
         }
+    }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = { showTakenDownDialog = false },
+        )
     }
 }
 
@@ -101,6 +122,7 @@ private fun TimelineRevampContent(
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -156,6 +178,7 @@ private fun TimelineRevampContent(
                         .padding(all = 1.dp),
                     shouldShowFavourite = node?.isFavourite == true,
                     isHiddenNodesEnabled = isHiddenNodesEnabled,
+                    onClick = { onNodeClicked(node) },
                 )
             }
         }
@@ -322,6 +345,8 @@ private fun TimelineRevampScreenPreview() {
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
+            onNodeClicked = {},
+            onTakenDownDialogEventConsumed = {},
         )
     }
 }
@@ -336,6 +361,8 @@ private fun TimelineRevampEmptyPreview() {
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
+            onNodeClicked = {},
+            onTakenDownDialogEventConsumed = {},
         )
     }
 }

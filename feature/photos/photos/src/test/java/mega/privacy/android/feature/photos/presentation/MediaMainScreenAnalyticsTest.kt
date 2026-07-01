@@ -148,6 +148,8 @@ class MediaMainScreenAnalyticsTest {
                     onTimelineRevampGridSizeChange = {},
                     onTimelineRevampZoomIn = {},
                     onTimelineRevampZoomOut = {},
+                    onTimelineRevampNodeClicked = {},
+                    onTimelineRevampTakenDownDialogConsumed = {},
                     timelineTabActionUiState = timelineTabActionUiState,
                     timelineRevampActionUiState = timelineTabActionUiState,
                     mediaCameraUploadUiState = mediaCameraUploadUiState,

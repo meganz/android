@@ -6,6 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -90,6 +93,12 @@ class TimelineRevampViewModel @Inject constructor(
     private val loadedNodes = MutableStateFlow<Map<Int, PhotosNodeContentItemV2>>(emptyMap())
     private val targetRange = MutableStateFlow(IntRange.EMPTY)
     private val mediaLoaderStarted = AtomicBoolean(false)
+
+    /**
+     * Backs [TimelineRevampUiState.Data.takenDownDialogEvent]; folded into [uiState] so the screen
+     * observes a single state object.
+     */
+    private val _takenDownDialogEvent = MutableStateFlow<StateEvent>(consumed)
 
     /**
      * The grid size (Compact / Default / Large). Drives only the grid column count, so it lives in
@@ -225,6 +234,15 @@ class TimelineRevampViewModel @Inject constructor(
                     )
             }
         }
+            // Inject the taken-down dialog event into the loaded state so the screen observes a
+            // single uiState object; kept out of the main combine (already at its 5-arg limit).
+            .combine(_takenDownDialogEvent) { state, takenDownDialogEvent ->
+                if (state is TimelineRevampUiState.Data) {
+                    state.copy(takenDownDialogEvent = takenDownDialogEvent)
+                } else {
+                    state
+                }
+            }
             .catch { e -> Timber.e(e, "Failed to load media timeline sections") }
             .asUiStateFlow(
                 viewModelScope,
@@ -605,6 +623,28 @@ class TimelineRevampViewModel @Inject constructor(
                 selectedFilterFlow.update { newPreferences }
             }.onFailure { Timber.e(it) }
         }
+    }
+
+    /**
+     * Handles a tap on a timeline item. Taken-down nodes must not be opened, so they trigger the
+     * dispute dialog instead of being previewed.
+     *
+     * Opening non-taken-down items is intentionally not wired yet — when the revamp implements
+     * tap-to-open, add the open call in the else branch; the taken-down guard is already in place.
+     */
+    fun onNodeClicked(node: PhotosNodeContentItemV2?) {
+        if (node?.isTakenDown == true) {
+            _takenDownDialogEvent.update { triggered }
+        } else {
+            // TODO: open the node in the viewer once the revamp wires tap-to-open.
+        }
+    }
+
+    /**
+     * Marks the taken-down dispute dialog event as handled.
+     */
+    fun onTakenDownDialogEventConsumed() {
+        _takenDownDialogEvent.update { consumed }
     }
 
     private companion object {

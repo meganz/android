@@ -80,6 +80,8 @@ class TimelineRevampScreenTest {
                 onGridSizeChange = {},
                 onZoomIn = {},
                 onZoomOut = {},
+                onNodeClicked = {},
+                onTakenDownDialogEventConsumed = {},
             )
         }
     }
