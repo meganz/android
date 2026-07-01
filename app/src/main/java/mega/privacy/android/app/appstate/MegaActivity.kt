@@ -287,16 +287,17 @@ class MegaActivity : FragmentActivity() {
                     reconnect = globalStateViewModel::backgroundFastLogin
                 )
 
+                var wasLoggedIn by remember { mutableStateOf(false) }
                 LaunchedEffect(globalState) {
                     val authStatus =
                         (globalState as? GlobalState.LoggedIn)?.session?.let {
                             PendingBackStackNavigationHandler.AuthStatus.LoggedIn(it)
                         } ?: PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn
-                    if (authStatus == PendingBackStackNavigationHandler.AuthStatus.NotLoggedIn) {
-                        if (!loginState.is2FARequired) {
-                            loginViewModel.stopLogin(isPerformLocalLogOut = false)
-                        }
+                    val isLoggedIn = authStatus.isLoggedIn
+                    if (wasLoggedIn && !isLoggedIn && !loginState.is2FARequired) {
+                        loginViewModel.stopLogin(isPerformLocalLogOut = false)
                     }
+                    wasLoggedIn = isLoggedIn
                     navigationHandler.onNetworkChange(globalState.isConnected)
                     navigationHandler.onLoginChange(authStatus)
                 }
