@@ -9,27 +9,33 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 
 /**
- * Compose-owned selection state for the contacts multi-select picker. Selection is keyed by the
- * stable contact handle and held independently of the (filterable) contact list, so a selected
- * contact stays selected across search/filter changes and reappears selected when the filter clears.
+ * Compose-owned selection state for the contacts multi-select picker. MEGA contacts are keyed by the
+ * stable contact handle, while phone contacts are keyed by email (they have no MEGA handle). Selection
+ * is held independently of the (filterable) contact list, so a selected contact stays selected across
+ * search/filter changes and reappears selected when the filter clears.
  *
- * @param initialSelectedHandles handles to pre-select.
+ * @param initialSelectedHandles MEGA contact handles to pre-select.
+ * @param initialSelectedPhoneEmails phone-contact emails to pre-select.
  */
 @Stable
 class ContactSelectionState(
     initialSelectedHandles: Set<Long> = emptySet(),
+    initialSelectedPhoneEmails: Set<String> = emptySet(),
 ) {
     var selectedHandles: Set<Long> by mutableStateOf(initialSelectedHandles)
         private set
 
-    /**
-     * Number of currently selected contacts.
-     */
-    val selectedItemsCount: Int
-        get() = selectedHandles.size
+    var selectedPhoneEmails: Set<String> by mutableStateOf(initialSelectedPhoneEmails)
+        private set
 
     /**
-     * Toggle the selection of the contact with the given [handle].
+     * Number of currently selected items across both MEGA contacts and phone contacts.
+     */
+    val selectedItemsCount: Int
+        get() = selectedHandles.size + selectedPhoneEmails.size
+
+    /**
+     * Toggle the selection of the MEGA contact with the given [handle].
      */
     fun toggleSelection(handle: Long) {
         selectedHandles = if (handle in selectedHandles) {
@@ -40,16 +46,48 @@ class ContactSelectionState(
     }
 
     /**
+     * Toggle the selection of the phone contact with the given [email].
+     */
+    fun togglePhoneSelection(email: String) {
+        selectedPhoneEmails = if (email in selectedPhoneEmails) {
+            selectedPhoneEmails - email
+        } else {
+            selectedPhoneEmails + email
+        }
+    }
+
+    /**
+     * Select the phone contacts with the given [emails] without deselecting any existing selection.
+     */
+    fun selectPhoneEmails(emails: Collection<String>) {
+        selectedPhoneEmails = selectedPhoneEmails + emails
+    }
+
+    /**
      * Clear the current selection.
      */
     fun deselectAll() {
         selectedHandles = emptySet()
+        selectedPhoneEmails = emptySet()
     }
 
     companion object {
-        val Saver: Saver<ContactSelectionState, List<Long>> = Saver(
-            save = { state -> state.selectedHandles.toList() },
-            restore = { handles -> ContactSelectionState(initialSelectedHandles = handles.toSet()) },
+        val Saver: Saver<ContactSelectionState, List<List<String>>> = Saver(
+            save = { state ->
+                listOf(
+                    state.selectedHandles.map { it.toString() },
+                    state.selectedPhoneEmails.toList(),
+                )
+            },
+            restore = { saved ->
+                ContactSelectionState(
+                    initialSelectedHandles = saved.getOrNull(0)
+                        ?.map { it.toLong() }
+                        ?.toSet()
+                        ?: emptySet(),
+                    initialSelectedPhoneEmails = saved.getOrNull(1)?.toSet() ?: emptySet(),
+                )
+            },
         )
     }
 }
@@ -60,7 +98,11 @@ class ContactSelectionState(
 @Composable
 fun rememberContactSelectionState(
     initialSelectedHandles: Set<Long> = emptySet(),
+    initialSelectedPhoneEmails: Set<String> = emptySet(),
 ): ContactSelectionState =
     rememberSaveable(saver = ContactSelectionState.Saver) {
-        ContactSelectionState(initialSelectedHandles = initialSelectedHandles)
+        ContactSelectionState(
+            initialSelectedHandles = initialSelectedHandles,
+            initialSelectedPhoneEmails = initialSelectedPhoneEmails,
+        )
     }

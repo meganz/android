@@ -9,6 +9,7 @@ import mega.privacy.android.feature.contact.add.AddContactViewModel
 import mega.privacy.android.feature.contact.add.view.AddContactsScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.AddChatParticipantsNavKey
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.AddContactsNavKey
 import mega.privacy.android.navigation.destination.AddMeetingParticipantsNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -20,26 +21,71 @@ import mega.privacy.android.shared.resources.R as sharedR
  * Hosted by the app module's gated `AddContactsNavKey` destination (behind `ContactsComposeUI`).
  *
  * @param navigationHandler
+ * @param showPhoneContacts whether to surface the collapsible phone-contacts section.
  */
 @SuppressLint("ComposeViewModelInjection")
 @Composable
 fun AddContactsEntry(
     navigationHandler: NavigationHandler,
+    showPhoneContacts: Boolean = false,
 ) {
     val viewModel = hiltViewModel<AddContactViewModel, AddContactViewModel.Factory> { factory ->
-        factory.create(chatId = null, monitorCallLimit = false)
+        factory.create(
+            chatId = null,
+            monitorCallLimit = false,
+            showPhoneContacts = showPhoneContacts,
+        )
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     AddContactsScreen(
         state = state,
         onSearchQueryChange = viewModel::setQuery,
-        onConfirm = { handles ->
+        onConfirm = { handles, phoneEmails ->
             navigationHandler.returnResult(
                 AddContactsNavKey.KEY,
-                viewModel.emailsForSelected(handles),
+                viewModel.emailsForSelected(handles, phoneEmails),
             )
         },
         onBack = { navigationHandler.remove(AddContactsNavKey) },
+        onReadContactsPermissionGranted = viewModel::onReadContactsPermissionGranted,
+        onContactsPicked = viewModel::onContactsPicked,
+        onPhoneContactsPickedConsumed = viewModel::onPhoneContactsPickedConsumed,
+    )
+}
+
+/**
+ * Add contact to share entry. Renders the multi-select picker with the phone-contacts section
+ * enabled, and publishes the merged MEGA + phone contact emails as a `List<String>` under
+ * [AddContactToShareNavKey.KEY] when confirmed. Backs the "add contacts to a shared folder" flow.
+ *
+ * @param navigationHandler
+ */
+@SuppressLint("ComposeViewModelInjection")
+@Composable
+fun AddContactToShareEntry(
+    navigationHandler: NavigationHandler,
+) {
+    val viewModel = hiltViewModel<AddContactViewModel, AddContactViewModel.Factory> { factory ->
+        factory.create(
+            chatId = null,
+            monitorCallLimit = false,
+            showPhoneContacts = true,
+        )
+    }
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+    AddContactsScreen(
+        state = state,
+        onSearchQueryChange = viewModel::setQuery,
+        onConfirm = { handles, phoneEmails ->
+            navigationHandler.returnResult(
+                AddContactToShareNavKey.KEY,
+                viewModel.emailsForSelected(handles, phoneEmails),
+            )
+        },
+        onBack = { navigationHandler.back() },
+        onReadContactsPermissionGranted = viewModel::onReadContactsPermissionGranted,
+        onContactsPicked = viewModel::onContactsPicked,
+        onPhoneContactsPickedConsumed = viewModel::onPhoneContactsPickedConsumed,
     )
 }
 
@@ -60,16 +106,20 @@ fun AddChatParticipantsEntry(
     chatId: Long,
 ) {
     val viewModel = hiltViewModel<AddContactViewModel, AddContactViewModel.Factory> { factory ->
-        factory.create(chatId = chatId, monitorCallLimit = false)
+        factory.create(
+            chatId = chatId,
+            monitorCallLimit = false,
+            showPhoneContacts = false,
+        )
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     AddContactsScreen(
         state = state,
         onSearchQueryChange = viewModel::setQuery,
-        onConfirm = { handles ->
+        onConfirm = { handles, phoneEmails ->
             navigationHandler.returnResult(
                 AddChatParticipantsNavKey.KEY,
-                viewModel.emailsForSelected(handles),
+                viewModel.emailsForSelected(handles, phoneEmails),
             )
         },
         onBack = { navigationHandler.remove(AddChatParticipantsNavKey(chatId)) },
@@ -94,16 +144,20 @@ fun AddMeetingParticipantsEntry(
     chatId: Long,
 ) {
     val viewModel = hiltViewModel<AddContactViewModel, AddContactViewModel.Factory> { factory ->
-        factory.create(chatId = chatId, monitorCallLimit = true)
+        factory.create(
+            chatId = chatId,
+            monitorCallLimit = true,
+            showPhoneContacts = false,
+        )
     }
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     AddContactsScreen(
         state = state,
         onSearchQueryChange = viewModel::setQuery,
-        onConfirm = { handles ->
+        onConfirm = { handles, phoneEmails ->
             navigationHandler.returnResult(
                 AddMeetingParticipantsNavKey.KEY,
-                viewModel.emailsForSelected(handles),
+                viewModel.emailsForSelected(handles, phoneEmails),
             )
         },
         onBack = { navigationHandler.remove(AddMeetingParticipantsNavKey(chatId)) },

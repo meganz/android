@@ -2953,6 +2953,14 @@
     <string name="contacts_remove_dialog_message">This contact will be removed from your contact list.</string>
     <!-- Add contacts picker: toolbar title shown when selecting contacts to send to a chat -->
     <string name="send_contacts">Send contacts</string>
+    <!-- Add contacts picker: header of the collapsible section that lists the contacts stored on the user's phone -->
+    <string name="add_contacts_phone_contacts_section_title">Phone contacts</string>
+    <!-- Add contacts picker: call to action asking the user to grant access to their phone's contacts -->
+    <string name="add_contacts_phone_contacts_allow_access">Allow access to contacts</string>
+    <!-- Add contacts picker: call to action to open the system picker and choose contacts from the phone -->
+    <string name="add_contacts_phone_contacts_select">Select phone contacts</string>
+    <!-- Add contacts picker: header of the section that lists the user's MEGA contacts, shown to separate them from the phone contacts section -->
+    <string name="add_contacts_mega_contacts_section_title">MEGA contacts</string>
     <!-- Multi-select picker: toolbar title showing how many items are currently selected. %1$d is the count. -->
     <plurals name="general_selection_num_selected">
         <item quantity="one">%1$d selected</item>

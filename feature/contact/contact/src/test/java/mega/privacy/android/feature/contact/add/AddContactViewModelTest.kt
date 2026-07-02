@@ -12,10 +12,16 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.domain.entity.contacts.LocalContact
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.call.MonitorParticipantsLimitWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
+import mega.privacy.android.domain.usecase.contact.GetLocalContactsFromUriUseCase
+import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
+import mega.privacy.android.domain.usecase.environment.GetDeviceSdkVersionUseCase
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
+import mega.privacy.android.feature.contact.add.model.PhoneContactsSection
 import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
@@ -23,11 +29,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.whenever
+import de.palm.composestateevents.StateEventWithContentTriggered
 import java.time.Instant
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -38,6 +47,9 @@ class AddContactViewModelTest {
     private val getContactsUseCase = mock<GetContactsUseCase>()
     private val getContactsToAddToChatUseCase = mock<GetContactsToAddToChatUseCase>()
     private val monitorParticipantsLimitWarningUseCase = mock<MonitorParticipantsLimitWarningUseCase>()
+    private val getDeviceSdkVersionUseCase = mock<GetDeviceSdkVersionUseCase>()
+    private val getLocalContactsUseCase = mock<GetLocalContactsUseCase>()
+    private val getLocalContactsFromUriUseCase = mock<GetLocalContactsFromUriUseCase>()
     private val contactItemUiStateMapper = ContactItemUiStateMapper(
         contactItemStatusMapper = ContactItemStatusMapper(),
         contactItemAvatarMapper = ContactItemAvatarMapper(),
@@ -54,18 +66,28 @@ class AddContactViewModelTest {
             getContactsUseCase,
             getContactsToAddToChatUseCase,
             monitorParticipantsLimitWarningUseCase,
+            getDeviceSdkVersionUseCase,
+            getLocalContactsUseCase,
+            getLocalContactsFromUriUseCase,
         )
     }
 
-    private fun createViewModel(chatId: Long?, monitorCallLimit: Boolean = false) =
-        AddContactViewModel(
-            chatId = chatId,
-            monitorCallLimit = monitorCallLimit,
-            getContactsUseCase = getContactsUseCase,
-            getContactsToAddToChatUseCase = getContactsToAddToChatUseCase,
-            monitorParticipantsLimitWarningUseCase = monitorParticipantsLimitWarningUseCase,
-            contactItemUiStateMapper = contactItemUiStateMapper,
-        )
+    private fun createViewModel(
+        chatId: Long?,
+        monitorCallLimit: Boolean = false,
+        showPhoneContacts: Boolean = false,
+    ) = AddContactViewModel(
+        chatId = chatId,
+        monitorCallLimit = monitorCallLimit,
+        showPhoneContacts = showPhoneContacts,
+        getContactsUseCase = getContactsUseCase,
+        getContactsToAddToChatUseCase = getContactsToAddToChatUseCase,
+        monitorParticipantsLimitWarningUseCase = monitorParticipantsLimitWarningUseCase,
+        getDeviceSdkVersionUseCase = getDeviceSdkVersionUseCase,
+        getLocalContactsUseCase = getLocalContactsUseCase,
+        getLocalContactsFromUriUseCase = getLocalContactsFromUriUseCase,
+        contactItemUiStateMapper = contactItemUiStateMapper,
+    )
 
     @Test
     fun `test that initial state is Loading`() = runTest {
@@ -247,6 +269,144 @@ class AddContactViewModelTest {
         }
     }
 
+    @Test
+    fun `test that phone contacts section is Hidden when showPhoneContacts is false`() = runTest {
+        stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().phoneContactsSection)
+                .isEqualTo(PhoneContactsSection.Hidden)
+        }
+        verifyNoInteractions(getDeviceSdkVersionUseCase)
+    }
+
+    @Test
+    fun `test that phone contacts section is PermissionRequired on pre-picker device when permission not granted`() =
+        runTest {
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+            whenever(getDeviceSdkVersionUseCase()).thenReturn(PRE_PICKER_SDK)
+            underTest = createViewModel(chatId = null, showPhoneContacts = true)
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().phoneContactsSection)
+                    .isEqualTo(PhoneContactsSection.PermissionRequired)
+            }
+            verifyNoInteractions(getLocalContactsUseCase)
+        }
+
+    @Test
+    fun `test that phone contacts section is Loaded on pre-picker device once permission is granted`() =
+        runTest {
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+            whenever(getDeviceSdkVersionUseCase()).thenReturn(PRE_PICKER_SDK)
+            whenever(getLocalContactsUseCase()).thenReturn(
+                listOf(
+                    LocalContact(id = 1L, name = "Phone Alice", emails = listOf("pa@test.com")),
+                    LocalContact(id = 2L, name = "No Email", emails = emptyList()),
+                )
+            )
+            underTest = createViewModel(chatId = null, showPhoneContacts = true)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onReadContactsPermissionGranted()
+                val section = awaitDataStateSection()
+                assertThat(section).isInstanceOf(PhoneContactsSection.Loaded::class.java)
+                val loaded = section as PhoneContactsSection.Loaded
+                // Contacts with no email are skipped.
+                assertThat(loaded.contacts.map { it.email }).containsExactly("pa@test.com")
+            }
+        }
+
+    @Test
+    fun `test that phone contacts section is PickerAvailable and empty on picker device`() = runTest {
+        stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+        whenever(getDeviceSdkVersionUseCase()).thenReturn(PICKER_SDK)
+        underTest = createViewModel(chatId = null, showPhoneContacts = true)
+
+        underTest.uiState.test {
+            val section = awaitDataState().phoneContactsSection
+            assertThat(section).isInstanceOf(PhoneContactsSection.PickerAvailable::class.java)
+            assertThat((section as PhoneContactsSection.PickerAvailable).picked).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that onContactsPicked appends resolved contacts and triggers the picked event`() =
+        runTest {
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+            whenever(getDeviceSdkVersionUseCase()).thenReturn(PICKER_SDK)
+            whenever(getLocalContactsFromUriUseCase(any())).thenReturn(
+                listOf(LocalContact(id = 1L, name = "Picked", emails = listOf("picked@test.com")))
+            )
+            underTest = createViewModel(chatId = null, showPhoneContacts = true)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onContactsPicked(UriPath("content://picked"))
+                var state = awaitDataState()
+                while (state.phoneContactsPickedEvent !is StateEventWithContentTriggered) {
+                    state = awaitDataState()
+                }
+                val picked = state.phoneContactsSection as PhoneContactsSection.PickerAvailable
+                assertThat(picked.picked.map { it.email }).containsExactly("picked@test.com")
+                val event = state.phoneContactsPickedEvent
+                check(event is StateEventWithContentTriggered)
+                assertThat(event.content).containsExactly("picked@test.com")
+            }
+        }
+
+    @Test
+    fun `test that onContactsPicked de-duplicates by email`() = runTest {
+        stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+        whenever(getDeviceSdkVersionUseCase()).thenReturn(PICKER_SDK)
+        whenever(getLocalContactsFromUriUseCase(any())).thenReturn(
+            listOf(LocalContact(id = 1L, name = "Picked", emails = listOf("dup@test.com")))
+        )
+        underTest = createViewModel(chatId = null, showPhoneContacts = true)
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onContactsPicked(UriPath("content://picked"))
+            var state = awaitDataState()
+            while ((state.phoneContactsSection as PhoneContactsSection.PickerAvailable).picked.isEmpty()) {
+                state = awaitDataState()
+            }
+            underTest.onPhoneContactsPickedConsumed()
+            underTest.onContactsPicked(UriPath("content://picked-again"))
+
+            // Give the second pick a chance to be processed; the list must stay de-duplicated.
+            cancelAndConsumeRemainingEvents()
+            val picked = (underTest.uiState.value as AddContactUiState.Data)
+                .phoneContactsSection as PhoneContactsSection.PickerAvailable
+            assertThat(picked.picked.map { it.email }).containsExactly("dup@test.com")
+        }
+    }
+
+    @Test
+    fun `test that emailsForSelected merges mega and phone emails de-duplicated`() = runTest {
+        stubContactsFlow(
+            listOf(
+                createContactItem(handle = 1L, email = "a@test.com", alias = "Alice"),
+                createContactItem(handle = 2L, email = "shared@test.com", alias = "Bob"),
+            )
+        )
+
+        underTest.uiState.test {
+            awaitDataState()
+            val merged = underTest.emailsForSelected(
+                handles = setOf(1L, 2L),
+                phoneEmails = setOf("phone@test.com", "shared@test.com"),
+            )
+            assertThat(merged)
+                .containsExactly("a@test.com", "shared@test.com", "phone@test.com")
+        }
+    }
+
+    private suspend fun ReceiveTurbine<AddContactUiState>.awaitDataStateSection(): PhoneContactsSection {
+        return awaitDataState().phoneContactsSection
+    }
+
     private suspend fun ReceiveTurbine<AddContactUiState>.awaitDataState(): AddContactUiState.Data {
         var item = awaitItem()
         while (item !is AddContactUiState.Data) {
@@ -289,4 +449,9 @@ class AddContactViewModelTest {
         lastSeen = null,
         chatroomId = chatroomId,
     )
+
+    private companion object {
+        const val PRE_PICKER_SDK = 34
+        const val PICKER_SDK = 37
+    }
 }
