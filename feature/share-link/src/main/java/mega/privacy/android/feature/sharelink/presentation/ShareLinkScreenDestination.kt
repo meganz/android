@@ -44,6 +44,9 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                 onOpenSettings = {
                     navigationHandler.navigate(LinkSettingsNavKey(handles = key.handles))
                 },
+                // Copy-to-clipboard is wired in AND-24054 and the system share sheet in AND-24045.
+                onShareLink = {},
+                onCopyLink = {},
             )
         }
     }

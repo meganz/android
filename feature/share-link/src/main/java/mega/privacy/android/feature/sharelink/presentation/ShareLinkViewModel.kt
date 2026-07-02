@@ -20,6 +20,8 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.shared.nodes.extension.getIcon
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 
 /**
@@ -39,6 +41,7 @@ class ShareLinkViewModel @AssistedInject constructor(
     private val exportNodeUseCase: ExportNodeUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val splitLinkAndKeyUseCase: SplitLinkAndKeyUseCase,
+    private val fileTypeIconMapper: FileTypeIconMapper,
 ) : ViewModel() {
 
     /**
@@ -84,6 +87,7 @@ class ShareLinkViewModel @AssistedInject constructor(
                     handles = args.handles,
                     nodeName = node.name,
                     isFolder = node is FolderNode,
+                    iconRes = node.getIcon(fileTypeIconMapper),
                     sizeInBytes = (node as? FileNode)?.size,
                     modificationTime = (node as? FileNode)?.modificationTime,
                     link = link,

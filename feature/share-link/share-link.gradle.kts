@@ -12,6 +12,11 @@ android {
         abortOnError = true
     }
     namespace = "mega.privacy.android.feature.sharelink"
+    testOptions {
+        unitTests {
+            targetSdk = 34
+        }
+    }
 }
 
 dependencies {
@@ -23,8 +28,10 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":domain"))
     implementation(project(":core:coroutine"))
+    implementation(project(":core:formatter"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
+    implementation(project(":shared:nodes"))
 
     implementation(lib.mega.core.ui)
     implementation(lib.mega.core.ui.tokens)

@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sharelink.presentation
 
+import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Stable
 import mega.privacy.android.domain.entity.AccountType
 
@@ -27,7 +28,8 @@ sealed interface ShareLinkUiState {
      *
      * @property handles Node handles whose link is being shared.
      * @property nodeName Display name of the node.
-     * @property isFolder Whether the node is a folder (drives the header icon).
+     * @property isFolder Whether the node is a folder.
+     * @property iconRes Header icon: the file-type icon for files, the folder icon for folders.
      * @property sizeInBytes File size in bytes for the header, or null for folders.
      * @property modificationTime File modification time (seconds since epoch), or null for folders.
      * @property link The full public link including the decryption key.
@@ -39,6 +41,7 @@ sealed interface ShareLinkUiState {
         val handles: List<Long>,
         val nodeName: String,
         val isFolder: Boolean,
+        @DrawableRes val iconRes: Int,
         val sizeInBytes: Long?,
         val modificationTime: Long?,
         val link: String,

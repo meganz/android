@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.link.LinkAndKey
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -18,6 +20,8 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,17 +42,20 @@ class ShareLinkViewModelTest {
     private val exportNodeUseCase = mock<ExportNodeUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val splitLinkAndKeyUseCase = mock<SplitLinkAndKeyUseCase>()
+    private val fileTypeIconMapper = mock<FileTypeIconMapper>()
 
     @BeforeEach
     fun setUp() {
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(AccountDetail()))
         whenever(splitLinkAndKeyUseCase(any())).thenReturn(LinkAndKey(null, null))
+        whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
         underTest = ShareLinkViewModel(
             args = ShareLinkViewModel.Args(handles = listOf(NODE_HANDLE)),
             getNodeByIdUseCase = getNodeByIdUseCase,
             exportNodeUseCase = exportNodeUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
+            fileTypeIconMapper = fileTypeIconMapper,
         )
     }
 
@@ -59,6 +66,7 @@ class ShareLinkViewModelTest {
             exportNodeUseCase,
             monitorAccountDetailUseCase,
             splitLinkAndKeyUseCase,
+            fileTypeIconMapper,
         )
     }
 
@@ -70,6 +78,7 @@ class ShareLinkViewModelTest {
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
                 on { size } doReturn 2048L
                 on { modificationTime } doReturn 1_718_000_000L
+                on { type } doReturn PdfFileTypeInfo
             }
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
             whenever(splitLinkAndKeyUseCase("https://mega.nz/file/abc#key123"))
@@ -79,6 +88,7 @@ class ShareLinkViewModelTest {
                 val data = awaitData()
                 assertThat(data.nodeName).isEqualTo("report.pdf")
                 assertThat(data.isFolder).isFalse()
+                assertThat(data.iconRes).isEqualTo(FILE_ICON_RES)
                 assertThat(data.sizeInBytes).isEqualTo(2048L)
                 assertThat(data.modificationTime).isEqualTo(1_718_000_000L)
                 assertThat(data.link).isEqualTo("https://mega.nz/file/abc#key123")
@@ -97,6 +107,7 @@ class ShareLinkViewModelTest {
                 on { exportedData } doReturn null
                 on { size } doReturn 10L
                 on { modificationTime } doReturn 5L
+                on { type } doReturn UnknownFileTypeInfo(mimeType = "video/mp4", extension = "mp4")
             }
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
             whenever(exportNodeUseCase(NodeId(NODE_HANDLE), null, CALLER_NAME))
@@ -140,6 +151,7 @@ class ShareLinkViewModelTest {
             val node = mock<TypedFileNode> {
                 on { name } doReturn "report.pdf"
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+                on { type } doReturn PdfFileTypeInfo
             }
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
             val levelDetail = mock<AccountLevelDetail> {
@@ -182,5 +194,6 @@ class ShareLinkViewModelTest {
     private companion object {
         const val NODE_HANDLE = 123L
         const val CALLER_NAME = "ShareLinkViewModel"
+        val FILE_ICON_RES = iconPackR.drawable.ic_pdf_medium_solid
     }
 }
