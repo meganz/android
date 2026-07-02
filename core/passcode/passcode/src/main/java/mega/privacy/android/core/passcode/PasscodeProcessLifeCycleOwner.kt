@@ -11,8 +11,6 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ReportFragment
-import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import timber.log.Timber
 
 /**
@@ -50,20 +48,6 @@ class PasscodeProcessLifecycleOwner private constructor() {
      */
     fun skipNextPasscodeCheck() {
         skipPasscode = true
-    }
-
-    @SuppressLint("RestrictedApi")
-    inner class ActivityInitializationListener(private val activity: Activity) :
-        ReportFragment.ActivityInitializationListener {
-        override fun onCreate() {}
-
-        override fun onStart() {
-            activityStarted(activity)
-        }
-
-        override fun onResume() {
-            activityResumed()
-        }
     }
 
     companion object {
@@ -166,16 +150,17 @@ class PasscodeProcessLifecycleOwner private constructor() {
                     })
             }
 
-            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
-                // Only use ReportFragment pre API 29 - after that, we can use the
-                // onActivityPostStarted and onActivityPostResumed callbacks registered in
-                // onActivityPreCreated()
+            override fun onActivityStarted(activity: Activity) {
+                // Below API 29 only; not via ReportFragment, whose single listener slot is shared
+                // with androidx ProcessLifecycleOwner.
                 if (Build.VERSION.SDK_INT < Q) {
-                    activity.reportFragment.setProcessListener(
-                        ActivityInitializationListener(
-                            activity
-                        )
-                    )
+                    activityStarted(activity)
+                }
+            }
+
+            override fun onActivityResumed(activity: Activity) {
+                if (Build.VERSION.SDK_INT < Q) {
+                    activityResumed()
                 }
             }
 
