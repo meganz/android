@@ -15,12 +15,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.NodeNameException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.file.IsValidTextFileUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
-import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.shared.nodes.dialog.newfile.NewTextFileNodeDialogUiState.Companion.DEFAULT_LINK_FILE_EXTENSION
 import timber.log.Timber
 
@@ -87,7 +87,8 @@ class NewTextFileNodeDialogViewModel @AssistedInject constructor(
                             ?: throw IllegalStateException("Root node not found")
                     }
                     validateNodeNameUseCase(trimmedFileName, parentOrRootNodeId)
-                    if (!trimmedFileName.endsWith(DEFAULT_LINK_FILE_EXTENSION)) {
+                    val hasExtension = trimmedFileName.substringAfterLast('.', "").isNotEmpty()
+                    if (hasExtension && !trimmedFileName.endsWith(DEFAULT_LINK_FILE_EXTENSION)) {
                         isValidTextFileUseCase(trimmedFileName)
                     }
                     trimmedFileName
