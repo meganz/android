@@ -5,12 +5,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.core.util.Consumer
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.channels.Channel
 import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
 import mega.privacy.android.app.presentation.container.MegaAppContainer
@@ -59,6 +59,14 @@ class ChatActivity : AppCompatActivity() {
     @Inject
     lateinit var appDialogDestinations: Set<@JvmSuppressWildcards AppDialogDestinations>
 
+    private val newIntents = Channel<Intent>(capacity = Channel.UNLIMITED)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        newIntents.trySend(intent)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -68,10 +76,6 @@ class ChatActivity : AppCompatActivity() {
         setContent {
             val mode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-
-            // The scaffold owns the back stack and only exposes its NavigationHandler inside the
-            // (non-composable) entry builder. Bridge it through a composition-scoped holder so
-            // onNewIntent can drive navigation without leaking the handler into an Activity field.
 
             LegacyActivityScaffold(
                 container = { content ->
@@ -87,8 +91,8 @@ class ChatActivity : AppCompatActivity() {
                 appDialogDestinations = appDialogDestinations,
                 onEmptyBackStack = { if (!isFinishing) finish() },
                 overlayContent = { navigationHandler ->
-                    DisposableEffect(Unit) {
-                        val listener = Consumer<Intent> { newIntent ->
+                    LaunchedEffect(navigationHandler) {
+                        for (newIntent in newIntents) {
                             when (val key = newIntent.toChatNavKey()) {
                                 is ChatLegacyContainerNavKey ->
                                     navigationHandler.openChatConversation(key)
@@ -96,8 +100,6 @@ class ChatActivity : AppCompatActivity() {
                                 else -> navigationHandler.navigate(key)
                             }
                         }
-                        addOnNewIntentListener(listener)
-                        onDispose { removeOnNewIntentListener(listener) }
                     }
                 }
             ) { navigationHandler, _ ->
