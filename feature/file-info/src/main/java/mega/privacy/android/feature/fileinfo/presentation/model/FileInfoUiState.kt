@@ -1,0 +1,34 @@
+package mega.privacy.android.feature.fileinfo.presentation.model
+
+import mega.privacy.android.domain.entity.shares.AccessPermission
+
+/**
+ * UI state for the File Info screen.
+ *
+ * @property isLoading whether the node information is still being loaded
+ * @property title the node name
+ * @property isFile true if the node is a file, false if it is a folder
+ * @property sizeInBytes the file size in bytes (0 for folders; folder size arrives with folder stats)
+ * @property creationTime the node creation time in seconds, or null if unknown
+ * @property modificationTime the file modification time in seconds, or null for folders
+ * @property descriptionText the node description, empty when none
+ * @property tags the tags associated with the node
+ * @property isTakenDown whether the node has been taken down
+ * @property accessPermission the current user's access level for this node
+ * @property isNodeInRubbish whether the node is in the rubbish bin
+ * @property isNodeInBackups whether the node is in the Backups folder
+ */
+internal data class FileInfoUiState(
+    val isLoading: Boolean = true,
+    val title: String = "",
+    val isFile: Boolean = true,
+    val sizeInBytes: Long = 0L,
+    val creationTime: Long? = null,
+    val modificationTime: Long? = null,
+    val descriptionText: String = "",
+    val tags: List<String> = emptyList(),
+    val isTakenDown: Boolean = false,
+    val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
+    val isNodeInRubbish: Boolean = false,
+    val isNodeInBackups: Boolean = false,
+)

@@ -27,6 +27,9 @@ dependencies {
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
 
+    implementation(androidx.lifecycle.viewmodel)
+    implementation(lib.logging.timber)
+
     // Navigation3
     implementation(androidx.navigation3.runtime)
     implementation(androidx.navigation3.ui)
