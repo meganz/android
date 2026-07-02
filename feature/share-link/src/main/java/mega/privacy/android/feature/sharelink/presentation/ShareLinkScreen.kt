@@ -22,12 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -136,6 +138,8 @@ private fun ShareLinkContent(
     onCopyLink: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val clipboardManager = LocalClipboardManager.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -159,7 +163,13 @@ private fun ShareLinkContent(
                 showCancelButton = false,
             )
 
-            LinkField(link = uiState.link, onCopyLink = onCopyLink)
+            LinkField(
+                link = uiState.link,
+                onCopyLink = {
+                    clipboardManager.setText(AnnotatedString(uiState.link))
+                    onCopyLink()
+                },
+            )
         }
     }
 }

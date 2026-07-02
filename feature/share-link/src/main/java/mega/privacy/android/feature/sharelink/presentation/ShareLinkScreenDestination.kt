@@ -2,16 +2,21 @@ package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import kotlinx.coroutines.launch
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.LinkSettingsNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * Registers the revamped Share link screen entry.
@@ -37,6 +42,9 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                 factory.create(ShareLinkViewModel.Args(handles = key.handles))
             }
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val resources = LocalResources.current
+            val snackbarQueue = rememberSnackBarQueue()
+            val coroutineScope = rememberCoroutineScope()
 
             ShareLinkScreen(
                 uiState = uiState,
@@ -44,9 +52,19 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                 onOpenSettings = {
                     navigationHandler.navigate(LinkSettingsNavKey(handles = key.handles))
                 },
-                // Copy-to-clipboard is wired in AND-24054 and the system share sheet in AND-24045.
+                // The system share sheet is wired in AND-24045.
                 onShareLink = {},
-                onCopyLink = {},
+                onCopyLink = {
+                    val data = uiState as? ShareLinkUiState.Data ?: return@ShareLinkScreen
+                    coroutineScope.launch {
+                        snackbarQueue.queueMessage(
+                            resources.getQuantityString(
+                                sharedR.plurals.share_link_created_and_copied_snackbar,
+                                data.handles.size,
+                            )
+                        )
+                    }
+                },
             )
         }
     }

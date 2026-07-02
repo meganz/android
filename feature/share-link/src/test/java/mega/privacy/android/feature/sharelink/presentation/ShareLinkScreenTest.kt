@@ -1,11 +1,15 @@
 package mega.privacy.android.feature.sharelink.presentation
 
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
@@ -82,23 +86,47 @@ class ShareLinkScreenTest {
         assertThat(copied).isTrue()
     }
 
+    @Test
+    fun `test that tapping the copy icon copies the link to the clipboard`() {
+        val clipboard = FakeClipboardManager()
+        setContent(uiState = data, clipboardManager = clipboard)
+
+        composeRule.onNodeWithContentDescription(context.getString(sharedR.string.general_copy))
+            .performClick()
+
+        assertThat(clipboard.getText()?.text).isEqualTo(data.link)
+    }
+
     private fun setContent(
         uiState: ShareLinkUiState,
         onBack: () -> Unit = {},
         onOpenSettings: () -> Unit = {},
         onShareLink: () -> Unit = {},
         onCopyLink: () -> Unit = {},
+        clipboardManager: ClipboardManager = FakeClipboardManager(),
     ) {
         composeRule.setContent {
-            AndroidThemeForPreviews {
-                ShareLinkScreen(
-                    uiState = uiState,
-                    onBack = onBack,
-                    onOpenSettings = onOpenSettings,
-                    onShareLink = onShareLink,
-                    onCopyLink = onCopyLink,
-                )
+            CompositionLocalProvider(LocalClipboardManager provides clipboardManager) {
+                AndroidThemeForPreviews {
+                    ShareLinkScreen(
+                        uiState = uiState,
+                        onBack = onBack,
+                        onOpenSettings = onOpenSettings,
+                        onShareLink = onShareLink,
+                        onCopyLink = onCopyLink,
+                    )
+                }
             }
         }
+    }
+
+    private class FakeClipboardManager : ClipboardManager {
+        private var text: AnnotatedString? = null
+
+        override fun setText(annotatedString: AnnotatedString) {
+            text = annotatedString
+        }
+
+        override fun getText(): AnnotatedString? = text
     }
 }
