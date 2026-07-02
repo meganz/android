@@ -145,7 +145,7 @@ class LegacyCoreActivityFeatureGraph(
                 navigationHandler = navigationHandler,
             )
             createGroupChatLegacyDestination(
-                returnResult = navigationHandler::returnResult,
+                navigationHandler = navigationHandler,
             )
         }
 }

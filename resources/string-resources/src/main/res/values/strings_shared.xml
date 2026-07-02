@@ -3089,4 +3089,16 @@
         <item quantity="one">Link created and copied to your clipboard</item>
         <item quantity="other">Links created and copied to your clipboard</item>
     </plurals>
+    <!-- Create group chat: toolbar title of the group settings step where the group name and options are set -->
+    <string name="create_group_chat_settings_title">New group</string>
+    <!-- Create group chat: hint of the group name text field. The name is optional. -->
+    <string name="create_group_chat_name_hint">Enter group name</string>
+    <!-- Create group chat: label of the encryption key rotation toggle -->
+    <string name="create_group_chat_ekr_label">Encryption key rotation</string>
+    <!-- Create group chat: explanation shown under the encryption key rotation toggle -->
+    <string name="create_group_chat_ekr_explanation">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <!-- Create group chat: label of the get chat link toggle -->
+    <string name="create_group_chat_get_chat_link_label">Get chat link</string>
+    <!-- Create group chat: label of the toggle allowing non-host participants to add others -->
+    <string name="create_group_chat_allow_add_participants_label">Allow non-hosts to add participants</string>
 </resources>
