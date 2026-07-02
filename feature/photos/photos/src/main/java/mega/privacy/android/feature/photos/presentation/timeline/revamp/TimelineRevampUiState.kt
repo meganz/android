@@ -7,6 +7,8 @@ import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 
 /**
  * UI state for the Timeline Revamp screen
@@ -38,6 +40,10 @@ sealed interface TimelineRevampUiState {
      * @property gridSize the selected grid size, driving the number of columns in the grid.
      * @property currentSort the selected sort option (Newest / Oldest), shown as the checked option in
      * the sort dialog.
+     * @property selectedPeriod the selected time period, deciding whether the grid or a Year / Month
+     * card list is shown.
+     * @property periodCards the Year or Month summary cards shown when [selectedPeriod] is
+     * [MediaTimePeriod.Years] or [MediaTimePeriod.Months]; empty otherwise.
      * @property takenDownDialogEvent triggered when a taken-down node is tapped, so the screen can
      * show the dispute dialog.
      */
@@ -48,6 +54,8 @@ sealed interface TimelineRevampUiState {
         val isHiddenNodesEnabled: Boolean = false,
         val gridSize: TimelineGridSize = TimelineGridSize.Default,
         val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
+        val selectedPeriod: MediaTimePeriod = MediaTimePeriod.All,
+        val periodCards: List<PhotosNodeListCard> = emptyList(),
         val takenDownDialogEvent: StateEvent = consumed,
     ) : TimelineRevampUiState
 }

@@ -1,8 +1,10 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
@@ -72,6 +74,60 @@ class TimelineRevampScreenTest {
         composeRule.onNodeWithTag(TIMELINE_REVAMP_GRID_SIZE_ICON_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that the sticky header is displayed when state is Data`() {
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "May 2026",
+                        startDate = 0L,
+                        endDate = 0L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = emptyMap(),
+            )
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_STICKY_HEADER_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that day sections in the same month are grouped under a single month header`() {
+        // 2026-06-20 (first month, shown by the sticky header) then 2026-05-15 and 2026-05-10 —
+        // two day sections in May that must collapse into a single May inline header.
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-20",
+                        startDate = 1_781_913_600L,
+                        endDate = 1_781_913_600L,
+                        count = 1,
+                    ),
+                    MediaTimelineSection(
+                        groupId = "2026-05-15",
+                        startDate = 1_778_803_200L,
+                        endDate = 1_778_803_200L,
+                        count = 1,
+                    ),
+                    MediaTimelineSection(
+                        groupId = "2026-05-10",
+                        startDate = 1_778_371_200L,
+                        endDate = 1_778_371_200L,
+                        count = 1,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0, 1, 2),
+                loadedNodes = emptyMap(),
+            )
+        )
+
+        composeRule.onAllNodesWithTag("${TIMELINE_REVAMP_SECTION_HEADER_TAG}2026-5").assertCountEquals(1)
+    }
+
     private fun ComposeContentTestRule.setScreen(uiState: TimelineRevampUiState) {
         setContent {
             TimelineRevampScreen(
@@ -80,6 +136,7 @@ class TimelineRevampScreenTest {
                 onGridSizeChange = {},
                 onZoomIn = {},
                 onZoomOut = {},
+                onMediaTimePeriodSelected = {},
                 onNodeClicked = {},
                 onTakenDownDialogEventConsumed = {},
             )

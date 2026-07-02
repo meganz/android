@@ -1,9 +1,10 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
 import android.content.res.Configuration
+import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,16 +14,17 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
@@ -41,6 +43,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.core.sharedcomponents.header.StickySectionHeader
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
@@ -48,10 +51,19 @@ import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.component.PhotoNodeBodyV2
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCache
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
+import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
+import java.time.Year
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 internal fun TimelineRevampScreen(
@@ -60,6 +72,7 @@ internal fun TimelineRevampScreen(
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
+    onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onTakenDownDialogEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
@@ -93,10 +106,13 @@ internal fun TimelineRevampScreen(
                 loadedNodes = uiState.loadedNodes,
                 isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                 gridSize = uiState.gridSize,
+                selectedPeriod = uiState.selectedPeriod,
+                periodCards = uiState.periodCards,
                 onVisibleRangeChanged = onVisibleRangeChanged,
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
+                onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                 onNodeClicked = onNodeClicked,
                 modifier = modifier,
             )
@@ -118,6 +134,115 @@ private fun TimelineRevampContent(
     loadedNodes: Map<Int, PhotosNodeContentItemV2>,
     isHiddenNodesEnabled: Boolean,
     gridSize: TimelineGridSize,
+    selectedPeriod: MediaTimePeriod,
+    periodCards: List<PhotosNodeListCard>,
+    onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
+    onGridSizeChange: (TimelineGridSize) -> Unit,
+    onZoomIn: () -> Unit,
+    onZoomOut: () -> Unit,
+    onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
+    onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val lazyGridState = rememberLazyGridState()
+    val cardListState = rememberLazyListState()
+    val configuration = LocalConfiguration.current
+    val columns =
+        if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            gridSize.portrait
+        } else {
+            gridSize.landscape
+        }
+    val locale = configuration.locales[0]
+
+    var pendingScroll by remember { mutableStateOf<PendingCardScroll?>(null) }
+
+    // Year card picker effect
+    LaunchedEffect(selectedPeriod, periodCards, pendingScroll) {
+        val target = pendingScroll
+        if (target is PendingCardScroll.ToYear &&
+            selectedPeriod == MediaTimePeriod.Months &&
+            periodCards.isNotEmpty()
+        ) {
+            val cardIndex = periodCards.indexOfFirst { it.year == target.year }
+            if (cardIndex >= 0) cardListState.scrollToItem(cardIndex)
+            pendingScroll = null
+        }
+    }
+
+    // Month card picker effect
+    LaunchedEffect(selectedPeriod, sections, pendingScroll) {
+        val target = pendingScroll
+        if (target is PendingCardScroll.ToMonth &&
+            selectedPeriod.isGridPeriod() &&
+            sections.isNotEmpty()
+        ) {
+            val sectionIndex = sections.indexOfFirst { it.isInMonth(target.year, target.month) }
+            if (sectionIndex >= 0) {
+                lazyGridState.scrollToItem(sectionIndex + sectionStartOffsets[sectionIndex])
+            }
+            pendingScroll = null
+        }
+    }
+
+    when (selectedPeriod) {
+        MediaTimePeriod.Years, MediaTimePeriod.Months -> {
+            PhotosNodeListCardListView(
+                modifier = modifier
+                    .fillMaxSize()
+                    .testTag(TIMELINE_REVAMP_CARD_LIST_TAG),
+                photos = periodCards,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                state = cardListState,
+                onClick = { card ->
+                    when (card.period) {
+                        PhotosNodeListCardPeriod.Year -> {
+                            pendingScroll = PendingCardScroll.ToYear(card.year)
+                            onMediaTimePeriodSelected(MediaTimePeriod.Months)
+                        }
+
+                        PhotosNodeListCardPeriod.Month -> {
+                            pendingScroll = PendingCardScroll.ToMonth(card.year, card.month)
+                            onMediaTimePeriodSelected(MediaTimePeriod.All)
+                        }
+
+                        PhotosNodeListCardPeriod.Day -> Unit
+                    }
+                },
+            )
+        }
+
+        else -> {
+            TimelineRevampGrid(
+                sections = sections,
+                sectionStartOffsets = sectionStartOffsets,
+                loadedNodes = loadedNodes,
+                isHiddenNodesEnabled = isHiddenNodesEnabled,
+                gridSize = gridSize,
+                columns = columns,
+                locale = locale,
+                lazyGridState = lazyGridState,
+                onVisibleRangeChanged = onVisibleRangeChanged,
+                onGridSizeChange = onGridSizeChange,
+                onZoomIn = onZoomIn,
+                onZoomOut = onZoomOut,
+                onNodeClicked = onNodeClicked,
+                modifier = modifier,
+            )
+        }
+    }
+}
+
+@Composable
+private fun TimelineRevampGrid(
+    sections: List<MediaTimelineSection>,
+    sectionStartOffsets: List<Int>,
+    loadedNodes: Map<Int, PhotosNodeContentItemV2>,
+    isHiddenNodesEnabled: Boolean,
+    gridSize: TimelineGridSize,
+    columns: Int,
+    locale: Locale,
+    lazyGridState: LazyGridState,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
@@ -125,96 +250,182 @@ private fun TimelineRevampContent(
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val lazyGridState = rememberLazyGridState()
-    val columns =
-        if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            gridSize.portrait
-        } else {
-            gridSize.landscape
-        }
-
     NotifyVisibleMediaRange(
         gridState = lazyGridState,
         onVisibleRangeChanged = onVisibleRangeChanged
     )
 
-    FastScrollLazyVerticalGrid(
-        columns = GridCells.Fixed(columns),
-        modifier = modifier
-            .fillMaxSize()
-            .photosZoomGestureDetector(
-                onZoomIn = onZoomIn,
-                onZoomOut = onZoomOut,
+    // Day sections are grouped into month headers: a header is emitted only at each month's first day
+    // section, so consecutive days of the same month flow under a single "June 2026" header.
+    val monthStartFlags = remember(sections) {
+        sections.mapIndexed { index, section ->
+            index == 0 || !TimelineDateCache.get(sections[index - 1].startDate)
+                .isSameMonthAs(TimelineDateCache.get(section.startDate))
+        }
+    }
+    val headerCount = remember(monthStartFlags) { monthStartFlags.count { it } }
+
+    // Recomputes on scroll (reads lazyGridState.layoutInfo, a snapshot state) and is re-created when
+    // the section layout or locale changes (the remember keys).
+    val stickyLabel by remember(sections, sectionStartOffsets, locale) {
+        derivedStateOf {
+            val visibleMediaIndices = lazyGridState.layoutInfo.visibleItemsInfo
+                .mapNotNull { (it.key as? String)?.removePrefix(MEDIA_KEY_PREFIX)?.toIntOrNull() }
+            stickyDayRangeLabel(visibleMediaIndices, sections, sectionStartOffsets, locale)
+        }
+    }
+
+    Column(modifier = modifier.fillMaxSize()) {
+        if (sections.isNotEmpty()) {
+            StickySectionHeader(
+                modifier = Modifier
+                    .testTag(TIMELINE_REVAMP_STICKY_HEADER_TAG),
+                title = stickyLabel,
+                trailingContent = {
+                    TimelineRevampGridSizeMenu(
+                        gridSize = gridSize,
+                        onGridSizeChange = onGridSizeChange,
+                    )
+                },
             )
-            .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
-        state = lazyGridState,
-        totalItems = sections.sumOf { it.count }.toInt() + sections.size,
-    ) {
-        sections.forEachIndexed { sectionIndex, section ->
-            val base = sectionStartOffsets[sectionIndex]
+        }
 
-            item(
-                key = "${HEADER_KEY_PREFIX}${section.groupId}",
-                span = { GridItemSpan(maxLineSpan) },
-            ) {
-                TimelineRevampSectionHeader(
-                    title = section.groupId,
-                    // The grid-size selector is only shown on the first header, matching the tab.
-                    showGridSizeMenu = sectionIndex == 0,
-                    gridSize = gridSize,
-                    onGridSizeChange = onGridSizeChange,
+        FastScrollLazyVerticalGrid(
+            columns = GridCells.Fixed(columns),
+            modifier = Modifier
+                .fillMaxSize()
+                .photosZoomGestureDetector(
+                    onZoomIn = onZoomIn,
+                    onZoomOut = onZoomOut,
                 )
-            }
+                .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
+            state = lazyGridState,
+            totalItems = sections.sumOf { it.count }.toInt() + headerCount,
+        ) {
+            sections.forEachIndexed { sectionIndex, section ->
+                val base = sectionStartOffsets[sectionIndex]
 
-            items(
-                count = section.count.toInt(),
-                key = { index -> "$MEDIA_KEY_PREFIX${base + index}" },
-            ) { index ->
-                val node = loadedNodes[base + index]
-                PhotoNodeBodyV2(
-                    node = node,
-                    modifier = Modifier
-                        .animateItem()
-                        .padding(all = 1.dp),
-                    shouldShowFavourite = node?.isFavourite == true,
-                    isHiddenNodesEnabled = isHiddenNodesEnabled,
-                    onClick = { onNodeClicked(node) },
-                )
+                if (monthStartFlags[sectionIndex] && sectionIndex != 0) {
+                    val monthHeaderKey = monthKey(section.startDate)
+                    item(
+                        key = "$HEADER_KEY_PREFIX$monthHeaderKey",
+                        span = { GridItemSpan(maxLineSpan) },
+                    ) {
+                        StickySectionHeader(
+                            modifier = Modifier
+                                .testTag("$TIMELINE_REVAMP_SECTION_HEADER_TAG$monthHeaderKey"),
+                            title = timelineMonthLabel(section.startDate, locale),
+                        )
+                    }
+                }
+
+                items(
+                    count = section.count.toInt(),
+                    key = { index -> "$MEDIA_KEY_PREFIX${base + index}" },
+                ) { index ->
+                    val node = loadedNodes[base + index]
+                    PhotoNodeBodyV2(
+                        node = node,
+                        modifier = Modifier
+                            .animateItem()
+                            .padding(all = 1.dp),
+                        shouldShowFavourite = node?.isFavourite == true,
+                        isHiddenNodesEnabled = isHiddenNodesEnabled,
+                        onClick = { onNodeClicked(node) },
+                    )
+                }
             }
         }
     }
 }
 
-@Composable
-private fun TimelineRevampSectionHeader(
-    title: String,
-    showGridSizeMenu: Boolean,
-    gridSize: TimelineGridSize,
-    onGridSizeChange: (TimelineGridSize) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, top = 14.dp, bottom = 14.dp)
-            .testTag("$TIMELINE_REVAMP_SECTION_HEADER_TAG$title"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        MegaText(
-            modifier = Modifier.weight(1f),
-            text = title,
-            style = AppTheme.typography.titleMedium,
-            textColor = TextColor.Primary,
-        )
+/**
+ * True for the day-level grid periods ([MediaTimePeriod.All] and [MediaTimePeriod.Days], which behave
+ * identically in the revamp).
+ */
+private fun MediaTimePeriod.isGridPeriod(): Boolean =
+    this == MediaTimePeriod.All || this == MediaTimePeriod.Days
 
-        if (showGridSizeMenu) {
-            TimelineRevampGridSizeMenu(
-                gridSize = gridSize,
-                onGridSizeChange = onGridSizeChange,
-                modifier = Modifier.padding(end = 16.dp),
-            )
+private fun MediaTimelineSection.isInMonth(year: Int, month: Int): Boolean {
+    val zonedDateTime = TimelineDateCache.get(startDate)
+    return zonedDateTime.year == year && zonedDateTime.monthValue == month
+}
+
+private fun ZonedDateTime.isSameMonthAs(other: ZonedDateTime): Boolean =
+    year == other.year && monthValue == other.monthValue
+
+private sealed interface PendingCardScroll {
+    data class ToYear(val year: Int) : PendingCardScroll
+    data class ToMonth(val year: Int, val month: Int) : PendingCardScroll
+}
+
+/**
+ * Builds the pinned sticky-header label: the day range of the on-screen items within the top-most
+ * visible month, e.g. "June 20—26 2026" ("June 20 2026" for a single day). Falls back to the first
+ * section's day when no media items are on screen yet.
+ */
+private fun stickyDayRangeLabel(
+    visibleMediaIndices: List<Int>,
+    sections: List<MediaTimelineSection>,
+    sectionStartOffsets: List<Int>,
+    locale: Locale,
+): String {
+    val topSection = sections.firstOrNull() ?: return ""
+    if (visibleMediaIndices.isEmpty()) {
+        val day = TimelineDateCache.get(topSection.startDate).dayOfMonth
+        return dayRangeLabel(topSection.startDate, day, day, locale)
+    }
+
+    val topIndex = sectionIndexOfMedia(
+        visibleMediaIndices.min(),
+        sectionStartOffsets
+    ).coerceIn(sections.indices)
+    val bottomIndex = sectionIndexOfMedia(
+        visibleMediaIndices.max(),
+        sectionStartOffsets
+    ).coerceIn(sections.indices)
+    val top = TimelineDateCache.get(sections[topIndex].startDate)
+
+    var minDay = Int.MAX_VALUE
+    var maxDay = Int.MIN_VALUE
+    for (index in topIndex..bottomIndex) {
+        val date = TimelineDateCache.get(sections[index].startDate)
+        if (date.year == top.year && date.monthValue == top.monthValue) {
+            minDay = minOf(minDay, date.dayOfMonth)
+            maxDay = maxOf(maxDay, date.dayOfMonth)
         }
     }
+    return dayRangeLabel(sections[topIndex].startDate, minDay, maxDay, locale)
+}
+
+/**
+ * Index of the section owning the global media slot [globalIndex], via [sectionStartOffsets].
+ */
+private fun sectionIndexOfMedia(globalIndex: Int, sectionStartOffsets: List<Int>): Int {
+    if (sectionStartOffsets.isEmpty()) return 0
+    return sectionStartOffsets.indexOfLast { it <= globalIndex }
+        .coerceIn(0, sectionStartOffsets.lastIndex)
+}
+
+private fun dayRangeLabel(
+    monthStartDateSeconds: Long,
+    minDay: Int,
+    maxDay: Int,
+    locale: Locale,
+): String {
+    val zonedDateTime = TimelineDateCache.get(monthStartDateSeconds)
+    val monthName = DateTimeFormatter
+        .ofPattern(getBestDateTimePattern(locale, "LLLL"), locale)
+        .format(zonedDateTime)
+    val minDayText = String.format(locale, "%02d", minDay)
+    val maxDayText = String.format(locale, "%02d", maxDay)
+    val dayPart = if (minDay == maxDay) minDayText else "$minDayText$DAY_RANGE_SEPARATOR$maxDayText"
+    return "$monthName $dayPart ${zonedDateTime.year}"
+}
+
+private fun monthKey(startDateSeconds: Long): String {
+    val date = TimelineDateCache.get(startDateSeconds)
+    return "${date.year}-${date.monthValue}"
 }
 
 @Composable
@@ -309,10 +520,27 @@ private fun NotifyVisibleMediaRange(
     }
 }
 
+/**
+ * Formats a month header label, mirroring the legacy tab: "May" for the current year and "May 2024"
+ * otherwise, using the locale's best pattern for the skeleton.
+ */
+private fun timelineMonthLabel(startDateSeconds: Long, locale: Locale): String {
+    val zonedDateTime = TimelineDateCache.get(startDateSeconds)
+    val isCurrentYear = zonedDateTime.year == Year.now().value
+    val skeleton = if (isCurrentYear) "LLLL" else "LLLL yyyy"
+    val pattern = getBestDateTimePattern(locale, skeleton)
+    return DateTimeFormatter.ofPattern(pattern, locale).format(zonedDateTime)
+}
+
 private const val HEADER_KEY_PREFIX = "header_"
 private const val MEDIA_KEY_PREFIX = "media_"
 
+/** Em-dash (U+2014) separating the first and last day in the sticky day-range header. */
+private const val DAY_RANGE_SEPARATOR = "—"
+
 internal const val TIMELINE_REVAMP_CONTENT_GRID_TAG = "timeline_revamp_content:grid"
+internal const val TIMELINE_REVAMP_STICKY_HEADER_TAG = "timeline_revamp_content:sticky_header"
+internal const val TIMELINE_REVAMP_CARD_LIST_TAG = "timeline_revamp_content:card_list"
 internal const val TIMELINE_REVAMP_SECTION_HEADER_TAG = "timeline_revamp_content:section_header_"
 internal const val TIMELINE_REVAMP_GRID_SIZE_ICON_TAG = "timeline_revamp_content:grid_size_icon"
 internal const val TIMELINE_REVAMP_LOADING_SKELETON_TAG = "timeline_revamp_content:loading_skeleton"
@@ -326,15 +554,15 @@ private fun TimelineRevampScreenPreview() {
             uiState = TimelineRevampUiState.Data(
                 sections = listOf(
                     MediaTimelineSection(
-                        groupId = "May 2026",
-                        startDate = 0L,
-                        endDate = 0L,
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
                         count = 7,
                     ),
                     MediaTimelineSection(
-                        groupId = "April 2026",
-                        startDate = 0L,
-                        endDate = 0L,
+                        groupId = "2026-05-10",
+                        startDate = 1_778_371_200L,
+                        endDate = 1_778_371_200L,
                         count = 4,
                     ),
                 ),
@@ -345,6 +573,7 @@ private fun TimelineRevampScreenPreview() {
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
+            onMediaTimePeriodSelected = {},
             onNodeClicked = {},
             onTakenDownDialogEventConsumed = {},
         )
@@ -361,6 +590,7 @@ private fun TimelineRevampEmptyPreview() {
             onGridSizeChange = {},
             onZoomIn = {},
             onZoomOut = {},
+            onMediaTimePeriodSelected = {},
             onNodeClicked = {},
             onTakenDownDialogEventConsumed = {},
         )

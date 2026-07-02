@@ -8,8 +8,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -23,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
@@ -60,6 +64,7 @@ import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabUiState
 import mega.privacy.android.feature.photos.presentation.albums.AlbumsTabViewModel
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.presentation.component.MediaBottomBar
+import mega.privacy.android.feature.photos.presentation.component.MediaTimePeriodSelector
 import mega.privacy.android.feature.photos.presentation.component.MediaTopBar
 import mega.privacy.android.feature.photos.presentation.effects.MediaMainEffects
 import mega.privacy.android.feature.photos.presentation.effects.MediaNodeActionEffects
@@ -126,6 +131,7 @@ fun MediaMainRoute(
     val timelineRevampActionUiState by timelineRevampViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
     val timelineRevampFilterUiState by timelineRevampViewModel.filterUiState.collectAsStateWithLifecycle()
+    val timelineRevampSelectedTimePeriod by timelineRevampViewModel.selectedTimePeriod.collectAsStateWithLifecycle()
     val mediaCameraUploadUiState by mediaCameraUploadViewModel.uiState.collectAsStateWithLifecycle()
     val videosSelectionUiState by videosTabViewModel.selectionUiState.collectAsStateWithLifecycle()
     val playlistsTabUiState by videoPlaylistsTabViewModel.uiState.collectAsStateWithLifecycle()
@@ -335,7 +341,7 @@ fun MediaMainRoute(
         onTimelineApplyFilterClick = timelineViewModel::onFilterChange,
         timelineRevampFilterUiState = timelineRevampFilterUiState,
         onTimelineRevampApplyFilterClick = timelineRevampViewModel::onFilterChange,
-        timelineRevampSelectedTimePeriod = timelineRevampViewModel.selectedTimePeriod,
+        timelineRevampSelectedTimePeriod = timelineRevampSelectedTimePeriod,
         onTimelinePhotoSelected = {
             if (it in timelineSelectedPhotoIds) {
                 timelineSelectedPhotoIds.remove(it)
@@ -355,6 +361,7 @@ fun MediaMainRoute(
         onCUBannerDismissRequest = mediaCameraUploadViewModel::dismissCUBanner,
         onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
         onMediaTimePeriodSelected = timelineViewModel::onMediaTimePeriodSelected,
+        onTimelineRevampMediaTimePeriodSelected = timelineRevampViewModel::onMediaTimePeriodSelected,
         onNavigateToCameraUploadsProgressScreen = onNavigateToCameraUploadsProgressScreen,
         onUpdateVideosSearchQuery = videosTabViewModel::searchQuery,
         onUpdatePlaylistSearchQuery = videoPlaylistsTabViewModel::searchQuery,
@@ -413,6 +420,7 @@ fun MediaMainScreen(
     onCUBannerDismissRequest: (status: CUStatusUiState) -> Unit,
     onNavigateToUpgradeAccount: (key: UpgradeAccountNavKey) -> Unit,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
+    onTimelineRevampMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNavigateToCameraUploadsProgressScreen: () -> Unit,
     onUpdateVideosSearchQuery: (value: String?) -> Unit,
     onUpdatePlaylistSearchQuery: (value: String?) -> Unit,
@@ -449,6 +457,8 @@ fun MediaMainScreen(
         if (isTimelineRevampEnabled) onTimelineRevampApplyFilterClick else onTimelineApplyFilterClick
     val effectiveOnSortOptionChange =
         if (isTimelineRevampEnabled) onTimelineRevampSortOptionChange else onTimelineSortOptionChange
+    val effectiveOnMediaTimePeriodSelected =
+        if (isTimelineRevampEnabled) onTimelineRevampMediaTimePeriodSelected else onMediaTimePeriodSelected
 
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -645,7 +655,7 @@ fun MediaMainScreen(
                                     videosSelectionUiState = videosSelectionUiState,
                                     selectedPhotoIds = selectedPhotoIds,
                                     showTimelineSortDialog = showTimelineSortDialog,
-                                    selectedTimePeriod = selectedTimePeriod,
+                                    selectedTimePeriod = effectiveSelectedTimePeriod,
                                     setEnableCUPage = setEnableCUPage,
                                     onTimelineGridSizeChange = onTimelineGridSizeChange,
                                     onTimelineSortDialogDismissed = {
@@ -677,7 +687,7 @@ fun MediaMainScreen(
                                     handleNotificationPermissionResult = handleNotificationPermissionResult,
                                     onCUBannerDismissRequest = onCUBannerDismissRequest,
                                     onNavigateToUpgradeAccount = onNavigateToUpgradeAccount,
-                                    onMediaTimePeriodSelected = onMediaTimePeriodSelected,
+                                    onMediaTimePeriodSelected = effectiveOnMediaTimePeriodSelected,
                                     showVideoPlaylistRemovedDialog = showVideoPlaylistRemovedDialog,
                                     dismissVideoPlaylistRemovedDialog = {
                                         showVideoPlaylistRemovedDialog = false
@@ -777,16 +787,34 @@ private fun MediaScreen.MediaContent(
         MediaScreen.Timeline -> {
             when (uiState.isTimelineRevampEnabled) {
                 true -> {
-                    TimelineRevampScreen(
-                        modifier = Modifier.fillMaxSize(),
-                        uiState = timelineRevampUiState,
-                        onVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
-                        onGridSizeChange = onTimelineRevampGridSizeChange,
-                        onZoomIn = onTimelineRevampZoomIn,
-                        onZoomOut = onTimelineRevampZoomOut,
-                        onNodeClicked = onTimelineRevampNodeClicked,
-                        onTakenDownDialogEventConsumed = onTimelineRevampTakenDownDialogConsumed,
-                    )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        TimelineRevampScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            uiState = timelineRevampUiState,
+                            onVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
+                            onGridSizeChange = onTimelineRevampGridSizeChange,
+                            onZoomIn = onTimelineRevampZoomIn,
+                            onZoomOut = onTimelineRevampZoomOut,
+                            onMediaTimePeriodSelected = onMediaTimePeriodSelected,
+                            onNodeClicked = onTimelineRevampNodeClicked,
+                            onTakenDownDialogEventConsumed = onTimelineRevampTakenDownDialogConsumed,
+                        )
+
+                        MediaTimePeriodSelector(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .navigationBarsPadding()
+                                .align(Alignment.BottomCenter),
+                            isVisible = timelineRevampUiState is TimelineRevampUiState.Data,
+                            selectedTimePeriod = selectedTimePeriod,
+                            onMediaTimePeriodSelected = onMediaTimePeriodSelected,
+                            periods = listOf(
+                                MediaTimePeriod.Years,
+                                MediaTimePeriod.Months,
+                                MediaTimePeriod.All,
+                            ),
+                        )
+                    }
 
                     if (showTimelineSortDialog) {
                         TimelineSortDialog(
@@ -948,6 +976,7 @@ private fun PhotosMainScreenPreview() {
             onCUBannerDismissRequest = {},
             onNavigateToUpgradeAccount = {},
             onMediaTimePeriodSelected = {},
+            onTimelineRevampMediaTimePeriodSelected = {},
             onNavigateToCameraUploadsProgressScreen = {},
             albumsTabUiState = AlbumsTabUiState(),
             videosSelectionUiState = VideosTabUiState.Selection(),

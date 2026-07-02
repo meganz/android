@@ -23,6 +23,7 @@ internal fun MediaTimePeriodSelector(
     selectedTimePeriod: MediaTimePeriod,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     modifier: Modifier = Modifier,
+    periods: List<MediaTimePeriod> = MediaTimePeriod.entries,
 ) {
     AnimatedVisibility(
         modifier = modifier,
@@ -36,7 +37,7 @@ internal fun MediaTimePeriodSelector(
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.Center,
         ) {
-            MediaTimePeriod.entries.forEachIndexed { index, timePeriod ->
+            periods.forEachIndexed { index, timePeriod ->
                 MegaChip(
                     onClick = { onMediaTimePeriodSelected(timePeriod) },
                     selected = selectedTimePeriod == timePeriod,
@@ -44,7 +45,7 @@ internal fun MediaTimePeriodSelector(
                     style = SelectionChipStyle,
                 )
 
-                if (index != MediaTimePeriod.entries.lastIndex) {
+                if (index != periods.lastIndex) {
                     Spacer(modifier = Modifier.width(8.dp))
                 }
             }

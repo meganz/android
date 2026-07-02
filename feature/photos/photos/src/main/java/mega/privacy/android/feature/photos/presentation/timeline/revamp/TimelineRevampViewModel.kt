@@ -1,8 +1,5 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,19 +8,25 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
@@ -51,11 +54,15 @@ import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCache
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
+import mega.privacy.android.feature.photos.presentation.timeline.TimelineFormatters
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabNormalModeActionUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.TimelineRevampViewModel.Companion.MAX_CACHED_ITEMS
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
@@ -63,6 +70,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEve
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import timber.log.Timber
+import java.time.Year
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -120,11 +128,12 @@ class TimelineRevampViewModel @Inject constructor(
     private val sortActionEnabledFlow = MutableStateFlow(true)
 
     /**
-     * The selected media time period (All / Days / Months / Years). Hoisted here — rather than in the
-     * UI state — so it survives navigation and changing it does not trigger a UI-state rebuild.
+     * The selected media time period (All / Months / Years). Drives which view is shown — the flat
+     * day-level grid ([MediaTimePeriod.All], and [MediaTimePeriod.Days] which is treated the same) or a
+     * Year / Month summary-card list — rather than re-bucketing the grid.
      */
-    var selectedTimePeriod by mutableStateOf(MediaTimePeriod.All)
-        private set
+    private val selectedTimePeriodFlow = MutableStateFlow(MediaTimePeriod.All)
+    val selectedTimePeriod: StateFlow<MediaTimePeriod> = selectedTimePeriodFlow.asStateFlow()
 
     private val selectedFilterFlow = MutableStateFlow<Map<String, String?>?>(null)
 
@@ -159,9 +168,9 @@ class TimelineRevampViewModel @Inject constructor(
     /**
      * The filter that scopes both the timeline sections and the per-section node pages, derived
      * reactively from [filterUiState] and the hidden-nodes state. Sensitive nodes are excluded only
-     * when the hidden-nodes feature is enabled and "show hidden items" is off (matching the tab).
-     * Sort and granularity remain at their defaults until the later parity steps. Eagerly shared so
-     * [fetchSectionNodes] can read the current value synchronously.
+     * when the hidden-nodes feature is enabled and "show hidden items" is off (matching the tab). The
+     * grid is always grouped at day granularity; the Year / Month card lists are queried separately.
+     * Eagerly shared so [fetchSectionNodes] can read the current value synchronously.
      */
     private val currentFilter: StateFlow<MediaTimelineFilter> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
@@ -215,22 +224,28 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     val uiState: StateFlow<TimelineRevampUiState> by lazy(LazyThreadSafetyMode.NONE) {
-        combine(
+        val gridFlow = combine(
             monitorTimelineSections(),
             loadedNodes,
             isHiddenNodesEnabled,
             gridSizeFlow,
             sortOptionsFlow,
         ) { sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort ->
-            when (sectionsState) {
+            GridBundle(sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort)
+        }
+
+        combine(gridFlow, selectedTimePeriodFlow, periodCards) { grid, period, cards ->
+            when (val sectionsState = grid.sectionsState) {
                 SectionsState.Loading -> TimelineRevampUiState.Loading
                 is SectionsState.Loaded ->
                     toUiState(
                         sections = sectionsState.sections,
-                        loaded = loaded,
-                        isHiddenNodesEnabled = hiddenNodesEnabled,
-                        gridSize = gridSize,
-                        currentSort = currentSort
+                        loaded = grid.loadedNodes,
+                        isHiddenNodesEnabled = grid.isHiddenNodesEnabled,
+                        gridSize = grid.gridSize,
+                        currentSort = grid.currentSort,
+                        selectedPeriod = period,
+                        periodCards = cards.forPeriod(period),
                     )
             }
         }
@@ -248,6 +263,148 @@ class TimelineRevampViewModel @Inject constructor(
                 viewModelScope,
                 TimelineRevampUiState.Loading,
             )
+    }
+
+    /**
+     * The Year and Month summary cards (with their thumbnails). Built lazily the first time a card
+     * period is selected for the current [currentFilter], then reused while that filter/sort holds —
+     * toggling between periods does not rebuild them. Rebuilt only when the filter or sort changes,
+     * mirroring the grid's one-shot load in [monitorTimelineSections]: neither reflects media added
+     * mid-session until the filter or sort changes (or the screen reloads).
+     *
+     * The Year and Month queries are independent, so they run concurrently.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val periodCards: StateFlow<PeriodCards> by lazy(LazyThreadSafetyMode.NONE) {
+        combine(currentFilter, sortOptionsFlow) { filter, sort -> filter to sort }
+            .flatMapLatest { (filter, sort) ->
+                selectedTimePeriodFlow
+                    .map { it.isCardPeriod() }
+                    .distinctUntilChanged()
+                    .filter { it }
+                    .take(1)
+                    .map {
+                        coroutineScope {
+                            val yearCards = async {
+                                buildPeriodCards(
+                                    period = MediaTimePeriod.Years,
+                                    filter = filter.copy(granularity = Granularity.Year),
+                                    order = sort.sortOrder,
+                                )
+                            }
+                            val monthCards = async {
+                                buildPeriodCards(
+                                    period = MediaTimePeriod.Months,
+                                    filter = filter.copy(granularity = Granularity.Month),
+                                    order = sort.sortOrder,
+                                )
+                            }
+                            PeriodCards(
+                                yearCards = yearCards.await(),
+                                monthCards = monthCards.await(),
+                            )
+                        }
+                    }
+                    .onStart { emit(PeriodCards.Empty) }
+            }
+            .asUiStateFlow(viewModelScope, PeriodCards.Empty)
+    }
+
+    /**
+     * Builds the summary cards for [period] by querying the timeline sections at the matching
+     * granularity and resolving one representative node (for the thumbnail) per section. Returns an
+     * empty list for periods without a card view.
+     */
+    private suspend fun buildPeriodCards(
+        period: MediaTimePeriod,
+        filter: MediaTimelineFilter,
+        order: SortOrder,
+    ): List<PhotosNodeListCard> {
+        val periodSections = runCatching {
+            getMediaTimelineSectionsUseCase(filter, order)
+        }.getOrDefault(emptyList())
+
+        return periodSections.mapNotNull { section ->
+            val representativeNode = runCatching {
+                listMediaNodesByOffsetUseCase(
+                    filter = filter,
+                    section = section,
+                    order = order,
+                    maxElements = 1,
+                    offset = 0L,
+                )
+            }.getOrNull()
+                ?.firstOrNull()
+                ?: return@mapNotNull null
+
+            buildPeriodCard(period, section, representativeNode)
+        }
+    }
+
+    private fun buildPeriodCard(
+        period: MediaTimePeriod,
+        section: MediaTimelineSection,
+        node: TypedFileNode,
+    ): PhotosNodeListCard {
+        val zonedDateTime = TimelineDateCache.get(node.modificationTime)
+        val isCurrentYear = zonedDateTime.year == Year.now().value
+        val cardPeriod: PhotosNodeListCardPeriod
+        val formattedDate: String
+        when (period) {
+            MediaTimePeriod.Years -> {
+                cardPeriod = PhotosNodeListCardPeriod.Year
+                formattedDate = TimelineFormatters.year.format(zonedDateTime)
+            }
+
+            else -> {
+                cardPeriod = PhotosNodeListCardPeriod.Month
+                formattedDate = if (isCurrentYear) {
+                    TimelineFormatters.month.format(zonedDateTime)
+                } else {
+                    TimelineFormatters.monthYear.format(zonedDateTime)
+                }
+            }
+        }
+        return PhotosNodeListCard(
+            period = cardPeriod,
+            key = node.id.longValue,
+            id = node.id.longValue,
+            day = zonedDateTime.dayOfMonth,
+            month = zonedDateTime.monthValue,
+            year = zonedDateTime.year,
+            formattedDate = formattedDate,
+            thumbnailFilePath = node.thumbnailPath,
+            previewFilePath = node.previewPath,
+            extension = node.type.extension,
+            isSensitive = node.isMarkedSensitive || node.isSensitiveInherited,
+            count = section.count.toInt(),
+        )
+    }
+
+    private fun MediaTimePeriod.isCardPeriod(): Boolean =
+        this == MediaTimePeriod.Years || this == MediaTimePeriod.Months
+
+    private data class GridBundle(
+        val sectionsState: SectionsState,
+        val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
+        val isHiddenNodesEnabled: Boolean,
+        val gridSize: TimelineGridSize,
+        val currentSort: TimelineTabSortOptions,
+    )
+
+    private data class PeriodCards(
+        val yearCards: List<PhotosNodeListCard>,
+        val monthCards: List<PhotosNodeListCard>,
+    ) {
+        fun forPeriod(period: MediaTimePeriod): List<PhotosNodeListCard> = when (period) {
+            MediaTimePeriod.Years -> yearCards
+            MediaTimePeriod.Months -> monthCards
+            else -> emptyList()
+        }
+
+        companion object {
+            val Empty = PeriodCards(emptyList(), emptyList())
+        }
     }
 
     /**
@@ -299,6 +456,8 @@ class TimelineRevampViewModel @Inject constructor(
         isHiddenNodesEnabled: Boolean,
         gridSize: TimelineGridSize,
         currentSort: TimelineTabSortOptions,
+        selectedPeriod: MediaTimePeriod,
+        periodCards: List<PhotosNodeListCard>,
     ): TimelineRevampUiState =
         if (sections.isEmpty()) {
             TimelineRevampUiState.Empty
@@ -310,6 +469,8 @@ class TimelineRevampViewModel @Inject constructor(
                 isHiddenNodesEnabled = isHiddenNodesEnabled,
                 gridSize = gridSize,
                 currentSort = currentSort,
+                selectedPeriod = selectedPeriod,
+                periodCards = periodCards,
             )
         }
 
@@ -319,7 +480,9 @@ class TimelineRevampViewModel @Inject constructor(
      */
     private sealed interface SectionsState {
         data object Loading : SectionsState
-        data class Loaded(val sections: List<MediaTimelineSection>) : SectionsState
+        data class Loaded(
+            val sections: List<MediaTimelineSection>,
+        ) : SectionsState
     }
 
     /**
@@ -509,10 +672,11 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * Updates the selected media time period. Hoisted state, so it does not trigger a UI-state rebuild.
+     * Updates the selected media time period, switching between the flat day-level grid and the
+     * Year / Month summary-card views.
      */
     fun onMediaTimePeriodSelected(value: MediaTimePeriod) {
-        selectedTimePeriod = value
+        selectedTimePeriodFlow.update { value }
     }
 
     /**

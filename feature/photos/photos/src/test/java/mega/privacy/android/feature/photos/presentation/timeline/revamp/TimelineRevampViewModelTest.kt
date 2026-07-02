@@ -11,6 +11,7 @@ import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import kotlinx.coroutines.test.advanceUntilIdle
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.NodeId
@@ -35,6 +36,7 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineFilterUiState
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineTabSortOptions
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
 import mega.privacy.android.feature.photos.presentation.timeline.revamp.mapper.MediaTimelineNodeUiItemMapper
 import org.junit.jupiter.api.Test
@@ -46,6 +48,7 @@ import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEve
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -274,11 +277,11 @@ internal class TimelineRevampViewModelTest {
     fun `test that selectedTimePeriod defaults to All and updates on selection`() = runTest {
         initUnderTest()
 
-        assertThat(underTest.selectedTimePeriod).isEqualTo(MediaTimePeriod.All)
+        assertThat(underTest.selectedTimePeriod.value).isEqualTo(MediaTimePeriod.All)
 
         underTest.onMediaTimePeriodSelected(MediaTimePeriod.Months)
 
-        assertThat(underTest.selectedTimePeriod).isEqualTo(MediaTimePeriod.Months)
+        assertThat(underTest.selectedTimePeriod.value).isEqualTo(MediaTimePeriod.Months)
     }
 
     @Test
@@ -653,6 +656,75 @@ internal class TimelineRevampViewModelTest {
             maxElements = any(),
             offset = any(),
         )
+    }
+
+    @Test
+    fun `test that selecting the Years period queries Year-granularity sections for the year cards`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+            initUnderTest()
+
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                underTest.onMediaTimePeriodSelected(MediaTimePeriod.Years)
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase).invoke(
+                eq(DEFAULT_FILTER.copy(granularity = MediaTimelineFilter.Granularity.Year)),
+                any(),
+            )
+        }
+
+    @Test
+    fun `test that selecting the Months period queries Month-granularity sections for the month cards`() =
+        runTest {
+            whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(emptyList())
+            initUnderTest()
+
+            underTest.uiState.test {
+                awaitItem()
+                advanceUntilIdle()
+                underTest.onMediaTimePeriodSelected(MediaTimePeriod.Months)
+                advanceUntilIdle()
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(getMediaTimelineSectionsUseCase).invoke(
+                eq(DEFAULT_FILTER.copy(granularity = MediaTimelineFilter.Granularity.Month)),
+                any(),
+            )
+        }
+
+    @Test
+    fun `test that selecting the Years period exposes the year cards in uiState`() = runTest {
+        whenever(getMediaTimelineSectionsUseCase(any(), any()))
+            .thenReturn(listOf(section(groupId = "2026", count = 5)))
+        val fileType = StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg")
+        val node = mock<TypedFileNode> {
+            on { modificationTime } doReturn 0L
+            on { id } doReturn NodeId(1L)
+            on { thumbnailPath } doReturn null
+            on { previewPath } doReturn null
+            on { type } doReturn fileType
+            on { isMarkedSensitive } doReturn false
+            on { isSensitiveInherited } doReturn false
+        }
+        whenever(listMediaNodesByOffsetUseCase(any(), any(), any(), any(), any()))
+            .thenReturn(listOf(node))
+        initUnderTest()
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            underTest.onMediaTimePeriodSelected(MediaTimePeriod.Years)
+            var data = awaitItem()
+            while (data.periodCards.isEmpty()) data = awaitItem()
+            assertThat(data.selectedPeriod).isEqualTo(MediaTimePeriod.Years)
+            assertThat(data.periodCards).hasSize(1)
+            assertThat(data.periodCards.first().period).isEqualTo(PhotosNodeListCardPeriod.Year)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun section(groupId: String, count: Long) =

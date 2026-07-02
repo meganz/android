@@ -181,6 +181,7 @@ class MediaMainScreenAnalyticsTest {
                     onCUBannerDismissRequest = {},
                     onNavigateToUpgradeAccount = {},
                     onMediaTimePeriodSelected = {},
+                    onTimelineRevampMediaTimePeriodSelected = {},
                     onNavigateToCameraUploadsProgressScreen = {},
                     onUpdateVideosSearchQuery = {},
                     onUpdatePlaylistSearchQuery = {},
