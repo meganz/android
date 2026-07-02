@@ -25,10 +25,7 @@ class UpdatePasscodeStateUseCase @Inject constructor(
 
         when (val timeOut = passcodeRepository.monitorPasscodeTimeOut().firstOrNull()) {
             PasscodeTimeout.Immediate -> {
-                if (isConfigurationChanged) checkTimeSpan(
-                    currentTime,
-                    CONFIGURATION_CHANGE_GRACE_MILLISECONDS
-                ) else passcodeRepository.setLocked(true)
+                if (!isConfigurationChanged) passcodeRepository.setLocked(true)
             }
 
             is PasscodeTimeout.TimeSpan -> {
@@ -60,8 +57,4 @@ class UpdatePasscodeStateUseCase @Inject constructor(
         currentTime: Long,
         timeOutMilliseconds: Long,
     ) = lastPaused != null && currentTime - lastPaused >= timeOutMilliseconds
-
-    companion object {
-        internal const val CONFIGURATION_CHANGE_GRACE_MILLISECONDS: Long = 700
-    }
 }
