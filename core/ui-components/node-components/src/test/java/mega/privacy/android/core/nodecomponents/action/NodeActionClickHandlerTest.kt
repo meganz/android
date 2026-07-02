@@ -124,8 +124,8 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
-import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
+import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.After
 import org.junit.Before
@@ -1176,7 +1176,7 @@ class NodeActionClickHandlerTest {
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
 
-        verify(mockNavigationHandler).navigate(FileInfoNavKey(handle = 123L))
+        verify(mockNavigationHandler).navigate(FileInfoNavKey(nodeHandle = 123L))
     }
 
     @Test

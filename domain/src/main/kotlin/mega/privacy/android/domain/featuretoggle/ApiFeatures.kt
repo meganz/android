@@ -22,6 +22,15 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Enables file info revamp
+     */
+    FileInfoRevamp(
+        "ff_aflin",
+        "Enable file info revamp",
+        false,
+    ),
+
+    /**
      * Enable video player revamp public link
      */
     VideoPlayerRevampPublicLink(

@@ -232,6 +232,7 @@ dependencies {
     implementation(project(":feature:sync"))
     implementation(project(":feature:text-editor:text-editor"))
     implementation(project(":feature:pdfviewer"))
+    implementation(project(":feature:file-info"))
     implementation(project(":feature:sign-in-external"))
     implementation(project(":feature:devicecenter"))
     implementation(project(":feature:cloudexplorer"))

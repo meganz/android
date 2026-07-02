@@ -155,7 +155,7 @@ data class TestPasswordNavKey(
 data class OfflineInfoNavKey(val handle: String) : NavKey
 
 @Serializable
-data class FileInfoNavKey(val handle: Long) : NavKey
+data class LegacyFileInfoNavKey(val handle: Long) : NavKey
 
 @Serializable
 data class AuthenticityCredentialsNavKey(

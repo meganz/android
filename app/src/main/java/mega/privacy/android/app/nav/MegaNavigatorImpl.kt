@@ -802,7 +802,7 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openFileInfoActivity(context: Context, handle: Long) {
         navigateForSingleActivity(
             context = context,
-            singleActivityDestination = FileInfoNavKey(handle = handle)
+            singleActivityDestination = FileInfoNavKey(nodeHandle = handle)
         )
     }
 

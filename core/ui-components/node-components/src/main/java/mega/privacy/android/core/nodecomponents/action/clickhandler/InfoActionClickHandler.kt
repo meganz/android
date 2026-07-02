@@ -21,7 +21,7 @@ class InfoActionClickHandler @Inject constructor(
             // For offline files, navigate to OfflineInfoNavKey
             provider.navigationHandler?.navigate(OfflineInfoNavKey(handle = node.id.longValue.toString()))
         } else if (provider.navigationHandler != null) {
-            provider.navigationHandler.navigate(FileInfoNavKey(handle = node.id.longValue))
+            provider.navigationHandler.navigate(FileInfoNavKey(nodeHandle = node.id.longValue))
         } else {
             megaNavigator.openFileInfoActivity(
                 context = provider.context,

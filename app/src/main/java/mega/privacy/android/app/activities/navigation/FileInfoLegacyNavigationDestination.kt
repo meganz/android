@@ -8,7 +8,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
-import mega.privacy.android.navigation.destination.FileInfoNavKey
+import mega.privacy.android.navigation.destination.LegacyFileInfoNavKey
 
 /**
  * Navigation destination for FileInfo screen.
@@ -22,7 +22,7 @@ import mega.privacy.android.navigation.destination.FileInfoNavKey
 fun EntryProviderScope<NavKey>.fileInfoScreen(
     removeDestination: () -> Unit,
 ) {
-    entry<FileInfoNavKey>(
+    entry<LegacyFileInfoNavKey>(
         metadata = transparentMetadata()
     ) { args ->
         val context = LocalContext.current
