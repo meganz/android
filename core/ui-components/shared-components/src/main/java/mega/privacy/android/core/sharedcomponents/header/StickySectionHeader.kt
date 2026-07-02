@@ -3,6 +3,7 @@ package mega.privacy.android.core.sharedcomponents.header
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,14 +33,15 @@ fun StickySectionHeader(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .height(36.dp)
             .background(DSTokens.colors.background.pageBackground)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(DSTokens.spacings.s3),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         MegaText(
             modifier = Modifier.weight(1f),
             text = title,
-            style = AppTheme.typography.titleMedium,
+            style = AppTheme.typography.titleSmall,
             textColor = TextColor.Primary,
         )
 

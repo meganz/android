@@ -122,11 +122,15 @@ fun MediaMainRoute(
         ),
     videosTabViewModel: VideosTabViewModel = hiltViewModel(),
     videoPlaylistsTabViewModel: VideoPlaylistsTabViewModel = hiltViewModel(),
+    mediaMainViewModel: MediaMainViewModel = hiltViewModel(),
 ) {
     val albumsTabUiState by albumsTabViewModel.uiState.collectAsStateWithLifecycle()
     val timelineTabUiState by timelineViewModel.uiState.collectAsStateWithLifecycle()
     val timelineRevampUiState by timelineRevampViewModel.uiState.collectAsStateWithLifecycle()
+    val mediaMainUiState by mediaMainViewModel.uiState.collectAsStateWithLifecycle()
+    val isTimelineRevampEnabled = mediaMainUiState.isTimelineRevampEnabled == true
     val selectedPhotosInTypedNodes by timelineViewModel.selectedPhotosInTypedNodesFlow.collectAsStateWithLifecycle()
+    val timelineRevampSelectedPhotosInTypedNodes by timelineRevampViewModel.selectedPhotosInTypedNodesFlow.collectAsStateWithLifecycle()
     val timelineTabActionUiState by timelineViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineRevampActionUiState by timelineRevampViewModel.actionUiState.collectAsStateWithLifecycle()
     val timelineFilterUiState by timelineViewModel.filterUiState.collectAsStateWithLifecycle()
@@ -210,10 +214,13 @@ fun MediaMainRoute(
 
     LaunchedEffect(timelineSelectedPhotoIds.size) {
         if (timelineSelectedPhotoIds.isNotEmpty()) {
+            val selectedNodes = if (isTimelineRevampEnabled) {
+                timelineRevampViewModel.retrieveTypedNodeFromSelection(timelineSelectedPhotoIds)
+            } else {
+                timelineViewModel.retrieveTypedNodeFromSelection(timelineSelectedPhotoIds)
+            }
             nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
-                selectedNodes = timelineViewModel
-                    .retrieveTypedNodeFromSelection(selectedIds = timelineSelectedPhotoIds)
-                    .toSet(),
+                selectedNodes = selectedNodes.toSet(),
                 nodeSourceType = NodeSourceType.TIMELINE,
             )
         }
@@ -311,7 +318,10 @@ fun MediaMainRoute(
         selectionModeType = selectionModeType,
         selectedTimePeriod = timelineViewModel.selectedTimePeriod,
         showTimelineFilter = showTimelineFilter,
-        selectedPhotosInTypedNode = { selectedPhotosInTypedNodes },
+        selectedPhotosInTypedNode = {
+            if (isTimelineRevampEnabled) timelineRevampSelectedPhotosInTypedNodes
+            else selectedPhotosInTypedNodes
+        },
         setEnableCUPage = { shouldShow ->
             mediaCameraUploadViewModel.shouldEnableCUPage(
                 mediaSource = timelineFilterUiState.mediaSource,
@@ -459,6 +469,13 @@ fun MediaMainScreen(
         if (isTimelineRevampEnabled) onTimelineRevampSortOptionChange else onTimelineSortOptionChange
     val effectiveOnMediaTimePeriodSelected =
         if (isTimelineRevampEnabled) onTimelineRevampMediaTimePeriodSelected else onMediaTimePeriodSelected
+    val effectiveCurrentSort =
+        if (isTimelineRevampEnabled) {
+            (timelineRevampUiState as? TimelineRevampUiState.Data)?.currentSort
+                ?: TimelineTabSortOptions.Newest
+        } else {
+            timelineTabUiState.currentSort
+        }
 
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -672,9 +689,9 @@ fun MediaMainScreen(
                                             onNavigateToTimelinePhotoPreview(
                                                 MediaTimelinePhotoPreviewNavKey(
                                                     id = it,
-                                                    sortType = timelineTabUiState.currentSort.toLegacySort().name,
-                                                    filterType = timelineFilterUiState.mediaType.name,
-                                                    mediaSource = timelineFilterUiState.mediaSource.toLegacyPhotosSource().name
+                                                    sortType = effectiveCurrentSort.toLegacySort().name,
+                                                    filterType = effectiveTimelineFilterUiState.mediaType.name,
+                                                    mediaSource = effectiveTimelineFilterUiState.mediaSource.toLegacyPhotosSource().name
                                                 )
                                             )
                                         }
@@ -796,7 +813,17 @@ private fun MediaScreen.MediaContent(
                             onZoomIn = onTimelineRevampZoomIn,
                             onZoomOut = onTimelineRevampZoomOut,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
-                            onNodeClicked = onTimelineRevampNodeClicked,
+                            onNodeClicked = { node ->
+                                when {
+                                    node == null -> Unit
+                                    // Taken-down nodes raise the dispute dialog instead of opening.
+                                    node.isTakenDown -> onTimelineRevampNodeClicked(node)
+                                    // Otherwise reuse the shared tab handler (select or open preview).
+                                    else -> onTimelinePhotoClick(node.id)
+                                }
+                            },
+                            onNodeSelected = { node -> onTimelinePhotoSelected(node.id) },
+                            selectedPhotoIds = selectedPhotoIds,
                             onTakenDownDialogEventConsumed = onTimelineRevampTakenDownDialogConsumed,
                         )
 

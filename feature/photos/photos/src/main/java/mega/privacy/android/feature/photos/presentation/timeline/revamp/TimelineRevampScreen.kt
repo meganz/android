@@ -74,6 +74,8 @@ internal fun TimelineRevampScreen(
     onZoomOut: () -> Unit,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
+    onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    selectedPhotoIds: Set<Long>,
     onTakenDownDialogEventConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -114,6 +116,8 @@ internal fun TimelineRevampScreen(
                 onZoomOut = onZoomOut,
                 onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                 onNodeClicked = onNodeClicked,
+                onNodeSelected = onNodeSelected,
+                selectedPhotoIds = selectedPhotoIds,
                 modifier = modifier,
             )
         }
@@ -142,6 +146,8 @@ private fun TimelineRevampContent(
     onZoomOut: () -> Unit,
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
+    onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    selectedPhotoIds: Set<Long>,
     modifier: Modifier = Modifier,
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -227,6 +233,8 @@ private fun TimelineRevampContent(
                 onZoomIn = onZoomIn,
                 onZoomOut = onZoomOut,
                 onNodeClicked = onNodeClicked,
+                onNodeSelected = onNodeSelected,
+                selectedPhotoIds = selectedPhotoIds,
                 modifier = modifier,
             )
         }
@@ -248,6 +256,8 @@ private fun TimelineRevampGrid(
     onZoomIn: () -> Unit,
     onZoomOut: () -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
+    onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    selectedPhotoIds: Set<Long>,
     modifier: Modifier = Modifier,
 ) {
     NotifyVisibleMediaRange(
@@ -329,9 +339,11 @@ private fun TimelineRevampGrid(
                         modifier = Modifier
                             .animateItem()
                             .padding(all = 1.dp),
+                        isSelected = node != null && node.id in selectedPhotoIds,
                         shouldShowFavourite = node?.isFavourite == true,
                         isHiddenNodesEnabled = isHiddenNodesEnabled,
                         onClick = { onNodeClicked(node) },
+                        onLongClick = { node?.let(onNodeSelected) },
                     )
                 }
             }
@@ -575,6 +587,8 @@ private fun TimelineRevampScreenPreview() {
             onZoomOut = {},
             onMediaTimePeriodSelected = {},
             onNodeClicked = {},
+            onNodeSelected = {},
+            selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
         )
     }
@@ -592,6 +606,8 @@ private fun TimelineRevampEmptyPreview() {
             onZoomOut = {},
             onMediaTimePeriodSelected = {},
             onNodeClicked = {},
+            onNodeSelected = {},
+            selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
         )
     }

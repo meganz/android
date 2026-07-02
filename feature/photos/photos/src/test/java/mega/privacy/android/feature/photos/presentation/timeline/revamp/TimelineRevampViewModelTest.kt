@@ -16,9 +16,11 @@ import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
@@ -72,6 +74,7 @@ internal class TimelineRevampViewModelTest {
     private val getCameraUploadFolderHandlesUseCase = mock<GetCameraUploadFolderHandlesUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
+    private val getNodeListByIdsUseCase = mock<GetNodeListByIdsUseCase>()
 
     private suspend fun initUnderTest(
         filterUiState: TimelineFilterUiState = TimelineFilterUiState(),
@@ -95,6 +98,7 @@ internal class TimelineRevampViewModelTest {
             getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            getNodeListByIdsUseCase = getNodeListByIdsUseCase,
         )
     }
 
@@ -725,6 +729,42 @@ internal class TimelineRevampViewModelTest {
             assertThat(data.periodCards.first().period).isEqualTo(PhotosNodeListCardPeriod.Year)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test that retrieveTypedNodeFromSelection resolves ids to typed nodes and exposes them`() =
+        runTest {
+            val nodes = listOf(mock<TypedNode>(), mock<TypedNode>())
+            whenever(getNodeListByIdsUseCase(any())).thenReturn(nodes)
+            initUnderTest()
+
+            val result = underTest.retrieveTypedNodeFromSelection(setOf(1L, 2L))
+
+            assertThat(result).isEqualTo(nodes)
+            assertThat(underTest.selectedPhotosInTypedNodesFlow.value).isEqualTo(nodes)
+            verify(getNodeListByIdsUseCase).invoke(listOf(NodeId(1L), NodeId(2L)))
+        }
+
+    @Test
+    fun `test that retrieveTypedNodeFromSelection clears the exposed nodes when selection is empty`() =
+        runTest {
+            whenever(getNodeListByIdsUseCase(any())).thenReturn(emptyList())
+            initUnderTest()
+
+            val result = underTest.retrieveTypedNodeFromSelection(emptySet())
+
+            assertThat(result).isEmpty()
+            assertThat(underTest.selectedPhotosInTypedNodesFlow.value).isEmpty()
+        }
+
+    @Test
+    fun `test that retrieveTypedNodeFromSelection returns empty when the fetch fails`() = runTest {
+        whenever(getNodeListByIdsUseCase(any())).thenThrow(RuntimeException("boom"))
+        initUnderTest()
+
+        val result = underTest.retrieveTypedNodeFromSelection(setOf(1L))
+
+        assertThat(result).isEmpty()
     }
 
     private fun section(groupId: String, count: Long) =

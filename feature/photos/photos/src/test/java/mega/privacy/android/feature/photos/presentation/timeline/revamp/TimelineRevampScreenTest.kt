@@ -138,6 +138,8 @@ class TimelineRevampScreenTest {
                 onZoomOut = {},
                 onMediaTimePeriodSelected = {},
                 onNodeClicked = {},
+                onNodeSelected = {},
+                selectedPhotoIds = emptySet(),
                 onTakenDownDialogEventConsumed = {},
             )
         }

@@ -40,8 +40,10 @@ import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Sensitivity
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadFolderHandlesUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
@@ -95,6 +97,7 @@ class TimelineRevampViewModel @Inject constructor(
     private val getCameraUploadFolderHandlesUseCase: GetCameraUploadFolderHandlesUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
+    private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase,
 ) : ViewModel() {
 
     private val sections = MutableStateFlow<List<MediaTimelineSection>>(emptyList())
@@ -134,6 +137,14 @@ class TimelineRevampViewModel @Inject constructor(
      */
     private val selectedTimePeriodFlow = MutableStateFlow(MediaTimePeriod.All)
     val selectedTimePeriod: StateFlow<MediaTimePeriod> = selectedTimePeriodFlow.asStateFlow()
+
+    /**
+     * The currently-selected media resolved to [TypedNode]s, for the selection-mode node actions.
+     * Unlike the tab (which filters an in-memory list), the revamp fetches them by id on demand.
+     */
+    private val _selectedPhotosInTypedNodesFlow = MutableStateFlow<List<TypedNode>>(emptyList())
+    internal val selectedPhotosInTypedNodesFlow: StateFlow<List<TypedNode>> =
+        _selectedPhotosInTypedNodesFlow.asStateFlow()
 
     private val selectedFilterFlow = MutableStateFlow<Map<String, String?>?>(null)
 
@@ -677,6 +688,18 @@ class TimelineRevampViewModel @Inject constructor(
      */
     fun onMediaTimePeriodSelected(value: MediaTimePeriod) {
         selectedTimePeriodFlow.update { value }
+    }
+
+    /**
+     * Resolves the given selected media ids to [TypedNode]s (fetched by id, since the revamp does not
+     * hold all nodes in memory), publishes them to [selectedPhotosInTypedNodesFlow], and returns them.
+     */
+    internal suspend fun retrieveTypedNodeFromSelection(selectedIds: Set<Long>): List<TypedNode> {
+        val nodes = runCatching { getNodeListByIdsUseCase(selectedIds.map { NodeId(it) }) }
+            .onFailure { Timber.e(it, "Failed to resolve selected nodes") }
+            .getOrDefault(emptyList())
+        _selectedPhotosInTypedNodesFlow.update { nodes }
+        return nodes
     }
 
     /**
