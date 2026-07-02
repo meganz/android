@@ -23,7 +23,9 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
+import mega.privacy.android.app.presentation.contact.AddContactToShareComposeActivity
 import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
+import mega.privacy.android.app.presentation.contact.navigation.intValue
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
@@ -98,6 +100,7 @@ import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -605,6 +608,40 @@ internal class MegaNavigatorImpl @Inject constructor(
                 putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, parentId?.longValue ?: -1L)
             }
         )
+    }
+
+    override fun openAddContactToShare(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        contactType: AddContactToShareNavKey.ContactType,
+        nodeHandles: List<Long>,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddContactToShareComposeActivity.getIntent(
+                    context = context,
+                    contactType = contactType,
+                    nodeHandles = nodeHandles,
+                )
+            } else {
+                Intent(context, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, contactType.intValue)
+                    if (nodeHandles.size == 1) {
+                        putExtra(AddContactActivity.EXTRA_NODE_HANDLE, nodeHandles.first())
+                        putExtra(AddContactActivity.EXTRA_MULTISELECT, 0)
+                    } else if (nodeHandles.size > 1) {
+                        putExtra(AddContactActivity.EXTRA_NODE_HANDLE, nodeHandles.toLongArray())
+                        putExtra(AddContactActivity.EXTRA_MULTISELECT, 1)
+                    }
+                }
+            }
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
     }
 
     override fun openSyncMegaFolder(context: Context, handle: Long) {

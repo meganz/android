@@ -17,9 +17,7 @@ class FileContactFeatureDestination : FeatureDestination {
                 resultFlow = navigationHandler::monitorResult,
                 clearResults = navigationHandler::clearResult
             )
-            addContactLegacyDestination(
-                returnResult = navigationHandler::returnResult,
-            )
+            addContactLegacyDestination(navigationHandler = navigationHandler)
             contactInfoLegacyDestination(
                 removeDestination = navigationHandler::back
             )

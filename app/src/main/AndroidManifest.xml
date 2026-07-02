@@ -387,6 +387,9 @@
             android:name=".presentation.contact.AddParticipantsComposeActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity
+            android:name=".presentation.contact.AddContactToShareComposeActivity"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity
             android:name=".presentation.contact.invite.InviteContactActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity

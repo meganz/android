@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import java.io.File
 
@@ -313,6 +314,24 @@ interface AppNavigator {
         initialUri: Uri? = null,
         isUpload: Boolean = false,
         parentId: NodeId? = null,
+    )
+
+    /**
+     * Opens the "add contacts to a shared folder" picker for a result. Behind
+     * `ContactsComposeUI`, launches the Compose picker (with phone contacts) when the flag is on
+     * and the legacy add-contact screen when it is off; both return the legacy result shape into
+     * [launcher].
+     *
+     * @param context the launching context.
+     * @param launcher the caller's result launcher receiving the picker's Activity result.
+     * @param contactType the contact source to surface in the picker.
+     * @param nodeHandles the handle(s) of the folder(s) being shared.
+     */
+    fun openAddContactToShare(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        contactType: AddContactToShareNavKey.ContactType,
+        nodeHandles: List<Long>,
     )
 
     /**
