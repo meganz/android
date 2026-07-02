@@ -49,13 +49,13 @@ class CheckNodesNameCollisionUseCase @Inject constructor(
                     parentNodeId = NodeId(parentNodeHandle),
                     name = currentNode.name
                 )?.takeUnless { conflictNode ->
-                    // A node never collides with itself, and for a MOVE a node
-                    // already living in the target folder is being moved to its
-                    // current location. Neither is a real collision (AND-23958);
-                    // resolving such a "collision" would delete the user's file.
-                    conflictNode.id == currentNode.id ||
-                            (type == NodeNameCollisionType.MOVE
-                                    && currentNode.parentId.longValue == parentNodeHandle)
+                    // A MOVE of a node to the folder it already lives in is a no-op,
+                    // not a real collision (AND-23958); resolving it would delete the
+                    // user's file. A COPY to the same folder, by contrast, is a real
+                    // collision that must auto-rename into a duplicate (T21388935), so
+                    // only skip the collision for MOVE.
+                    type == NodeNameCollisionType.MOVE
+                            && currentNode.parentId.longValue == parentNodeHandle
                 }?.let { conflictNode ->
                     conflictNodes[nodeHandle] = createNodeNameCollision(
                         currentNode = currentNode,
