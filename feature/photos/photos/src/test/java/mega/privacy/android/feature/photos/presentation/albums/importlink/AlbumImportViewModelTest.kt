@@ -19,6 +19,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
@@ -239,6 +241,67 @@ class AlbumImportViewModelTest {
 
             verify(mockGetPublicAlbumUseCase).invoke(albumLink = AlbumLink(link))
             verifyNoInteractions(mockMonitorFetchNodesFinishUseCase)
+        }
+
+    @Test
+    fun `test that isAvailableStorageCollected stays false when account detail has null storage detail`() =
+        runTest {
+            val link = "https://mega.app/collection/handle#key"
+            val album = mock<UserAlbum>()
+
+            whenever(mockHasCredentialsUseCase()).thenReturn(true)
+            whenever(mockRootNodeExistsUseCase()).thenReturn(true)
+            whenever(mockMonitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
+            whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(link)))
+                .thenReturn(album to listOf())
+            whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+                .thenReturn(listOf())
+            whenever(mockGetUserAlbums()).thenReturn(emptyFlow())
+            whenever(mockGetCurrentStorageStateUseCase()).thenReturn(StorageState.Unknown)
+            whenever(mockMonitorAccountDetailUseCase())
+                .thenReturn(flowOf(AccountDetail(storageDetail = null)))
+
+            initUnderTest(albumLink = link)
+            advanceUntilIdle()
+
+            underTest.stateFlow.test {
+                assertThat(awaitItem().isAvailableStorageCollected).isFalse()
+            }
+            assertThat(underTest.availableStorage).isEqualTo(0L)
+        }
+
+    @Test
+    fun `test that isAvailableStorageCollected becomes true and available storage is set when account detail has storage detail`() =
+        runTest {
+            val link = "https://mega.app/collection/handle#key"
+            val album = mock<UserAlbum>()
+            val storageDetail = AccountStorageDetail(
+                usedCloudDrive = 0L,
+                usedRubbish = 0L,
+                usedIncoming = 0L,
+                totalStorage = 1000L,
+                usedStorage = 250L,
+            )
+
+            whenever(mockHasCredentialsUseCase()).thenReturn(true)
+            whenever(mockRootNodeExistsUseCase()).thenReturn(true)
+            whenever(mockMonitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
+            whenever(mockGetPublicAlbumUseCase(albumLink = AlbumLink(link)))
+                .thenReturn(album to listOf())
+            whenever(mockGetPublicAlbumPhotoUseCase(albumPhotoIds = listOf()))
+                .thenReturn(listOf())
+            whenever(mockGetUserAlbums()).thenReturn(emptyFlow())
+            whenever(mockGetCurrentStorageStateUseCase()).thenReturn(StorageState.Unknown)
+            whenever(mockMonitorAccountDetailUseCase())
+                .thenReturn(flowOf(AccountDetail(storageDetail = storageDetail)))
+
+            initUnderTest(albumLink = link)
+            advanceUntilIdle()
+
+            underTest.stateFlow.test {
+                assertThat(awaitItem().isAvailableStorageCollected).isTrue()
+            }
+            assertThat(underTest.availableStorage).isEqualTo(750L)
         }
 
     @Test

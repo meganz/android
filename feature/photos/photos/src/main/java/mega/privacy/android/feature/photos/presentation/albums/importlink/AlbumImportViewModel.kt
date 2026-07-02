@@ -585,7 +585,8 @@ class AlbumImportViewModel @AssistedInject constructor(
         .launchIn(viewModelScope)
 
     private fun handleAccountDetail(accountDetail: AccountDetail) {
-        availableStorage = accountDetail.storageDetail?.availableSpace ?: 0L
+        val storageDetail = accountDetail.storageDetail ?: return
+        availableStorage = storageDetail.availableSpace
 
         state.update {
             it.copy(isAvailableStorageCollected = true)
