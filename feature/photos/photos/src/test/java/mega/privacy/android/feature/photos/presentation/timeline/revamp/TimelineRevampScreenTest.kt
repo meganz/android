@@ -144,6 +144,7 @@ class TimelineRevampScreenTest {
                 onMediaTimePeriodSelected = {},
                 onNodeClicked = {},
                 onNodeSelected = {},
+                onScrollingChanged = {},
                 selectedPhotoIds = emptySet(),
                 onTakenDownDialogEventConsumed = {},
                 clearCameraUploadsCompletedMessage = {},

@@ -82,6 +82,7 @@ internal fun TimelineRevampScreen(
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    onScrollingChanged: (Boolean) -> Unit,
     selectedPhotoIds: Set<Long>,
     onTakenDownDialogEventConsumed: () -> Unit,
     clearCameraUploadsCompletedMessage: () -> Unit,
@@ -148,6 +149,7 @@ internal fun TimelineRevampScreen(
                 onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
+                onScrollingChanged = onScrollingChanged,
                 selectedPhotoIds = selectedPhotoIds,
                 bannerContent = if (selectedPhotoIds.isEmpty()) {
                     {
@@ -195,6 +197,7 @@ private fun TimelineRevampContent(
     onMediaTimePeriodSelected: (MediaTimePeriod) -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    onScrollingChanged: (Boolean) -> Unit,
     selectedPhotoIds: Set<Long>,
     modifier: Modifier = Modifier,
     bannerContent: (@Composable () -> Unit)? = null,
@@ -233,8 +236,8 @@ private fun TimelineRevampContent(
             sections.isNotEmpty()
         ) {
             val sectionIndex = sections.indexOfFirst { it.isInMonth(target.year, target.month) }
-            if (sectionIndex >= 0) {
-                lazyGridState.scrollToItem(sectionIndex + sectionStartOffsets[sectionIndex])
+            sectionStartOffsets.getOrNull(sectionIndex)?.let { offset ->
+                lazyGridState.scrollToItem(sectionIndex + offset)
             }
             pendingScroll = null
         }
@@ -283,6 +286,7 @@ private fun TimelineRevampContent(
                 onZoomOut = onZoomOut,
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
+                onScrollingChanged = onScrollingChanged,
                 selectedPhotoIds = selectedPhotoIds,
                 bannerContent = bannerContent,
                 modifier = modifier,
@@ -307,13 +311,28 @@ private fun TimelineRevampGrid(
     onZoomOut: () -> Unit,
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
+    onScrollingChanged: (Boolean) -> Unit,
     selectedPhotoIds: Set<Long>,
     modifier: Modifier = Modifier,
     bannerContent: (@Composable () -> Unit)? = null,
 ) {
+    // Maps a section's groupId to its start offset, to recover a visible item's global index from its
+    // section-relative key (see mediaKey).
+    val offsetByGroupId = remember(sections, sectionStartOffsets) {
+        sections.zip(sectionStartOffsets).associate { (section, offset) ->
+            section.groupId to offset
+        }
+    }
+
     NotifyVisibleMediaRange(
         gridState = lazyGridState,
-        onVisibleRangeChanged = onVisibleRangeChanged
+        offsetByGroupId = offsetByGroupId,
+        onVisibleRangeChanged = onVisibleRangeChanged,
+    )
+
+    ReportScrollInProgress(
+        gridState = lazyGridState,
+        onScrollingChanged = onScrollingChanged,
     )
 
     // Day sections are grouped into month headers: a header is emitted only at each month's first day
@@ -337,10 +356,10 @@ private fun TimelineRevampGrid(
 
     // Recomputes on scroll (reads lazyGridState.layoutInfo, a snapshot state) and is re-created when
     // the section layout or locale changes (the remember keys).
-    val stickyLabel by remember(sections, sectionStartOffsets, locale) {
+    val stickyLabel by remember(sections, sectionStartOffsets, offsetByGroupId, locale) {
         derivedStateOf {
             val visibleMediaIndices = lazyGridState.layoutInfo.visibleItemsInfo
-                .mapNotNull { (it.key as? String)?.removePrefix(MEDIA_KEY_PREFIX)?.toIntOrNull() }
+                .mapNotNull { globalMediaIndexOf(it.key, offsetByGroupId) }
             stickyDayRangeLabel(visibleMediaIndices, sections, sectionStartOffsets, locale)
         }
     }
@@ -397,9 +416,7 @@ private fun TimelineRevampGrid(
                 )
             }
 
-            sections.forEachIndexed { sectionIndex, section ->
-                val base = sectionStartOffsets[sectionIndex]
-
+            sections.zip(sectionStartOffsets).forEachIndexed { sectionIndex, (section, base) ->
                 if (monthStartFlags[sectionIndex] && sectionIndex != 0) {
                     val monthHeaderKey = monthKey(section.startDate)
                     item(
@@ -416,7 +433,7 @@ private fun TimelineRevampGrid(
 
                 items(
                     count = section.count.toInt(),
-                    key = { index -> "$MEDIA_KEY_PREFIX${base + index}" },
+                    key = { index -> mediaKey(section.groupId, index) },
                 ) { index ->
                     val node = loadedNodes[base + index]
                     PhotoNodeBodyV2(
@@ -535,11 +552,6 @@ private fun dayRangeLabel(
     return "$monthName $dayPart ${zonedDateTime.year}"
 }
 
-private fun monthKey(startDateSeconds: Long): String {
-    val date = TimelineDateCache.get(startDateSeconds)
-    return "${date.year}-${date.monthValue}"
-}
-
 @Composable
 private fun TimelineRevampGridSizeMenu(
     gridSize: TimelineGridSize,
@@ -616,12 +628,13 @@ private fun TimelineRevampGridSizeMenu(
 @Composable
 private fun NotifyVisibleMediaRange(
     gridState: LazyGridState,
+    offsetByGroupId: Map<String, Int>,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
 ) {
-    LaunchedEffect(gridState, onVisibleRangeChanged) {
+    LaunchedEffect(gridState, offsetByGroupId, onVisibleRangeChanged) {
         snapshotFlow {
             gridState.layoutInfo.visibleItemsInfo
-                .mapNotNull { (it.key as? String)?.removePrefix(MEDIA_KEY_PREFIX)?.toIntOrNull() }
+                .mapNotNull { globalMediaIndexOf(it.key, offsetByGroupId) }
         }
             .distinctUntilChanged()
             .collect { visibleIndices ->
@@ -629,6 +642,27 @@ private fun NotifyVisibleMediaRange(
                     onVisibleRangeChanged(visibleIndices.min(), visibleIndices.max())
                 }
             }
+    }
+}
+
+/**
+ * Reports whether the grid is actively scrolling, so the ViewModel can hold a silent refresh's
+ * re-layout until the user is at rest.
+ */
+@Composable
+private fun ReportScrollInProgress(
+    gridState: LazyGridState,
+    onScrollingChanged: (Boolean) -> Unit,
+) {
+    LaunchedEffect(gridState, onScrollingChanged) {
+        try {
+            snapshotFlow { gridState.isScrollInProgress }
+                .distinctUntilChanged()
+                .collect(onScrollingChanged)
+        } finally {
+            // To avoid indefinite suspend when leaving composition
+            onScrollingChanged(false)
+        }
     }
 }
 
@@ -644,17 +678,12 @@ private fun timelineMonthLabel(startDateSeconds: Long, locale: Locale): String {
     return DateTimeFormatter.ofPattern(pattern, locale).format(zonedDateTime)
 }
 
-private const val HEADER_KEY_PREFIX = "header_"
-private const val MEDIA_KEY_PREFIX = "media_"
-private const val ENABLE_CU_BANNER = "timeline_revamp_content:banner"
-private const val NON_STICKY_HEADER_ITEM = "timeline_revamp_content:non_sticky_header"
-
-/** Em-dash (U+2014) separating the first and last day in the sticky day-range header. */
 private const val DAY_RANGE_SEPARATOR = "—"
 
 internal const val TIMELINE_REVAMP_CONTENT_GRID_TAG = "timeline_revamp_content:grid"
 internal const val TIMELINE_REVAMP_STICKY_HEADER_TAG = "timeline_revamp_content:sticky_header"
-internal const val TIMELINE_REVAMP_NON_STICKY_HEADER_TAG = "timeline_revamp_content:non_sticky_header"
+internal const val TIMELINE_REVAMP_NON_STICKY_HEADER_TAG =
+    "timeline_revamp_content:non_sticky_header"
 internal const val TIMELINE_REVAMP_CARD_LIST_TAG = "timeline_revamp_content:card_list"
 internal const val TIMELINE_REVAMP_SECTION_HEADER_TAG = "timeline_revamp_content:section_header_"
 internal const val TIMELINE_REVAMP_GRID_SIZE_ICON_TAG = "timeline_revamp_content:grid_size_icon"
@@ -692,6 +721,7 @@ private fun TimelineRevampScreenPreview() {
             onMediaTimePeriodSelected = {},
             onNodeClicked = {},
             onNodeSelected = {},
+            onScrollingChanged = {},
             selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
             mediaCameraUploadUiState = MediaCameraUploadUiState(),
@@ -737,6 +767,7 @@ private fun TimelineRevampWithBannerPreview() {
             onMediaTimePeriodSelected = {},
             onNodeClicked = {},
             onNodeSelected = {},
+            onScrollingChanged = {},
             selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
             mediaCameraUploadUiState = MediaCameraUploadUiState(
@@ -767,6 +798,7 @@ private fun TimelineRevampEmptyPreview() {
             onMediaTimePeriodSelected = {},
             onNodeClicked = {},
             onNodeSelected = {},
+            onScrollingChanged = {},
             selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
             mediaCameraUploadUiState = MediaCameraUploadUiState(),

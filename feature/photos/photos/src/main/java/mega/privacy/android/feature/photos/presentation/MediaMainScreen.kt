@@ -213,12 +213,20 @@ fun MediaMainRoute(
         }
     }
 
-    LaunchedEffect(timelineSelectedPhotoIds.size) {
+    // Re-resolve on selection-size change and, in the revamp, on section changes so deleted nodes drop.
+    val timelineRevampSections =
+        (timelineRevampUiState as? TimelineRevampUiState.Data)?.sections
+    LaunchedEffect(timelineSelectedPhotoIds.size, timelineRevampSections) {
         if (timelineSelectedPhotoIds.isNotEmpty()) {
             val selectedNodes = if (isTimelineRevampEnabled) {
                 timelineRevampViewModel.retrieveTypedNodeFromSelection(timelineSelectedPhotoIds)
             } else {
                 timelineViewModel.retrieveTypedNodeFromSelection(timelineSelectedPhotoIds)
+            }
+            // Drop any selected id whose node no longer exists. Only prune on a non-empty result, so a
+            // transient resolution failure (which also returns empty) never clears the selection.
+            if (isTimelineRevampEnabled && selectedNodes.isNotEmpty()) {
+                timelineSelectedPhotoIds.retainAll(selectedNodes.map { it.id.longValue }.toSet())
             }
             nodeOptionsActionViewModel.updateSelectionModeAvailableActions(
                 selectedNodes = selectedNodes.toSet(),
@@ -321,6 +329,7 @@ fun MediaMainRoute(
         timelineTabUiState = timelineTabUiState,
         timelineRevampUiState = timelineRevampUiState,
         onTimelineRevampVisibleRangeChanged = timelineRevampViewModel::onVisibleRangeChanged,
+        onTimelineRevampScrollingChanged = timelineRevampViewModel::onScrollingChanged,
         onTimelineRevampGridSizeChange = timelineRevampViewModel::onGridSizeChange,
         onTimelineRevampZoomIn = timelineRevampViewModel::onZoomIn,
         onTimelineRevampZoomOut = timelineRevampViewModel::onZoomOut,
@@ -411,6 +420,7 @@ fun MediaMainScreen(
     timelineTabUiState: TimelineTabUiState,
     timelineRevampUiState: TimelineRevampUiState,
     onTimelineRevampVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
+    onTimelineRevampScrollingChanged: (Boolean) -> Unit,
     onTimelineRevampGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineRevampZoomIn: () -> Unit,
     onTimelineRevampZoomOut: () -> Unit,
@@ -684,6 +694,7 @@ fun MediaMainScreen(
                                     timelineTabUiState = timelineTabUiState,
                                     timelineRevampUiState = timelineRevampUiState,
                                     onTimelineRevampVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
+                                    onTimelineRevampScrollingChanged = onTimelineRevampScrollingChanged,
                                     onTimelineRevampGridSizeChange = onTimelineRevampGridSizeChange,
                                     onTimelineRevampZoomIn = onTimelineRevampZoomIn,
                                     onTimelineRevampZoomOut = onTimelineRevampZoomOut,
@@ -789,6 +800,7 @@ private fun MediaScreen.MediaContent(
     timelineTabUiState: TimelineTabUiState,
     timelineRevampUiState: TimelineRevampUiState,
     onTimelineRevampVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
+    onTimelineRevampScrollingChanged: (Boolean) -> Unit,
     onTimelineRevampGridSizeChange: (value: TimelineGridSize) -> Unit,
     onTimelineRevampZoomIn: () -> Unit,
     onTimelineRevampZoomOut: () -> Unit,
@@ -835,6 +847,7 @@ private fun MediaScreen.MediaContent(
                             mediaCameraUploadUiState = mediaCameraUploadUiState,
                             showEnableCameraUploadsPage = showEnableCameraUploadsPage,
                             onVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
+                            onScrollingChanged = onTimelineRevampScrollingChanged,
                             onGridSizeChange = onTimelineRevampGridSizeChange,
                             onZoomIn = onTimelineRevampZoomIn,
                             onZoomOut = onTimelineRevampZoomOut,
@@ -987,6 +1000,7 @@ private fun PhotosMainScreenPreview() {
             timelineTabUiState = TimelineTabUiState(),
             timelineRevampUiState = TimelineRevampUiState.Loading,
             onTimelineRevampVisibleRangeChanged = { _, _ -> },
+            onTimelineRevampScrollingChanged = {},
             onTimelineRevampGridSizeChange = {},
             onTimelineRevampZoomIn = {},
             onTimelineRevampZoomOut = {},
