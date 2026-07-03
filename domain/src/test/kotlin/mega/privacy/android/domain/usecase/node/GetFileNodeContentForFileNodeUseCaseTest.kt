@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -42,6 +43,7 @@ class GetFileNodeContentForFileNodeUseCaseTest {
     private val getFolderLinkNodeContentUriUseCase = mock<GetFolderLinkNodeContentUriUseCase>()
     private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
     private val getPathFromNodeContentUseCase = mock<GetPathFromNodeContentUseCase>()
+    private val getFileTypeInfoByContentUseCase = mock<GetFileTypeInfoByContentUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -50,6 +52,7 @@ class GetFileNodeContentForFileNodeUseCaseTest {
             getFolderLinkNodeContentUriUseCase,
             getNodePreviewFileUseCase,
             getPathFromNodeContentUseCase,
+            getFileTypeInfoByContentUseCase,
         )
     }
 
@@ -60,6 +63,7 @@ class GetFileNodeContentForFileNodeUseCaseTest {
             getFolderLinkNodeContentUriUseCase,
             getNodePreviewFileUseCase,
             getPathFromNodeContentUseCase,
+            getFileTypeInfoByContentUseCase,
         )
     }
 
@@ -304,6 +308,54 @@ class GetFileNodeContentForFileNodeUseCaseTest {
         verify(getNodePreviewFileUseCase).invoke(unknownNode)
         assertThat(result).isInstanceOf(FileNodeContent.Other::class.java)
         assertThat((result as FileNodeContent.Other).localFile).isEqualTo(file)
+    }
+
+    @Test
+    fun `test that an unmapped node with a dotted fake extension is sniffed as video`() = runTest {
+        val node = mock<TypedFileNode>().stub {
+            on { type } doReturn UnMappedFileTypeInfo("55 (1)")
+        }
+        val content = NodeContentUri.LocalContentUri(File("video"))
+        whenever(getFileTypeInfoByContentUseCase(node)).thenReturn(
+            VideoFileTypeInfo(mimeType = "video/mp4", extension = "", duration = Duration.INFINITE)
+        )
+        whenever(getNodeContentUriUseCase(node)).thenReturn(content)
+
+        val result = underTest(node)
+
+        verify(getFileTypeInfoByContentUseCase).invoke(node)
+        assertThat(result).isInstanceOf(FileNodeContent.AudioOrVideo::class.java)
+    }
+
+    @Test
+    fun `test that an extensionless node sniffed as text returns TextContent`() = runTest {
+        val node = mock<TypedFileNode>().stub {
+            on { type } doReturn UnMappedFileTypeInfo("")
+            on { size } doReturn 10L
+        }
+        whenever(getFileTypeInfoByContentUseCase(node)).thenReturn(
+            TextFileTypeInfo(mimeType = "text/plain", extension = "")
+        )
+
+        val result = underTest(node)
+
+        assertThat(result).isInstanceOf(FileNodeContent.TextContent::class.java)
+    }
+
+    @Test
+    fun `test that an extensionless undetected node falls back to Other`() = runTest {
+        val node = mock<TypedFileNode>().stub {
+            on { type } doReturn UnMappedFileTypeInfo("")
+            on { size } doReturn 10L
+        }
+        val previewFile = File("preview")
+        whenever(getFileTypeInfoByContentUseCase(node)).thenReturn(null)
+        whenever(getNodePreviewFileUseCase(node)).thenReturn(previewFile)
+
+        val result = underTest(node)
+
+        assertThat(result).isInstanceOf(FileNodeContent.Other::class.java)
+        assertThat((result as FileNodeContent.Other).localFile).isEqualTo(previewFile)
     }
 
     private fun provideNodeType() = Stream.of(

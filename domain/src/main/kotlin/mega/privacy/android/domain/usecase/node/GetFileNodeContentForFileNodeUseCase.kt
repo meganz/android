@@ -1,9 +1,11 @@
 package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.FileNodeContent
@@ -20,6 +22,7 @@ class GetFileNodeContentForFileNodeUseCase @Inject constructor(
     private val getFolderLinkNodeContentUriUseCase: GetFolderLinkNodeContentUriUseCase,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase,
 ) {
     /**
      * Invoke
@@ -37,7 +40,7 @@ class GetFileNodeContentForFileNodeUseCase @Inject constructor(
         } else {
             getNodeContentUriUseCase::invoke
         }
-        return when (fileNode.type) {
+        return when (resolveType(fileNode)) {
             is PdfFileTypeInfo -> FileNodeContent.Pdf(
                 uri = getContentUri(fileNode)
             )
@@ -64,4 +67,11 @@ class GetFileNodeContentForFileNodeUseCase @Inject constructor(
             )
         }
     }
+
+    private suspend fun resolveType(fileNode: TypedFileNode): FileTypeInfo? =
+        if (fileNode.type is UnMappedFileTypeInfo) {
+            getFileTypeInfoByContentUseCase(fileNode)
+        } else {
+            fileNode.type
+        }
 }

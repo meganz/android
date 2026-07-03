@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
@@ -107,6 +108,7 @@ class NodeActionsViewModelTest {
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase = mock()
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
@@ -137,6 +139,7 @@ class NodeActionsViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             updateNodeSensitiveUseCase = updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
@@ -172,6 +175,7 @@ class NodeActionsViewModelTest {
             nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase,
             updateNodeSensitiveUseCase,
             get1On1ChatIdUseCase,
             monitorAccountDetailUseCase,
