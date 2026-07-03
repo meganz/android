@@ -2333,7 +2333,7 @@
     <string name="select_videos_search_empty_view_description">Wyszukaj filmy w swoim dysku w chmurze</string>
     <string name="link_decryption_key_dialog_title">Wprowadź klucz deszyfrujący</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Nieprawidłowy klucz</string>
-    <string name="new_text_file_invalid_extension_error_message">Użyj prawidłowego rozszerzenia pliku (np. .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Użyj prawidłowego rozszerzenia pliku (np. .txt, .md lub .xml)</string>
     <string name="link_decryption_key_dialog_message">Wprowadź klucz, aby otworzyć ten link.\nNie masz go? Skontaktuj się z właścicielem linku.</string>
     <string name="upload_bottom_sheet_action_upload_files">Wgraj pliki</string>
     <string name="upload_bottom_sheet_action_upload_folder">Wgraj katalog</string>
@@ -2734,4 +2734,33 @@
     <string name="park_account_screen_start_button">Utwórz nowe konto</string>
     <string name="park_account_success_message">Twoje stare konto zostało zablokowane. Teraz możesz zalogować się na swoje nowe konto.</string>
     <string name="add_participants_title">Dodaj uczestnikow</string>
+    <string name="meetings_add_participants_user_limit_warning">To połączenie jest ograniczone do 100 uczestników. Każdy, kto przekroczy ten limit, może tylko czatować. Organizator może przejść na plan Pro, aby usunąć ten limit.</string>
+    <string name="email_confirmation_resend_button_countdown">Wyślij ponownie e-mail w %1$s</string>
+    <string name="share_link_access_banner_title">Dostęp do linków</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Każdy, kto posiada ten link, może przeglądać i pobierać dane użytkownika</item>
+        <item quantity="few">Każdy, kto posiada te linki, może przeglądać i pobierać dane użytkownika</item>
+        <item quantity="many">Każdy, kto posiada te linki, może przeglądać i pobierać dane użytkownika</item>
+        <item quantity="other">Każdy, kto posiada te linki, może przeglądać i pobierać dane użytkownika</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link utworzony i skopiowany do schowka</item>
+        <item quantity="few">Linki utworzone i skopiowane do schowka</item>
+        <item quantity="many">Linki utworzone i skopiowane do schowka</item>
+        <item quantity="other">Linki utworzone i skopiowane do schowka</item>
+    </plurals>
+    <string name="document_scanner_prepare_title">Konfigurowanie skanera dokumentów</string>
+    <string name="document_scanner_prepare_message">To zdarza się tylko raz. Możesz nadal korzystać z urządzenia podczas pobierania.</string>
+    <string name="document_scanner_prepare_error_title">Nie udało się skonfigurować skanera dokumentów</string>
+    <string name="document_scanner_prepare_error_transient_message">Sprawdź połączenie i spróbuj ponownie.</string>
+    <string name="document_scanner_prepare_error_permanent_message">Możesz użyć starego skanera zamiast tego.</string>
+    <string name="document_scanner_prepare_retry_button">Spróbuj ponownie</string>
+    <string name="document_scanner_prepare_waiting_for_connection">Oczekiwanie na połączenie. Pobieranie automatycznie wznowi się, gdy będziesz ponownie online.</string>
+    <string name="document_scanner_prepare_reconnecting">Ponowne łączenie&#8230;</string>
+    <string name="add_contacts_phone_contacts_section_title">Kontakty z telefonu</string>
+    <string name="create_group_chat_settings_title">Nowa grupa</string>
+    <string name="create_group_chat_name_hint">Wprowadź nazwę grupy</string>
+    <string name="create_group_chat_ekr_label">Rotacja klucza szyfrowania</string>
+    <string name="create_group_chat_get_chat_link_label">Uzyskaj link do czatu</string>
+    <string name="create_group_chat_allow_add_participants_label">Umożliwienie dodawania uczestników przez osoby niebędące gospodarzami</string>
 </resources>

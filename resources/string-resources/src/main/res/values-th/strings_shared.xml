@@ -2158,7 +2158,7 @@
     <string name="pdf_viewer_error_no_network">ไม่มีการเชื่อมต่อกับเครือข่าย กรุณาเชื่อมต่อใหม่เพื่อเปิดไฟล์</string>
     <string name="open_link_dialog_title">เปิดลิงก์</string>
     <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
-    <string name="new_text_file_invalid_extension_error_message">กรุณาใช้นามสกุลไฟล์ที่ถูกต้อง เช่น .txt</string>
+    <string name="new_text_file_invalid_extension_error_message">กรุณาใช้นามสกุลไฟล์ที่ถูกต้อง เช่น .txt .md หรือ .xml</string>
     <string name="link_decryption_key_dialog_message">ใส่คีย์เพื่อเปิดลิงก์นี้\nหากไม่มีคีย์ กรุณาติดต่อเจ้าของลิงก์</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2443,4 +2443,27 @@
     <string name="park_account_screen_start_button">เริ่มต้นใช้งานบัญชีใหม่</string>
     <string name="park_account_success_message">ระบบเก็บบัญชีเดิมของคุณเรียบร้อยแล้ว ตอนนี้คุณสามารถเข้าสู่ระบบเพื่อใช้งานบัญชีใหม่ได้ทันที</string>
     <string name="add_participants_title">เพิ่มผู้เข้าร่วม</string>
+    <string name="share_link_access_banner_title">สิทธิ์การเข้าถึงลิงก์</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="other">ใครก็ตามที่มีลิงก์เหล่านี้ สามารถดูและดาวน์โหลดข้อมูลของคุณได้</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="other">ทำการสร้างลิงก์และคัดลอกไปที่คลิปบอร์ดของคุณแล้ว</item>
+    </plurals>
+    <string name="meetings_add_participants_user_limit_warning">การโทรนี้จำกัดผู้เข้าร่วมสูงสุด 100 คน ผู้เข้าร่วมที่เกินมาจะทำได้เพียงส่งข้อความแชทเท่านั้น โดยผู้จัดการประชุมสามารถอัปเกรดเป็น Pro เพื่อปลดล็อกขีดจำกัดนี้ได้</string>
+    <string name="email_confirmation_resend_button_countdown">ส่งอีเมลอีกครั้งในอีก %1$s</string>
+    <string name="document_scanner_prepare_title">กำลังตั้งค่าตัวสแกนเอกสาร</string>
+    <string name="document_scanner_prepare_message">ขั้นตอนนี้เกิดขึ้นเพียงครั้งเดียว คุณยังคงใช้งานอุปกรณ์ต่อไปได้ในระหว่างที่ระบบกำลังดาวน์โหลด</string>
+    <string name="document_scanner_prepare_error_title">ไม่สามารถตั้งค่าตัวสแกนเอกสารได้</string>
+    <string name="document_scanner_prepare_error_transient_message">กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตของคุณแล้วลองใหม่อีกครั้ง</string>
+    <string name="document_scanner_prepare_error_permanent_message">คุณสามารถเปลี่ยนไปใช้ตัวสแกนระบบเดิมแทนได้</string>
+    <string name="document_scanner_prepare_retry_button">ลองใหม่</string>
+    <string name="document_scanner_prepare_waiting_for_connection">กำลังรอการเชื่อมต่อ ระบบจะดาวน์โหลดต่อโดยอัตโนมัติเมื่อคุณกลับมาออนไลน์</string>
+    <string name="document_scanner_prepare_reconnecting">กำลังเชื่อมต่อใหม่&#8230;</string>
+    <string name="add_contacts_phone_contacts_section_title">รายชื่อในโทรศัพท์</string>
+    <string name="create_group_chat_settings_title">กลุ่มใหม่</string>
+    <string name="create_group_chat_name_hint">กรอกชื่อกลุ่ม</string>
+    <string name="create_group_chat_ekr_label">การสลับกุญแจเข้ารหัส</string>
+    <string name="create_group_chat_get_chat_link_label">รับลิงก์แชท</string>
+    <string name="create_group_chat_allow_add_participants_label">อนุญาตให้ผู้ที่ไม่ใช่ผู้จัดการประชุมเพิ่มผู้เข้าร่วมได้</string>
 </resources>

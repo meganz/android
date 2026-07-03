@@ -2225,7 +2225,7 @@
     </plurals>
     <string name="general_title_incoming_shares">Binnenkomende delingen</string>
     <string name="select_videos_search_empty_view_description">Zoek video\’s in uw Cloudopslag</string>
-    <string name="new_text_file_invalid_extension_error_message">Gebruik een geldige bestandsextensie (bijv. .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Gebruik een geldige bestandsextensie (bijv. .txt, .md of .xml)</string>
     <string name="link_decryption_key_dialog_message">Voer de sleutel in om deze link te openen. \nHeeft u hem niet? Neem contact op met de eigenaar van de link.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2545,4 +2545,29 @@
     <string name="park_account_screen_start_button">Nieuw account aanmaken</string>
     <string name="park_account_success_message">Uw oude account is geparkeerd.U kunt nu inloggen op uw nieuwe account.</string>
     <string name="add_participants_title">Deelnemers toevoegen</string>
+    <string name="meetings_add_participants_user_limit_warning">Dit gesprek is beperkt tot 100 deelnemers. Wie daarbuiten valt, kan alleen chatten. De organisator kan upgraden naar Pro om deze limiet op te heffen.</string>
+    <string name="email_confirmation_resend_button_countdown">E-mail opnieuw verzenden over %1$s</string>
+    <string name="document_scanner_prepare_title">De documentscanner instellen</string>
+    <string name="document_scanner_prepare_message">Dit gebeurt slechts één keer. U kunt uw apparaat blijven gebruiken terwijl het downloadt.</string>
+    <string name="document_scanner_prepare_error_title">Het lukte niet om de documentscanner te installeren</string>
+    <string name="document_scanner_prepare_error_transient_message">Controleer uw verbinding en probeer het opnieuw.</string>
+    <string name="document_scanner_prepare_error_permanent_message">U kunt in plaats daarvan de oude scanner gebruiken.</string>
+    <string name="document_scanner_prepare_retry_button">Probeer nogmaals</string>
+    <string name="share_link_access_banner_title">Link toegang</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Iedereen met deze link kan uw gegevens bekijken en downloaden</item>
+        <item quantity="other">Iedereen met deze links kan uw gegevens bekijken en downloaden</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link gecreëerd en gekopieerd naar uw klembord</item>
+        <item quantity="other">Links gecreëerd en gekopieerd naar uw klembord</item>
+    </plurals>
+    <string name="document_scanner_prepare_waiting_for_connection">Wachten op verbinding. De download wordt automatisch hervat zodra u weer online bent.</string>
+    <string name="document_scanner_prepare_reconnecting">Opnieuw verbinding maken&#8230;</string>
+    <string name="add_contacts_phone_contacts_section_title">Telefoon contacten</string>
+    <string name="create_group_chat_settings_title">Nieuwe groep</string>
+    <string name="create_group_chat_name_hint">Voer groep naam in</string>
+    <string name="create_group_chat_ekr_label">Coderingssleutel rotatie</string>
+    <string name="create_group_chat_get_chat_link_label">Gesprekslink ophalen</string>
+    <string name="create_group_chat_allow_add_participants_label">Toestaan dat non-hosts deelnemers kunnen toevoegen</string>
 </resources>

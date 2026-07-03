@@ -2603,4 +2603,22 @@
     <string name="park_account_screen_start_button">Crear una cuenta nueva</string>
     <string name="park_account_success_message">Has aparcado tu cuenta antigua. Accede a tu cuenta nueva.</string>
     <string name="add_participants_title">Añadir participantes</string>
+    <string name="meetings_add_participants_user_limit_warning">Esta llamada está limitada a 100 participantes. Cualquiera que supere ese límite solo podrá chatear. El organizador puede ampliar a Pro para eliminar este límite.</string>
+    <string name="share_link_access_banner_title">Acceso al enlace</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Quien tenga este enlace puede ver y descargar lo que contiene.</item>
+        <item quantity="many">Quien tenga estos enlaces puede ver y descargar lo que contienen.</item>
+        <item quantity="other">Quien tenga estos enlaces puede ver y descargar lo que contienen.</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Enlace creado y copiado en el portapapeles</item>
+        <item quantity="many">Enlaces creados y copiados en el portapapeles</item>
+        <item quantity="other">Enlaces creados y copiados en el portapapeles</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">Contactos del teléfono</string>
+    <string name="create_group_chat_name_hint">Introducir el nombre del grupo</string>
+    <string name="create_group_chat_ekr_label">Rotación de la clave de cifrado</string>
+    <string name="create_group_chat_settings_title">Nuevo grupo</string>
+    <string name="create_group_chat_get_chat_link_label">Obtener enlace de chat</string>
+    <string name="create_group_chat_allow_add_participants_label">Permitir a los no anfitriones añadir participantes</string>
 </resources>

@@ -2405,11 +2405,24 @@
     <plurals name="general_selection_num_selected">
         <item quantity="other">%1$d&#160;mục đã&#160;được chọn</item>
     </plurals>
-    <string name="video_player_video_not_rendered">Không thể hiển&#160;thị video này</string>
+    <string name="video_player_video_not_rendered">Không thể hiển thị video này</string>
     <string name="sync_battery_optimisation_banner">Để liên&#160;tục đồng&#160;bộ hóa các tệp&#160;tin và thư&#160;mục, hãy cho phép MEGA chạy trong&#160;nền</string>
     <string name="sync_dialog_battery_optimization_title">Tối ưu pin</string>
     <string name="general_do_not_allow_button">Không cho</string>
     <string name="general_allow_button">Cho phép</string>
     <string name="document_scanner_download_dialog_download_button">Tải xuống</string>
     <string name="add_participants_title">Thêm thành viên</string>
+    <string name="share_link_access_banner_title">Truy cập đường liên kết</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="other">Bất kỳ ai có các đường liên kết này đều có thể xem và tải xuống dữ liệu của bạn</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="other">Các đường liên kết đã được tạo và ghi vào bảng nhớ tạm</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">Danh bạ điện thoại</string>
+    <string name="create_group_chat_settings_title">Nhóm mới</string>
+    <string name="create_group_chat_name_hint">Điền tên nhóm</string>
+    <string name="create_group_chat_ekr_label">Luân phiên chìa khóa mã</string>
+    <string name="create_group_chat_get_chat_link_label">Lấy liên kết cuộc&#160;chat</string>
+    <string name="create_group_chat_allow_add_participants_label">Cho phép các thành viên không chủ trì mời thêm người</string>
 </resources>
