@@ -24,6 +24,8 @@ val ExplorerMode.titleStringId: Int
         ExplorerMode.AddVideosToPlaylist,
             -> sharedR.string.video_section_video_selected_top_bar_title
 
+        ExplorerMode.PinToHome -> sharedR.string.home_pinned_choose_files_and_folders
+
         else -> sharedR.string.cloud_explorer_select_destination_title
     }
 
@@ -52,4 +54,5 @@ val ExplorerMode.actionStringId: Int
             -> sharedR.string.general_action_save
 
         ExplorerMode.AddVideosToPlaylist -> sharedR.string.video_to_playlist_add_button
+        ExplorerMode.PinToHome -> sharedR.string.general_dialog_choose_button
     }

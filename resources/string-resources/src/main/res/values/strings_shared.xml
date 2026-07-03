@@ -1383,6 +1383,8 @@
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Choose</string>
+    <!-- Choose folders and files to pin to Home. Used both as the picker's top bar title and as the add button/link on the empty Pinned widget. -->
+    <string name="home_pinned_choose_files_and_folders">Choose files &amp; folders</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Apply to all</string>
     <!-- Sync message when a single issue resolved -->

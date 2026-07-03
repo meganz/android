@@ -57,6 +57,11 @@ data class AddVideoToPlaylistNavKey(val addedVideoIds: List<NodeId>) : ExplorerN
 }
 
 @Serializable
+data object PinToHomeNavKey : ExplorerNavKey {
+    const val RESULT = "PinToHomeNavKey::result"
+}
+
+@Serializable
 data object SelectSyncFolderNavKey : ExplorerNavKey
 
 @Serializable
