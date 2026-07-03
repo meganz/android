@@ -1,7 +1,6 @@
 package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,7 +36,6 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.banner.InlineInfoBanner
 import mega.android.core.ui.components.divider.SubtleDivider
-import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -49,10 +47,10 @@ import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
+import mega.privacy.android.feature.sharelink.presentation.component.ShareLinkDetailRow
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -187,40 +185,12 @@ private fun LinkField(
             .clip(RoundedCornerShape(8.dp))
             .testTag(SHARE_LINK_LINK_FIELD_TAG),
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            MegaText(
-                text = stringResource(sharedR.string.album_get_link_link_section_title),
-                textColor = TextColor.Primary,
-                style = AppTheme.typography.labelLarge,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                MegaText(
-                    modifier = Modifier.weight(1f),
-                    text = link,
-                    textColor = TextColor.Primary,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    style = AppTheme.typography.bodyLarge,
-                )
-                MegaIcon(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clickable(onClick = onCopyLink),
-                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Copy01),
-                    tint = IconColor.Primary,
-                    contentDescription = stringResource(sharedR.string.general_copy),
-                )
-            }
-        }
+        ShareLinkDetailRow(
+            modifier = Modifier.padding(16.dp),
+            label = stringResource(sharedR.string.album_get_link_link_section_title),
+            value = link,
+            onCopy = onCopyLink,
+        )
     }
 }
 
