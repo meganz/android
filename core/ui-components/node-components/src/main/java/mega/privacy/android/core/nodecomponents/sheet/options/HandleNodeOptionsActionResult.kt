@@ -135,6 +135,7 @@ fun HandleNodeOptionsActionResult(
         onCopyPublicLinkFiles = nodeOptionsActionViewModel::copyPublicLinkFile,
         onTransfer = onTransfer,
         onNavigate = navigationHandler::navigate,
+        onShareHiddenNodeWarningConfirmed = nodeOptionsActionViewModel::onShareHiddenNodeWarningConfirmed,
         consumeNameCollisionResult = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
         consumePublicCopyCollisionResult = nodeOptionsActionViewModel::markHandlePublicCopyCollisionResult,
         consumeInfoToShow = nodeOptionsActionViewModel::onInfoToShowEventConsumed,
@@ -147,6 +148,7 @@ fun HandleNodeOptionsActionResult(
         consumeAccessDialogShown = nodeOptionsActionViewModel::markShareFolderAccessDialogShown,
         consumeShareFolderEvent = nodeOptionsActionViewModel::resetShareFolderEvent,
         consumeShareFolderDialogEvent = nodeOptionsActionViewModel::resetShareFolderDialogEvent,
+        consumeShareHiddenNodeWarningEvent = nodeOptionsActionViewModel::resetShareHiddenNodeWarningEvent,
         onActionTriggered = { nodeOptionsActionViewModel.onActionTriggered() },
         onRestoreSuccess = { data ->
             val locateActionLabel = localResources.getString(

@@ -65,6 +65,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
@@ -97,6 +98,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
@@ -171,6 +174,9 @@ class NodeOptionsActionViewModelTest {
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
+    private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
+    private val getShareFolderSensitiveWarningTypeUseCase =
+        mock<GetShareFolderSensitiveWarningTypeUseCase>()
 
     // Mock action handlers for testing
     private val mockSingleNodeActionHandler = mock<SingleNodeAction>()
@@ -254,6 +260,8 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -301,6 +309,10 @@ class NodeOptionsActionViewModelTest {
         isNodeInBackupsUseCase.stub { onBlocking { invoke(any()) } doReturn false }
         getNodeAccessPermission.stub { onBlocking { invoke(any()) } doReturn AccessPermission.FULL }
         checkNodeCanBeMovedToTargetNode.stub { onBlocking { invoke(any(), any()) } doReturn true }
+        monitorHiddenNodesEnabledUseCase.stub { on { invoke() } doReturn flowOf(false) }
+        getShareFolderSensitiveWarningTypeUseCase.stub {
+            onBlocking { invoke(any(), any()) } doReturn SensitiveNodeShareWarning.None
+        }
     }
 
     @AfterEach
@@ -332,6 +344,8 @@ class NodeOptionsActionViewModelTest {
             getBusinessStatusUseCase,
             getFileTypeInfoByNameUseCase,
             createShareKeyUseCase,
+            monitorHiddenNodesEnabledUseCase,
+            getShareFolderSensitiveWarningTypeUseCase,
             mockSingleNodeActionHandler,
             mockMultiNodeActionHandler,
             nodeSelectionModeActionMapper,
@@ -1099,6 +1113,8 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = multipleHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1172,6 +1188,8 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1239,6 +1257,8 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = emptySet(),
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1298,6 +1318,8 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = emptySet(),
             createShareKeyUseCase = createShareKeyUseCase,
+            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
+            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1485,6 +1507,193 @@ class NodeOptionsActionViewModelTest {
             viewModel.uiState.test {
                 assertThat(awaitItem().shareFolderEvent).isInstanceOf(
                     StateEventWithContentTriggered::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test verifyShareFolderAction triggers shareHiddenNodeWarningEvent and does not proceed when warning is Folder`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(
+                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+                val content =
+                    (state.shareHiddenNodeWarningEvent as StateEventWithContentTriggered<Pair<List<Long>, Boolean>>).content
+                assertThat(content.first).isEqualTo(listOf(123L))
+                assertThat(content.second).isFalse()
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderDialogEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+            }
+
+            verifyNoInteractions(createShareKeyUseCase)
+            verifyNoInteractions(checkBackupNodeTypeUseCase)
+        }
+
+    @Test
+    fun `test verifyShareFolderAction reports sharingMultipleFolders when warning is Folders`() =
+        runTest {
+            val mockFolderNode1 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+            val mockFolderNode2 = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(456L)
+            }
+
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(
+                getShareFolderSensitiveWarningTypeUseCase(
+                    listOf(NodeId(123L), NodeId(456L)),
+                    true
+                )
+            ).thenReturn(SensitiveNodeShareWarning.Folders)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(listOf(mockFolderNode1, mockFolderNode2))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val content =
+                    (state.shareHiddenNodeWarningEvent as StateEventWithContentTriggered<Pair<List<Long>, Boolean>>).content
+                assertThat(content.first).isEqualTo(listOf(123L, 456L))
+                assertThat(content.second).isTrue()
+            }
+        }
+
+    @Test
+    fun `test verifyShareFolderAction proceeds without warning when warning is None`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(
+                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+            ).thenReturn(SensitiveNodeShareWarning.None)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
+            verify(checkBackupNodeTypeUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test onShareHiddenNodeWarningConfirmed proceeds with share after a warning was shown`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(
+                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.onShareHiddenNodeWarningConfirmed(listOf(123L))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
+            verify(checkBackupNodeTypeUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test onShareHiddenNodeWarningConfirmed routes to backup dialog when confirmed node is a backup node`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(
+                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.RootNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.onShareHiddenNodeWarningConfirmed(listOf(123L))
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareFolderDialogEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+        }
+
+    @Test
+    fun `test resetShareHiddenNodeWarningEvent consumes the event`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
+            whenever(
+                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+            ).thenReturn(SensitiveNodeShareWarning.Folder)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.resetShareHiddenNodeWarningEvent()
+
+            viewModel.uiState.test {
+                assertThat(awaitItem().shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
                 )
             }
         }

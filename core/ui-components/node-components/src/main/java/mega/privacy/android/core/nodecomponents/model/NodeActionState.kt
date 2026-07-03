@@ -33,6 +33,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property infoToShowEvent Info to show event
  * @property renameNodeRequestEvent Rename node request event
  * @property shareFolderDialogEvent Share folder dialog event
+ * @property shareHiddenNodeWarningEvent Hidden/sensitive-node share warning event. Carries the
+ *   folder handles to share and whether more than one folder is being shared (plural wording).
  * @property shareFolderEvent Share folder event
  * @property visibleActions Visible actions
  * @property availableActions Available actions
@@ -56,6 +58,7 @@ data class NodeActionState(
     val infoToShowEvent: StateEventWithContent<LocalizedText> = consumed(),
     val renameNodeRequestEvent: StateEventWithContent<NodeId> = consumed(),
     val shareFolderDialogEvent: StateEventWithContent<List<Long>> = consumed(),
+    val shareHiddenNodeWarningEvent: StateEventWithContent<Pair<List<Long>, Boolean>> = consumed(),
     val shareFolderEvent: StateEventWithContent<List<Long>> = consumed(),
     val visibleActions: List<MenuActionWithIcon> = emptyList(),
     val availableActions: List<MenuActionWithIcon> = emptyList(),

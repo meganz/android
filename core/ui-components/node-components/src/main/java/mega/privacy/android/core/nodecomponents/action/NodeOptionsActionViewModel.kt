@@ -57,6 +57,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.SingleNodeRestoreResult
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -96,6 +97,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
@@ -161,6 +164,8 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
+    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
+    private val getShareFolderSensitiveWarningTypeUseCase: GetShareFolderSensitiveWarningTypeUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
@@ -193,6 +198,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
 
     private var rubbishBinNode: UnTypedNode? = null
     private var updateSelectionJob: Job? = null
+    private var pendingSensitiveShareFolderNodes: List<TypedFolderNode> = emptyList()
 
     // Node handles for the share currently awaiting contact selection. The contact
     // picker only returns the selected emails, so the target handles are retained here.
@@ -515,30 +521,81 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
             withContext(NonCancellable) {
                 val filteredFolderNodes = nodes.filterIsInstance<TypedFolderNode>()
 
-                filteredFolderNodes.forEach { folderNode ->
-                    runCatching { createShareKeyUseCase(folderNode) }
-                }
+                val hiddenNodesEnabled = runCatching {
+                    monitorHiddenNodesEnabledUseCase().first()
+                }.getOrDefault(false)
+                val warning = runCatching {
+                    getShareFolderSensitiveWarningTypeUseCase(
+                        filteredFolderNodes.map { it.id },
+                        hiddenNodesEnabled,
+                    )
+                }.getOrDefault(SensitiveNodeShareWarning.None)
 
-                val hasBackUpNodes = filteredFolderNodes
-                    .any { folderNode ->
-                        runCatching {
-                            checkBackupNodeTypeUseCase(folderNode) != BackupNodeType.NonBackupNode
-                        }.getOrDefault(false)
-                    }
-
-                val nodeIds = filteredFolderNodes.map { it.id.longValue }
-
-                if (hasBackUpNodes) {
+                if (warning != SensitiveNodeShareWarning.None) {
+                    pendingSensitiveShareFolderNodes = filteredFolderNodes
+                    val nodeIds = filteredFolderNodes.map { it.id.longValue }
                     uiState.update { state ->
-                        state.copy(shareFolderDialogEvent = triggered(nodeIds))
+                        state.copy(
+                            shareHiddenNodeWarningEvent = triggered(
+                                nodeIds to (warning == SensitiveNodeShareWarning.Folders)
+                            )
+                        )
                     }
                 } else {
-                    pendingShareFolderHandles = nodeIds
-                    uiState.update { state ->
-                        state.copy(shareFolderEvent = triggered(nodeIds))
-                    }
+                    proceedShareFolderAfterSensitiveCheck(filteredFolderNodes)
                 }
             }
+        }
+    }
+
+    /**
+     * Continues the share once the sensitive-node warning (if any) has been resolved: creates the
+     * share keys, then routes to the backup-share dialog or straight to the contact picker.
+     */
+    private suspend fun proceedShareFolderAfterSensitiveCheck(folderNodes: List<TypedFolderNode>) {
+        folderNodes.forEach { folderNode ->
+            runCatching { createShareKeyUseCase(folderNode) }
+        }
+
+        val hasBackUpNodes = folderNodes
+            .any { folderNode ->
+                runCatching {
+                    checkBackupNodeTypeUseCase(folderNode) != BackupNodeType.NonBackupNode
+                }.getOrDefault(false)
+            }
+
+        val nodeIds = folderNodes.map { it.id.longValue }
+
+        if (hasBackUpNodes) {
+            uiState.update { state ->
+                state.copy(shareFolderDialogEvent = triggered(nodeIds))
+            }
+        } else {
+            pendingShareFolderHandles = nodeIdsuiState.update { state ->
+                state.copy(shareFolderEvent = triggered(nodeIds))
+            }
+        }
+    }
+
+    /**
+     * Continues the share after the user confirms the hidden/sensitive-node warning. The backup
+     * check still runs afterwards, so the backup dialog may be shown next.
+     */
+    fun onShareHiddenNodeWarningConfirmed(nodeHandles: List<Long>) {
+        val folderNodes = pendingSensitiveShareFolderNodes
+            .filter { it.id.longValue in nodeHandles }
+        pendingSensitiveShareFolderNodes = emptyList()
+        viewModelScope.launch {
+            withContext(NonCancellable) {
+                resetShareHiddenNodeWarningEvent()
+                proceedShareFolderAfterSensitiveCheck(folderNodes)
+            }
+        }
+    }
+
+    fun resetShareHiddenNodeWarningEvent() {
+        uiState.update {
+            it.copy(shareHiddenNodeWarningEvent = consumed())
         }
     }
 
