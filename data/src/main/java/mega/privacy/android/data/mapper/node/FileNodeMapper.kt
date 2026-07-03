@@ -9,7 +9,9 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -33,6 +35,7 @@ internal class FileNodeMapper @Inject constructor(
     private val cacheGateway: CacheGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val nodeMediaTypeMapper: NodeMediaTypeMapper,
     private val offlineAvailabilityMapper: OfflineAvailabilityMapper,
     private val stringListMapper: StringListMapper,
     private val nodeLabelMapper: NodeLabelMapper,
@@ -74,7 +77,7 @@ internal class FileNodeMapper @Inject constructor(
                 megaNode,
                 cacheGateway.getFullSizeCacheFolderPath()
             ),
-            type = fileTypeInfoMapper(megaNode.name, megaNode.duration),
+            type = resolveType(megaNode),
             isFavourite = megaNode.isFavourite,
             isMarkedSensitive = megaNode.isMarkedSensitive,
             isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),
@@ -97,6 +100,21 @@ internal class FileNodeMapper @Inject constructor(
     }.onFailure {
         Timber.e(it, "FileNodeMapper failed for handle=${megaNode.handle}")
     }.getOrNull()
+
+    private fun resolveType(megaNode: MegaNode): FileTypeInfo {
+        val nameType = fileTypeInfoMapper(megaNode.name, megaNode.duration)
+        return if (nameType is UnMappedFileTypeInfo) {
+            nodeMediaTypeMapper(
+                videoCodecId = megaNode.videocodecid,
+                shortFormat = megaNode.shortformat,
+                width = megaNode.width,
+                height = megaNode.height,
+                duration = megaNode.duration,
+            ) ?: nameType
+        } else {
+            nameType
+        }
+    }
 
     private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: String?): String? =
         thumbnailFolder?.let {
