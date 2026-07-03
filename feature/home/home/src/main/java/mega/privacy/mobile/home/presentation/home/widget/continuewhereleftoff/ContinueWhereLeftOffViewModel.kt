@@ -46,17 +46,20 @@ internal class ContinueWhereLeftOffViewModel @Inject constructor(
                 sortField = ContinueWhereLeftOffSortField.Timestamp,
                 sortDirection = SortDirection.Descending,
             )
-                .transformLatest { items ->
-                    emit(nameResolver.applyCachedNames(items))
-                    if (nameResolver.resolveBlankNames(items)) {
-                        emit(nameResolver.applyCachedNames(items))
+                .transformLatest { result ->
+                    emit(result.copy(items = nameResolver.applyCachedNames(result.items)))
+                    if (nameResolver.resolveBlankNames(result.items)) {
+                        emit(result.copy(items = nameResolver.applyCachedNames(result.items)))
                     }
                 },
             openNodeEventChannel.receiveAsFlow()
                 .onStart { emit(consumed()) },
-        ) { items, openNodeEvent ->
+        ) { result, openNodeEvent ->
             ContinueWhereLeftOffUiState(
-                items = items,
+                items = result.items,
+                // Keep the loading skeleton until the hidden-nodes state is resolved so sensitive
+                // items are never shown unblurred before their blur is applied (AND-24162).
+                isLoading = !result.isHiddenResolved,
                 openNodeEvent = openNodeEvent,
             )
         }.catch { e ->
