@@ -3,6 +3,8 @@ package mega.privacy.android.feature.payment
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -11,13 +13,18 @@ import androidx.compose.ui.test.performScrollToNode
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
+import mega.privacy.android.feature.payment.components.TEST_TAG_CURRENT_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
+import mega.privacy.android.feature.payment.components.TEST_TAG_PLAN_PRICE_CARD_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
+import mega.privacy.android.feature.payment.components.TEST_TAG_WHY_GO_PRO_CARD
 import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
@@ -26,6 +33,8 @@ import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_ADDITI
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FEATURE_ROW
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_COLUMN
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_MONTHLY_CHIP
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_PLAN_CARD
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_TITLE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SAVE_UP_TO_BADGE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_DESC
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_TITLE
@@ -391,8 +400,101 @@ class UpgradeAccountScreenTest {
         assert(learnMoreClicked) { "onSubscriptionUnavailableLearnMoreClick should be called when Learn more is clicked" }
     }
 
+    @Test
+    fun `test that revamp content shows title, why-go-pro card and plan cards when flag enabled`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_WHY_GO_PRO_CARD))
+            .assertExists()
+        (0..2).forEach { index ->
+            val tag = "$TEST_TAG_REVAMP_PLAN_CARD$index"
+            composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+                .performScrollToNode(hasTestTag(tag))
+                .assertExists()
+        }
+    }
+
+    @Test
+    fun `test that revamp current plan card is shown for upgrade account`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_CURRENT_PLAN_CARD))
+        composeRule.onNodeWithTag(TEST_TAG_CURRENT_PLAN_CARD)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that revamp current plan card is not shown for free account`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = AccountType.FREE),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_CURRENT_PLAN_CARD).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that revamp legacy bottom bar buy button is not shown`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_BUY_BUTTON).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that revamp plan card buy button calls onInAppCheckoutClick`() {
+        var clickedSubscription: Subscription? = null
+        setContent(
+            isUpgradeAccount = false,
+            isSubscriptionRevampEnabled = true,
+            onBuyPlanClick = { clickedSubscription = it },
+            uiState = revampUiState(currentPlan = null),
+        )
+
+        val firstCardTag = "${TEST_TAG_REVAMP_PLAN_CARD}0"
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(firstCardTag))
+        composeRule.onAllNodesWithTag(TEST_TAG_PLAN_PRICE_CARD_BUTTON).onFirst().performClick()
+
+        assert(clickedSubscription != null) {
+            "onInAppCheckoutClick should be called when a plan card buy button is clicked"
+        }
+        assert(clickedSubscription?.accountType == AccountType.PRO_I) {
+            "First plan card should buy PRO_I"
+        }
+    }
+
+    private fun revampUiState(
+        currentPlan: AccountType? = AccountType.PRO_I,
+    ) = UpgradeAccountState(
+        localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
+        isSubscriptionFeatureAvailable = true,
+        cheapestSubscriptionAvailable = subscriptionProII,
+        currentSubscriptionPlan = currentPlan,
+        subscriptionCycle = AccountSubscriptionCycle.YEARLY,
+        subscriptionStatus = SubscriptionStatus.VALID,
+        subscriptionRenewTime = 1_815_000_000L,
+    )
+
     private fun setContent(
         isUpgradeAccount: Boolean = false,
+        isSubscriptionRevampEnabled: Boolean = false,
         onBuyPlanClick: (Subscription) -> Unit = {},
         onFreePlanClick: () -> Unit = {},
         maybeLaterClicked: () -> Unit = {},
@@ -409,6 +511,7 @@ class UpgradeAccountScreenTest {
             uiState = uiState,
             onBack = {},
             isUpgradeAccount = isUpgradeAccount,
+            isSubscriptionRevampEnabled = isSubscriptionRevampEnabled,
             onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
         )
     }
