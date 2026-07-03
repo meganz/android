@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
+import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,7 +76,7 @@ class TimelineRevampScreenTest {
     }
 
     @Test
-    fun `test that the sticky header is displayed when state is Data`() {
+    fun `test that the header is displayed when state is Data`() {
         composeRule.setScreen(
             TimelineRevampUiState.Data(
                 sections = listOf(
@@ -91,7 +92,9 @@ class TimelineRevampScreenTest {
             )
         )
 
-        composeRule.onNodeWithTag(TIMELINE_REVAMP_STICKY_HEADER_TAG).assertIsDisplayed()
+        // At rest the scrolling (non-sticky) header sits at the top; the pinned overlay only appears
+        // once it scrolls past the viewport top.
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_NON_STICKY_HEADER_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -132,6 +135,8 @@ class TimelineRevampScreenTest {
         setContent {
             TimelineRevampScreen(
                 uiState = uiState,
+                mediaCameraUploadUiState = MediaCameraUploadUiState(),
+                showEnableCameraUploadsPage = false,
                 onVisibleRangeChanged = { _, _ -> },
                 onGridSizeChange = {},
                 onZoomIn = {},
@@ -141,6 +146,13 @@ class TimelineRevampScreenTest {
                 onNodeSelected = {},
                 selectedPhotoIds = emptySet(),
                 onTakenDownDialogEventConsumed = {},
+                clearCameraUploadsCompletedMessage = {},
+                onNavigateToCameraUploadsSettings = {},
+                onNavigateToMobileDataSettings = {},
+                onNavigateToUpgradeAccount = {},
+                onCameraUploadsBannerDismiss = {},
+                handleCameraUploadsPermissionsResult = {},
+                handleNotificationPermissionResult = {},
             )
         }
     }

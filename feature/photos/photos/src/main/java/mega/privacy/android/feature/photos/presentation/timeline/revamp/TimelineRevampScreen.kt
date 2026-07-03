@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.testTag
@@ -50,8 +50,13 @@ import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMe
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
+import mega.privacy.android.feature.photos.presentation.CUStatusUiState
+import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotoNodeBodyV2
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCache
+import mega.privacy.android.feature.photos.presentation.timeline.rememberCameraUploadsBannerHandlers
+import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
+import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
@@ -68,6 +73,8 @@ import java.util.Locale
 @Composable
 internal fun TimelineRevampScreen(
     uiState: TimelineRevampUiState,
+    mediaCameraUploadUiState: MediaCameraUploadUiState,
+    showEnableCameraUploadsPage: Boolean,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
@@ -77,6 +84,13 @@ internal fun TimelineRevampScreen(
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     selectedPhotoIds: Set<Long>,
     onTakenDownDialogEventConsumed: () -> Unit,
+    clearCameraUploadsCompletedMessage: () -> Unit,
+    onNavigateToCameraUploadsSettings: () -> Unit,
+    onNavigateToMobileDataSettings: () -> Unit,
+    onNavigateToUpgradeAccount: () -> Unit,
+    onCameraUploadsBannerDismiss: (status: CUStatusUiState) -> Unit,
+    handleCameraUploadsPermissionsResult: () -> Unit,
+    handleNotificationPermissionResult: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
@@ -86,14 +100,30 @@ internal fun TimelineRevampScreen(
         showTakenDownDialog = true
     }
 
-    when (uiState) {
-        is TimelineRevampUiState.Loading -> {
+    val cameraUploadsBannerHandlers = rememberCameraUploadsBannerHandlers(
+        mediaCameraUploadUiState = mediaCameraUploadUiState,
+        clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+        handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+        handleNotificationPermissionResult = handleNotificationPermissionResult,
+    )
+
+    when {
+        showEnableCameraUploadsPage -> {
+            EnableCameraUploadsContent(
+                modifier = modifier
+                    .padding(horizontal = 16.dp)
+                    .testTag(TIMELINE_REVAMP_ENABLE_CU_CONTENT_TAG),
+                onEnable = onNavigateToCameraUploadsSettings,
+            )
+        }
+
+        uiState is TimelineRevampUiState.Loading -> {
             MediaSkeletonView(
                 modifier = modifier.testTag(TIMELINE_REVAMP_LOADING_SKELETON_TAG),
             )
         }
 
-        is TimelineRevampUiState.Empty -> {
+        uiState is TimelineRevampUiState.Empty -> {
             EmptyStateView(
                 modifier = Modifier.testTag(TIMELINE_REVAMP_EMPTY_VIEW_TAG),
                 imagePainter = painterResource(R.drawable.il_glass_image),
@@ -101,8 +131,9 @@ internal fun TimelineRevampScreen(
             )
         }
 
-        is TimelineRevampUiState.Data -> {
+        uiState is TimelineRevampUiState.Data -> {
             TimelineRevampContent(
+                modifier = modifier.fillMaxSize(),
                 sections = uiState.sections,
                 sectionStartOffsets = uiState.sectionStartOffsets,
                 loadedNodes = uiState.loadedNodes,
@@ -118,7 +149,24 @@ internal fun TimelineRevampScreen(
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
                 selectedPhotoIds = selectedPhotoIds,
-                modifier = modifier,
+                bannerContent = if (selectedPhotoIds.isEmpty()) {
+                    {
+                        CameraUploadsBanner(
+                            status = mediaCameraUploadUiState.status,
+                            onEnableCameraUploads = onNavigateToCameraUploadsSettings,
+                            onDismissRequest = onCameraUploadsBannerDismiss,
+                            onChangeCameraUploadsPermissions =
+                                cameraUploadsBannerHandlers.onChangeCameraUploadsPermissions,
+                            onRequestNotificationPermission =
+                                cameraUploadsBannerHandlers.onRequestNotificationPermission,
+                            onNavigateToCameraUploadsSettings = onNavigateToCameraUploadsSettings,
+                            onNavigateMobileDataSetting = onNavigateToMobileDataSettings,
+                            onNavigateUpgradeScreen = onNavigateToUpgradeAccount,
+                        )
+                    }
+                } else {
+                    null
+                },
             )
         }
     }
@@ -149,6 +197,7 @@ private fun TimelineRevampContent(
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     selectedPhotoIds: Set<Long>,
     modifier: Modifier = Modifier,
+    bannerContent: (@Composable () -> Unit)? = null,
 ) {
     val lazyGridState = rememberLazyGridState()
     val cardListState = rememberLazyListState()
@@ -235,6 +284,7 @@ private fun TimelineRevampContent(
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
                 selectedPhotoIds = selectedPhotoIds,
+                bannerContent = bannerContent,
                 modifier = modifier,
             )
         }
@@ -259,6 +309,7 @@ private fun TimelineRevampGrid(
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     selectedPhotoIds: Set<Long>,
     modifier: Modifier = Modifier,
+    bannerContent: (@Composable () -> Unit)? = null,
 ) {
     NotifyVisibleMediaRange(
         gridState = lazyGridState,
@@ -275,6 +326,15 @@ private fun TimelineRevampGrid(
     }
     val headerCount = remember(monthStartFlags) { monthStartFlags.count { it } }
 
+    // Items actually emitted into the grid: the optional CU banner, the always-present non-sticky
+    // header, one inline month header per month *after* the first (the first month is represented by
+    // the non-sticky header, so its own header is skipped), and every media node.
+    val totalGridItems = remember(sections, headerCount, bannerContent != null) {
+        val inlineMonthHeaderCount = (headerCount - 1).coerceAtLeast(0)
+        val bannerItems = if (bannerContent != null) 1 else 0
+        bannerItems + 1 + inlineMonthHeaderCount + sections.sumOf { it.count }.toInt()
+    }
+
     // Recomputes on scroll (reads lazyGridState.layoutInfo, a snapshot state) and is re-created when
     // the section layout or locale changes (the remember keys).
     val stickyLabel by remember(sections, sectionStartOffsets, locale) {
@@ -285,21 +345,20 @@ private fun TimelineRevampGrid(
         }
     }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        if (sections.isNotEmpty()) {
-            StickySectionHeader(
-                modifier = Modifier
-                    .testTag(TIMELINE_REVAMP_STICKY_HEADER_TAG),
-                title = stickyLabel,
-                trailingContent = {
-                    TimelineRevampGridSizeMenu(
-                        gridSize = gridSize,
-                        onGridSizeChange = onGridSizeChange,
-                    )
-                },
-            )
+    // Pin the sticky header once the non-sticky header item scrolls past the top of the viewport:
+    // either it is gone entirely, or its top edge has reached/crossed the viewport top (so it is
+    // being clipped and the pinned overlay takes over seamlessly).
+    val showStickyHeader by remember(sections) {
+        derivedStateOf {
+            if (sections.isEmpty()) return@derivedStateOf false
+            val layoutInfo = lazyGridState.layoutInfo
+            val headerInfo = layoutInfo.visibleItemsInfo
+                .firstOrNull { it.key == NON_STICKY_HEADER_ITEM }
+            headerInfo == null || headerInfo.offset.y < layoutInfo.viewportStartOffset
         }
+    }
 
+    Box(modifier = modifier.fillMaxSize()) {
         FastScrollLazyVerticalGrid(
             columns = GridCells.Fixed(columns),
             modifier = Modifier
@@ -310,8 +369,34 @@ private fun TimelineRevampGrid(
                 )
                 .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
             state = lazyGridState,
-            totalItems = sections.sumOf { it.count }.toInt() + headerCount,
+            totalItems = totalGridItems,
         ) {
+            bannerContent?.let {
+                item(
+                    key = ENABLE_CU_BANNER,
+                    span = { GridItemSpan(maxLineSpan) },
+                ) {
+                    it()
+                }
+            }
+
+            item(
+                key = NON_STICKY_HEADER_ITEM,
+                span = { GridItemSpan(maxLineSpan) },
+            ) {
+                StickySectionHeader(
+                    modifier = Modifier
+                        .testTag(TIMELINE_REVAMP_NON_STICKY_HEADER_TAG),
+                    title = stickyLabel,
+                    trailingContent = {
+                        TimelineRevampGridSizeMenu(
+                            gridSize = gridSize,
+                            onGridSizeChange = onGridSizeChange,
+                        )
+                    },
+                )
+            }
+
             sections.forEachIndexed { sectionIndex, section ->
                 val base = sectionStartOffsets[sectionIndex]
 
@@ -347,6 +432,21 @@ private fun TimelineRevampGrid(
                     )
                 }
             }
+        }
+
+        if (showStickyHeader) {
+            StickySectionHeader(
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .testTag(TIMELINE_REVAMP_STICKY_HEADER_TAG),
+                title = stickyLabel,
+                trailingContent = {
+                    TimelineRevampGridSizeMenu(
+                        gridSize = gridSize,
+                        onGridSizeChange = onGridSizeChange,
+                    )
+                },
+            )
         }
     }
 }
@@ -546,17 +646,21 @@ private fun timelineMonthLabel(startDateSeconds: Long, locale: Locale): String {
 
 private const val HEADER_KEY_PREFIX = "header_"
 private const val MEDIA_KEY_PREFIX = "media_"
+private const val ENABLE_CU_BANNER = "timeline_revamp_content:banner"
+private const val NON_STICKY_HEADER_ITEM = "timeline_revamp_content:non_sticky_header"
 
 /** Em-dash (U+2014) separating the first and last day in the sticky day-range header. */
 private const val DAY_RANGE_SEPARATOR = "—"
 
 internal const val TIMELINE_REVAMP_CONTENT_GRID_TAG = "timeline_revamp_content:grid"
 internal const val TIMELINE_REVAMP_STICKY_HEADER_TAG = "timeline_revamp_content:sticky_header"
+internal const val TIMELINE_REVAMP_NON_STICKY_HEADER_TAG = "timeline_revamp_content:non_sticky_header"
 internal const val TIMELINE_REVAMP_CARD_LIST_TAG = "timeline_revamp_content:card_list"
 internal const val TIMELINE_REVAMP_SECTION_HEADER_TAG = "timeline_revamp_content:section_header_"
 internal const val TIMELINE_REVAMP_GRID_SIZE_ICON_TAG = "timeline_revamp_content:grid_size_icon"
 internal const val TIMELINE_REVAMP_LOADING_SKELETON_TAG = "timeline_revamp_content:loading_skeleton"
 internal const val TIMELINE_REVAMP_EMPTY_VIEW_TAG = "timeline_revamp_content:empty_view"
+internal const val TIMELINE_REVAMP_ENABLE_CU_CONTENT_TAG = "timeline_revamp_content:enable_cu"
 
 @CombinedThemePreviews
 @Composable
@@ -590,6 +694,62 @@ private fun TimelineRevampScreenPreview() {
             onNodeSelected = {},
             selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
+            mediaCameraUploadUiState = MediaCameraUploadUiState(),
+            showEnableCameraUploadsPage = false,
+            clearCameraUploadsCompletedMessage = {},
+            onNavigateToCameraUploadsSettings = {},
+            onNavigateToMobileDataSettings = {},
+            onNavigateToUpgradeAccount = {},
+            onCameraUploadsBannerDismiss = {},
+            handleCameraUploadsPermissionsResult = {},
+            handleNotificationPermissionResult = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun TimelineRevampWithBannerPreview() {
+    AndroidThemeForPreviews {
+        TimelineRevampScreen(
+            uiState = TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 7,
+                    ),
+                    MediaTimelineSection(
+                        groupId = "2026-05-10",
+                        startDate = 1_778_371_200L,
+                        endDate = 1_778_371_200L,
+                        count = 4,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0, 7),
+                loadedNodes = emptyMap(),
+            ),
+            onVisibleRangeChanged = { _, _ -> },
+            onGridSizeChange = {},
+            onZoomIn = {},
+            onZoomOut = {},
+            onMediaTimePeriodSelected = {},
+            onNodeClicked = {},
+            onNodeSelected = {},
+            selectedPhotoIds = emptySet(),
+            onTakenDownDialogEventConsumed = {},
+            mediaCameraUploadUiState = MediaCameraUploadUiState(
+                status = CUStatusUiState.Disabled(shouldNotifyUser = true),
+            ),
+            showEnableCameraUploadsPage = false,
+            clearCameraUploadsCompletedMessage = {},
+            onNavigateToCameraUploadsSettings = {},
+            onNavigateToMobileDataSettings = {},
+            onNavigateToUpgradeAccount = {},
+            onCameraUploadsBannerDismiss = {},
+            handleCameraUploadsPermissionsResult = {},
+            handleNotificationPermissionResult = {},
         )
     }
 }
@@ -609,6 +769,15 @@ private fun TimelineRevampEmptyPreview() {
             onNodeSelected = {},
             selectedPhotoIds = emptySet(),
             onTakenDownDialogEventConsumed = {},
+            mediaCameraUploadUiState = MediaCameraUploadUiState(),
+            showEnableCameraUploadsPage = false,
+            clearCameraUploadsCompletedMessage = {},
+            onNavigateToCameraUploadsSettings = {},
+            onNavigateToMobileDataSettings = {},
+            onNavigateToUpgradeAccount = {},
+            onCameraUploadsBannerDismiss = {},
+            handleCameraUploadsPermissionsResult = {},
+            handleNotificationPermissionResult = {},
         )
     }
 }

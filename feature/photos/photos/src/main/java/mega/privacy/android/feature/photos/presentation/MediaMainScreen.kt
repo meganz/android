@@ -54,6 +54,7 @@ import mega.privacy.android.core.nodecomponents.model.NodeActionState
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.extensions.toTrackingEvent
+import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLegacyPhotosSource
 import mega.privacy.android.feature.photos.model.MediaAppBarAction
 import mega.privacy.android.feature.photos.model.MediaScreen
@@ -249,6 +250,24 @@ fun MediaMainRoute(
                 mediaSource = timelineRevampFilterUiState.mediaSource,
             )
         }
+    }
+
+    LaunchedEffect(
+        timelineRevampUiState,
+        mediaCameraUploadUiState.status,
+        timelineRevampFilterUiState.mediaSource,
+    ) {
+        val show = when (timelineRevampUiState) {
+            is TimelineRevampUiState.Empty ->
+                mediaCameraUploadUiState.status is CUStatusUiState.Disabled
+
+            is TimelineRevampUiState.Data -> false
+            else -> return@LaunchedEffect
+        }
+        mediaCameraUploadViewModel.shouldEnableCUPage(
+            mediaSource = timelineRevampFilterUiState.mediaSource,
+            show = show,
+        )
     }
 
     MediaNodeActionEffects(
@@ -476,6 +495,9 @@ fun MediaMainScreen(
         } else {
             timelineTabUiState.currentSort
         }
+    val showEnableCameraUploadsPageForRevamp = isTimelineRevampEnabled &&
+            mediaCameraUploadUiState.enableCameraUploadPageShowing &&
+            timelineRevampFilterUiState.mediaSource != FilterMediaSource.CloudDrive
 
     var currentTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showTimelineSortDialog by rememberSaveable { mutableStateOf(false) }
@@ -667,6 +689,7 @@ fun MediaMainScreen(
                                     onTimelineRevampZoomOut = onTimelineRevampZoomOut,
                                     onTimelineRevampNodeClicked = onTimelineRevampNodeClicked,
                                     onTimelineRevampTakenDownDialogConsumed = onTimelineRevampTakenDownDialogConsumed,
+                                    showEnableCameraUploadsPage = showEnableCameraUploadsPageForRevamp,
                                     timelineFilterUiState = timelineFilterUiState,
                                     mediaCameraUploadUiState = mediaCameraUploadUiState,
                                     videosSelectionUiState = videosSelectionUiState,
@@ -771,6 +794,7 @@ private fun MediaScreen.MediaContent(
     onTimelineRevampZoomOut: () -> Unit,
     onTimelineRevampNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onTimelineRevampTakenDownDialogConsumed: () -> Unit,
+    showEnableCameraUploadsPage: Boolean,
     mediaCameraUploadUiState: MediaCameraUploadUiState,
     timelineFilterUiState: TimelineFilterUiState,
     videosSelectionUiState: VideosTabUiState.Selection,
@@ -808,6 +832,8 @@ private fun MediaScreen.MediaContent(
                         TimelineRevampScreen(
                             modifier = Modifier.fillMaxSize(),
                             uiState = timelineRevampUiState,
+                            mediaCameraUploadUiState = mediaCameraUploadUiState,
+                            showEnableCameraUploadsPage = showEnableCameraUploadsPage,
                             onVisibleRangeChanged = onTimelineRevampVisibleRangeChanged,
                             onGridSizeChange = onTimelineRevampGridSizeChange,
                             onZoomIn = onTimelineRevampZoomIn,
@@ -815,16 +841,33 @@ private fun MediaScreen.MediaContent(
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                             onNodeClicked = { node ->
                                 when {
-                                    node == null -> Unit
-                                    // Taken-down nodes raise the dispute dialog instead of opening.
+                                    node == null -> return@TimelineRevampScreen
                                     node.isTakenDown -> onTimelineRevampNodeClicked(node)
-                                    // Otherwise reuse the shared tab handler (select or open preview).
                                     else -> onTimelinePhotoClick(node.id)
                                 }
                             },
                             onNodeSelected = { node -> onTimelinePhotoSelected(node.id) },
                             selectedPhotoIds = selectedPhotoIds,
                             onTakenDownDialogEventConsumed = onTimelineRevampTakenDownDialogConsumed,
+                            clearCameraUploadsCompletedMessage = clearCameraUploadsCompletedMessage,
+                            onNavigateToCameraUploadsSettings = {
+                                onNavigateToCameraUploadsSettings(
+                                    LegacySettingsCameraUploadsActivityNavKey()
+                                )
+                            },
+                            onNavigateToMobileDataSettings = {
+                                onNavigateToCameraUploadsSettings(
+                                    LegacySettingsCameraUploadsActivityNavKey(
+                                        isShowHowToUploadPrompt = true
+                                    )
+                                )
+                            },
+                            onNavigateToUpgradeAccount = {
+                                onNavigateToUpgradeAccount(UpgradeAccountNavKey())
+                            },
+                            onCameraUploadsBannerDismiss = onCUBannerDismissRequest,
+                            handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
+                            handleNotificationPermissionResult = handleNotificationPermissionResult,
                         )
 
                         MediaTimePeriodSelector(
