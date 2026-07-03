@@ -2621,4 +2621,21 @@
     <string name="video_player_video_not_rendered">Acest videoclip nu poate fi afișat.</string>
     <string name="document_scanner_download_dialog_download_button">Descarcă</string>
     <string name="add_participants_title">Adaugă participanți</string>
+    <string name="share_link_access_banner_title">Acces la ink-uri</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Oricine are acest link vă poate vizualiza și descărca datele</item>
+        <item quantity="few">Oricine are aceste link-uri vă poate vizualiza și descărca datele</item>
+        <item quantity="other">Oricine are aceste link-uri vă poate vizualiza și descărca datele</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link creat și copiat în clipboard</item>
+        <item quantity="few">Link-uri create și copiate în clipboard</item>
+        <item quantity="other">Link-uri create și copiate în clipboard</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">Contacte din telefon</string>
+    <string name="create_group_chat_settings_title">Grup nou</string>
+    <string name="create_group_chat_name_hint">Introduceți numele grupului</string>
+    <string name="create_group_chat_ekr_label">Rotația cheii de criptare</string>
+    <string name="create_group_chat_get_chat_link_label">Obține linkul chatului</string>
+    <string name="create_group_chat_allow_add_participants_label">Permite non-gazdelor să adauge participanți</string>
 </resources>

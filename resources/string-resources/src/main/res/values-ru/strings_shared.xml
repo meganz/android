@@ -2350,7 +2350,7 @@
     <string name="general_title_incoming_shares">Входящие элементы</string>
     <string name="pdf_viewer_error_no_network">Нет подключения к сети. Пожалуйста, подключитесь повторно, чтобы открыть файл.</string>
     <string name="select_videos_search_empty_view_description">Ищите видео в Облачном диске</string>
-    <string name="new_text_file_invalid_extension_error_message">Укажите допустимое расширение файла (например, .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Укажите допустимое расширение файла (например, .txt, .md или .xml)</string>
     <string name="label_file_size_petabytes">%s&#160;ПБ</string>
     <string name="label_file_size_exabytes">%s&#160;ЭБ</string>
     <plurals name="num_of_folders_num_of_files">
@@ -2723,4 +2723,23 @@
     <string name="video_player_video_not_rendered">Это видео не может быть отображено</string>
     <string name="document_scanner_download_dialog_download_button">Скачать</string>
     <string name="add_participants_title">Добавить участников</string>
+    <string name="share_link_access_banner_title">Доступ по ссылке</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Любой человек, у которого есть ссылка, может просматривать и скачивать эти данные</item>
+        <item quantity="few">Любой человек, у которого есть ссылки, может просматривать и скачивать эти данные</item>
+        <item quantity="many">Любой человек, у которого есть ссылки, может просматривать и скачивать эти данные</item>
+        <item quantity="other">Любой человек, у которого есть ссылки, может просматривать и скачивать эти данные</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Ссылка создана и скопирована в буфер обмена</item>
+        <item quantity="few">Ссылки созданы и скопированы в буфер обмена</item>
+        <item quantity="many">Ссылки созданы и скопированы в буфер обмена</item>
+        <item quantity="other">Ссылки созданы и скопированы в буфер обмена</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">Телефонные контакты</string>
+    <string name="create_group_chat_settings_title">Новая группа</string>
+    <string name="create_group_chat_name_hint">Введите имя группы</string>
+    <string name="create_group_chat_ekr_label">Чередование ключей шифрования</string>
+    <string name="create_group_chat_get_chat_link_label">Ссылка на чат</string>
+    <string name="create_group_chat_allow_add_participants_label">Разрешить не организаторам добавлять участников</string>
 </resources>

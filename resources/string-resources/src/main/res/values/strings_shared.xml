@@ -2475,7 +2475,7 @@
     <!-- Bullet point shown when a folder link has been removed due to ToS violation -->
     <string name="folder_link_unavailable_tos_violation">The folder link has been removed as it violated our Terms of Service.</string>
     <!--Error message to show when adding a new text file with invalid text extension-->
-    <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt, .md, or .xml)</string>
     <!-- Title for the decryption key dialog when a folder/file link requires a key -->
     <string name="link_decryption_key_dialog_title">Enter decryption key</string>
     <!-- Two line message for the decryption key dialog prompting user to enter the key -->
@@ -3049,4 +3049,48 @@
     <string name="park_account_success_message">Your old account has been parked. You can now log in to your new account.</string>
     <!-- Add contacts picker: toolbar title shown when selecting contacts to add as chat participants -->
     <string name="add_participants_title">Add participants</string>
+    <!-- Add participants picker: warning shown when the meeting call has reached its participant limit -->
+    <string name="meetings_add_participants_user_limit_warning">This call is limited to 100 participants. Anyone beyond that can only chat. The organiser can upgrade to Pro to remove this limit.</string>
+    <!-- Disabled state of the resend button showing the remaining cooldown time before the user can resend the confirmation email again. %1$s is the remaining time formatted as minutes and seconds, e.g. "1:00". -->
+    <string name="email_confirmation_resend_button_countdown">Resend email in %1$s</string>
+    <string name="document_scanner_prepare_title">Setting up document scanner</string>
+    <string name="document_scanner_prepare_message">This only happens once. You can keep using your device while it downloads.</string>
+    <string name="document_scanner_prepare_error_title">Couldnt set up the document scanner</string>
+    <string name="document_scanner_prepare_error_transient_message">Check your connection and try again.</string>
+    <string name="document_scanner_prepare_error_permanent_message">You can use the old scanner instead.</string>
+    <string name="document_scanner_prepare_retry_button">Try again</string>
+    <string name="document_scanner_prepare_waiting_for_connection">Waiting for connection. The download resumes automatically once youre back online.</string>
+    <string name="document_scanner_prepare_reconnecting">Reconnecting&#8230;</string>
+    <!-- Share link revamp: title of the "Link access" info banner on the Share link screen -->
+    <string name="share_link_access_banner_title">Link access</string>
+    <!-- Share link revamp: body of the "Link access" info banner -->
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Anyone with this link can view and download your data</item>
+        <item quantity="other">Anyone with these links can view and download your data</item>
+    </plurals>
+    <!-- Share link revamp: snackbar shown after the link(s) are created and copied to the clipboard -->
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link created and copied to your clipboard</item>
+        <item quantity="other">Links created and copied to your clipboard</item>
+    </plurals>
+    <!-- Add contacts picker: header of the collapsible section that lists the contacts stored on the user's phone -->
+    <string name="add_contacts_phone_contacts_section_title">Phone contacts</string>
+    <!-- Add contacts picker: call to action asking the user to grant access to their phone's contacts -->
+    <string name="add_contacts_phone_contacts_allow_access">Allow access to contacts</string>
+    <!-- Add contacts picker: call to action to open the system picker and choose contacts from the phone -->
+    <string name="add_contacts_phone_contacts_select">Select phone contacts</string>
+    <!-- Add contacts picker: header of the section that lists the user's MEGA contacts, shown to separate them from the phone contacts section -->
+    <string name="add_contacts_mega_contacts_section_title">MEGA contacts</string>
+    <!-- Create group chat: toolbar title of the group settings step where the group name and options are set -->
+    <string name="create_group_chat_settings_title">New group</string>
+    <!-- Create group chat: hint of the group name text field. The name is optional. -->
+    <string name="create_group_chat_name_hint">Enter group name</string>
+    <!-- Create group chat: label of the encryption key rotation toggle -->
+    <string name="create_group_chat_ekr_label">Encryption key rotation</string>
+    <!-- Create group chat: explanation shown under the encryption key rotation toggle -->
+    <string name="create_group_chat_ekr_explanation">Encryption key rotation is slightly more secure, but doesn’t allow you to create a chat link and new participants won’t see past messages.</string>
+    <!-- Create group chat: label of the get chat link toggle -->
+    <string name="create_group_chat_get_chat_link_label">Get chat link</string>
+    <!-- Create group chat: label of the toggle allowing non-host participants to add others -->
+    <string name="create_group_chat_allow_add_participants_label">Allow non-hosts to add participants</string>
 </resources>

@@ -2213,7 +2213,7 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">Falsches Passwort</string>
     <string name="text_editor_fast_scroll_line_tooltip">Zeile %1$d</string>
     <string name="select_videos_search_empty_view_description">Finden Sie Videos in Ihrem Cloud Drive</string>
-    <string name="new_text_file_invalid_extension_error_message">Verwenden Sie eine gültige Dateierweiterung (z. B. .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Verwenden Sie eine gültige Dateierweiterung (z. B. .txt, .md oder .xml)</string>
     <string name="link_decryption_key_dialog_message">Geben Sie den Schlüssel ein, um diesen Link zu öffnen.\nWenn Sie den Schlüssel nicht haben, wenden Sie sich an den Eigentümer des Links.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2524,12 +2524,38 @@
     <string name="document_scanner_download_dialog_use_old_scanner_button">Alten Scanner verwenden</string>
     <string name="document_scanner_download_dialog_title">Dokumentenscanner herunterladen</string>
     <string name="document_scanner_download_dialog_download_button">Download</string>
-    <string name="document_scanner_download_dialog_message">Zur Nutzung des neuen Dokumentenscanners ist ein einmaliger Download von %1$d&#160;MB erforderlich.</string>
-    <string name="document_scanner_download_dialog_mobile_data_message">Für den neuen Dokumentenscanner ist ein einmaliger Download von %1$d&#160;MB erforderlich. Es können Gebühren für die mobile Datenübertragung anfallen.</string>
+    <string name="document_scanner_download_dialog_message">Zur Nutzung des neuen Dokumentenscanners ist ein einmaliger Download von %1$d MB erforderlich.</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Für den neuen Dokumentenscanner ist ein einmaliger Download von %1$d MB erforderlich. Es können Gebühren für die mobile Datenübertragung anfallen.</string>
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Über mobile Daten herunterladen</string>
     <string name="park_account_screen_title">Account parken</string>
     <string name="park_account_screen_acknowledge">Ich bestätige, dass ich einen neuen, leeren Account erstelle und alle Daten in meinem jetzigen Account verliere, sofern ich mein Passwort oder den exportierten Rettungsschlüssel nicht wiederfinde.</string>
     <string name="park_account_screen_start_button">Neuen Account erstellen</string>
     <string name="park_account_success_message">Ihr alter Account wurde geparkt. Sie können sich jetzt bei Ihrem neuen Account anmelden.</string>
     <string name="add_participants_title">Teilnehmer hinzufügen</string>
+    <string name="meetings_add_participants_user_limit_warning">Dieser Anruf ist auf 100 Teilnehmer beschränkt. Alle weiteren Teilnehmer können nur chatten. Der Organisator kann auf Pro upgraden, um diese Einschränkung aufzuheben.</string>
+    <string name="email_confirmation_resend_button_countdown">E-Mail in %1$s erneut senden</string>
+    <string name="document_scanner_prepare_title">Dokumentenscanner wird eingerichtet</string>
+    <string name="document_scanner_prepare_message">Dies wird nur einmal durchgeführt. Sie können Ihr Gerät während des Downloads weiter nutzen.</string>
+    <string name="document_scanner_prepare_error_title">Fehler beim Einrichten des Dokumentenscanners</string>
+    <string name="document_scanner_prepare_error_transient_message">Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
+    <string name="document_scanner_prepare_error_permanent_message">Sie können stattdessen den alten Scanner verwenden.</string>
+    <string name="document_scanner_prepare_retry_button">Wiederholen</string>
+    <string name="share_link_access_banner_title">Linkzugriff</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Jeder, der über diesen Link verfügt, kann Ihre Daten einsehen und herunterladen</item>
+        <item quantity="other">Jeder, der über diese Links verfügt, kann Ihre Daten einsehen und herunterladen</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link erstellt und in die Zwischenablage kopiert</item>
+        <item quantity="other">Links erstellt und in die Zwischenablage kopiert</item>
+    </plurals>
+    <string name="document_scanner_prepare_waiting_for_connection">Warte auf Verbindung. Der Download wird automatisch fortgesetzt, sobald Sie wieder online sind.</string>
+    <string name="document_scanner_prepare_reconnecting">Verbindung wird wiederhergestellt&#8230;</string>
+    <string name="add_contacts_phone_contacts_section_title">Telefonkontakte</string>
+    <string name="create_group_chat_name_hint">Benennen Sie den Gruppenchat</string>
+    <string name="create_group_chat_ekr_label">Schlüsselrotation</string>
+    <string name="create_group_chat_ekr_explanation">Schlüsselrotation ist etwas sicherer. Allerdings können Sie dann keine Chatlinks mehr erstellen, und neue Teilnehmer können frühere Nachrichten nicht mehr sehen.</string>
+    <string name="create_group_chat_settings_title">Neue Gruppe</string>
+    <string name="create_group_chat_get_chat_link_label">Chatlink erstellen</string>
+    <string name="create_group_chat_allow_add_participants_label">Nicht-Gastgebern erlauben, Teilnehmer hinzuzufügen</string>
 </resources>

@@ -2401,4 +2401,18 @@
     <string name="general_allow_button">Izinkan</string>
     <string name="document_scanner_download_dialog_download_button">Unduh</string>
     <string name="add_participants_title">Tambahkan peserta</string>
+    <string name="meetings_add_participants_user_limit_warning">Panggilan ini dibatasi hingga 100 peserta. Peserta di luar jumlah tersebut hanya dapat mengobrol. Penyelenggara dapat meningkatkan keanggotaan ke Pro untuk menghapus batasan ini.</string>
+    <string name="share_link_access_banner_title">Akses tautan</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="other">Siapa pun yang memiliki tautan ini dapat melihat dan mengunduh data anda</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="other">Tautan dibuat dan disalin ke papan klip anda</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">Kontak telepon</string>
+    <string name="create_group_chat_name_hint">Masukan nama grup</string>
+    <string name="create_group_chat_ekr_label">Rotasi kunci enkripsi</string>
+    <string name="create_group_chat_settings_title">Grup baru</string>
+    <string name="create_group_chat_get_chat_link_label">Dapatkan tautan obrolan</string>
+    <string name="create_group_chat_allow_add_participants_label">Izinkan non-host untuk menambahkan peserta</string>
 </resources>

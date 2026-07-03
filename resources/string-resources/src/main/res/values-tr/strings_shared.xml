@@ -2538,4 +2538,19 @@
     <string name="video_player_video_not_rendered">Bu video görüntülenemiyor.</string>
     <string name="document_scanner_download_dialog_download_button">İndir</string>
     <string name="add_participants_title">Katılımcı ekle</string>
+    <string name="share_link_access_banner_title">Bağlantı erişimi</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Bu bağlantıya sahip herkes verilerinizi görüntüleyebilir ve indirebilir</item>
+        <item quantity="other">Bu bağlantılara sahip herkes verilerinizi görüntüleyebilir ve indirebilir</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Bağlantı oluşturuldu ve panonuza kopyalandı</item>
+        <item quantity="other">Bağlantılar oluşturuldu ve panonuza kopyalandı</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">Telefon kişileri</string>
+    <string name="create_group_chat_settings_title">Yeni grup</string>
+    <string name="create_group_chat_name_hint">Grup adını girin</string>
+    <string name="create_group_chat_ekr_label">Şifreleme anahtarı döndürme</string>
+    <string name="create_group_chat_get_chat_link_label">Sohbet bağlantısını al</string>
+    <string name="create_group_chat_allow_add_participants_label">Yönetici olmayanların katılımcı eklemesine izin ver</string>
 </resources>

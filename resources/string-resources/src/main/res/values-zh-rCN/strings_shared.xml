@@ -755,7 +755,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">需要文件扩展名</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA将获取这个文件的临时副本，以便您预览。它不会被保存，也不会在应用程序之外可用。%1$s将被下载。</string>
+    <string name="alert_larger_file_preview">此文件无法在 MEGA 中预览。下载该文件(%1$s)以在其他应用中打开。</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">完成进度：%1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1211,7 +1211,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">允许移动数据</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">预览大文件</string>
+    <string name="alert_larger_file_preview_title">预览不可用</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">立即预览</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2164,7 +2164,7 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">密码错误</string>
     <string name="text_editor_fast_scroll_line_tooltip">第%1$d行</string>
     <string name="select_videos_search_empty_view_description">在您的云盘中搜索视频</string>
-    <string name="new_text_file_invalid_extension_error_message">使用有效的文件扩展名（例如 .txt）</string>
+    <string name="new_text_file_invalid_extension_error_message">请使用有效的文件扩展名（例如 .txt，.md 或 .xml）</string>
     <string name="link_decryption_key_dialog_message">输入打开此链接所需的密钥。\n没有密钥？请联系链接所有者。</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2441,4 +2441,40 @@
     <string name="video_player_video_not_rendered">此视频无法显示</string>
     <string name="document_scanner_download_dialog_download_button">下载</string>
     <string name="add_participants_title">添加参与者</string>
+    <string name="share_link_access_banner_title">链接访问</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="other">任何拥有这些链接的人都可以查看和下载您的数据</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="other">链接已创建并复制到您的剪贴板</item>
+    </plurals>
+    <string name="document_scanner_download_dialog_title">下载文档扫描仪</string>
+    <string name="document_scanner_download_dialog_message">新的文档扫描仪在您可以使用之前需要进行一次性 %1$d MB 的下载。</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">通过移动数据下载？</string>
+    <string name="add_contacts_phone_contacts_section_title">手机通讯录</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">新的文档扫描仪需要一次性下载 %1$d MB。可能产生移动数据流量费。</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">通过移动数据下载</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">使用旧版的扫描仪</string>
+    <string name="park_account_screen_title">封存帐户</string>
+    <string name="park_account_screen_acknowledge">我了解我正在重新创建一个新的空帐户。除非我能想起密码或找到已导出的恢复密钥，否则我将失去当前帐户中的所有数据。</string>
+    <string name="park_account_screen_start_button">开启新帐户</string>
+    <string name="park_account_success_message">您的旧帐户已被封存。您现在可以登录您的新帐户。</string>
+    <string name="meetings_add_participants_user_limit_warning">本次通话限制为100名参与者。超过此人数的参与者只能进行聊天。主办方可以升级到 Pro 以移除此限制。</string>
+    <string name="email_confirmation_resend_button_countdown">在 %1$s 后重新发送电子邮件</string>
+    <string name="document_scanner_prepare_title">设置文档扫描仪</string>
+    <string name="document_scanner_prepare_message">这只会发生一次。您可以在下载时继续使用您的设备。</string>
+    <string name="document_scanner_prepare_error_title">无法设置文档扫描仪</string>
+    <string name="document_scanner_prepare_error_transient_message">请检查您的网络连接，然后再试一次。</string>
+    <string name="document_scanner_prepare_error_permanent_message">您可以改用旧的扫描仪。</string>
+    <string name="document_scanner_prepare_retry_button">请再试一次</string>
+    <string name="document_scanner_prepare_waiting_for_connection">正在等待连接。一旦您重新上线，下载将自动继续。</string>
+    <string name="document_scanner_prepare_reconnecting">正在重新连接&#8230;</string>
+    <string name="add_contacts_phone_contacts_allow_access">允许访问通讯录</string>
+    <string name="add_contacts_phone_contacts_select">选择手机联系人</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA联系人</string>
+    <string name="create_group_chat_settings_title">新建群组</string>
+    <string name="create_group_chat_name_hint">输入群组名称</string>
+    <string name="create_group_chat_ekr_label">加密密钥轮换</string>
+    <string name="create_group_chat_get_chat_link_label">获取聊天链接</string>
+    <string name="create_group_chat_allow_add_participants_label">允许非主持人添加参与者</string>
 </resources>

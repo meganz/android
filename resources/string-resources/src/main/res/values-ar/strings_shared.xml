@@ -2890,4 +2890,28 @@
     <string name="video_player_video_not_rendered">هذا الفيديو لا يمكن عرضه.</string>
     <string name="document_scanner_download_dialog_download_button">تنزيل</string>
     <string name="add_participants_title">إضافة مشاركين</string>
+    <string name="meetings_add_participants_user_limit_warning">هذه المكالمة محدودة بـ 100 مشارك. أي شخص يتجاوز ذلك يمكنه فقط المحادثة. يمكن للمنظم الترقية إلى برو Pro لإزالة هذا الحد.</string>
+    <string name="share_link_access_banner_title">الوصول إلى الرابط</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="zero">يمكن لأي شخص لديه هذا الرابط عرض بياناتك وتنزيلها</item>
+        <item quantity="one">يمكن لأي شخص لديه هذا الرابط عرض بياناتك وتنزيلها</item>
+        <item quantity="two">يمكن لأي شخص لديه هذه الروابط عرض بياناتك وتنزيلها</item>
+        <item quantity="few">يمكن لأي شخص لديه هذه الروابط عرض بياناتك وتنزيلها</item>
+        <item quantity="many">يمكن لأي شخص لديه هذه الروابط عرض بياناتك وتنزيلها</item>
+        <item quantity="other">يمكن لأي شخص لديه هذه الروابط عرض بياناتك وتنزيلها</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="zero">تم إنشاء الرابط و نسخه إلى الحافظة</item>
+        <item quantity="one">تم إنشاء الرابط و نسخه إلى الحافظة</item>
+        <item quantity="two">تم إنشاء الروابط و نسخهم إلى الحافظة</item>
+        <item quantity="few">تم إنشاء الروابط و نسخهم إلى الحافظة</item>
+        <item quantity="many">تم إنشاء الروابط و نسخهم إلى الحافظة</item>
+        <item quantity="other">تم إنشاء الروابط و نسخهم إلى الحافظة</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">جهات اتصال الهاتف</string>
+    <string name="create_group_chat_name_hint">ادخل اسم المجموعة</string>
+    <string name="create_group_chat_ekr_label">تدوير مفتاح التشفير</string>
+    <string name="create_group_chat_settings_title">مجموعة جديدة</string>
+    <string name="create_group_chat_get_chat_link_label">استخرج رابط المحادثة</string>
+    <string name="create_group_chat_allow_add_participants_label">السماح لغير المضيفين بإضافة مشاركين</string>
 </resources>

@@ -87,7 +87,7 @@
     <!-- success message when the subscription has been canceled correctly -->
     <string name="cancel_subscription_ok">구독이 취소되었습니다</string>
     <!-- error message when the subscription has not been canceled successfully -->
-    <string name="cancel_subscription_error">당신의 구독을 취소할 수 없었습니다. 도움을 받으려면 https://mega.nz/support에서 지원 부서에 연락주세요.</string>
+    <string name="cancel_subscription_error">당신의 구독을 취소할 수 없었습니다. 도움을 받으려면 https://mega.nz/support에서 지원 부서에 연락하세요.</string>
     <!-- Menu item to kill all opened sessions -->
     <string name="action_kill_all_sessions">다른 세션 닫기</string>
     <!-- Message after kill all opened sessions -->
@@ -713,7 +713,7 @@
     <!-- Error message when the credentials to login are incorrect. -->
     <string name="error_incorrect_email_or_password">잘못된 이메일 또는 암호입니다. 다시 시도하세요.</string>
     <!-- Error message when trying to login and the account is suspended. -->
-    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. https://mega.nz/support에서 지원 부서에 연락주세요</string>
+    <string name="error_account_suspended">당신의 계정은 이용 약관 위반으로 인해 정지되어 있습니다. https://mega.nz/support에서 지원 부서에 연락하세요</string>
     <!-- Error message when to many attempts to login. -->
     <string name="too_many_attempts_login">로그인 시도 실패가 너무 많습니다, 1시간 동안 기다려주세요.</string>
     <!-- Error message when trying to login to an account not validated. -->
@@ -1221,7 +1221,7 @@
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">장치 모델</string>
     <!-- mail body -->
-    <string name="settings_feedback_body_android_version">안드로이드 버전</string>
+    <string name="settings_feedback_body_android_version">Android 버전</string>
     <!-- Input field description in the create file dialog. -->
     <string name="context_new_file_name">파일 이름</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1727,13 +1727,13 @@
     <!-- Text of the dialog shown when the storage of a PRO I or II account is almost full -->
     <string name="text_almost_full_warning_pro_account">클라우드 드라이브가 거의 찼습니다. 지금 업그레이드 하고 %1$s의 저장소와 %2$s의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is almost full -->
-    <string name="text_almost_full_warning_pro3_account">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하시면 MEGA 고객 지원에 연락하여 맞춤 요금제를 받으세요.</string>
+    <string name="text_almost_full_warning_pro3_account">클라우드 드라이브가 거의 찼습니다. 더 많은 저장소가 필요하시면 맞춤 요금제를 위해 MEGA 지원 부서에 연락하세요.</string>
     <!-- Text of the dialog shown when the storage of a FREE account is full -->
     <string name="text_storage_full_warning">클라우드 드라이브가 가득 찼습니다. Pro로 업그레이드하고 최대 %1$s의 저장소와 %2$s의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO I or II account is full -->
     <string name="text_storage_full_warning_pro_account">클라우드 드라이브가 가득 찼습니다. 지금 업그레이드하고 최대 %1$s의 저장소와 %2$s의 전송 할당량을 받으세요.</string>
     <!-- Text of the dialog shown when the storage of a PRO III account is full -->
-    <string name="text_storage_full_warning_pro3_account">클라우드 드라이브가 가득 찼습니다. 더 많은 저장소가 필요하다면 맞춤 요금제를 위해 MEGA 고객 지원에 연락하세요.</string>
+    <string name="text_storage_full_warning_pro3_account">클라우드 드라이브가 가득 찼습니다. 더 많은 저장소가 필요하시면 맞춤 요금제를 위해 MEGA 지원 부서에 연락하세요.</string>
     <!-- Button of the dialog shown when the storage is almost full to see the available PRO plans -->
     <string name="button_plans_almost_full_warning">요금제 보기</string>
     <!-- Button of the dialog shown when the storage is almost full to custom a plan -->
@@ -2501,11 +2501,11 @@
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">즐겨찾기 삭제</string>
     <!-- Context menu item. Allows to mark file/folder with own color label -->
-    <string name="file_properties_label">라벨</string>
+    <string name="file_properties_label">레이블</string>
     <!-- Information text to let’s the user know that they can remove a colour from a folder or file that was already marked. -->
-    <string name="action_remove_label">라벨 제거</string>
+    <string name="action_remove_label">레이블 제거</string>
     <!-- Title text to show label selector. -->
-    <string name="title_label">라벨</string>
+    <string name="title_label">레이블</string>
     <!-- A user can mark a folder or file with red colour. -->
     <string name="label_red">빨강</string>
     <!-- A user can mark a folder or file with orange colour. -->
@@ -4405,7 +4405,7 @@
     <!-- Camera uploads low battery info in Photos screen. -->
     <string name="photos_camera_uploads_low_battery">배터리가 %1$d%% 이하이기 대문에 업로드를 일시정지 하였습니다</string>
     <!-- Camera uploads general issue info in Photos screen. -->
-    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면, https://mega.nz/support에서 지원 부서에 연락주세요</string>
+    <string name="photos_camera_uploads_general_issue">카메라 업로드가 작동을 멈추었습니다. 해결하려면 카메라 업로드를 재활성화 하세요. 만약 문제가 계속되면, https://mega.nz/support에서 지원 부서에 연락하세요</string>
     <!-- Camera uploads pending info in Photos screen. -->
     <plurals name="photos_camera_uploads_pending">
         <item quantity="other">카메라 업로드 진행 중, 파일 %1$d개 대기 중</item>
