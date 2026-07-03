@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionRes
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -63,6 +64,7 @@ internal fun HandleNodeOptionsActionEvent(
     onNavigate: (NavKey) -> Unit,
     onRestoreSuccess: (RestoreData) -> Unit,
     onShareContactSelected: (List<String>, List<Long>) -> Unit,
+    onShareHiddenNodeWarningConfirmed: (List<Long>) -> Unit,
     consumeNameCollisionResult: () -> Unit,
     consumePublicCopyCollisionResult: () -> Unit,
     consumeInfoToShow: () -> Unit,
@@ -75,6 +77,7 @@ internal fun HandleNodeOptionsActionEvent(
     consumeAccessDialogShown: () -> Unit,
     consumeShareFolderEvent: () -> Unit,
     consumeShareFolderDialogEvent: () -> Unit,
+    consumeShareHiddenNodeWarningEvent: () -> Unit,
     consumeRestoreSuccess: () -> Unit = {},
     onActionTriggered: () -> Unit = {},
 ) {
@@ -85,6 +88,7 @@ internal fun HandleNodeOptionsActionEvent(
     val coroutineScope = rememberCoroutineScope()
     var isShowForeignDialog by rememberSaveable { mutableStateOf(false) }
     var isOverQuota by rememberSaveable { mutableStateOf<Boolean?>(null) }
+    var shareHiddenNodeWarning by remember { mutableStateOf<Pair<List<Long>, Boolean>?>(null) }
     val nameCollisionLauncher = rememberLauncherForActivityResult(
         contract = megaResultContract.nameCollisionActivityContract
     ) { message ->
@@ -224,6 +228,15 @@ internal fun HandleNodeOptionsActionEvent(
     )
 
     EventEffect(
+        event = nodeActionState.shareHiddenNodeWarningEvent,
+        onConsumed = consumeShareHiddenNodeWarningEvent,
+        action = { warning ->
+            onActionTriggered()
+            shareHiddenNodeWarning = warning
+        }
+    )
+
+    EventEffect(
         event = nodeActionState.shareFolderEvent,
         onConsumed = consumeShareFolderEvent,
         action = { handles ->
@@ -231,6 +244,19 @@ internal fun HandleNodeOptionsActionEvent(
             shareFolderLauncher.launch(handles.toLongArray())
         }
     )
+
+    shareHiddenNodeWarning?.let { (handles, sharingMultipleFolders) ->
+        ShareHiddenNodeWarningDialog(
+            sharingMultipleFolders = sharingMultipleFolders,
+            onConfirm = {
+                shareHiddenNodeWarning = null
+                onShareHiddenNodeWarningConfirmed(handles)
+            },
+            onCancel = {
+                shareHiddenNodeWarning = null
+            },
+        )
+    }
 
     if (isShowForeignDialog) {
         BasicDialog(
