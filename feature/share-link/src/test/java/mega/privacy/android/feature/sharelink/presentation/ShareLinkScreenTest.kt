@@ -1,19 +1,20 @@
 package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.Clipboard
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.NativeClipboard
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_DETAILS_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
@@ -47,7 +48,7 @@ class ShareLinkScreenTest {
 
         composeRule.onNodeWithText("Presentation.pdf").assertIsDisplayed()
         composeRule.onNodeWithTag(SHARE_LINK_ACCESS_BANNER_TAG).assertIsDisplayed()
-        composeRule.onNodeWithTag(SHARE_LINK_LINK_FIELD_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(SHARE_LINK_DETAILS_TAG).assertIsDisplayed()
         composeRule.onNodeWithTag(SHARE_LINK_SHARE_BUTTON_TAG).assertIsDisplayed()
     }
 
@@ -88,13 +89,14 @@ class ShareLinkScreenTest {
 
     @Test
     fun `test that tapping the copy icon copies the link to the clipboard`() {
-        val clipboard = FakeClipboardManager()
-        setContent(uiState = data, clipboardManager = clipboard)
+        val clipboard = FakeClipboard()
+        setContent(uiState = data, clipboard = clipboard)
 
         composeRule.onNodeWithContentDescription(context.getString(sharedR.string.general_copy))
             .performClick()
+        composeRule.waitForIdle()
 
-        assertThat(clipboard.getText()?.text).isEqualTo(data.link)
+        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.link)
     }
 
     private fun setContent(
@@ -103,30 +105,32 @@ class ShareLinkScreenTest {
         onOpenSettings: () -> Unit = {},
         onShareLink: () -> Unit = {},
         onCopyLink: () -> Unit = {},
-        clipboardManager: ClipboardManager = FakeClipboardManager(),
+        clipboard: Clipboard = FakeClipboard(),
     ) {
         composeRule.setContent {
-            CompositionLocalProvider(LocalClipboardManager provides clipboardManager) {
-                AndroidThemeForPreviews {
-                    ShareLinkScreen(
-                        uiState = uiState,
-                        onBack = onBack,
-                        onOpenSettings = onOpenSettings,
-                        onShareLink = onShareLink,
-                        onCopyLink = onCopyLink,
-                    )
-                }
+            CompositionLocalProvider(LocalClipboard provides clipboard) {
+                ShareLinkScreen(
+                    uiState = uiState,
+                    onBack = onBack,
+                    onOpenSettings = onOpenSettings,
+                    onShareLink = onShareLink,
+                    onCopyLink = onCopyLink,
+                )
             }
         }
     }
 
-    private class FakeClipboardManager : ClipboardManager {
-        private var text: AnnotatedString? = null
+    private class FakeClipboard : Clipboard {
+        var clipEntry: ClipEntry? = null
+            private set
 
-        override fun setText(annotatedString: AnnotatedString) {
-            text = annotatedString
+        override suspend fun getClipEntry(): ClipEntry? = clipEntry
+
+        override suspend fun setClipEntry(clipEntry: ClipEntry?) {
+            this.clipEntry = clipEntry
         }
 
-        override fun getText(): AnnotatedString? = text
+        override val nativeClipboard: NativeClipboard
+            get() = throw UnsupportedOperationException("Not used in tests")
     }
 }

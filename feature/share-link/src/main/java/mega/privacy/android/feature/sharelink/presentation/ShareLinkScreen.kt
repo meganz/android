@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sharelink.presentation
 
+import android.content.ClipData
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,27 +18,26 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.banner.InlineInfoBanner
+import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.divider.SubtleDivider
-import mega.android.core.ui.components.surface.BoxSurface
-import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.Button
@@ -50,7 +50,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
-import mega.privacy.android.feature.sharelink.presentation.component.ShareLinkDetailRow
+import mega.privacy.android.feature.sharelink.presentation.component.ShareLinkDetails
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -136,7 +136,8 @@ private fun ShareLinkContent(
     onCopyLink: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
 
     Column(
         modifier = modifier
@@ -161,36 +162,18 @@ private fun ShareLinkContent(
                 showCancelButton = false,
             )
 
-            LinkField(
+            ShareLinkDetails(
                 link = uiState.link,
                 onCopyLink = {
-                    clipboardManager.setText(AnnotatedString(uiState.link))
+                    coroutineScope.launch {
+                        clipboard.setClipEntry(
+                            ClipData.newPlainText(COPIED_LINK_LABEL, uiState.link).toClipEntry(),
+                        )
+                    }
                     onCopyLink()
                 },
             )
         }
-    }
-}
-
-@Composable
-private fun LinkField(
-    link: String,
-    onCopyLink: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    BoxSurface(
-        surfaceColor = SurfaceColor.Surface1,
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .testTag(SHARE_LINK_LINK_FIELD_TAG),
-    ) {
-        ShareLinkDetailRow(
-            modifier = Modifier.padding(16.dp),
-            label = stringResource(sharedR.string.album_get_link_link_section_title),
-            value = link,
-            onCopy = onCopyLink,
-        )
     }
 }
 
@@ -364,6 +347,6 @@ internal const val SHARE_LINK_APP_BAR_TAG = "share_link_screen:app_bar"
 internal const val SHARE_LINK_SHARE_BUTTON_TAG = "share_link_screen:button_share"
 internal const val SHARE_LINK_NODE_HEADER_TAG = "share_link_screen:node_header"
 internal const val SHARE_LINK_ACCESS_BANNER_TAG = "share_link_screen:access_banner"
-internal const val SHARE_LINK_LINK_FIELD_TAG = "share_link_screen:link_field"
 internal const val SHARE_LINK_LOADING_TAG = "share_link_screen:loading"
 internal const val SHARE_LINK_ERROR_TAG = "share_link_screen:error"
+private const val COPIED_LINK_LABEL = "Copied Text"

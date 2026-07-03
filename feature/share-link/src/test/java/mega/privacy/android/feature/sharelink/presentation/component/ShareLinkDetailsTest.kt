@@ -12,23 +12,23 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class ShareLinkDetailRowTest {
+class ShareLinkDetailsTest {
 
     @get:Rule
     val composeRule = createComposeRule()
 
     @Test
-    fun `test that the label and value are displayed`() {
-        setContent(label = "Link", value = "https://mega.nz/file/abc123")
+    fun `test that the card and link value are displayed`() {
+        setContent(link = "https://mega.nz/file/abc123")
 
-        composeRule.onNodeWithText("Link").assertIsDisplayed()
+        composeRule.onNodeWithTag(SHARE_LINK_DETAILS_TAG).assertIsDisplayed()
         composeRule.onNodeWithText("https://mega.nz/file/abc123").assertIsDisplayed()
     }
 
     @Test
-    fun `test that tapping the copy icon invokes onCopy`() {
+    fun `test that tapping the copy icon invokes onCopyLink`() {
         var copied = false
-        setContent(onCopy = { copied = true })
+        setContent(onCopyLink = { copied = true })
 
         composeRule.onNodeWithTag(SHARE_LINK_DETAIL_ROW_COPY_TAG).performClick()
 
@@ -36,15 +36,13 @@ class ShareLinkDetailRowTest {
     }
 
     private fun setContent(
-        label: String = "Link",
-        value: String = "https://mega.nz/file/abc123",
-        onCopy: () -> Unit = {},
+        link: String = "https://mega.nz/file/abc123",
+        onCopyLink: () -> Unit = {},
     ) {
         composeRule.setContent {
-            ShareLinkDetailRow(
-                label = label,
-                value = value,
-                onCopy = onCopy,
+            ShareLinkDetails(
+                link = link,
+                onCopyLink = onCopyLink,
             )
         }
     }
