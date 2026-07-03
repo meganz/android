@@ -6,6 +6,7 @@ plugins {
     alias(convention.plugins.mega.android.room)
     alias(convention.plugins.mega.android.hilt)
     alias(plugin.plugins.kotlin.serialisation)
+    alias(plugin.plugins.compose.screenshot)
     id("kotlin-parcelize")
 }
 
@@ -17,6 +18,7 @@ android {
         testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
     }
     namespace = "mega.privacy.android.shared.nodes"
+    experimentalProperties["android.experimental.enableScreenshotTest"] = true
     testOptions {
         unitTests {
             targetSdk = 34
@@ -78,4 +80,9 @@ dependencies {
     testImplementation(androidx.material3)
     testImplementation(androidx.work.test)
     testRuntimeOnly(testlib.junit.jupiter.engine)
+
+    // screenshot tests
+    screenshotTestImplementation(platform(androidx.compose.bom))
+    screenshotTestImplementation(androidx.compose.ui.tooling)
+    screenshotTestImplementation(testlib.compose.screenshot)
 }
