@@ -57,10 +57,10 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
     val uiState: StateFlow<ContinueWhereLeftOffListUiState> by lazy(LazyThreadSafetyMode.NONE) {
         combine(
             monitorContinueWhereLeftOffItemsUseCase(MAX_LIST_ITEMS)
-                .transformLatest { items ->
-                    emit(nameResolver.applyCachedNames(items))
-                    if (nameResolver.resolveBlankNames(items)) {
-                        emit(nameResolver.applyCachedNames(items))
+                .transformLatest { result ->
+                    emit(result.copy(items = nameResolver.applyCachedNames(result.items)))
+                    if (nameResolver.resolveBlankNames(result.items)) {
+                        emit(result.copy(items = nameResolver.applyCachedNames(result.items)))
                     }
                 },
             monitorContinueWhereLeftOffSortPreferenceUseCase()
@@ -69,10 +69,12 @@ internal class ContinueWhereLeftOffListViewModel @Inject constructor(
                 .onStart { emit(consumed()) },
             uiAction,
             monitorConnectivityUseCase().catch { Timber.e(it) },
-        ) { items, sortConfiguration, openNodeEvent, action, isConnected ->
+        ) { result, sortConfiguration, openNodeEvent, action, isConnected ->
             ContinueWhereLeftOffListUiState(
-                items = items.sortedForDisplay(sortConfiguration),
-                isLoading = false,
+                items = result.items.sortedForDisplay(sortConfiguration),
+                // Keep loading until the hidden-nodes state is resolved so sensitive items are
+                // never shown unblurred before their blur is applied (AND-24162).
+                isLoading = !result.isHiddenResolved,
                 isConnected = isConnected,
                 openNodeEvent = openNodeEvent,
                 sortConfiguration = sortConfiguration,

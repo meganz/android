@@ -40,6 +40,7 @@ import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
+import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -63,6 +64,7 @@ import mega.privacy.mobile.home.presentation.continuewhereleftoff.iconForType
 @Composable
 internal fun ContinueWhereLeftOffCarousel(
     items: List<ContinueWhereLeftOffItem>,
+    isLoading: Boolean,
     onItemClick: (ContinueWhereLeftOffItem) -> Unit,
     onViewAllClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -74,7 +76,12 @@ internal fun ContinueWhereLeftOffCarousel(
             onViewAllClick = onViewAllClick,
             showChevron = items.isNotEmpty(),
         )
-        if (items.isEmpty()) {
+        if (isLoading) {
+            // Show skeleton cards until the first batch is computed and the hidden-nodes state is
+            // resolved, so the empty state never flashes on a cold start (T21385393) and sensitive
+            // items are never shown unblurred before their blur is applied (AND-24162).
+            ContinueWhereLeftOffLoadingView()
+        } else if (items.isEmpty()) {
             ContinueWhereLeftOffEmptyView()
         } else {
             val listState = rememberLazyListState()
@@ -196,6 +203,45 @@ private fun ContinueWhereLeftOffEmptyView(
             painter = painterResource(R.drawable.ic_cwlo_empty_state),
             contentDescription = null,
             modifier = Modifier.size(60.dp),
+        )
+    }
+}
+
+@Composable
+private fun ContinueWhereLeftOffLoadingView(
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier = modifier
+            .fillMaxWidth()
+            .testTag(CONTINUE_WHERE_LEFT_OFF_LOADING_TEST_TAG),
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        userScrollEnabled = false,
+    ) {
+        items(CAROUSEL_SKELETON_ITEMS) {
+            ContinueWhereLeftOffCardSkeleton()
+        }
+    }
+}
+
+@Composable
+private fun ContinueWhereLeftOffCardSkeleton(
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.width(140.dp)) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(90.dp)
+                .shimmerEffect(RoundedCornerShape(8.dp)),
+        )
+        Spacer(
+            modifier = Modifier
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .height(16.dp)
+                .fillMaxWidth(0.7f)
+                .shimmerEffect(),
         )
     }
 }
@@ -345,6 +391,7 @@ private fun ContinueWhereLeftOffCarouselPreview() {
                     lastAccessedTimestamp = 1712707200L,
                 ),
             ),
+            isLoading = false,
             onItemClick = {},
             onViewAllClick = {},
         )
@@ -364,6 +411,7 @@ private fun ContinueWhereLeftOffCarouselWithMorePreview() {
                     lastAccessedTimestamp = 1712880000L + handle,
                 )
             },
+            isLoading = false,
             onItemClick = {},
             onViewAllClick = {},
         )
@@ -376,6 +424,20 @@ private fun ContinueWhereLeftOffCarouselEmptyPreview() {
     AndroidThemeForPreviews {
         ContinueWhereLeftOffCarousel(
             items = emptyList(),
+            isLoading = false,
+            onItemClick = {},
+            onViewAllClick = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ContinueWhereLeftOffCarouselLoadingPreview() {
+    AndroidThemeForPreviews {
+        ContinueWhereLeftOffCarousel(
+            items = emptyList(),
+            isLoading = true,
             onItemClick = {},
             onViewAllClick = {},
         )
@@ -386,8 +448,13 @@ private fun ContinueWhereLeftOffCarouselEmptyPreview() {
 // appended that opens the full list (T21373295).
 private const val CAROUSEL_MAX_VISIBLE_ITEMS = 8
 
+// Number of skeleton cards shown while the first batch of items loads.
+private const val CAROUSEL_SKELETON_ITEMS = 4
+
 internal const val CONTINUE_WHERE_LEFT_OFF_EMPTY_TEXT_TEST_TAG =
     "continue_where_left_off_widget:empty_text"
+internal const val CONTINUE_WHERE_LEFT_OFF_LOADING_TEST_TAG =
+    "continue_where_left_off_widget:loading"
 internal const val CONTINUE_WHERE_LEFT_OFF_LIST_TEST_TAG =
     "continue_where_left_off_widget:list"
 internal const val CONTINUE_WHERE_LEFT_OFF_CHEVRON_TEST_TAG =

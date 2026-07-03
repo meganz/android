@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffResult
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
@@ -62,20 +64,24 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
         limit: Int,
         sortField: ContinueWhereLeftOffSortField? = null,
         sortDirection: SortDirection? = null,
-    ): Flow<List<ContinueWhereLeftOffItem>> =
+    ): Flow<ContinueWhereLeftOffResult> =
         combine(
             repository.monitorContinueWhereLeftOffItems(limit, sortField, sortDirection),
-            // Fail-open defaults so the list is never blocked waiting for account/settings to load
-            // and nothing is removed before the real values are known: "feature disabled" and
-            // "showing hidden items" both mean keep everything. Removal only happens once the real
-            // values say the feature is enabled AND hidden items are not being shown.
-            monitorHiddenNodesEnabledUseCase().onStart { emit(false) },
+            // Emit a null placeholder until the real eligibility loads so the list is never blocked
+            // waiting for the account, while still telling consumers (via isHiddenResolved) that the
+            // sensitivity is not yet known. A null placeholder is treated as "feature disabled" here
+            // so nothing is removed and nothing is blurred before the real value arrives — consumers
+            // keep showing their loading state instead of rendering these unresolved items.
+            monitorHiddenNodesEnabledUseCase().map<Boolean, Boolean?> { it }.onStart { emit(null) },
             monitorShowHiddenItemsUseCase().onStart { emit(true) },
             // Re-evaluate when a node moves (e.g. into the rubbish bin), is deleted, has its
             // sensitivity changed (e.g. the user hides the open file), or is renamed, since none
             // of these alter the recently-used table on their own.
             relevantNodeChanges(),
-        ) { items, hiddenNodesEnabled, showHiddenItems, _ ->
+        ) { items, hiddenNodesEnabledOrNull, showHiddenItems, _ ->
+            val isHiddenResolved = hiddenNodesEnabledOrNull != null
+            val hiddenNodesEnabled = hiddenNodesEnabledOrNull == true
+
             // Items moved to the rubbish bin or deleted are never resumable, so drop them
             // regardless of the hidden-nodes feature or the "show hidden items" setting.
             val trashedHandles = items.trashedNodeHandles()
@@ -83,7 +89,8 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
             val resumableItems = items.filterNot { it.nodeHandle in trashedHandles }
 
             val visibleItems = when {
-                // Hidden-nodes feature off for this account: nothing is sensitive, show as-is.
+                // Eligibility not resolved yet, or feature off for this account: nothing is
+                // sensitive, show as-is. Nothing is removed while unresolved.
                 !hiddenNodesEnabled -> resumableItems
                 // Feature on and showing hidden items: keep the hidden ones but flag them so the
                 // carousel blurs them, the same way the node lists render sensitive content.
@@ -98,7 +105,10 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
                     resumableItems.filterNot { it.nodeHandle in hiddenHandles }
                 }
             }
-            visibleItems.withRefreshedNodeInfo()
+            ContinueWhereLeftOffResult(
+                items = visibleItems.withRefreshedNodeInfo(),
+                isHiddenResolved = isHiddenResolved,
+            )
         }.distinctUntilChanged()
 
     private fun relevantNodeChanges(): Flow<NodeUpdate> =

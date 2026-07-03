@@ -7,5 +7,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 
 internal data class ContinueWhereLeftOffUiState(
     val items: List<ContinueWhereLeftOffItem> = emptyList(),
+    val isLoading: Boolean = true,
     val openNodeEvent: StateEventWithContent<TypedFileNode> = consumed(),
 )
