@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.di.mediaplayer.AudioPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
 import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
+import mega.privacy.android.app.mediaplayer.model.LegacyAudioPlayerUiState
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.DeleteAudioPlaybackInfoUseCase
@@ -24,8 +24,8 @@ class AudioPlayerViewModel @Inject constructor(
     private val getMediaPlaybackInfoUseCase: GetMediaPlaybackInfoUseCase,
     private val deleteAudioPlaybackInfoUseCase: DeleteAudioPlaybackInfoUseCase,
 ) : ViewModel() {
-    val uiState: StateFlow<AudioPlayerUiState>
-        field: MutableStateFlow<AudioPlayerUiState> = MutableStateFlow(AudioPlayerUiState())
+    val uiState: StateFlow<LegacyAudioPlayerUiState>
+        field: MutableStateFlow<LegacyAudioPlayerUiState> = MutableStateFlow(LegacyAudioPlayerUiState())
     private var playbackPositionStatus = PlaybackPositionStatus.Initial
     private var playbackPositionJob: Job? = null
 
