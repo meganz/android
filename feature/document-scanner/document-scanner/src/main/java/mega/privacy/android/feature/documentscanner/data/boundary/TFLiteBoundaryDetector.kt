@@ -15,8 +15,10 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
+import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.concurrent.withLock
 
 /**
  * Document boundary detector backed by a TFLite UNet (midv-500-models, MIT).
@@ -59,10 +61,16 @@ class TFLiteBoundaryDetector @Inject constructor(
     // Lazy-loaded on the first detect() call rather than `by lazy { ... }`:
     // the singleton is constructed before the model is on disk, and a
     // nullable var leaves room for a future lifecycle-owned release()/reload.
+    @Volatile
     private var interpreter: Interpreter? = null
 
     // Held to keep the JNI delegate alive for the interpreter's lifetime.
     private var gpuDelegate: GpuDelegate? = null
+
+    // Guards interpreter creation ([obtainInterpreter]) against teardown
+    // ([release]). The hot inference path in [detect] reads the interpreter once
+    // (volatile) and runs unlocked, so per-frame cost is unchanged.
+    private val interpreterLock = ReentrantLock()
 
     private val inputBuffer: ByteBuffer = ByteBuffer
         .allocateDirect(1 * INPUT_SIZE * INPUT_SIZE * 3 * Float.SIZE_BYTES)
@@ -83,10 +91,28 @@ class TFLiteBoundaryDetector @Inject constructor(
      */
     private fun obtainInterpreter(): Interpreter? {
         interpreter?.let { return it }
-        val modelFile = checkNotNull(modelProvider.cachedModelFile()) {
-            "Model file missing — call ensureModelReady() before detect()"
+        return interpreterLock.withLock {
+            interpreter?.let { return it }
+            val modelFile = checkNotNull(modelProvider.cachedModelFile()) {
+                "Model file missing — call ensureModelReady() before detect()"
+            }
+            loadInterpreter(modelFile)?.also { interpreter = it }
         }
-        return loadInterpreter(modelFile)?.also { interpreter = it }
+    }
+
+    /**
+     * Releases the interpreter and GPU delegate. Idempotent. Callers must have
+     * stopped feeding frames (unbound the CameraX analyzer) before releasing so
+     * an in-flight [detect] on the analysis thread cannot race the close.
+     */
+    override fun release() {
+        interpreterLock.withLock {
+            interpreter?.close()
+            interpreter = null
+            gpuDelegate?.close()
+            gpuDelegate = null
+            Timber.d("[DocScanner][load] TFLite interpreter released")
+        }
     }
 
     private fun loadInterpreter(modelFile: File): Interpreter? = try {
@@ -135,18 +161,11 @@ class TFLiteBoundaryDetector @Inject constructor(
         rotationDegrees: Int,
         timestamp: Long,
     ): DetectionResult? {
-        val interp = obtainInterpreter() ?: return null
-
         val rotated = grayFrameRotator.rotate(grayBytes, width, height, rotationDegrees)
 
-        fillInputTensor(rotated.bytes, rotated.width, rotated.height)
-
-        try {
-            interp.run(inputBuffer, outputTensor)
-        } catch (e: Exception) {
-            Timber.e(e, "[DocScanner][infer] TFLite inference failed")
-            return null
-        }
+        // Interpreter acquisition + inference run under interpreterLock (see
+        // runInferenceLocked); the post-processing below is lock-free.
+        if (!runInferenceLocked(rotated)) return null
 
         flattenOutput(outputTensor, outputBuffer)
 
@@ -169,6 +188,28 @@ class TFLiteBoundaryDetector @Inject constructor(
             frameWidth = rotated.width,
             frameHeight = rotated.height,
         )
+    }
+
+    /**
+     * Runs interpreter acquisition + inference under [interpreterLock] so a
+     * concurrent [release] cannot close the interpreter mid-run and crash the
+     * native layer. Returns false when the interpreter is unavailable or
+     * inference throws. Kept separate from the lock-free post-processing so the
+     * critical section is explicit; [release] only ever blocks for the duration
+     * of a single inference.
+     */
+    private fun runInferenceLocked(rotated: GrayFrameRotator.RotatedFrame): Boolean {
+        interpreterLock.withLock {
+            val interp = obtainInterpreter() ?: return false
+            fillInputTensor(rotated.bytes, rotated.width, rotated.height)
+            return try {
+                interp.run(inputBuffer, outputTensor)
+                true
+            } catch (e: Exception) {
+                Timber.e(e, "[DocScanner][infer] TFLite inference failed")
+                false
+            }
+        }
     }
 
     private fun isAcceptedQuad(corners: LargestComponentFinder.ExtremeCorners): Boolean {

@@ -236,7 +236,7 @@ Backend is merged under AND-23706; this plan covers the **presentation layer reb
 | U3 | AND-23985 | Download enqueue policy: Wi-Fi/consent → `CONNECTED` now; declined-cellular → `UNMETERED` background. `enqueueUniqueWork(KEEP)`. | U2 |
 | U4 | AND-23986 | `PrepareScannerScreen` + VM: `WorkInfo` progress, "use old scanner" (background-continue), failure→legacy+retry, success→auto-enter camera. | U3 |
 | **Phase 2 — Scan camera UX** | | | |
-| U5 | _new_ | Wire `ImageAnalysis` → `TFLiteBoundaryDetector` in `ContinuousScanScreen`; `BoundaryOverlay` + `ScanGuideOverlay`; richer `ScanSessionViewModel` (detect/stability state). Reference the April OpenCV PoC's overlay/VM, retarget to TFLite. | U4 |
+| U5 | _new_ | Wire `ImageAnalysis` → `TFLiteBoundaryDetector` in `ContinuousScanScreen`; `BoundaryOverlay` + `ScanGuideOverlay`; richer `ScanSessionViewModel` (detect/stability state). Built fresh against the merged TFLite contracts — no OpenCV. | U4 |
 | U6 | _new_ | Scanner chrome: top bar, manual shutter, **"switch back to old scanner"** control. | U5 |
 | U7 | _new_ | Auto-capture-on-stable trigger + capture feedback (flash, fly-to-thumbnail). | U6 |
 | **Phase 3 — Capture pipeline & pages** | | | |
@@ -252,4 +252,4 @@ Backend is merged under AND-23706; this plan covers the **presentation layer reb
 
 - Restore parked tests via Robolectric (separate ticket).
 - Implement a real `KotlinColumnPageSplitter` for book-spread spine splitting (deferred).
-- Reassess OpenCV dependency removal once all MRs land — currently no consumers in the merged scope.
+- OpenCV is abandoned: the detector is TFLite-only and the merged scope contains no OpenCV code or dependency.

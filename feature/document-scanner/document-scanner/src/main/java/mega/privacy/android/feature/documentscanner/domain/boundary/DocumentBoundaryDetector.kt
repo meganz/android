@@ -28,4 +28,17 @@ interface DocumentBoundaryDetector {
         rotationDegrees: Int,
         timestamp: Long,
     ): DetectionResult?
+
+    /**
+     * Releases any native resources held by the detector (e.g. a TFLite
+     * interpreter and GPU delegate). Safe to call more than once. After release,
+     * the next [detect] call re-initialises lazily — this still requires the
+     * model file to be on disk (the same precondition as the first [detect]); if
+     * it has since been removed, re-initialisation fails.
+     *
+     * Callers must stop feeding frames before releasing so the analysis thread
+     * cannot race the teardown — in this feature the ViewModel releases in
+     * `onCleared`, after the screen has unbound the CameraX analyzer.
+     */
+    fun release()
 }
