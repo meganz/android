@@ -7,12 +7,14 @@ import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerActivity
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLES_NODES_SEARCH
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MEDIA_QUEUE_TITLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ORDER_GET_CHILDREN
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_ID
@@ -66,6 +68,8 @@ class MediaPlayerIntentMapper @Inject constructor(
         nodeHandles: List<Long>? = null,
         collectionTitle: String? = null,
         collectionId: Long? = null,
+        chatId: Long? = null,
+        msgId: Long? = null,
         enableAddToAlbum: Boolean = false,
         serializedData: String? = null,
         publicLinkUrl: String? = null,
@@ -121,6 +125,12 @@ class MediaPlayerIntentMapper @Inject constructor(
             }
             localFilePath?.let {
                 putExtra(URL_LOCAL_FILE_PATH, it)
+            }
+            chatId?.let {
+                putExtra(INTENT_EXTRA_KEY_CHAT_ID, it)
+            }
+            msgId?.let {
+                putExtra(INTENT_EXTRA_KEY_MSG_ID, it)
             }
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             putExtra(INTENT_EXTRA_KEY_VIDEO_ADD_TO_ALBUM, enableAddToAlbum)

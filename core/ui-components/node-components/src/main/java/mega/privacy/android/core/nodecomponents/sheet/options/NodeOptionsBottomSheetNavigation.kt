@@ -19,6 +19,8 @@ data class NodeOptionsBottomSheetNavKey(
     val nodeHandle: Long = -1L,
     val nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
     val partiallyExpand: Boolean = true,
+    val chatId: Long? = null,
+    val msgId: Long? = null,
     val publicLinkUrl: String? = null,
     val localFilePath: String? = null,
     val serializedData: String? = null,
@@ -54,6 +56,8 @@ internal fun EntryProviderScope<NavKey>.nodeOptionsBottomSheet(
                         publicLinkUrl = it.publicLinkUrl,
                         localFilePath = it.localFilePath,
                         serializedData = it.serializedData,
+                        chatId = it.chatId,
+                        msgId = it.msgId,
                     )
                 }
             )

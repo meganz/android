@@ -56,9 +56,9 @@ import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.presentation.videoplayer.mapper.PlayerErrorTypeMapper
-import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.mapper.VideoPlayerItemMapper
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
+import mega.privacy.android.app.presentation.videoplayer.model.PlayerErrorType
 import mega.privacy.android.app.presentation.videoplayer.model.SubtitleSelectedStatus
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerItem
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
@@ -279,6 +279,8 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                 fileLinkUrl = args.fileLinkUrl,
                 localFilePath = args.localFilePath,
                 serializedData = args.serializedData,
+                chatId = args.chatId,
+                msgId = args.msgId,
             )
         )
 
@@ -2067,6 +2069,8 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         val fileName: String,
         val collectionTitle: String?,
         val collectionId: Long?,
+        val chatId: Long?,
+        val msgId: Long?,
         val serializedData: String?,
     )
 }

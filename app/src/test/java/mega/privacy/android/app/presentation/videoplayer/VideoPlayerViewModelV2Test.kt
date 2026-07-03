@@ -357,6 +357,8 @@ class VideoPlayerViewModelV2Test {
             fileName = "",
             collectionTitle = null,
             collectionId = null,
+            chatId = null,
+            msgId = null,
             serializedData = null,
         )
         whenever(monitorTransferEventsUseCase()).thenReturn(fakeMonitorTransferEventsFlow)

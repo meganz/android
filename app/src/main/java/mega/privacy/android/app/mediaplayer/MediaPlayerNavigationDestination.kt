@@ -39,6 +39,8 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
                 mediaQueueTitle = key.mediaQueueTitle,
                 collectionTitle = key.collectionTitle,
                 collectionId = key.collectionId,
+                chatId = key.chatId,
+                msgId = key.msgId,
                 publicLinkUrl = key.publicLinkUrl,
                 localFilePath = key.localFilePath,
             )

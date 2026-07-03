@@ -38,7 +38,9 @@ internal fun EntryProviderScope<NavKey>.videoPlayerEntryProvider(
                     nodeSourceType = uiState.nodeSourceType,
                     publicLinkUrl = uiState.fileLinkUrl,
                     localFilePath = uiState.localFilePath,
-                    serializedData = uiState.serializedData
+                    serializedData = uiState.serializedData,
+                    chatId = uiState.chatId,
+                    msgId = uiState.msgId,
                 )
             )
         },

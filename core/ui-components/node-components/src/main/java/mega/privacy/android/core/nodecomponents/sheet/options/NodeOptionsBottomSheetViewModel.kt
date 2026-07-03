@@ -21,6 +21,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapp
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetState
 import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.mapper.ZipFileTypedNodeMapper
+import mega.privacy.android.core.nodecomponents.menu.menuitem.InfoBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -83,13 +85,21 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     private val getFileByPathUseCase: GetFileByPathUseCase,
     private val zipFileTypedNodeMapper: ZipFileTypedNodeMapper,
     private val getPublicNodeFromSerializedDataUseCase: GetPublicNodeFromSerializedDataUseCase,
+    private val getChatFileUseCase: GetChatFileUseCase,
     @Assisted private val nodeId: Long,
     @Assisted private val nodeSourceType: NodeSourceType,
     @Assisted private val partiallyExpand: Boolean,
+    @Assisted("chatId") private val chatId: Long?,
+    @Assisted("msgId") private val msgId: Long?,
     @Assisted("publicLinkUrl") private val publicLinkUrl: String?,
     @Assisted("localFilePath") private val localFilePath: String?,
     @Assisted("serializedData") private val serializedData: String?,
 ) : ViewModel() {
+
+    private data class PrimaryNodeResult(
+        val node: TypedNode?,
+        val isChatNodeFromOthers: Boolean = false,
+    )
 
     private var offlineMonitorJob: Job? = null
 
@@ -140,8 +150,9 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             }
             val isInRubbish = runCatching { isNodeInRubbishBinUseCase(nodeId) }.getOrDefault(false)
             val deferredInBackups = async { loadIsInBackups(nodeId, isInRubbish) }
+            val (primaryNode, isChatNodeFromOthers) = deferredNode.await()
             val effectiveNode =
-                deferredNode.await() ?: loadOfflineFallbackNode(nodeId) ?: loadZipFileNode()
+                primaryNode ?: loadOfflineFallbackNode(nodeId) ?: loadZipFileNode()
 
             if (effectiveNode == null) {
                 uiState.update { it.copy(error = triggered(Exception("Node is null"))) }
@@ -154,6 +165,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
                 isInRubbish = isInRubbish,
                 permission = deferredPermission.await(),
                 isInBackUps = deferredInBackups.await(),
+                isChatNodeFromOthers = isChatNodeFromOthers,
             )
             val nodeUiItem = nodeUiItemMapper(listOf(effectiveNode))
                 .firstOrNull()
@@ -181,28 +193,50 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
      *     [publicLinkUrl] is provided (the file may still be in the user's
      *     account).
      *  2. [NodeSourceType.FOLDER_LINK] — fetch by id via [getPublicNodeByIdUseCase].
-     *  3. Otherwise fetch their own nodes by [getNodeByIdUseCase].
+     *     Falls back to [getPublicNodeFromSerializedDataUseCase] when the id lookup
+     *     returns null.
+     *  3. [NodeSourceType.CHAT] — try [getNodeByIdUseCase] first (own nodes sent to
+     *     chat). If that returns null, fall back to [GetChatFileUseCase] using
+     *     [chatId]/[msgId] (nodes received from others); in that case
+     *     [PrimaryNodeResult.isChatNodeFromOthers] is set to true so the caller can
+     *     suppress actions that require node ownership (e.g. Info).
+     *  4. Otherwise fetch their own nodes by [getNodeByIdUseCase].
      */
-    private suspend fun loadPrimaryNode(nodeId: NodeId): TypedNode? = runCatching {
+    private suspend fun loadPrimaryNode(nodeId: NodeId): PrimaryNodeResult = runCatching {
         when (nodeSourceType) {
-            NodeSourceType.FILE_LINK -> {
-                if (!publicLinkUrl.isNullOrBlank()) {
+            NodeSourceType.FILE_LINK -> PrimaryNodeResult(
+                node = if (!publicLinkUrl.isNullOrBlank()) {
                     mapTypedNodeToPublicLinkUseCase(getPublicNodeUseCase(publicLinkUrl))
                 } else {
                     getNodeByIdUseCase(nodeId)
                 }
-            }
+            )
 
-            NodeSourceType.FOLDER_LINK -> {
-                getPublicNodeByIdUseCase(nodeId) ?: run {
+            NodeSourceType.FOLDER_LINK -> PrimaryNodeResult(
+                node = getPublicNodeByIdUseCase(nodeId) ?: run {
                     Timber.d("getPublicNodeByIdUseCase returned null for nodeId=$nodeId, trying serializedData fallback")
                     serializedData?.let { getPublicNodeFromSerializedDataUseCase(it) }
                 }
+            )
+
+            NodeSourceType.CHAT -> {
+                val node = getNodeByIdUseCase(nodeId)
+                if (node != null) {
+                    PrimaryNodeResult(node = node)
+                } else {
+                    val chatFile = if (chatId != null && msgId != null)
+                        getChatFileUseCase(chatId, msgId)
+                    else null
+                    PrimaryNodeResult(
+                        node = chatFile,
+                        isChatNodeFromOthers = chatFile != null,
+                    )
+                }
             }
 
-            else -> getNodeByIdUseCase(nodeId)
+            else -> PrimaryNodeResult(node = getNodeByIdUseCase(nodeId))
         }
-    }.getOrNull()
+    }.getOrNull() ?: PrimaryNodeResult(null)
 
     private suspend fun loadZipFileNode(): TypedNode? {
         if (nodeSourceType != NodeSourceType.VIDEO_PLAYER_ZIP_FILE) return null
@@ -241,9 +275,15 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         isInRubbish: Boolean,
         permission: AccessPermission?,
         isInBackUps: Boolean,
-    ): List<List<NodeActionModeMenuItem>> =
-        nodeBottomSheetActionMapper(
-            toolbarOptions = options,
+        isChatNodeFromOthers: Boolean = false,
+    ): List<List<NodeActionModeMenuItem>> {
+        val effectiveOptions = if (isChatNodeFromOthers) {
+            options.filterNot { it is InfoBottomSheetMenuItem }.toSet()
+        } else {
+            options
+        }
+        return nodeBottomSheetActionMapper(
+            toolbarOptions = effectiveOptions,
             selectedNode = node,
             isNodeInRubbish = isInRubbish,
             accessPermission = permission,
@@ -256,6 +296,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             .mapValues { (_, list) -> list.sortedBy { it.orderInGroup } }
             .values
             .toList()
+    }
 
     private fun NodeUiItem<TypedNode>.withPublicLinkPreview(
         source: TypedNode,
@@ -298,6 +339,8 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
             nodeId: Long,
             nodeSourceType: NodeSourceType,
             partiallyExpand: Boolean,
+            @Assisted("chatId") chatId: Long?,
+            @Assisted("msgId") msgId: Long?,
             @Assisted("publicLinkUrl") publicLinkUrl: String?,
             @Assisted("localFilePath") localFilePath: String?,
             @Assisted("serializedData") serializedData: String?,

@@ -81,6 +81,8 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  * @property isPlayQueueVisible whether the play queue is shown as an in-place overlay (Compose route, which has no separate queue destination)
  * @property invalidLaunchSourceEvent one-shot event emitted when no valid launch payload was
  *   available at creation (e.g. after process death); drives the route to navigate back.
+ * @property chatId the chat room ID
+ * @property msgId the message ID within the chat
  */
 data class VideoPlayerUiState(
     val items: List<VideoPlayerItem> = emptyList(),
@@ -141,4 +143,6 @@ data class VideoPlayerUiState(
     val isVideoNotRendered: Boolean = false,
     val isPlayQueueVisible: Boolean = false,
     val invalidLaunchSourceEvent: StateEvent = consumed,
+    val chatId: Long? = null,
+    val msgId: Long? = null,
 )

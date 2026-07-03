@@ -10,6 +10,7 @@ import mega.android.core.ui.model.SnackbarAttributes
 import mega.privacy.android.core.nodecomponents.mapper.NodeBottomSheetActionMapper
 import mega.privacy.android.core.nodecomponents.mapper.OfflineTypedNodeMapper
 import mega.privacy.android.core.nodecomponents.mapper.ZipFileTypedNodeMapper
+import mega.privacy.android.core.nodecomponents.menu.menuitem.InfoBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.menu.registry.NodeMenuProviderRegistry
 import mega.privacy.android.core.nodecomponents.model.NodeActionModeMenuItem
 import mega.privacy.android.core.nodecomponents.model.ZipFileTypedNode
@@ -19,6 +20,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -44,11 +47,13 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 
@@ -75,6 +80,7 @@ class NodeOptionsBottomSheetViewModelTest {
     private val getFileByPathUseCase = mock<GetFileByPathUseCase>()
     private val getPublicNodeFromSerializedDataUseCase =
         mock<GetPublicNodeFromSerializedDataUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
 
     private val sampleFileNode = mock<TypedFileNode>().stub {
         on { id } doReturn NodeId(123)
@@ -98,6 +104,8 @@ class NodeOptionsBottomSheetViewModelTest {
         nodeId: Long = sampleFileNode.id.longValue,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         partiallyExpand: Boolean = true,
+        chatId: Long? = null,
+        msgId: Long? = null,
         publicLinkUrl: String? = null,
         localFilePath: String? = null,
         serializedData: String? = null,
@@ -123,9 +131,12 @@ class NodeOptionsBottomSheetViewModelTest {
             isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             getFileByPathUseCase = getFileByPathUseCase,
             getPublicNodeFromSerializedDataUseCase = getPublicNodeFromSerializedDataUseCase,
+            getChatFileUseCase = getChatFileUseCase,
             nodeId = nodeId,
             nodeSourceType = nodeSourceType,
             partiallyExpand = partiallyExpand,
+            chatId = chatId,
+            msgId = msgId,
             publicLinkUrl = publicLinkUrl,
             localFilePath = localFilePath,
             serializedData = serializedData,
@@ -770,5 +781,124 @@ class NodeOptionsBottomSheetViewModelTest {
             )
 
             verify(getPublicNodeFromSerializedDataUseCase, never()).invoke(any())
+        }
+
+    @Test
+    fun `test that CHAT source uses getNodeByIdUseCase result when it returns a node`() = runTest {
+        whenever(getNodeByIdUseCase(any())).thenReturn(sampleFileNode)
+        whenever(nodeUiItemMapper(listOf(sampleFileNode))).thenReturn(listOf(mock()))
+        whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+        whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+        whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+        whenever(nodeBottomSheetActionMapper(any(), any(), any(), anyOrNull(), any(), any(), any()))
+            .thenReturn(emptyList())
+
+        initViewModel(
+            nodeId = sampleFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.CHAT,
+            chatId = 100L,
+            msgId = 200L,
+        )
+
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that CHAT source calls getChatFileUseCase when getNodeByIdUseCase returns null and chatId and msgId are provided`() =
+        runTest {
+            val chatId = 100L
+            val msgId = 200L
+            val mockChatFile = ChatDefaultFile(
+                typedFileNode = sampleFileNode,
+                chatId = chatId,
+                messageId = msgId,
+            )
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getChatFileUseCase(chatId, msgId)).thenReturn(mockChatFile)
+            whenever(nodeUiItemMapper(listOf(mockChatFile))).thenReturn(emptyList())
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(
+                nodeBottomSheetActionMapper(any(), any(), any(), anyOrNull(), any(), any(), any())
+            ).thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = mockChatFile.id.longValue,
+                nodeSourceType = NodeSourceType.CHAT,
+                chatId = chatId,
+                msgId = msgId,
+            )
+
+            verify(getChatFileUseCase).invoke(chatId, msgId)
+        }
+
+    @Test
+    fun `test that CHAT source does not call getChatFileUseCase when chatId is null`() = runTest {
+        whenever(getNodeByIdUseCase(any())).thenReturn(null)
+
+        initViewModel(
+            nodeId = sampleFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.CHAT,
+            chatId = null,
+            msgId = 200L,
+        )
+
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that CHAT source does not call getChatFileUseCase when msgId is null`() = runTest {
+        whenever(getNodeByIdUseCase(any())).thenReturn(null)
+
+        initViewModel(
+            nodeId = sampleFileNode.id.longValue,
+            nodeSourceType = NodeSourceType.CHAT,
+            chatId = 100L,
+            msgId = null,
+        )
+
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that InfoBottomSheetMenuItem is filtered from options when chat node is from others`() =
+        runTest {
+            val chatId = 100L
+            val msgId = 200L
+            val infoMenuItem = mock<InfoBottomSheetMenuItem>()
+            val mockChatFile = ChatDefaultFile(
+                typedFileNode = sampleFileNode,
+                chatId = chatId,
+                messageId = msgId,
+            )
+            whenever(nodeMenuProviderRegistry.getBottomSheetOptions(NodeSourceType.CHAT))
+                .thenReturn(setOf(infoMenuItem))
+            whenever(getNodeByIdUseCase(any())).thenReturn(null)
+            whenever(getChatFileUseCase(chatId, msgId)).thenReturn(mockChatFile)
+            whenever(nodeUiItemMapper(listOf(mockChatFile))).thenReturn(emptyList())
+            whenever(isNodeInRubbishBinUseCase(any())).thenReturn(false)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
+            whenever(getNodeAccessPermission(any())).thenReturn(AccessPermission.FULL)
+            whenever(
+                nodeBottomSheetActionMapper(any(), any(), any(), anyOrNull(), any(), any(), any())
+            ).thenReturn(emptyList())
+
+            initViewModel(
+                nodeId = mockChatFile.id.longValue,
+                nodeSourceType = NodeSourceType.CHAT,
+                chatId = chatId,
+                msgId = msgId,
+            )
+
+            verify(nodeBottomSheetActionMapper).invoke(
+                argThat { options -> options.none { it is InfoBottomSheetMenuItem } },
+                any(),
+                any(),
+                anyOrNull(),
+                any(),
+                any(),
+                any(),
+            )
         }
 }

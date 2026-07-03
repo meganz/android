@@ -61,8 +61,10 @@ import mega.privacy.android.app.utils.ChatUtil.AUDIOFOCUS_DEFAULT
 import mega.privacy.android.app.utils.ChatUtil.getRequest
 import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -118,11 +120,18 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                         collectionTitle = intent.getStringExtra(
                             INTENT_EXTRA_KEY_VIDEO_COLLECTION_TITLE
                         ),
-                        collectionId = if (intent.hasExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID))
-                            intent.getLongExtra(
-                                INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID,
-                                -1L
-                            ) else null,
+                        collectionId =
+                            if (intent.hasExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID))
+                                intent.getLongExtra(INTENT_EXTRA_KEY_VIDEO_COLLECTION_ID, -1L)
+                            else null,
+                        chatId =
+                            if (intent.hasExtra(INTENT_EXTRA_KEY_CHAT_ID))
+                                intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, -1L)
+                            else null,
+                        msgId =
+                            if (intent.hasExtra(INTENT_EXTRA_KEY_MSG_ID))
+                                intent.getLongExtra(INTENT_EXTRA_KEY_MSG_ID, -1L)
+                            else null,
                         serializedData = intent.getStringExtra(EXTRA_SERIALIZE_STRING)
                     )
                 )
