@@ -18,4 +18,9 @@ class HttpConnectionRepositoryImpl @Inject constructor(
     override suspend fun getDataBytesFromUrl(url: URL): ByteArray? = withContext(ioDispatcher) {
         httpConnectionGateway.getDataBytesFromUrl(url)
     }
+
+    override suspend fun getDataBytesFromUrl(url: URL, maxBytes: Int): ByteArray? =
+        withContext(ioDispatcher) {
+            httpConnectionGateway.getDataBytesFromUrl(url, maxBytes)
+        }
 }
