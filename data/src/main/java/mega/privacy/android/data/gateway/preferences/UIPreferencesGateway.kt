@@ -77,6 +77,20 @@ interface UIPreferencesGateway {
      */
     suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
 
+    /**
+     * Monitor the sorting order preference
+     *
+     * @return a [Flow] to observe the sorting order preference
+     */
+    fun monitorSortingPreference(): Flow<Int?>
+
+    /**
+     * Set the sorting order preference
+     *
+     * @param value An [Int] representing the new sorting order preference
+     */
+    suspend fun setSortingPreference(value: Int)
+
 
     /**
      * Set offline warning message visibility

@@ -33,8 +33,8 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AppVersionMapper
-import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.AppVersion
@@ -54,6 +54,7 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KE
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_KEY_CONTENT_CONSUMPTION
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_SENSITIVES
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_VAL_SHOW_HIDDEN_NODES
+import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
@@ -195,6 +196,12 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean) =
         uiPreferencesGateway.setSubfolderMediaDiscoveryEnabled(enabled)
+
+    override fun monitorSortingPreference(): Flow<SortingPreference?> =
+        uiPreferencesGateway.monitorSortingPreference().map { SortingPreference(it) }
+
+    override suspend fun setSortingPreference(preference: SortingPreference) =
+        uiPreferencesGateway.setSortingPreference(preference.id)
 
     override fun monitorShowHiddenItems(): Flow<Boolean> = showHiddenNodesFlow
         .onStart {

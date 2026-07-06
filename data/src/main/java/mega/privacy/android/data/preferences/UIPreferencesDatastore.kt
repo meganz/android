@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.extensions.monitor
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import javax.inject.Inject
-import kotlin.text.set
 
 private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
 private const val PREFERRED_START_SCREEN = "PREFERRED_START_SCREEN"
@@ -28,6 +27,7 @@ private const val SUBFOLDER_MEDIA_DISCOVERY = "SUBFOLDER_MEDIA_DISCOVERY"
 private const val SHOW_OFFLINE_WARNING_VIEW = "SHOW_OFFLINE_WARNING_VIEW"
 private const val PHOTOS_RECENT_QUERIES = "PHOTOS_RECENT_QUERIES"
 private const val VIEW_TYPE = "VIEW_TYPE"
+private const val SORTING_PREFERENCE = "SORTING_PREFERENCE"
 private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
     "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
 private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
@@ -61,6 +61,7 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val mediaDiscoveryViewKey = intPreferencesKey(MEDIA_DISCOVERY_VIEW)
     private val subFolderMediaDiscoveryKey = booleanPreferencesKey(SUBFOLDER_MEDIA_DISCOVERY)
     private val viewTypeKey = intPreferencesKey(VIEW_TYPE)
+    private val sortingPreferenceKey = intPreferencesKey(SORTING_PREFERENCE)
     private val offlineWarningViewKey = booleanPreferencesKey(SHOW_OFFLINE_WARNING_VIEW)
     private val almostFullStorageBannerClosingTimestampKey =
         longPreferencesKey(ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP)
@@ -83,6 +84,15 @@ internal class UIPreferencesDatastore @Inject constructor(
     override suspend fun setViewType(value: Int) {
         context.uiPreferenceDataStore.edit {
             it[viewTypeKey] = value
+        }
+    }
+
+    override fun monitorSortingPreference(): Flow<Int?> =
+        context.uiPreferenceDataStore.monitor(sortingPreferenceKey)
+
+    override suspend fun setSortingPreference(value: Int) {
+        context.uiPreferenceDataStore.edit {
+            it[sortingPreferenceKey] = value
         }
     }
 

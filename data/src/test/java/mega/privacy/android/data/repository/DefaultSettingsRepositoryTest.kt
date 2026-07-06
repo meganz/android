@@ -21,14 +21,15 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.AppVersionMapper
-import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
 import mega.privacy.android.data.mapper.StartScreenMapper
+import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.home.PinnedHomeItem
 import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
@@ -42,6 +43,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
@@ -340,6 +342,39 @@ internal class DefaultSettingsRepositoryTest {
 
             underTest.monitorGeoTaggingStatus().test {
                 assertThat(awaitItem()).isEqualTo(enabled)
+                awaitComplete()
+            }
+        }
+
+    @ParameterizedTest
+    @EnumSource(SortingPreference::class)
+    fun `test setSortingPreference calls uiPreferencesGateway setSortingPreference`(
+        preference: SortingPreference,
+    ) = runTest {
+        underTest.setSortingPreference(preference)
+        verify(uiPreferencesGateway).setSortingPreference(preference.id)
+    }
+
+    @ParameterizedTest
+    @EnumSource(SortingPreference::class)
+    fun `test monitorSortingPreference maps the value from uiPreferencesGateway`(
+        preference: SortingPreference,
+    ) = runTest {
+        whenever(uiPreferencesGateway.monitorSortingPreference()).thenReturn(flowOf(preference.id))
+
+        underTest.monitorSortingPreference().test {
+            assertThat(awaitItem()).isEqualTo(preference)
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun `test monitorSortingPreference returns null when uiPreferencesGateway returns null`() =
+        runTest {
+            whenever(uiPreferencesGateway.monitorSortingPreference()).thenReturn(flowOf(null))
+
+            underTest.monitorSortingPreference().test {
+                assertThat(awaitItem()).isNull()
                 awaitComplete()
             }
         }
