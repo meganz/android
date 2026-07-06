@@ -32,10 +32,12 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.geometry.Offset
+import mega.privacy.android.feature.documentscanner.components.BoundaryOverlay
+import mega.privacy.android.feature.documentscanner.components.ScanBoundaryStability
 import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 import mega.privacy.android.feature.documentscanner.presentation.ScanSessionViewModel
 import mega.privacy.android.feature.documentscanner.presentation.analyzer.ScanFrameAnalyzer
-import mega.privacy.android.feature.documentscanner.presentation.component.BoundaryOverlay
 import mega.privacy.android.feature.documentscanner.presentation.component.ScanGuideOverlay
 import mega.privacy.android.feature.documentscanner.presentation.component.ScannerCloseButton
 import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
@@ -118,8 +120,17 @@ private fun CameraContent(
         ScanGuideOverlay(modifier = Modifier.fillMaxSize())
 
         BoundaryOverlay(
-            overlayState = boundaryOverlayState,
-            stabilityState = stabilityState,
+            normalisedCorners = boundaryOverlayState.boundary?.let {
+                listOf(
+                    Offset(it.topLeft.x, it.topLeft.y),
+                    Offset(it.topRight.x, it.topRight.y),
+                    Offset(it.bottomRight.x, it.bottomRight.y),
+                    Offset(it.bottomLeft.x, it.bottomLeft.y),
+                )
+            },
+            frameWidth = boundaryOverlayState.frameWidth,
+            frameHeight = boundaryOverlayState.frameHeight,
+            stability = stabilityState.toScanBoundaryStability(),
             modifier = Modifier.fillMaxSize(),
         )
 
@@ -130,6 +141,13 @@ private fun CameraContent(
                 .statusBarsPadding(),
         )
     }
+}
+
+private fun StabilityState.toScanBoundaryStability(): ScanBoundaryStability = when (this) {
+    StabilityState.SEARCHING -> ScanBoundaryStability.SEARCHING
+    StabilityState.UNSTABLE -> ScanBoundaryStability.UNSTABLE
+    StabilityState.STABILIZING -> ScanBoundaryStability.STABILIZING
+    StabilityState.STABLE -> ScanBoundaryStability.STABLE
 }
 
 // core/ui-components was checked for a CameraX PreviewView wrapper composable;
