@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.node
 
 import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -9,9 +10,9 @@ import mega.privacy.android.app.activities.contract.HiddenNodeOnboardingActivity
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
-import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.activities.contract.VideoToPlaylistActivityContract
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.node.model.menuaction.AddToPlaylistMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.AvailableOfflineMenuAction
 import mega.privacy.android.app.presentation.node.model.menuaction.ClearSelectionMenuAction
@@ -30,6 +31,8 @@ import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAct
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
+import mega.privacy.android.navigation.megaNavigator
 
 /**
  * Node bottom sheet action handler
@@ -86,8 +89,28 @@ class NodeActionHandler(
 
     private val shareFolderActivityLauncher =
         (activity as? AppCompatActivity)?.registerForActivityResult(
-            ShareFolderActivityContract()
-        ) { result ->
+            ActivityResultContracts.StartActivityForResult()
+        ) { activityResult ->
+            val intent = activityResult.data
+            val result = if (activityResult.resultCode == Activity.RESULT_OK && intent?.extras != null) {
+                val contactsData = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                when (intent.getIntExtra("MULTISELECT", -1)) {
+                    0 -> {
+                        val nodeHandle = intent.getLongExtra(AddContactActivity.EXTRA_NODE_HANDLE, -1)
+                        (contactsData ?: emptyList<String>()) to listOf(nodeHandle)
+                    }
+
+                    1 -> {
+                        val nodeHandles =
+                            intent.getLongArrayExtra(AddContactActivity.EXTRA_NODE_HANDLE)?.toList()
+                        (contactsData ?: emptyList<String>()) to (nodeHandles ?: emptyList())
+                    }
+
+                    else -> null
+                }
+            } else {
+                null
+            }
             result?.let { (contactIds, nodeHandles) ->
                 nodeActionsViewModel.contactSelectedForShareFolder(contactIds, nodeHandles)
             }
@@ -143,6 +166,17 @@ class NodeActionHandler(
         selectMoveNodeActivityLauncher?.launch(handles)
     }
 
+    private fun launchShareFolder(nodeHandles: List<Long>) {
+        shareFolderActivityLauncher?.let { launcher ->
+            activity.megaNavigator.openAddContactToShare(
+                context = activity,
+                launcher = launcher,
+                contactType = AddContactToShareNavKey.ContactType.All,
+                nodeHandles = nodeHandles,
+            )
+        }
+    }
+
     /**
      * handles actions from bottom sheet
      *
@@ -155,7 +189,7 @@ class NodeActionHandler(
             is VersionsMenuAction -> versionsActivityLauncher?.launch(node.id.longValue)
             is MoveMenuAction -> launchMove(longArrayOf(node.id.longValue))
             is CopyMenuAction -> launchCopy(longArrayOf(node.id.longValue))
-            is ShareFolderMenuAction -> shareFolderActivityLauncher?.launch(longArrayOf(node.id.longValue))
+            is ShareFolderMenuAction -> launchShareFolder(listOf(node.id.longValue))
             is RestoreMenuAction -> restoreFromRubbishLauncher?.launch(longArrayOf(node.id.longValue))
             is SendToChatMenuAction -> sendToChatLauncher?.launch(longArrayOf(node.id.longValue))
             is OpenWithMenuAction -> nodeActionsViewModel.downloadNodeForPreview(true)
@@ -204,8 +238,7 @@ class NodeActionHandler(
             )
 
             is ShareFolderMenuAction -> {
-                val nodeHandleArray = nodes.map { it.id.longValue }.toLongArray()
-                shareFolderActivityLauncher?.launch(nodeHandleArray)
+                launchShareFolder(nodes.map { it.id.longValue })
             }
 
             is CopyMenuAction -> {

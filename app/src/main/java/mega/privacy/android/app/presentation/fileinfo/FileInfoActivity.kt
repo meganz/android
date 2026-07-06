@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.getValue
@@ -32,11 +34,11 @@ import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivit
 import mega.privacy.android.app.activities.contract.NameCollisionActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
-import mega.privacy.android.app.activities.contract.SelectUsersToShareActivityContract
 import mega.privacy.android.app.extensions.handleLocationClick
 import mega.privacy.android.app.extensions.launchUrl
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
@@ -80,6 +82,7 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -134,7 +137,7 @@ class FileInfoActivity : BaseActivity() {
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
 
-    private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
+    private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<Intent>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
     private lateinit var copyLauncher: ActivityResultLauncher<LongArray>
     private lateinit var moveLauncher: ActivityResultLauncher<LongArray>
@@ -337,9 +340,14 @@ class FileInfoActivity : BaseActivity() {
 
     private fun configureSelectContactForShareFolderLauncher() {
         selectContactForShareFolderLauncher =
-            registerForActivityResult(SelectUsersToShareActivityContract()) { result ->
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
                 if (!viewModel.checkAndHandleIsDeviceConnected()) {
                     return@registerForActivityResult
+                }
+                val result = if (activityResult.resultCode == Activity.RESULT_OK) {
+                    activityResult.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                } else {
+                    null
                 }
                 result?.let {
                     val contactsData = ArrayList<String>().apply { addAll(result) }
@@ -450,7 +458,12 @@ class FileInfoActivity : BaseActivity() {
     }
 
     private fun navigateToShare(nodeId: NodeId = viewModel.nodeId) {
-        selectContactForShareFolderLauncher.launch(nodeId)
+        megaNavigator.openAddContactToShare(
+            context = this,
+            launcher = selectContactForShareFolderLauncher,
+            contactType = AddContactToShareNavKey.ContactType.All,
+            nodeHandles = listOf(nodeId.longValue),
+        )
     }
 
     private fun navigateToSharedContacts() {
