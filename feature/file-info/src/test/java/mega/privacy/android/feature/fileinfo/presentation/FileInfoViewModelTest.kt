@@ -7,8 +7,10 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -17,6 +19,7 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -39,6 +42,9 @@ internal class FileInfoViewModelTest {
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase = mock()
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val fileTypeIconMapper: FileTypeIconMapper = mock()
+
+    private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
 
     private lateinit var underTest: FileInfoViewModel
 
@@ -49,6 +55,7 @@ internal class FileInfoViewModelTest {
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
+            fileTypeIconMapper = fileTypeIconMapper,
             nodeHandle = nodeHandle,
         )
     }
@@ -61,8 +68,10 @@ internal class FileInfoViewModelTest {
             isNodeInRubbishBinUseCase,
             isNodeInBackupsUseCase,
             getNodeAccessPermission,
+            fileTypeIconMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
+        whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
     }
 
     private fun mockFileNode(
@@ -82,6 +91,7 @@ internal class FileInfoViewModelTest {
         on { this.description } doReturn description
         on { this.tags } doReturn tags
         on { this.isTakenDown } doReturn isTakenDown
+        on { this.type } doReturn fileTypeInfo
     }
 
     private fun mockFolderNode(
@@ -109,6 +119,9 @@ internal class FileInfoViewModelTest {
             assertThat(isLoading).isFalse()
             assertThat(title).isEqualTo("file.txt")
             assertThat(isFile).isTrue()
+            assertThat(iconRes).isEqualTo(FILE_ICON_RES)
+            assertThat(thumbnailData).isEqualTo(ThumbnailRequest(NodeId(NODE_HANDLE)))
+            assertThat(fileTypeExtension).isEqualTo("heic")
             assertThat(sizeInBytes).isEqualTo(1024L)
             assertThat(creationTime).isEqualTo(100L)
             assertThat(modificationTime).isEqualTo(200L)
@@ -130,6 +143,9 @@ internal class FileInfoViewModelTest {
         with(underTest.uiState.value) {
             assertThat(isFile).isFalse()
             assertThat(title).isEqualTo("folder")
+            assertThat(fileTypeExtension).isNull()
+            assertThat(thumbnailData).isNull()
+            assertThat(iconRes).isNotNull()
             assertThat(sizeInBytes).isEqualTo(0L)
             assertThat(modificationTime).isNull()
             assertThat(descriptionText).isEmpty()
@@ -197,5 +213,6 @@ internal class FileInfoViewModelTest {
 
     private companion object {
         const val NODE_HANDLE = 99113034474275L
+        const val FILE_ICON_RES = 12345
     }
 }

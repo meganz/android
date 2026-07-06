@@ -22,18 +22,27 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":core:formatter"))
+    implementation(project(":shared:nodes"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(lib.mega.core.ui)
     implementation(lib.mega.analytics)
 
-    implementation(androidx.lifecycle.viewmodel)
+    implementation(lib.kotlin.ktx)
     implementation(lib.logging.timber)
 
     // Navigation3
     implementation(androidx.navigation3.runtime)
     implementation(androidx.navigation3.ui)
     implementation(androidx.hilt.navigation)
+
+    // Compose
+    implementation(androidx.lifecycle.runtime.compose)
+    implementation(androidx.lifecycle.viewmodel)
+    implementation(androidx.compose.viewmodel)
+    implementation(androidx.bundles.compose.bom)
+    implementation(androidx.material3)
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))

@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
@@ -24,6 +26,8 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
+import mega.privacy.android.shared.nodes.extension.getIcon
+import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = FileInfoViewModel.Factory::class)
@@ -33,6 +37,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val fileTypeIconMapper: FileTypeIconMapper,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
 
@@ -53,6 +58,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                 .getOrNull()
 
             if (node == null) {
+                // TODO handle error state
                 _uiState.update { it.copy(isLoading = false) }
                 return@launch
             }
@@ -75,17 +81,23 @@ internal class FileInfoViewModel @AssistedInject constructor(
             val isFile: Boolean
             val sizeInBytes: Long
             val modificationTime: Long?
+            val fileTypeExtension: String?
+            val thumbnailData: ThumbnailData?
             when (node) {
                 is TypedFileNode -> {
                     isFile = true
                     sizeInBytes = node.size
                     modificationTime = node.modificationTime
+                    fileTypeExtension = node.type.extension
+                    thumbnailData = ThumbnailRequest(nodeId)
                 }
 
                 else -> {
                     isFile = false
                     sizeInBytes = 0L
                     modificationTime = null
+                    fileTypeExtension = null
+                    thumbnailData = null
                 }
             }
 
@@ -94,6 +106,9 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     isLoading = false,
                     title = node.name,
                     isFile = isFile,
+                    iconRes = node.getIcon(fileTypeIconMapper),
+                    thumbnailData = thumbnailData,
+                    fileTypeExtension = fileTypeExtension,
                     sizeInBytes = sizeInBytes,
                     creationTime = node.creationTime,
                     modificationTime = modificationTime,
