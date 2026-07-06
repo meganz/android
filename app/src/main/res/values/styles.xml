@@ -662,6 +662,12 @@
         <item name="drawableTint">@color/color_support_error</item>
     </style>
 
+    <style name="BottomSheetOption.Brand">
+        <item name="android:textAppearance">@style/TextAppearance.Mega.Subtitle1</item>
+        <item name="android:textColor">@color/color_text_brand</item>
+        <item name="drawableTint">@color/color_icon_brand</item>
+    </style>
+
     <style name="CallBanner">
         <item name="android:minHeight">36dp</item>
         <item name="android:background">@android:color/transparent</item>

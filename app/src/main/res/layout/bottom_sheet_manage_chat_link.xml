@@ -55,7 +55,7 @@
                 android:id="@+id/delete_manage_chat_link_option"
                 android:gravity="center_vertical"
                 android:text="@string/context_delete_link"
-                style="@style/BottomSheetOption.Red"
+                style="@style/BottomSheetOption.Brand"
                 app:drawableStartCompat="@drawable/ic_delete_msg"/>
 
         </LinearLayout>
