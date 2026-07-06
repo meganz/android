@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -31,10 +32,19 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 import mega.privacy.android.feature.documentscanner.presentation.ScanSessionViewModel
+import mega.privacy.android.feature.documentscanner.presentation.analyzer.ScanFrameAnalyzer
+import mega.privacy.android.feature.documentscanner.presentation.component.BoundaryOverlay
+import mega.privacy.android.feature.documentscanner.presentation.component.ScanGuideOverlay
 import mega.privacy.android.feature.documentscanner.presentation.component.ScannerCloseButton
+import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
+import java.util.concurrent.Executors
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
+
+/** Minimum time between analysed frames (≈5 Hz) — see [ScanFrameAnalyzer]. */
+private const val ANALYSIS_INTERVAL_MS = 200L
 
 /**
  * Main scanning screen with CameraX preview, permission handling, and close button.
@@ -43,7 +53,7 @@ import timber.log.Timber
  * @param viewModel ViewModel managing camera and session state
  */
 @Composable
-fun ContinuousScanScreen(
+internal fun ContinuousScanScreen(
     onClose: () -> Unit,
     viewModel: ScanSessionViewModel = hiltViewModel(),
 ) {
@@ -71,8 +81,19 @@ fun ContinuousScanScreen(
         }
     }
 
+    // The prepare screen normally guarantees the model is cached before we get
+    // here; this is a safety net if detection finds it missing (e.g. deep link).
+    LaunchedEffect(uiState.isModelMissing) {
+        if (uiState.isModelMissing) onClose()
+    }
+
     if (uiState.isCameraPermissionGranted) {
-        CameraContent(onClose = onClose)
+        CameraContent(
+            boundaryOverlayState = uiState.boundaryOverlayState,
+            stabilityState = uiState.stabilityState,
+            onClose = onClose,
+            onFrame = viewModel::onAnalysisFrame,
+        )
     } else {
         PermissionDeniedContent(
             onRequestPermission = { permissionLauncher.launch(Manifest.permission.CAMERA) },
@@ -83,10 +104,24 @@ fun ContinuousScanScreen(
 
 @Composable
 private fun CameraContent(
+    boundaryOverlayState: BoundaryOverlayState,
+    stabilityState: StabilityState,
     onClose: () -> Unit,
+    onFrame: (ByteArray, Int, Int, Int, Long) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
-        CameraPreview(modifier = Modifier.fillMaxSize())
+        CameraPreview(
+            onFrame = onFrame,
+            modifier = Modifier.fillMaxSize(),
+        )
+
+        ScanGuideOverlay(modifier = Modifier.fillMaxSize())
+
+        BoundaryOverlay(
+            overlayState = boundaryOverlayState,
+            stabilityState = stabilityState,
+            modifier = Modifier.fillMaxSize(),
+        )
 
         ScannerCloseButton(
             onClose = onClose,
@@ -100,10 +135,15 @@ private fun CameraContent(
 // core/ui-components was checked for a CameraX PreviewView wrapper composable;
 // no equivalent component exists there.
 @Composable
-private fun CameraPreview(modifier: Modifier = Modifier) {
+private fun CameraPreview(
+    onFrame: (ByteArray, Int, Int, Int, Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val previewView = remember { PreviewView(context) }
+    val analysisExecutor = remember { Executors.newSingleThreadExecutor() }
+    val scanFrameAnalyzer = remember { ScanFrameAnalyzer(ANALYSIS_INTERVAL_MS) }
 
     DisposableEffect(lifecycleOwner) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
@@ -112,6 +152,34 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
             val preview = Preview.Builder().build().also {
                 it.surfaceProvider = previewView.surfaceProvider
             }
+            val imageAnalysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+                .also { analysis ->
+                    analysis.setAnalyzer(analysisExecutor) { imageProxy ->
+                        try {
+                            val plane = imageProxy.planes[0]
+                            val frame = scanFrameAnalyzer.analyze(
+                                width = imageProxy.width,
+                                height = imageProxy.height,
+                                rowStride = plane.rowStride,
+                                pixelStride = plane.pixelStride,
+                                rotationDegrees = imageProxy.imageInfo.rotationDegrees,
+                                timestampMs = imageProxy.imageInfo.timestamp / 1_000_000,
+                            ) {
+                                val buffer = plane.buffer
+                                ByteArray(buffer.remaining()).also { buffer.get(it) }
+                            }
+                            frame?.let {
+                                onFrame(it.bytes, it.width, it.height, it.rotationDegrees, it.timestampMs)
+                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "[DocScanner] Analysis frame failed")
+                        } finally {
+                            imageProxy.close()
+                        }
+                    }
+                }
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             try {
                 cameraProvider.unbindAll()
@@ -119,6 +187,7 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
                     lifecycleOwner,
                     cameraSelector,
                     preview,
+                    imageAnalysis,
                 )
             } catch (e: Exception) {
                 Timber.e(e, "CameraX bind failed")
@@ -129,6 +198,7 @@ private fun CameraPreview(modifier: Modifier = Modifier) {
             if (cameraProviderFuture.isDone) {
                 cameraProviderFuture.get().unbindAll()
             }
+            analysisExecutor.shutdown()
         }
     }
 
