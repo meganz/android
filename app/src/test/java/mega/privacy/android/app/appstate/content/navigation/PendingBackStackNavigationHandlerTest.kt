@@ -10,9 +10,9 @@ import mega.privacy.android.app.appstate.content.destinations.FetchNodeProviderI
 import mega.privacy.android.app.appstate.content.destinations.FetchingContentNavKey
 import mega.privacy.android.app.appstate.global.model.RootNodeState
 import mega.privacy.android.domain.entity.node.root.RefreshEvent
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.navkey.NoNodeNavKey
-import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.MediaMainNavKey
@@ -73,6 +73,7 @@ class PendingBackStackNavigationHandlerTest {
         ),
         hasRoot: Boolean = true,
         isPasscodeLocked: Boolean = false,
+        isConnected: Boolean = true,
     ) =
         PendingBackStackNavigationHandler(
             backstack = backStack,
@@ -85,7 +86,7 @@ class PendingBackStackNavigationHandlerTest {
             isPasscodeLocked = isPasscodeLocked,
             passcodeDestination = PasscodeDestination,
             navigationResultManager = navigationResultManager,
-            isConnected = true
+            isConnected = isConnected
         )
 
     @AfterEach
@@ -499,6 +500,37 @@ class PendingBackStackNavigationHandlerTest {
         tempHandler.onRootNodeChange(RootNodeState(exists = true))
         assertThat(tempBackStack).containsExactly(PasscodeDestination)
     }
+
+    @Test
+    fun `test that passcode is added when locked and logged in offline without root node`() =
+        runTest {
+            val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
+            val tempHandler = initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(initialSession),
+                hasRoot = false,
+                isConnected = false,
+            )
+
+            tempHandler.onPasscodeStateChanged(true)
+
+            assertThat(tempBackStack.last()).isEqualTo(PasscodeDestination)
+        }
+
+    @Test
+    fun `test that initial passcode lock is added when logged in offline without root node`() =
+        runTest {
+            val tempBackStack = PendingBackStack<NavKey>(NavBackStack(DefaultLandingScreen))
+            initHandler(
+                backStack = tempBackStack,
+                authStatus = PendingBackStackNavigationHandler.AuthStatus.LoggedIn(initialSession),
+                hasRoot = false,
+                isConnected = false,
+                isPasscodeLocked = true,
+            )
+
+            assertThat(tempBackStack.last()).isEqualTo(PasscodeDestination)
+        }
 
 
     @Test
