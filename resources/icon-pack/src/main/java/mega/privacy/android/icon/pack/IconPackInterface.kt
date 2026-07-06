@@ -175,6 +175,7 @@ interface IconPackInterface {
                 val FolderOpen: ImageVector
                 val FolderPlus01: ImageVector
                 val FolderUsers: ImageVector
+                val FolderSearch: ImageVector
                 val Filter: ImageVector
                 val GearSix: ImageVector
                 val Gif: ImageVector

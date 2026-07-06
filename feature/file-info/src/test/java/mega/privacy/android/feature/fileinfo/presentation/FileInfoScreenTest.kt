@@ -5,8 +5,12 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.Rule
@@ -28,6 +32,8 @@ class FileInfoScreenTest {
         sizeInBytes = 10L * 1024 * 1024,
         creationTime = 1_749_000_000L,
         modificationTime = 1_749_500_000L,
+        nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+        locationFolders = listOf("Documents"),
     )
 
     private val folderState = FileInfoUiState(
@@ -81,15 +87,27 @@ class FileInfoScreenTest {
         composeRule.onNodeWithTag(FILE_INFO_LOADING_TAG).assertIsDisplayed()
     }
 
+    @Test
+    fun `test that clicking the location row invokes onLocationClick`() {
+        var clicked = false
+        setContent(uiState = fileState, onLocationClick = { clicked = true })
+
+        composeRule.onNodeWithTag(FILE_INFO_LOCATION_TAG).performScrollTo().performClick()
+
+        assertThat(clicked).isTrue()
+    }
+
     private fun setContent(
         uiState: FileInfoUiState,
         onBack: () -> Unit = {},
+        onLocationClick: () -> Unit = {},
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 FileInfoScreen(
                     uiState = uiState,
                     onBack = onBack,
+                    onLocationClick = onLocationClick,
                 )
             }
         }

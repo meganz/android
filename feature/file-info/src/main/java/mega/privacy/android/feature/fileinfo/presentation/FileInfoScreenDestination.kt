@@ -10,6 +10,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.LegacyFileInfoNavKey
 
@@ -35,6 +36,17 @@ fun EntryProviderScope<NavKey>.fileInfoScreen(
             FileInfoScreen(
                 uiState = uiState,
                 onBack = navigationHandler::back,
+                onLocationClick = {
+                    uiState.locationDestinations?.let { destinations ->
+                        // Close File Info before opening the folder so the back stack
+                        // doesn't loop folder -> file -> info -> folder.
+                        navigationHandler.remove(key)
+                        navigationHandler.navigate(
+                            destinations = destinations,
+                            navOptions = navOptions { launchSingleTop = true },
+                        )
+                    }
+                },
             )
         }
     }

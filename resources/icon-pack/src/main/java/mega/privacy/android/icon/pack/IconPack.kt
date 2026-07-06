@@ -72,6 +72,7 @@ import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderImage
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderIncomingImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderOpenImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderPlus01ImageVector
+import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderSearchImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineFolderUsersImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineGearSixImageVector
 import mega.privacy.android.icon.pack.vectors.createMediumThinOutlineGifImageVector
@@ -392,6 +393,9 @@ public object IconPack : IconPackInterface {
 
                 override val FolderPlus01: ImageVector by
                         lazy { createMediumThinOutlineFolderPlus01ImageVector() }
+
+                override val FolderSearch: ImageVector by
+                        lazy { createMediumThinOutlineFolderSearchImageVector() }
 
                 override val FolderUsers: ImageVector by
                         lazy { createMediumThinOutlineFolderUsersImageVector() }

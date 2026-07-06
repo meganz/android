@@ -6,16 +6,22 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeLocation
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
+import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -43,6 +49,9 @@ internal class FileInfoViewModelTest {
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
+    private val getNodePathByIdUseCase: GetNodePathByIdUseCase = mock()
+    private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase = mock()
+    private val nodeDestinationMapper: NodeDestinationMapper = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
 
@@ -56,6 +65,9 @@ internal class FileInfoViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             fileTypeIconMapper = fileTypeIconMapper,
+            getNodePathByIdUseCase = getNodePathByIdUseCase,
+            getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
+            nodeDestinationMapper = nodeDestinationMapper,
             nodeHandle = nodeHandle,
         )
     }
@@ -69,6 +81,9 @@ internal class FileInfoViewModelTest {
             isNodeInBackupsUseCase,
             getNodeAccessPermission,
             fileTypeIconMapper,
+            getNodePathByIdUseCase,
+            getNodeLocationByIdUseCase,
+            nodeDestinationMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
         whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
@@ -210,6 +225,96 @@ internal class FileInfoViewModelTest {
         verify(getNodeByIdUseCase, times(2)).invoke(NodeId(NODE_HANDLE))
         assertThat(underTest.uiState.value.title).isEqualTo("new.txt")
     }
+
+    @Test
+    fun `test that the source type and path folders and destinations are exposed for the location`() =
+        runTest {
+            val node = mockFileNode()
+            val nodeLocation = NodeLocation(
+                node = node,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ancestorIds = listOf(NodeId(10L)),
+            )
+            val destinations = listOf<NavKey>(mock())
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(getNodePathByIdUseCase(NodeId(NODE_HANDLE)))
+                .thenReturn("/Documents/Marketing/file.txt")
+            whenever(getNodeLocationByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(nodeLocation)
+            whenever(nodeDestinationMapper(nodeLocation)).thenReturn(destinations)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            with(underTest.uiState.value) {
+                assertThat(nodeSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+                assertThat(locationFolders).containsExactly("Documents", "Marketing").inOrder()
+                assertThat(locationDestinations).isEqualTo(destinations)
+            }
+        }
+
+    @Test
+    fun `test that the location folders are empty when the node sits in the root`() =
+        runTest {
+            val node = mockFileNode()
+            val nodeLocation = NodeLocation(
+                node = node,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                ancestorIds = emptyList(),
+            )
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(getNodePathByIdUseCase(NodeId(NODE_HANDLE)))
+                .thenReturn("/file.txt")
+            whenever(getNodeLocationByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(nodeLocation)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            with(underTest.uiState.value) {
+                assertThat(nodeSourceType).isEqualTo(NodeSourceType.CLOUD_DRIVE)
+                assertThat(locationFolders).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that the owner email prefix is stripped from the incoming share location folders`() =
+        runTest {
+            val node = mockFileNode()
+            val nodeLocation = NodeLocation(
+                node = node,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                ancestorIds = listOf(NodeId(10L)),
+            )
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(getNodePathByIdUseCase(NodeId(NODE_HANDLE)))
+                .thenReturn("bob@mega.co.nz:Marketing/2026/file.txt")
+            whenever(getNodeLocationByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(nodeLocation)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            with(underTest.uiState.value) {
+                assertThat(nodeSourceType).isEqualTo(NodeSourceType.INCOMING_SHARES)
+                assertThat(locationFolders).containsExactly("Marketing", "2026").inOrder()
+            }
+        }
+
+    @Test
+    fun `test that the source type is null when the location cannot be resolved`() =
+        runTest {
+            val node = mockFileNode()
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(getNodePathByIdUseCase(NodeId(NODE_HANDLE))).thenReturn("")
+            whenever(getNodeLocationByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(null)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            with(underTest.uiState.value) {
+                assertThat(nodeSourceType).isNull()
+                assertThat(locationFolders).isEmpty()
+                assertThat(locationDestinations).isNull()
+            }
+        }
 
     private companion object {
         const val NODE_HANDLE = 99113034474275L
