@@ -546,6 +546,24 @@ internal class SettingsCameraUploadsViewModelTest {
             assertThat(analyticsExtension.events.first()).isEqualTo(CameraUploadsEnabledEvent)
         }
 
+        @Test
+        fun `test that enabling camera uploads refreshes the keep file names state in the UI`() =
+            runTest {
+                initializeUnderTest(isCameraUploadsEnabled = false)
+                whenever(isConnectedToInternetUseCase()).thenReturn(true)
+                // The safety net in SetupCameraUploadsSettingUseCase writes keepFileNames=true,
+                // so after enable the UseCase read must return true.
+                whenever(areUploadFileNamesKeptUseCase()).thenReturn(true)
+
+                underTest.onCameraUploadsStateChanged(enabled = true)
+                underTest.onMediaPermissionsGranted()
+
+                underTest.uiState.test {
+                    assertThat(awaitItem().shouldKeepUploadFileNames).isTrue()
+                    cancelAndIgnoreRemainingEvents()
+                }
+            }
+
         @ParameterizedTest(name = "is camera uploads enabled: {0}")
         @ValueSource(booleans = [true, false])
         fun `test that camera uploads is disabled when it receives a monitor update to disable the feature`(
