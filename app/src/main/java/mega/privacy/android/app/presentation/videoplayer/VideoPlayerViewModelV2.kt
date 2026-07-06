@@ -1158,6 +1158,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     internal fun onMediaItemTransition(handle: String?, isUpdateName: Boolean) {
         updateCurrentPlayingVideoSize(null)
         if (handle == null) return
+        playerRetry = 0
         if (isPausedByUser) {
             isPausedByUser = false
         }
