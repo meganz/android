@@ -44,6 +44,8 @@ sealed interface TimelineRevampUiState {
      * card list is shown.
      * @property periodCards the Year or Month summary cards shown when [selectedPeriod] is
      * [MediaTimePeriod.Years] or [MediaTimePeriod.Months]; empty otherwise.
+     * @property arePeriodCardsLoading whether the Year / Month summary cards are still being built
+     * for the current [selectedPeriod]; drives the card shimmer while [periodCards] is empty.
      * @property takenDownDialogEvent triggered when a taken-down node is tapped, so the screen can
      * show the dispute dialog.
      */
@@ -56,6 +58,7 @@ sealed interface TimelineRevampUiState {
         val currentSort: TimelineTabSortOptions = TimelineTabSortOptions.Newest,
         val selectedPeriod: MediaTimePeriod = MediaTimePeriod.All,
         val periodCards: List<PhotosNodeListCard> = emptyList(),
+        val arePeriodCardsLoading: Boolean = false,
         val takenDownDialogEvent: StateEvent = consumed,
     ) : TimelineRevampUiState
 }

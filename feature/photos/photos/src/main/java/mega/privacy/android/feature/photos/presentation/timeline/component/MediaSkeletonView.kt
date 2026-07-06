@@ -85,6 +85,37 @@ fun MediaSkeletonView(modifier: Modifier = Modifier) {
 
 
 @Composable
+fun PeriodCardsSkeletonView(modifier: Modifier = Modifier) {
+    LazyColumn(
+        modifier = modifier.fillMaxSize(),
+        userScrollEnabled = false,
+    ) {
+        items(count = 4) { index ->
+            Spacer(
+                modifier = Modifier
+                    .padding(
+                        start = 16.dp,
+                        top = if (index == 0) 16.dp else 12.dp,
+                        bottom = 8.dp,
+                    )
+                    .height(20.dp)
+                    .width(140.dp)
+                    .shimmerEffectSemiRounded(),
+            )
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .aspectRatio(4f / 3f)
+                    .shimmerEffect(shape = RoundedCornerShape(16.dp)),
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+    }
+}
+
+
+@Composable
 fun AlbumListSkeletonView(modifier: Modifier = Modifier) {
     val columns =
         if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -286,6 +317,14 @@ private fun Modifier.shimmerEffectSquare(): Modifier {
 private fun MediaSkeletonViewPreview() {
     AndroidThemeForPreviews {
         MediaSkeletonView()
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PeriodCardsSkeletonViewPreview() {
+    AndroidThemeForPreviews {
+        PeriodCardsSkeletonView()
     }
 }
 

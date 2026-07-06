@@ -9,6 +9,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
+import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
+import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -95,6 +98,68 @@ class TimelineRevampScreenTest {
         // At rest the scrolling (non-sticky) header sits at the top; the pinned overlay only appears
         // once it scrolls past the viewport top.
         composeRule.onNodeWithTag(TIMELINE_REVAMP_NON_STICKY_HEADER_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that card skeleton is displayed when period cards are loading for Years`() {
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "May 2026",
+                        startDate = 0L,
+                        endDate = 0L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = emptyMap(),
+                selectedPeriod = MediaTimePeriod.Years,
+                periodCards = emptyList(),
+                arePeriodCardsLoading = true,
+            )
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_CARD_LIST_SKELETON_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that card list is displayed when period cards finished loading for Years`() {
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "May 2026",
+                        startDate = 0L,
+                        endDate = 0L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = emptyMap(),
+                selectedPeriod = MediaTimePeriod.Years,
+                periodCards = listOf(
+                    PhotosNodeListCard(
+                        period = PhotosNodeListCardPeriod.Year,
+                        key = 1L,
+                        id = 1L,
+                        day = 1,
+                        month = 1,
+                        year = 2026,
+                        formattedDate = "2026",
+                        thumbnailFilePath = null,
+                        previewFilePath = null,
+                        extension = "",
+                        isSensitive = false,
+                        count = 3,
+                    ),
+                ),
+                arePeriodCardsLoading = false,
+            )
+        )
+
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_CARD_LIST_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(TIMELINE_REVAMP_CARD_LIST_SKELETON_TAG).assertDoesNotExist()
     }
 
     @Test

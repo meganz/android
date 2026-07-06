@@ -298,6 +298,7 @@ class TimelineRevampViewModel @Inject constructor(
                         currentSort = grid.currentSort,
                         selectedPeriod = period,
                         periodCards = cards.forPeriod(period),
+                        arePeriodCardsLoading = cards.isLoading,
                     ).let { state ->
                         // Inject the taken-down dialog event so the screen observes a single object.
                         if (state is TimelineRevampUiState.Data) {
@@ -358,13 +359,13 @@ class TimelineRevampViewModel @Inject constructor(
                             )
                         }
                     }
-                    .onStart { emit(PeriodCards.Empty) }
+                    .onStart { emit(PeriodCards.Loading) }
             }
             .catch { e ->
                 Timber.e(e, "Failed to build period cards")
                 emit(PeriodCards.Empty)
             }
-            .asUiStateFlow(viewModelScope, PeriodCards.Empty)
+            .asUiStateFlow(viewModelScope, PeriodCards.Loading)
     }
 
     /**
@@ -536,6 +537,7 @@ class TimelineRevampViewModel @Inject constructor(
         currentSort: TimelineTabSortOptions,
         selectedPeriod: MediaTimePeriod,
         periodCards: List<PhotosNodeListCard>,
+        arePeriodCardsLoading: Boolean,
     ): TimelineRevampUiState =
         if (sections.isEmpty()) {
             TimelineRevampUiState.Empty
@@ -549,6 +551,7 @@ class TimelineRevampViewModel @Inject constructor(
                 currentSort = currentSort,
                 selectedPeriod = selectedPeriod,
                 periodCards = periodCards,
+                arePeriodCardsLoading = arePeriodCardsLoading,
             )
         }
 
@@ -955,6 +958,7 @@ class TimelineRevampViewModel @Inject constructor(
     private data class PeriodCards(
         val yearCards: List<PhotosNodeListCard>,
         val monthCards: List<PhotosNodeListCard>,
+        val isLoading: Boolean = false,
     ) {
         fun forPeriod(period: MediaTimePeriod): List<PhotosNodeListCard> = when (period) {
             MediaTimePeriod.Years -> yearCards
@@ -963,6 +967,7 @@ class TimelineRevampViewModel @Inject constructor(
         }
 
         companion object {
+            val Loading = PeriodCards(emptyList(), emptyList(), isLoading = true)
             val Empty = PeriodCards(emptyList(), emptyList())
         }
     }

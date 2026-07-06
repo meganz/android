@@ -58,6 +58,7 @@ import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCac
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
+import mega.privacy.android.feature.photos.presentation.timeline.component.PeriodCardsSkeletonView
 import mega.privacy.android.feature.photos.presentation.timeline.component.PhotosNodeListCardListView
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
@@ -142,6 +143,7 @@ internal fun TimelineRevampScreen(
                 gridSize = uiState.gridSize,
                 selectedPeriod = uiState.selectedPeriod,
                 periodCards = uiState.periodCards,
+                arePeriodCardsLoading = uiState.arePeriodCardsLoading,
                 onVisibleRangeChanged = onVisibleRangeChanged,
                 onGridSizeChange = onGridSizeChange,
                 onZoomIn = onZoomIn,
@@ -190,6 +192,7 @@ private fun TimelineRevampContent(
     gridSize: TimelineGridSize,
     selectedPeriod: MediaTimePeriod,
     periodCards: List<PhotosNodeListCard>,
+    arePeriodCardsLoading: Boolean,
     onVisibleRangeChanged: (firstIndex: Int, lastIndex: Int) -> Unit,
     onGridSizeChange: (TimelineGridSize) -> Unit,
     onZoomIn: () -> Unit,
@@ -245,29 +248,37 @@ private fun TimelineRevampContent(
 
     when (selectedPeriod) {
         MediaTimePeriod.Years, MediaTimePeriod.Months -> {
-            PhotosNodeListCardListView(
-                modifier = modifier
-                    .fillMaxSize()
-                    .testTag(TIMELINE_REVAMP_CARD_LIST_TAG),
-                photos = periodCards,
-                isHiddenNodesEnabled = isHiddenNodesEnabled,
-                state = cardListState,
-                onClick = { card ->
-                    when (card.period) {
-                        PhotosNodeListCardPeriod.Year -> {
-                            pendingScroll = PendingCardScroll.ToYear(card.year)
-                            onMediaTimePeriodSelected(MediaTimePeriod.Months)
-                        }
+            if (arePeriodCardsLoading) {
+                PeriodCardsSkeletonView(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .testTag(TIMELINE_REVAMP_CARD_LIST_SKELETON_TAG),
+                )
+            } else {
+                PhotosNodeListCardListView(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .testTag(TIMELINE_REVAMP_CARD_LIST_TAG),
+                    photos = periodCards,
+                    isHiddenNodesEnabled = isHiddenNodesEnabled,
+                    state = cardListState,
+                    onClick = { card ->
+                        when (card.period) {
+                            PhotosNodeListCardPeriod.Year -> {
+                                pendingScroll = PendingCardScroll.ToYear(card.year)
+                                onMediaTimePeriodSelected(MediaTimePeriod.Months)
+                            }
 
-                        PhotosNodeListCardPeriod.Month -> {
-                            pendingScroll = PendingCardScroll.ToMonth(card.year, card.month)
-                            onMediaTimePeriodSelected(MediaTimePeriod.All)
-                        }
+                            PhotosNodeListCardPeriod.Month -> {
+                                pendingScroll = PendingCardScroll.ToMonth(card.year, card.month)
+                                onMediaTimePeriodSelected(MediaTimePeriod.All)
+                            }
 
-                        PhotosNodeListCardPeriod.Day -> Unit
-                    }
-                },
-            )
+                            PhotosNodeListCardPeriod.Day -> Unit
+                        }
+                    },
+                )
+            }
         }
 
         else -> {
@@ -680,6 +691,8 @@ internal const val TIMELINE_REVAMP_STICKY_HEADER_TAG = "timeline_revamp_content:
 internal const val TIMELINE_REVAMP_NON_STICKY_HEADER_TAG =
     "timeline_revamp_content:non_sticky_header"
 internal const val TIMELINE_REVAMP_CARD_LIST_TAG = "timeline_revamp_content:card_list"
+internal const val TIMELINE_REVAMP_CARD_LIST_SKELETON_TAG =
+    "timeline_revamp_content:card_list_skeleton"
 internal const val TIMELINE_REVAMP_SECTION_HEADER_TAG = "timeline_revamp_content:section_header_"
 internal const val TIMELINE_REVAMP_GRID_SIZE_ICON_TAG = "timeline_revamp_content:grid_size_icon"
 internal const val TIMELINE_REVAMP_LOADING_SKELETON_TAG = "timeline_revamp_content:loading_skeleton"
