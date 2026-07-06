@@ -39,7 +39,7 @@
             <!-- Options -->
             <TextView
                 android:id="@+id/remove_phonenumber"
-                style="@style/BottomSheetOption.Red"
+                style="@style/BottomSheetOption.Brand"
                 android:text="@string/general_remove"
                 app:drawableStartCompat="@drawable/ic_x_medium_thin_outline" />
         </LinearLayout>

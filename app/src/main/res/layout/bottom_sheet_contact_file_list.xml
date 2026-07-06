@@ -165,13 +165,13 @@
 
             <TextView
                 android:id="@+id/leave_option"
-                style="@style/BottomSheetOption.Red"
+                style="@style/BottomSheetOption.Brand"
                 android:text="@string/alert_leave_share"
                 app:drawableStartCompat="@drawable/ic_log_out_02_medium_thin_outline"/>
 
             <TextView
                 android:id="@+id/rubbish_bin_option"
-                style="@style/BottomSheetOption.Red"
+                style="@style/BottomSheetOption.Brand"
                 android:text="@string/context_move_to_trash"
                 app:drawableStartCompat="@drawable/ic_trash_medium_thin_outline"/>
 

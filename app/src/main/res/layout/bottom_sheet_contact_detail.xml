@@ -81,7 +81,7 @@
 
             <TextView
                 android:id="@+id/option_remove"
-                style="@style/BottomSheetOption.Red"
+                style="@style/BottomSheetOption.Brand"
                 android:text="@string/context_remove"
                 app:drawableStartCompat="@drawable/ic_x_medium_thin_outline" />
         </LinearLayout>

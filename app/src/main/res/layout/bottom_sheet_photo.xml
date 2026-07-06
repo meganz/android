@@ -29,7 +29,7 @@
 
         <TextView
             android:id="@+id/delete_picture_action"
-            style="@style/BottomSheetOption.Red"
+            style="@style/BottomSheetOption.Brand"
             android:text="@string/delete_avatar_panel"
             app:drawableStartCompat="@drawable/ic_x_medium_thin_outline" />
     </LinearLayout>
