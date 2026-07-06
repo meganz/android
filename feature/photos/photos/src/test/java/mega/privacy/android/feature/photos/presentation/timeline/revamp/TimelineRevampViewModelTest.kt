@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorMediaNodeContentChangesUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.SignalMediaCountChangesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -81,12 +82,15 @@ internal class TimelineRevampViewModelTest {
     private val monitorShowHiddenItemsUseCase = mock<MonitorShowHiddenItemsUseCase>()
     private val getNodeListByIdsUseCase = mock<GetNodeListByIdsUseCase>()
     private val signalMediaCountChangesUseCase = mock<SignalMediaCountChangesUseCase>()
+    private val monitorMediaNodeContentChangesUseCase =
+        mock<MonitorMediaNodeContentChangesUseCase>()
 
     private suspend fun initUnderTest(
         filterUiState: TimelineFilterUiState = TimelineFilterUiState(),
         isHiddenNodesEnabled: Boolean = false,
         showHiddenItems: Boolean = false,
         mediaChanges: Flow<Unit> = emptyFlow(),
+        contentChanges: Flow<Set<Long>> = emptyFlow(),
     ) {
         whenever(timelineFilterUiStateMapper(anyOrNull<Map<String, String?>>(), any()))
             .thenReturn(filterUiState)
@@ -96,6 +100,7 @@ internal class TimelineRevampViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(isHiddenNodesEnabled))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(showHiddenItems))
         whenever(signalMediaCountChangesUseCase()).thenReturn(mediaChanges)
+        whenever(monitorMediaNodeContentChangesUseCase()).thenReturn(contentChanges)
         underTest = TimelineRevampViewModel(
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listMediaNodesByOffsetUseCase = listMediaNodesByOffsetUseCase,
@@ -108,6 +113,7 @@ internal class TimelineRevampViewModelTest {
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             getNodeListByIdsUseCase = getNodeListByIdsUseCase,
             signalMediaCountChangesUseCase = signalMediaCountChangesUseCase,
+            monitorMediaNodeContentChangesUseCase = monitorMediaNodeContentChangesUseCase,
         )
     }
 
@@ -882,11 +888,53 @@ internal class TimelineRevampViewModelTest {
         }
     }
 
+    @Test
+    fun `test that a content change patches the cached item in place`() = runTest {
+        val may = section(groupId = "May 2026", count = 3)
+        whenever(getMediaTimelineSectionsUseCase(any(), any())).thenReturn(listOf(may))
+        val nodes = (0 until 3).map { mock<TypedFileNode>() }
+        val items = (0 until 3).map { item(id = 100L + it) }
+        nodes.forEachIndexed { i, node ->
+            whenever(mediaTimelineNodeUiItemMapper(node)).thenReturn(items[i])
+        }
+        whenever(listMediaNodesByOffsetUseCase(any(), eq(may), any(), any(), any()))
+            .thenReturn(nodes)
+
+        // A favourite change on id 101 re-fetches that node and re-maps it to a favourited item.
+        val refreshedNode = mock<TypedFileNode> { on { id } doReturn NodeId(101L) }
+        val patchedItem = item(id = 101L, isFavourite = true)
+        whenever(getNodeListByIdsUseCase(listOf(NodeId(101L)))).thenReturn(listOf(refreshedNode))
+        whenever(mediaTimelineNodeUiItemMapper(refreshedNode)).thenReturn(patchedItem)
+
+        val contentChanges = Channel<Set<Long>>(capacity = 1)
+        initUnderTest(contentChanges = contentChanges.consumeAsFlow())
+
+        underTest.uiState.filterIsInstance<TimelineRevampUiState.Data>().test {
+            awaitItem() // initial Data, no loaded nodes
+            underTest.onVisibleRangeChanged(firstIndex = 0, lastIndex = 2)
+            advanceUntilIdle()
+            var data = awaitItem()
+            while (data.loadedNodes.isEmpty()) data = awaitItem()
+            assertThat(data.loadedNodes.values).containsExactlyElementsIn(items)
+
+            contentChanges.send(setOf(101L))
+            advanceUntilIdle()
+
+            var patched = awaitItem()
+            while (!patched.loadedNodes.values.contains(patchedItem)) patched = awaitItem()
+            // Only the changed slot (global index 1) is replaced; the rest are untouched.
+            assertThat(patched.loadedNodes[1]).isEqualTo(patchedItem)
+            assertThat(patched.loadedNodes.values).doesNotContain(items[1])
+            assertThat(patched.loadedNodes[0]).isEqualTo(items[0])
+            assertThat(patched.loadedNodes[2]).isEqualTo(items[2])
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private fun section(groupId: String, count: Long) =
         MediaTimelineSection(groupId = groupId, startDate = 0L, endDate = 0L, count = count)
 
-    private fun item(id: Long) = PhotosNodeContentItemV2(
+    private fun item(id: Long, isFavourite: Boolean = false) = PhotosNodeContentItemV2(
         key = id,
         contentType = PhotosNodeContentType.PhotoNode,
         id = id,
@@ -898,7 +946,7 @@ internal class TimelineRevampViewModelTest {
         thumbnailFilePath = null,
         previewFilePath = null,
         extension = "jpg",
-        isFavourite = false,
+        isFavourite = isFavourite,
         isSensitive = false,
     )
 

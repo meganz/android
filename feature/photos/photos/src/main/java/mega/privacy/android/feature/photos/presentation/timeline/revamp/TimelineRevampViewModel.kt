@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorMediaNodeContentChangesUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.SignalMediaCountChangesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
@@ -107,6 +108,7 @@ class TimelineRevampViewModel @Inject constructor(
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase,
     private val signalMediaCountChangesUseCase: SignalMediaCountChangesUseCase,
+    private val monitorMediaNodeContentChangesUseCase: MonitorMediaNodeContentChangesUseCase,
 ) : ViewModel() {
 
     private val sectionsState = MutableStateFlow<SectionsState>(SectionsState.Loading)
@@ -115,6 +117,7 @@ class TimelineRevampViewModel @Inject constructor(
     private val isScrollingFlow = MutableStateFlow(false)
     private val mediaLoaderStarted = AtomicBoolean(false)
     private val sectionsMonitorStarted = AtomicBoolean(false)
+    private val contentMonitorStarted = AtomicBoolean(false)
 
     /**
      * Backs [TimelineRevampUiState.Data.takenDownDialogEvent]; folded into [uiState] so the screen
@@ -174,7 +177,12 @@ class TimelineRevampViewModel @Inject constructor(
                 preferenceMap = newFilter ?: preferenceMap,
                 shouldApplyFilterFromPreference = newFilter != null,
             )
-        }.asUiStateFlow(viewModelScope, TimelineFilterUiState())
+        }
+            .catch { e ->
+                Timber.e(e, "Failed to map timeline filter ui state")
+                emit(TimelineFilterUiState())
+            }
+            .asUiStateFlow(viewModelScope, TimelineFilterUiState())
     }
 
     /**
@@ -207,7 +215,12 @@ class TimelineRevampViewModel @Inject constructor(
             }
             timelineFilterUiStateMapper(filter, getCameraUploadFolderHandles())
                 .copy(sensitivity = sensitivity)
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
+        }
+            .catch { e ->
+                Timber.e(e, "Failed to derive current filter")
+                emit(DEFAULT_FILTER)
+            }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
     }
 
     /**
@@ -346,6 +359,10 @@ class TimelineRevampViewModel @Inject constructor(
                         }
                     }
                     .onStart { emit(PeriodCards.Empty) }
+            }
+            .catch { e ->
+                Timber.e(e, "Failed to build period cards")
+                emit(PeriodCards.Empty)
             }
             .asUiStateFlow(viewModelScope, PeriodCards.Empty)
     }
@@ -509,6 +526,7 @@ class TimelineRevampViewModel @Inject constructor(
     private suspend fun getTimelineSections(filter: MediaTimelineFilter, order: SortOrder) =
         runCatching { getMediaTimelineSectionsUseCase(filter, order) }
             .getOrDefault(emptyList())
+            .distinctBy { it.groupId }
 
     private fun toUiState(
         sections: List<MediaTimelineSection>,
@@ -548,6 +566,7 @@ class TimelineRevampViewModel @Inject constructor(
                 .coerceAtLeast(0)..(lastIndex + loadBuffer)
         }
         ensureMediaLoaderStarted()
+        ensureContentMonitorStarted()
     }
 
     private fun ensureMediaLoaderStarted() {
@@ -563,6 +582,44 @@ class TimelineRevampViewModel @Inject constructor(
                     ensureRangeLoaded(range, newSections)
                 }
         }
+    }
+
+    /**
+     * Starts the single coroutine (once) that patches cached items in place when a media node's
+     * render-affecting content (favourite / sensitivity) changes, so the affected thumbnails re-render
+     * without a section reload or a shimmer.
+     */
+    private fun ensureContentMonitorStarted() {
+        if (!contentMonitorStarted.compareAndSet(false, true)) return
+        viewModelScope.launch {
+            monitorMediaNodeContentChangesUseCase().collect(::replaceAndUpdateCache)
+        }
+    }
+
+    /**
+     * Re-fetches the changed nodes we currently hold, re-maps them, and replaces their cache entries in
+     * place (same [SlotKey]); nodes not in the cache are ignored. Runs on the same dispatcher as the
+     * media loader, so cache access stays confined to one thread.
+     */
+    private suspend fun replaceAndUpdateCache(targetNodeIds: Set<Long>) {
+        val cachedIds = mediaCache.values.mapTo(mutableSetOf()) { it.id }
+        val idsToPatch = targetNodeIds intersect cachedIds
+        if (idsToPatch.isEmpty()) return
+
+        val refreshedById = runCatching { getNodeListByIdsUseCase(idsToPatch.map { NodeId(it) }) }
+            .onFailure { Timber.e(it, "Failed to refresh changed media nodes") }
+            .getOrDefault(emptyList())
+            .filterIsInstance<TypedFileNode>()
+            .associateBy { it.id.longValue }
+        if (refreshedById.isEmpty()) return
+
+        val replacements = mediaCache.entries
+            .mapNotNull { (slot, item) ->
+                refreshedById[item.id]?.let { slot to mediaTimelineNodeUiItemMapper(it) }
+            }
+        if (replacements.isEmpty()) return
+        replacements.forEach { (slot, item) -> mediaCache[slot] = item }
+        loadedNodes.update { getAndUpdateLoadedNodes() }
     }
 
     private fun updateMediaCache(newSections: List<MediaTimelineSection>) {

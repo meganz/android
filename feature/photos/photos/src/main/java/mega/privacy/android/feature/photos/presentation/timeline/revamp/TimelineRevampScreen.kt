@@ -27,6 +27,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,7 +55,6 @@ import mega.privacy.android.feature.photos.presentation.CUStatusUiState
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.feature.photos.presentation.component.PhotoNodeBodyV2
 import mega.privacy.android.feature.photos.presentation.timeline.TimelineDateCache
-import mega.privacy.android.feature.photos.presentation.timeline.rememberCameraUploadsBannerHandlers
 import mega.privacy.android.feature.photos.presentation.timeline.component.CameraUploadsBanner
 import mega.privacy.android.feature.photos.presentation.timeline.component.EnableCameraUploadsContent
 import mega.privacy.android.feature.photos.presentation.timeline.component.MediaSkeletonView
@@ -62,11 +62,11 @@ import mega.privacy.android.feature.photos.presentation.timeline.component.Photo
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
+import mega.privacy.android.feature.photos.presentation.timeline.rememberCameraUploadsBannerHandlers
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.resources.R as sharedR
 import java.time.Year
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -211,7 +211,7 @@ private fun TimelineRevampContent(
         } else {
             gridSize.landscape
         }
-    val locale = configuration.locales[0]
+    val locale = LocalLocale.current.platformLocale
 
     var pendingScroll by remember { mutableStateOf<PendingCardScroll?>(null) }
 
@@ -335,23 +335,20 @@ private fun TimelineRevampGrid(
         onScrollingChanged = onScrollingChanged,
     )
 
-    // Day sections are grouped into month headers: a header is emitted only at each month's first day
-    // section, so consecutive days of the same month flow under a single "June 2026" header.
-    val monthStartFlags = remember(sections) {
-        sections.mapIndexed { index, section ->
-            index == 0 || !TimelineDateCache.get(sections[index - 1].startDate)
-                .isSameMonthAs(TimelineDateCache.get(section.startDate))
+    val headerIndexes = remember(sections) {
+        val seenMonths = HashSet<String>()
+        buildSet {
+            sections.forEachIndexed { index, section ->
+                val monthAdded = seenMonths.add(monthKey(section.startDate))
+                if (monthAdded && index != 0) {
+                    add(index)
+                }
+            }
         }
     }
-    val headerCount = remember(monthStartFlags) { monthStartFlags.count { it } }
-
-    // Items actually emitted into the grid: the optional CU banner, the always-present non-sticky
-    // header, one inline month header per month *after* the first (the first month is represented by
-    // the non-sticky header, so its own header is skipped), and every media node.
-    val totalGridItems = remember(sections, headerCount, bannerContent != null) {
-        val inlineMonthHeaderCount = (headerCount - 1).coerceAtLeast(0)
+    val totalGridItems = remember(sections, headerIndexes, bannerContent != null) {
         val bannerItems = if (bannerContent != null) 1 else 0
-        bannerItems + 1 + inlineMonthHeaderCount + sections.sumOf { it.count }.toInt()
+        bannerItems + 1 + headerIndexes.size + sections.sumOf { it.count }.toInt()
     }
 
     // Recomputes on scroll (reads lazyGridState.layoutInfo, a snapshot state) and is re-created when
@@ -389,6 +386,7 @@ private fun TimelineRevampGrid(
                 .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
             state = lazyGridState,
             totalItems = totalGridItems,
+            fastScrollerVerticalOffset = 36.dp
         ) {
             bannerContent?.let {
                 item(
@@ -417,7 +415,7 @@ private fun TimelineRevampGrid(
             }
 
             sections.zip(sectionStartOffsets).forEachIndexed { sectionIndex, (section, base) ->
-                if (monthStartFlags[sectionIndex] && sectionIndex != 0) {
+                if (sectionIndex in headerIndexes) {
                     val monthHeaderKey = monthKey(section.startDate)
                     item(
                         key = "$HEADER_KEY_PREFIX$monthHeaderKey",
@@ -479,9 +477,6 @@ private fun MediaTimelineSection.isInMonth(year: Int, month: Int): Boolean {
     val zonedDateTime = TimelineDateCache.get(startDate)
     return zonedDateTime.year == year && zonedDateTime.monthValue == month
 }
-
-private fun ZonedDateTime.isSameMonthAs(other: ZonedDateTime): Boolean =
-    year == other.year && monthValue == other.monthValue
 
 private sealed interface PendingCardScroll {
     data class ToYear(val year: Int) : PendingCardScroll
