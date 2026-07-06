@@ -17,6 +17,8 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
@@ -52,6 +54,7 @@ import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaEvent
@@ -90,6 +93,11 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
     private lateinit var contactController: ContactController
     internal lateinit var nodeController: NodeController
+
+    private val selectContactToShareLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            onSelectContactToShareResult(result)
+        }
 
     private var selectedShare: MegaShare? = null
 
@@ -525,12 +533,13 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
      * Starts a new Intent to share the folder to different contacts
      */
     private fun shareFolder() {
-        val intent = Intent()
-        intent.setClass(this, AddContactActivity::class.java)
-        intent.putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
-        intent.putExtra("MULTISELECT", 0)
-        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, node?.handle)
-        startActivityForResult(intent, Constants.REQUEST_CODE_SELECT_CONTACT)
+        val handle = node?.handle ?: return
+        megaNavigator.openAddContactToShare(
+            this,
+            selectContactToShareLauncher,
+            AddContactToShareNavKey.ContactType.All,
+            listOf(handle),
+        )
     }
 
     // Clear all selected items
@@ -718,60 +727,56 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
         adapter?.notifyDataSetChanged()
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intent)
-        if (intent == null) {
+    private fun onSelectContactToShareResult(result: ActivityResult) {
+        val intent = result.data
+        if (intent == null || result.resultCode != RESULT_OK) {
             return
         }
 
-        if (requestCode == Constants.REQUEST_CODE_SELECT_CONTACT && resultCode == RESULT_OK) {
-            if (!Util.isOnline(this)) {
-                showSnackbar(getString(R.string.error_server_connection_problem))
-                return
-            }
+        if (!Util.isOnline(this)) {
+            showSnackbar(getString(R.string.error_server_connection_problem))
+            return
+        }
 
-            val emails =
-                intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
-                    ?: arrayListOf()
-            val nodeHandle = intent.getLongExtra(AddContactActivity.EXTRA_NODE_HANDLE, -1)
+        val emails =
+            intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                ?: arrayListOf()
+        val nodeHandle = intent.getLongExtra(AddContactActivity.EXTRA_NODE_HANDLE, -1)
 
-            if (nodeHandle != -1L) {
-                node = megaApi.getNodeByHandle(nodeHandle)
-            }
+        if (nodeHandle != -1L) {
+            node = megaApi.getNodeByHandle(nodeHandle)
+        }
 
-            if (fileBackupManager?.shareFolder(
-                    nodeController, longArrayOf(nodeHandle), emails, MegaShare.ACCESS_READ
-                ) == true
-            ) {
-                return
-            }
+        if (fileBackupManager?.shareFolder(
+                nodeController, longArrayOf(nodeHandle), emails, MegaShare.ACCESS_READ
+            ) == true
+        ) {
+            return
+        }
 
-            node?.let {
-                if (it.isFolder) {
-                    val dialogBuilder = MaterialAlertDialogBuilder(
-                        this, R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        node?.let {
+            if (it.isFolder) {
+                val dialogBuilder = MaterialAlertDialogBuilder(
+                    this, R.style.ThemeOverlay_Mega_MaterialAlertDialog
+                )
+                dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions))
+                val items = arrayOf<CharSequence>(
+                    getString(R.string.file_properties_shared_folder_read_only), getString(
+                        R.string.file_properties_shared_folder_read_write
+                    ), getString(R.string.file_properties_shared_folder_full_access)
+                )
+                dialogBuilder.setSingleChoiceItems(
+                    items, -1
+                ) { _: DialogInterface?, item: Int ->
+                    permissionsDialog?.dismiss()
+                    statusDialog = MegaProgressDialogUtil.createProgressDialog(
+                        this, getString(R.string.context_sharing_folder)
                     )
-                    dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions))
-                    val items = arrayOf<CharSequence>(
-                        getString(R.string.file_properties_shared_folder_read_only), getString(
-                            R.string.file_properties_shared_folder_read_write
-                        ), getString(R.string.file_properties_shared_folder_full_access)
-                    )
-                    dialogBuilder.setSingleChoiceItems(
-                        items, -1
-                    ) { _: DialogInterface?, item: Int ->
-                        permissionsDialog?.dismiss()
-                        statusDialog = MegaProgressDialogUtil.createProgressDialog(
-                            this, getString(R.string.context_sharing_folder)
-                        )
-                        statusDialog?.show()
-                        this.shareFolder(it, emails, item)
-                    }
-                    permissionsDialog = dialogBuilder.create().also { dialog -> dialog.show() }
+                    statusDialog?.show()
+                    this.shareFolder(it, emails, item)
                 }
+                permissionsDialog = dialogBuilder.create().also { dialog -> dialog.show() }
             }
-
         }
     }
 
