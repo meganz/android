@@ -15,8 +15,10 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.mapper.FileContentTypeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.data.mapper.getFileTypeInfoForExtension
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -52,6 +54,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheGateway: CacheGateway,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
+    private val fileContentTypeMapper: FileContentTypeMapper,
     private val fileGateway: FileGateway,
     private val deviceGateway: DeviceGateway,
     private val fileAttributeGateway: FileAttributeGateway,
@@ -271,6 +274,16 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override fun getFileTypeInfoByName(name: String, duration: Int): FileTypeInfo =
         fileTypeInfoMapper(name, duration)
+
+    override fun getFileTypeInfoFromContent(header: ByteArray, duration: Int): FileTypeInfo? =
+        fileContentTypeMapper(header)?.let { mimeType ->
+            getFileTypeInfoForExtension(mimeType = mimeType, extension = "", duration = duration)
+        }
+
+    override suspend fun readFirstBytesFromPath(path: String, length: Int): ByteArray? =
+        withContext(ioDispatcher) {
+            fileGateway.readFirstBytesFromPath(path, length)
+        }
 
     override fun isNodeOpenableTextFile(node: FileNode) =
         MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)

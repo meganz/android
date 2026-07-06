@@ -200,6 +200,21 @@ internal class FileFacade @Inject constructor(
     override suspend fun readBytesFromPath(path: String): ByteArray? =
         File(path).takeIf { it.exists() }?.readBytes()
 
+    override suspend fun readFirstBytesFromPath(path: String, length: Int): ByteArray? {
+        if (length <= 0) return ByteArray(0)
+        val file = File(path).takeIf { it.exists() && it.isFile } ?: return null
+        return file.inputStream().use { stream ->
+            val buffer = ByteArray(length)
+            var total = 0
+            while (total < length) {
+                val read = stream.read(buffer, total, length - total)
+                if (read == -1) break
+                total += read
+            }
+            buffer.copyOf(total)
+        }
+    }
+
     override suspend fun writeBytesToPath(path: String, bytes: ByteArray) {
         File(path).writeBytes(bytes)
     }

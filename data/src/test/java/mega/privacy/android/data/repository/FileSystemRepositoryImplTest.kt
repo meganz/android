@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.mapper.FileContentTypeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
@@ -65,6 +66,7 @@ internal class FileSystemRepositoryImplTest {
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val cacheGateway: CacheGateway = mock()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
+    private val fileContentTypeMapper: FileContentTypeMapper = mock()
     private val fileGateway: FileGateway = mock()
     private val deviceGateway = mock<DeviceGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
@@ -89,6 +91,7 @@ internal class FileSystemRepositoryImplTest {
             ioDispatcher = ioDispatcher,
             cacheGateway = cacheGateway,
             fileTypeInfoMapper = fileTypeInfoMapper,
+            fileContentTypeMapper = fileContentTypeMapper,
             fileGateway = fileGateway,
             deviceGateway = deviceGateway,
             fileAttributeGateway = fileAttributeGateway,
@@ -103,6 +106,7 @@ internal class FileSystemRepositoryImplTest {
             context,
             cacheGateway,
             fileTypeInfoMapper,
+            fileContentTypeMapper,
             fileGateway,
             deviceGateway,
             fileAttributeGateway,

@@ -148,6 +148,15 @@ interface FileGateway {
     suspend fun readBytesFromPath(path: String): ByteArray?
 
     /**
+     * Read at most [length] bytes from the start of the file at the given path.
+     *
+     * @param path absolute path to the file
+     * @param length maximum number of bytes to read
+     * @return the read bytes, or null if the file does not exist
+     */
+    suspend fun readFirstBytesFromPath(path: String, length: Int): ByteArray?
+
+    /**
      * Write raw bytes to the file at the given path.
      *
      * @param path absolute path to the file
