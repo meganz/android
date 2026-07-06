@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,13 +33,11 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.geometry.Offset
 import mega.privacy.android.feature.documentscanner.components.BoundaryOverlay
 import mega.privacy.android.feature.documentscanner.components.ScanBoundaryStability
 import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 import mega.privacy.android.feature.documentscanner.presentation.ScanSessionViewModel
 import mega.privacy.android.feature.documentscanner.presentation.analyzer.ScanFrameAnalyzer
-import mega.privacy.android.feature.documentscanner.presentation.component.ScanGuideOverlay
 import mega.privacy.android.feature.documentscanner.presentation.component.ScannerCloseButton
 import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
 import java.util.concurrent.Executors
@@ -116,8 +115,6 @@ private fun CameraContent(
             onFrame = onFrame,
             modifier = Modifier.fillMaxSize(),
         )
-
-        ScanGuideOverlay(modifier = Modifier.fillMaxSize())
 
         BoundaryOverlay(
             normalisedCorners = boundaryOverlayState.boundary?.let {

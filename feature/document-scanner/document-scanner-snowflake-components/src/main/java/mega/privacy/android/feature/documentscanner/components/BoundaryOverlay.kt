@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.dp
 import mega.android.core.ui.tokens.theme.DSTokens
 
 /** How stable the detected boundary is — drives the overlay colour. */
@@ -33,9 +34,7 @@ fun BoundaryOverlay(
 
     val color = when (stability) {
         ScanBoundaryStability.STABLE -> DSTokens.colors.support.success
-        ScanBoundaryStability.STABILIZING -> DSTokens.colors.support.warning
-        ScanBoundaryStability.UNSTABLE -> DSTokens.colors.support.warning
-        ScanBoundaryStability.SEARCHING -> DSTokens.colors.support.error
+        else -> DSTokens.colors.support.info
     }
 
     Canvas(modifier = modifier) {
@@ -57,11 +56,11 @@ fun BoundaryOverlay(
             close()
         }
 
-        drawPath(path = path, color = color.copy(alpha = 0.1f))
-        drawPath(path = path, color = color, style = Stroke(width = 3f))
+        drawPath(path = path, color = color.copy(alpha = 0.15f))
+        drawPath(path = path, color = color, style = Stroke(width = 4.dp.toPx()))
 
         viewCorners.forEach { corner ->
-            drawCircle(color = color, radius = 8f, center = corner)
+            drawCircle(color = color, radius = 5.dp.toPx(), center = corner)
         }
     }
 }
