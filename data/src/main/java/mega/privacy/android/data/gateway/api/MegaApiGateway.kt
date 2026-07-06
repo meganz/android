@@ -3021,6 +3021,27 @@ interface MegaApiGateway {
     suspend fun getBandwidthOverQuotaDelay(): Long
 
     /**
+     * Get the number of nodes (files and folders) in the account.
+     *
+     * @return the number of nodes.
+     */
+    suspend fun getNumNodes(): Long
+
+    /**
+     * Get the storage over quota deletion deadline (Unix timestamp in seconds).
+     *
+     * @return the deadline timestamp in seconds, or a negative value if there is no deadline.
+     */
+    suspend fun getOverquotaDeadlineTs(): Long
+
+    /**
+     * Get the list of storage over quota warning timestamps (Unix timestamps in seconds).
+     *
+     * @return the list of warning timestamps in seconds.
+     */
+    suspend fun getOverquotaWarningsTs(): List<Long>
+
+    /**
      * Launches a request to stop sharing a file/folder
      *
      * @param node          MegaNode to stop sharing

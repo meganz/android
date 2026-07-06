@@ -642,6 +642,18 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
+    override suspend fun getNumberOfNodes(): Long = withContext(ioDispatcher) {
+        megaApiGateway.getNumNodes()
+    }
+
+    override suspend fun getOverDiskQuotaDeadline(): Long = withContext(ioDispatcher) {
+        megaApiGateway.getOverquotaDeadlineTs()
+    }
+
+    override suspend fun getOverDiskQuotaWarningTimestamps(): List<Long> = withContext(ioDispatcher) {
+        megaApiGateway.getOverquotaWarningsTs()
+    }
+
     private suspend fun handleAccountDetail(request: MegaRequest): AccountDetail {
         val newDetail = accountDetailMapper(
             request.megaAccountDetails,

@@ -246,6 +246,27 @@ interface AccountRepository {
     suspend fun getAccountEmail(forceRefresh: Boolean = true): String?
 
     /**
+     * Get the number of nodes (files and folders) in the account.
+     *
+     * @return the number of nodes.
+     */
+    suspend fun getNumberOfNodes(): Long
+
+    /**
+     * Get the storage over quota deletion deadline (Unix timestamp in seconds).
+     *
+     * @return the deadline timestamp in seconds, or a negative value if there is no deadline.
+     */
+    suspend fun getOverDiskQuotaDeadline(): Long
+
+    /**
+     * Get the list of storage over quota warning timestamps (Unix timestamps in seconds).
+     *
+     * @return the list of warning timestamps in seconds.
+     */
+    suspend fun getOverDiskQuotaWarningTimestamps(): List<Long>
+
+    /**
      * Monitor account detail
      *
      */
