@@ -57,6 +57,7 @@ import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON.JSON_VA
 import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.entity.preference.ViewModePreference
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -202,6 +203,12 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setSortingPreference(preference: SortingPreference) =
         uiPreferencesGateway.setSortingPreference(preference.id)
+
+    override fun monitorViewModePreference(): Flow<ViewModePreference?> =
+        uiPreferencesGateway.monitorViewModePreference().map { ViewModePreference(it) }
+
+    override suspend fun setViewModePreference(preference: ViewModePreference) =
+        uiPreferencesGateway.setViewModePreference(preference.id)
 
     override fun monitorShowHiddenItems(): Flow<Boolean> = showHiddenNodesFlow
         .onStart {

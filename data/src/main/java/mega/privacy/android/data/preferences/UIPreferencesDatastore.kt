@@ -28,6 +28,7 @@ private const val SHOW_OFFLINE_WARNING_VIEW = "SHOW_OFFLINE_WARNING_VIEW"
 private const val PHOTOS_RECENT_QUERIES = "PHOTOS_RECENT_QUERIES"
 private const val VIEW_TYPE = "VIEW_TYPE"
 private const val SORTING_PREFERENCE = "SORTING_PREFERENCE"
+private const val VIEW_MODE_PREFERENCE = "VIEW_MODE_PREFERENCE"
 private const val ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP =
     "ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP"
 private const val ADS_CLOSING_TIMESTAMP = "ADS_CLOSING_TIMESTAMP"
@@ -62,6 +63,7 @@ internal class UIPreferencesDatastore @Inject constructor(
     private val subFolderMediaDiscoveryKey = booleanPreferencesKey(SUBFOLDER_MEDIA_DISCOVERY)
     private val viewTypeKey = intPreferencesKey(VIEW_TYPE)
     private val sortingPreferenceKey = intPreferencesKey(SORTING_PREFERENCE)
+    private val viewModePreferenceKey = intPreferencesKey(VIEW_MODE_PREFERENCE)
     private val offlineWarningViewKey = booleanPreferencesKey(SHOW_OFFLINE_WARNING_VIEW)
     private val almostFullStorageBannerClosingTimestampKey =
         longPreferencesKey(ALMOST_FULL_STORAGE_BANNER_CLOSING_TIMESTAMP)
@@ -93,6 +95,15 @@ internal class UIPreferencesDatastore @Inject constructor(
     override suspend fun setSortingPreference(value: Int) {
         context.uiPreferenceDataStore.edit {
             it[sortingPreferenceKey] = value
+        }
+    }
+
+    override fun monitorViewModePreference(): Flow<Int?> =
+        context.uiPreferenceDataStore.monitor(viewModePreferenceKey)
+
+    override suspend fun setViewModePreference(value: Int) {
+        context.uiPreferenceDataStore.edit {
+            it[viewModePreferenceKey] = value
         }
     }
 

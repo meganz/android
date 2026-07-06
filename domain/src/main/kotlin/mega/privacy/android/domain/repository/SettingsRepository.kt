@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.entity.preference.ViewModePreference
 import java.io.File
 
 /**
@@ -119,6 +120,20 @@ interface SettingsRepository {
      * @param preference the [SortingPreference] to set
      */
     suspend fun setSortingPreference(preference: SortingPreference)
+
+    /**
+     * Monitor the view mode preference
+     *
+     * @return the [ViewModePreference] as a flow, or null if none has been set
+     */
+    fun monitorViewModePreference(): Flow<ViewModePreference?>
+
+    /**
+     * Set the view mode preference
+     *
+     * @param preference the [ViewModePreference] to set
+     */
+    suspend fun setViewModePreference(preference: ViewModePreference)
 
     /**
      * Monitor show hidden items
