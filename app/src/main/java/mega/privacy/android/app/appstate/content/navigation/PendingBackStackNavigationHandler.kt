@@ -204,7 +204,7 @@ class PendingBackStackNavigationHandler(
         isPasscodeLocked = isLocked
 
         if (isPasscodeLocked) {
-            if (isLoggedInWithRoot()) {
+            if (currentAuthStatus.isLoggedIn) {
                 showPasscodeScreen()
             }
         } else {
