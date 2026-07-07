@@ -521,15 +521,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
             withContext(NonCancellable) {
                 val filteredFolderNodes = nodes.filterIsInstance<TypedFolderNode>()
 
-                val hiddenNodesEnabled = runCatching {
-                    monitorHiddenNodesEnabledUseCase().first()
-                }.getOrDefault(false)
-                val warning = runCatching {
-                    getShareFolderSensitiveWarningTypeUseCase(
-                        filteredFolderNodes.map { it.id },
-                        hiddenNodesEnabled,
-                    )
-                }.getOrDefault(SensitiveNodeShareWarning.None)
+                val warning = getShareFolderSensitiveWarning(filteredFolderNodes)
 
                 if (warning != SensitiveNodeShareWarning.None) {
                     pendingSensitiveShareFolderNodes = filteredFolderNodes
@@ -546,6 +538,31 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Resolves the hidden/sensitive-node share warning for [folderNodes].
+     *
+     * When [AppFeatures.ContactsComposeUI] is off the legacy `AddContactActivity` runs its own
+     * hidden-node check, so this warning is skipped to avoid showing it twice.
+     */
+    private suspend fun getShareFolderSensitiveWarning(
+        folderNodes: List<TypedFolderNode>,
+    ): SensitiveNodeShareWarning {
+        val contactsComposeUIEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        }.getOrDefault(false)
+        if (!contactsComposeUIEnabled) return SensitiveNodeShareWarning.None
+
+        val hiddenNodesEnabled = runCatching {
+            monitorHiddenNodesEnabledUseCase().first()
+        }.getOrDefault(false)
+        return runCatching {
+            getShareFolderSensitiveWarningTypeUseCase(
+                folderNodes.map { it.id },
+                hiddenNodesEnabled,
+            )
+        }.getOrDefault(SensitiveNodeShareWarning.None)
     }
 
     /**
@@ -571,7 +588,8 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
                 state.copy(shareFolderDialogEvent = triggered(nodeIds))
             }
         } else {
-            pendingShareFolderHandles = nodeIdsuiState.update { state ->
+            pendingShareFolderHandles = nodeIds
+            uiState.update { state ->
                 state.copy(shareFolderEvent = triggered(nodeIds))
             }
         }

@@ -106,6 +106,7 @@ import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicL
 import mega.privacy.android.domain.usecase.shares.CreateShareKeyUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.videosection.RemoveRecentlyWatchedItemUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.menu.CommonMenuAction
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -313,6 +314,9 @@ class NodeOptionsActionViewModelTest {
         getShareFolderSensitiveWarningTypeUseCase.stub {
             onBlocking { invoke(any(), any()) } doReturn SensitiveNodeShareWarning.None
         }
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+        }
     }
 
     @AfterEach
@@ -346,6 +350,7 @@ class NodeOptionsActionViewModelTest {
             createShareKeyUseCase,
             monitorHiddenNodesEnabledUseCase,
             getShareFolderSensitiveWarningTypeUseCase,
+            getFeatureFlagValueUseCase,
             mockSingleNodeActionHandler,
             mockMultiNodeActionHandler,
             nodeSelectionModeActionMapper,
@@ -1610,6 +1615,36 @@ class NodeOptionsActionViewModelTest {
 
             verify(createShareKeyUseCase).invoke(mockFolderNode)
             verify(checkBackupNodeTypeUseCase).invoke(mockFolderNode)
+        }
+
+    @Test
+    fun `test verifyShareFolderAction skips the sensitive-node warning and proceeds when ContactsComposeUI is off`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(123L)
+            }
+
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent).isInstanceOf(
+                    StateEventWithContentConsumed::class.java
+                )
+                assertThat(state.shareFolderEvent).isInstanceOf(
+                    StateEventWithContentTriggered::class.java
+                )
+            }
+
+            verify(getShareFolderSensitiveWarningTypeUseCase, never()).invoke(any(), any())
+            verify(createShareKeyUseCase).invoke(mockFolderNode)
         }
 
     @Test
