@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.documentscanner.presentation.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
 import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 
@@ -17,7 +19,10 @@ import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
  *   cached before this screen is shown.
  * @property captureMode Whether capture fires automatically on a stable document
  *   ([CaptureMode.AUTO]) or only on the manual shutter ([CaptureMode.MANUAL]).
- *   Toggled from the scanner top bar; the auto-capture trigger itself lands in U7.
+ *   Toggled from the scanner top bar.
+ * @property captureEvent One-shot signal telling the screen to capture the current
+ *   frame — fired on a stable document (AUTO, off cooldown) or a manual shutter tap.
+ *   The screen grabs the frame, then calls back to consume it.
  */
 internal data class ScanSessionUiState(
     val isCameraPermissionGranted: Boolean = false,
@@ -25,4 +30,5 @@ internal data class ScanSessionUiState(
     val stabilityState: StabilityState = StabilityState.SEARCHING,
     val isModelMissing: Boolean = false,
     val captureMode: CaptureMode = CaptureMode.AUTO,
+    val captureEvent: StateEvent = consumed,
 )
