@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_MONTHLY
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_CURRENT_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
@@ -405,7 +406,7 @@ class UpgradeAccountScreenTest {
         setContent(
             isUpgradeAccount = true,
             isSubscriptionRevampEnabled = true,
-            uiState = revampUiState(),
+            uiState = revampUiState(currentPlan = null),
         )
 
         composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertExists()
@@ -480,16 +481,77 @@ class UpgradeAccountScreenTest {
         }
     }
 
+    @Test
+    fun `test that current plan is excluded from segment when subscription is recurring`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(
+                currentPlan = AccountType.PRO_I,
+                subscriptionCycle = AccountSubscriptionCycle.YEARLY,
+                subscriptionStatus = SubscriptionStatus.VALID,
+            ),
+        )
+
+        // Scroll past the plan cards so a third card would be composed if it existed.
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_ADDITIONAL_BENEFITS))
+        composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}1").assertExists()
+        composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}2").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that current plan is shown in segment when subscription is one-off`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(
+                currentPlan = AccountType.PRO_I,
+                subscriptionCycle = AccountSubscriptionCycle.YEARLY,
+                subscriptionStatus = SubscriptionStatus.NONE,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag("${TEST_TAG_REVAMP_PLAN_CARD}2"))
+            .assertExists()
+    }
+
+    @Test
+    fun `test that current plan is excluded from monthly tab when subscription is recurring monthly`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(
+                currentPlan = AccountType.PRO_I,
+                subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+                subscriptionStatus = SubscriptionStatus.VALID,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_BILLING_PERIOD_MONTHLY))
+        composeRule.onNodeWithTag(TEST_TAG_BILLING_PERIOD_MONTHLY).performClick()
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_ADDITIONAL_BENEFITS))
+        composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}1").assertExists()
+        composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}2").assertDoesNotExist()
+    }
+
     private fun revampUiState(
         currentPlan: AccountType? = AccountType.PRO_I,
+        subscriptionCycle: AccountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
+        subscriptionStatus: SubscriptionStatus = SubscriptionStatus.VALID,
     ) = UpgradeAccountState(
         localisedSubscriptionsList = expectedLocalisedSubscriptionsList,
         isSubscriptionFeatureAvailable = true,
         cheapestSubscriptionAvailable = subscriptionProII,
         currentSubscriptionPlan = currentPlan,
-        subscriptionCycle = AccountSubscriptionCycle.YEARLY,
-        subscriptionStatus = SubscriptionStatus.VALID,
+        subscriptionCycle = subscriptionCycle,
+        subscriptionStatus = subscriptionStatus,
         subscriptionRenewTime = 1_815_000_000L,
+        proExpirationTime = 1_815_000_000L,
     )
 
     private fun setContent(
