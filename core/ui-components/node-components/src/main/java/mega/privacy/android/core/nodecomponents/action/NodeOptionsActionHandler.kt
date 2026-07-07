@@ -84,17 +84,6 @@ fun rememberSingleNodeActionHandler(
         }
     }
 
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.shareFolderActivityResultContract
-    ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            viewModel.contactSelectedForShareFolder(
-                contactIds,
-                nodeHandles
-            )
-        }
-    }
-
     val restoreLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.nameCollisionActivityContract
     ) { message ->
@@ -144,7 +133,6 @@ fun rememberSingleNodeActionHandler(
         moveLauncher,
         copyLauncher,
         publicCopyLauncher,
-        shareFolderLauncher,
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
@@ -168,7 +156,6 @@ fun rememberSingleNodeActionHandler(
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
                 publicCopyLauncher = publicCopyLauncher,
-                shareFolderLauncher = shareFolderLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
                 hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,
@@ -260,17 +247,6 @@ fun rememberMultiNodeActionHandler(
         }
     }
 
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaActivityResultContract.shareFolderActivityResultContract
-    ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            viewModel.contactSelectedForShareFolder(
-                contactIds,
-                nodeHandles
-            )
-        }
-    }
-
     val restoreLauncher = rememberLauncherForActivityResult(
         contract = megaActivityResultContract.nameCollisionActivityContract
     ) { message ->
@@ -311,7 +287,6 @@ fun rememberMultiNodeActionHandler(
         moveLauncher,
         copyLauncher,
         publicCopyLauncher,
-        shareFolderLauncher,
         restoreLauncher,
         sendToChatLauncher,
         hiddenNodesOnboardingLauncher,
@@ -333,7 +308,6 @@ fun rememberMultiNodeActionHandler(
                 moveLauncher = moveLauncher,
                 copyLauncher = copyLauncher,
                 publicCopyLauncher = publicCopyLauncher,
-                shareFolderLauncher = shareFolderLauncher,
                 restoreLauncher = restoreLauncher,
                 sendToChatLauncher = sendToChatLauncher,
                 hiddenNodesOnboardingLauncher = hiddenNodesOnboardingLauncher,

@@ -194,6 +194,10 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private var rubbishBinNode: UnTypedNode? = null
     private var updateSelectionJob: Job? = null
 
+    // Node handles for the share currently awaiting contact selection. The contact
+    // picker only returns the selected emails, so the target handles are retained here.
+    private var pendingShareFolderHandles: List<Long> = emptyList()
+
     init {
         getRubbishBinNode()
         monitorIsLoggedIn()
@@ -529,6 +533,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
                         state.copy(shareFolderDialogEvent = triggered(nodeIds))
                     }
                 } else {
+                    pendingShareFolderHandles = nodeIds
                     uiState.update { state ->
                         state.copy(shareFolderEvent = triggered(nodeIds))
                     }
@@ -544,6 +549,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     }
 
     fun triggerShareFolderFromDialogResult(nodeHandles: List<Long>) {
+        pendingShareFolderHandles = nodeHandles
         uiState.update { state ->
             state.copy(shareFolderEvent = triggered(nodeHandles))
         }
@@ -553,6 +559,19 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         uiState.update {
             it.copy(shareFolderEvent = consumed())
         }
+    }
+
+    /**
+     * Contacts selected in the add-contacts picker for the pending folder share.
+     *
+     * The picker returns only the selected emails; the target node handles are the
+     * ones retained when the share was triggered.
+     *
+     * @param contactsData Emails of the contacts to share the folder with.
+     */
+    fun contactSelectedForShareFolder(contactsData: List<String>) {
+        contactSelectedForShareFolder(contactsData, pendingShareFolderHandles)
+        pendingShareFolderHandles = emptyList()
     }
 
     /**

@@ -8,7 +8,6 @@ import mega.privacy.android.app.activities.contract.NameCollisionActivityContrac
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
 import mega.privacy.android.app.activities.contract.SendToChatActivityContract
-import mega.privacy.android.app.activities.contract.ShareFolderActivityContract
 import mega.privacy.android.app.activities.contract.VersionsFileActivityContract
 import mega.privacy.android.app.activities.contract.VideoToPlaylistActivityContract
 import mega.privacy.android.app.camera.InAppCameraLauncher
@@ -32,9 +31,6 @@ class MegaActivityResultContractImpl @Inject constructor() : MegaActivityResultC
 
     override val selectFolderToCopyActivityResultContract: SelectFolderToCopyActivityContract =
         SelectFolderToCopyActivityContract()
-
-    override val shareFolderActivityResultContract: ShareFolderActivityContract =
-        ShareFolderActivityContract()
 
     override val sendToChatActivityResultContract: SendToChatActivityContract =
         SendToChatActivityContract()

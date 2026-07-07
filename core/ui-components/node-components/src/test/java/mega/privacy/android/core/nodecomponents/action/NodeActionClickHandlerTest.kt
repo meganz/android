@@ -192,7 +192,6 @@ class NodeActionClickHandlerTest {
     private val mockMoveLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockPublicCopyLauncher = mock<ActivityResultLauncher<LongArray>>()
-    private val mockShareFolderLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockRestoreLauncher = mock<ActivityResultLauncher<ArrayList<NameCollision>>>()
     private val mockSendToChatLauncher = mock<ActivityResultLauncher<LongArray>>()
     private val mockHiddenNodesOnboardingLauncher = mock<ActivityResultLauncher<Boolean>>()
@@ -210,7 +209,6 @@ class NodeActionClickHandlerTest {
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         publicCopyLauncher = mockPublicCopyLauncher,
-        shareFolderLauncher = mockShareFolderLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
@@ -229,7 +227,6 @@ class NodeActionClickHandlerTest {
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         publicCopyLauncher = mockPublicCopyLauncher,
-        shareFolderLauncher = mockShareFolderLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
@@ -248,7 +245,6 @@ class NodeActionClickHandlerTest {
         moveLauncher = mockMoveLauncher,
         copyLauncher = mockCopyLauncher,
         publicCopyLauncher = mockPublicCopyLauncher,
-        shareFolderLauncher = mockShareFolderLauncher,
         restoreLauncher = mockRestoreLauncher,
         sendToChatLauncher = mockSendToChatLauncher,
         hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
@@ -305,7 +301,6 @@ class NodeActionClickHandlerTest {
             mockMoveLauncher,
             mockCopyLauncher,
             mockPublicCopyLauncher,
-            mockShareFolderLauncher,
             mockRestoreLauncher,
             mockSendToChatLauncher,
             mockHiddenNodesOnboardingLauncher,
