@@ -128,9 +128,16 @@ internal fun LazyListScope.subscriptionRevampContent(
     if (uiState.localisedSubscriptionsList.isEmpty() || uiState.isSubscriptionFeatureAvailable != true) {
         upgradeAccountSkeleton(itemCount = 3)
     } else {
-        val subscriptionsForPeriod = uiState.localisedSubscriptionsList.filter {
-            it.hasSubscriptionFor(isMonthly)
-        }
+        val subscriptionsForPeriod = uiState.localisedSubscriptionsList
+            .filter { it.hasSubscriptionFor(isMonthly) }
+            .filterNot { subscription ->
+                isCurrentRecurringPlan(
+                    uiState = uiState,
+                    subscriptionAccountType = subscription.accountType,
+                    isMonthly = isMonthly,
+                    isUpgradeAccount = isUpgradeAccount,
+                )
+            }
         itemsIndexed(
             subscriptionsForPeriod,
             key = { _, subscription -> subscription.accountType.name }
@@ -166,7 +173,7 @@ internal fun LazyListScope.subscriptionRevampContent(
 
             val isRecommended =
                 uiState.cheapestSubscriptionAvailable?.accountType == subscription.accountType
-            val isCurrentPlan = isCurrentPlan(
+            val isCurrentPlan = isCurrentRecurringPlan(
                 uiState = uiState,
                 subscriptionAccountType = subscription.accountType,
                 isMonthly = isMonthly,
@@ -197,6 +204,25 @@ internal fun LazyListScope.subscriptionRevampContent(
         }
     }
 }
+
+/**
+ * Whether [subscriptionAccountType] is the user's current plan held as a renewing (recurring)
+ * subscription. Recurring current plans are hidden from the Monthly/Yearly segment because the user
+ * already owns them and cannot re-purchase them; one-off purchases of the same tier stay visible and
+ * buyable so the user can still subscribe (DSN-3131 "Current plan logic").
+ */
+private fun isCurrentRecurringPlan(
+    uiState: UpgradeAccountState,
+    subscriptionAccountType: AccountType,
+    isMonthly: Boolean,
+    isUpgradeAccount: Boolean,
+): Boolean = uiState.isCurrentSubscriptionRenewing &&
+        isCurrentPlan(
+            uiState = uiState,
+            subscriptionAccountType = subscriptionAccountType,
+            isMonthly = isMonthly,
+            isUpgradeAccount = isUpgradeAccount,
+        )
 
 /**
  * Returns the formatted renewal/expiry date for the current plan, or null if none is available.
