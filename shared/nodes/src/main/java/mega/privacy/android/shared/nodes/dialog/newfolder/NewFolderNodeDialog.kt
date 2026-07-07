@@ -66,6 +66,13 @@ fun NewFolderNodeDialog(
     }
 
     EventEffect(
+        event = dialogState.dismissOnDisconnectionEvent,
+        onConsumed = viewModel::clearDismissOnDisconnectionEvent,
+    ) {
+        onDismiss()
+    }
+
+    EventEffect(
         event = dialogState.errorEvent,
         onConsumed = viewModel::clearError
     ) {
