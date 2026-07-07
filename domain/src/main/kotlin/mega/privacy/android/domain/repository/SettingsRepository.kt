@@ -14,8 +14,10 @@ import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.SortDirection
+import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
+import mega.privacy.android.domain.entity.preference.ViewModePreference
 import java.io.File
 
 /**
@@ -104,6 +106,34 @@ interface SettingsRepository {
      * @param enabled
      */
     suspend fun setSubfolderMediaDiscoveryEnabled(enabled: Boolean)
+
+    /**
+     * Monitor the sorting order preference
+     *
+     * @return the [SortingPreference] as a flow, or null if none has been set
+     */
+    fun monitorSortingPreference(): Flow<SortingPreference?>
+
+    /**
+     * Set the sorting order preference
+     *
+     * @param preference the [SortingPreference] to set
+     */
+    suspend fun setSortingPreference(preference: SortingPreference)
+
+    /**
+     * Monitor the view mode preference
+     *
+     * @return the [ViewModePreference] as a flow, or null if none has been set
+     */
+    fun monitorViewModePreference(): Flow<ViewModePreference?>
+
+    /**
+     * Set the view mode preference
+     *
+     * @param preference the [ViewModePreference] to set
+     */
+    suspend fun setViewModePreference(preference: ViewModePreference)
 
     /**
      * Monitor show hidden items

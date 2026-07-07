@@ -2,9 +2,12 @@ package mega.privacy.android.feature.documentscanner.presentation
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.boundary.StabilityTracker
+import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
 import mega.privacy.android.feature.documentscanner.domain.entity.DetectionResult
 import mega.privacy.android.feature.documentscanner.domain.entity.DocumentBoundary
 import mega.privacy.android.feature.documentscanner.domain.entity.Point
@@ -55,6 +58,14 @@ class ScanSessionViewModelTest {
         grayBytes = ByteArray(4), width = 2, height = 2, rotationDegrees = 90, timestamp = 1L,
     )
 
+    private fun stableFrameAt(timestamp: Long) {
+        whenever(boundaryDetector.detect(any(), any(), any(), any(), any()))
+            .thenReturn(DetectionResult(rawBoundary, frameTimestamp = timestamp, frameWidth = 100, frameHeight = 200))
+        whenever(boundarySmoother.smooth(rawBoundary)).thenReturn(smoothedBoundary)
+        whenever(stabilityTracker.onDetectionResult(any())).thenReturn(StabilityState.STABLE)
+        underTest.onAnalysisFrame(ByteArray(4), 2, 2, 90, timestamp)
+    }
+
     @Test
     fun `test that initial state has camera permission not granted`() = runTest {
         underTest.uiState.test {
@@ -67,6 +78,26 @@ class ScanSessionViewModelTest {
         underTest.onCameraPermissionGranted()
         underTest.uiState.test {
             assertThat(awaitItem().isCameraPermissionGranted).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the initial capture mode is AUTO`() = runTest {
+        underTest.uiState.test {
+            assertThat(awaitItem().captureMode).isEqualTo(CaptureMode.AUTO)
+        }
+    }
+
+    @Test
+    fun `test that onToggleAutoCapture switches AUTO to MANUAL and back`() = runTest {
+        underTest.onToggleAutoCapture()
+        underTest.uiState.test {
+            assertThat(awaitItem().captureMode).isEqualTo(CaptureMode.MANUAL)
+        }
+
+        underTest.onToggleAutoCapture()
+        underTest.uiState.test {
+            assertThat(awaitItem().captureMode).isEqualTo(CaptureMode.AUTO)
         }
     }
 
@@ -130,6 +161,73 @@ class ScanSessionViewModelTest {
         verify(boundarySmoother, never()).smooth(any())
         underTest.uiState.test {
             assertThat(awaitItem().isModelMissing).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that a stable document auto-captures in AUTO mode`() = runTest {
+        modelPresent()
+        stableFrameAt(1_000)
+        underTest.uiState.test {
+            assertThat(awaitItem().captureEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that MANUAL mode does not auto-capture on a stable document`() = runTest {
+        modelPresent()
+        underTest.onToggleAutoCapture() // AUTO -> MANUAL
+        stableFrameAt(1_000)
+        underTest.uiState.test {
+            assertThat(awaitItem().captureEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that a non-stable frame does not auto-capture`() = runTest {
+        modelPresent()
+        whenever(boundaryDetector.detect(any(), any(), any(), any(), any()))
+            .thenReturn(DetectionResult(rawBoundary, frameTimestamp = 1_000, frameWidth = 100, frameHeight = 200))
+        whenever(boundarySmoother.smooth(rawBoundary)).thenReturn(smoothedBoundary)
+        whenever(stabilityTracker.onDetectionResult(any())).thenReturn(StabilityState.STABILIZING)
+
+        underTest.onAnalysisFrame(ByteArray(4), 2, 2, 90, 1_000)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().captureEvent).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that auto-capture respects the cooldown`() = runTest {
+        modelPresent()
+        stableFrameAt(1_000)                       // fires
+        underTest.onCaptureHandled()               // consume
+        stableFrameAt(2_000)                       // within 3s cooldown -> no fire
+        underTest.uiState.test {
+            assertThat(awaitItem().captureEvent).isEqualTo(consumed)
+        }
+        stableFrameAt(4_001)                       // past cooldown -> fires again
+        underTest.uiState.test {
+            assertThat(awaitItem().captureEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that onManualCapture triggers a capture regardless of mode`() = runTest {
+        underTest.onToggleAutoCapture() // MANUAL
+        underTest.onManualCapture()
+        underTest.uiState.test {
+            assertThat(awaitItem().captureEvent).isEqualTo(triggered)
+        }
+    }
+
+    @Test
+    fun `test that onCaptureHandled consumes the capture event`() = runTest {
+        underTest.onManualCapture()
+        underTest.onCaptureHandled()
+        underTest.uiState.test {
+            assertThat(awaitItem().captureEvent).isEqualTo(consumed)
         }
     }
 

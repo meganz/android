@@ -1,6 +1,5 @@
 package mega.privacy.android.app.textEditor
 
-import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,11 +13,9 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.flow.drop
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
-import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
@@ -38,13 +35,10 @@ import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomS
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.entity.texteditor.textEditorModeFromValue
-import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.texteditor.presentation.TextEditorComposeViewModel
 import mega.privacy.android.feature.texteditor.presentation.TextEditorScreen
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
-import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
-import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -133,51 +127,6 @@ internal fun shouldShowSendToChat(nodeSourceType: Int?): Boolean {
 }
 
 /**
- * Builds the legacy [Intent] for [TextEditorActivity] from [navKey].
- * Used when [ApiFeatures.TextEditorCompose] is disabled.
- */
-private fun buildTextEditorIntent(context: Context, navKey: LegacyTextEditorNavKey): Intent {
-    return when {
-        navKey.chatId != null && navKey.messageId != null ->
-            Intent(context, TextEditorActivity::class.java).apply {
-                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_CHAT)
-                putExtra(ChatNavKey.LEGACY_MESSAGE_ID, navKey.messageId)
-                putExtra(ChatNavKey.LEGACY_CHAT_ID, navKey.chatId)
-            }
-        navKey.localPath != null -> {
-            val nodeSourceType = navKey.nodeSourceType ?: OFFLINE_ADAPTER
-            Intent(context, TextEditorActivity::class.java).apply {
-                putExtra(Constants.INTENT_EXTRA_KEY_PATH, navKey.localPath)
-                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, nodeSourceType)
-                putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, navKey.fileName)
-                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            }
-        }
-        navKey.publicUrl != null ->
-            Intent(context, TextEditorActivity::class.java).apply {
-                putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, FILE_LINK_ADAPTER)
-                putExtra(
-                    Constants.INTENT_EXTRA_KEY_HANDLE,
-                    navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
-                )
-                putExtra(Constants.EXTRA_SERIALIZE_STRING, navKey.serializedNode)
-                putExtra(TextEditorViewModel.MODE, navKey.mode)
-                putExtra(Constants.URL_FILE_LINK, navKey.publicUrl)
-            }
-        else ->
-            TextEditorActivity.createIntent(
-                context = context,
-                nodeHandle = navKey.nodeHandle ?: MegaApiJava.INVALID_HANDLE,
-                mode = navKey.mode,
-                nodeSourceType = navKey.nodeSourceType,
-                fileName = navKey.fileName,
-            ).apply {
-                putExtra(FROM_HOME_PAGE, navKey.fromHome)
-            }
-    }
-}
-
-/**
  * Builds [TextEditorComposeViewModel.Args] from [navKey].
  */
 internal fun buildTextEditorViewModelArgs(
@@ -257,8 +206,7 @@ private fun cloudNodeArgs(
 }
 
 /**
- * Legacy text editor destination. Uses [FeatureFlagGate] with [ApiFeatures.TextEditorCompose]:
- * when enabled shows [TextEditorScreen]; when disabled starts [TextEditorActivity] and pops.
+ * Text editor destination. Renders the Compose [TextEditorScreen].
  * Tapping More opens the Node Options Bottom Sheet (cloud node only). When the user deletes or
  * moves the node (Navigation or most Transfer results), the editor is closed; preview/Open-with
  * downloads stay on the editor and forward the transfer.
@@ -285,24 +233,12 @@ private fun TextEditorEntry(
     viewTypeToNodeSourceTypeMapper: ViewTypeToNodeSourceTypeMapper,
     transferHandler: TransferHandler,
 ) {
-    val context = LocalContext.current
-    FeatureFlagGate(
-        feature = ApiFeatures.TextEditorCompose,
-        disabled = {
-            LaunchedEffect(Unit) {
-                context.startActivity(buildTextEditorIntent(context, navKey))
-                navigationHandler.back()
-            }
-        },
-        enabled = {
-            TextEditorComposeContent(
-                navKey = navKey,
-                navigationHandler = navigationHandler,
-                removeDestination = navigationHandler::back,
-                transferHandler = transferHandler,
-                viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
-            )
-        },
+    TextEditorComposeContent(
+        navKey = navKey,
+        navigationHandler = navigationHandler,
+        removeDestination = navigationHandler::back,
+        transferHandler = transferHandler,
+        viewTypeToNodeSourceTypeMapper = viewTypeToNodeSourceTypeMapper,
     )
 }
 

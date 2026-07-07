@@ -34,7 +34,13 @@ internal fun ScannerRouterScreen(
 
     when (val current = route) {
         ScannerRoute.LaunchCamera ->
-            ContinuousScanScreen(onClose = { navigationHandler.back() })
+            ContinuousScanScreen(
+                onClose = { navigationHandler.back() },
+                onSwitchToLegacy = {
+                    navigationHandler.navigate(LegacyScanDocumentNavKey)
+                    navigationHandler.remove(ContinuousScanNavKey)
+                },
+            )
 
         is ScannerRoute.UseLegacy -> LaunchedEffect(current) {
             // The legacy ML Kit scanner is launched by an app-shell handler that

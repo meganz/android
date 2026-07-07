@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.settings.model
 
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.account.AccountDetail
 
 /**
@@ -24,6 +26,7 @@ import mega.privacy.android.domain.entity.account.AccountDetail
  * Uploads should be shown
  * @property showHiddenItems
  * @property accountDetail
+ * @property deleteAccountEvent one-shot event carrying the account-deletion request result
  */
 data class SettingsState(
     val autoAcceptEnabled: Boolean,
@@ -44,4 +47,5 @@ data class SettingsState(
     val subFolderMediaDiscoveryChecked: Boolean,
     val showHiddenItems: Boolean,
     val accountDetail: AccountDetail?,
+    val deleteAccountEvent: StateEventWithContent<Boolean> = consumed(),
 )

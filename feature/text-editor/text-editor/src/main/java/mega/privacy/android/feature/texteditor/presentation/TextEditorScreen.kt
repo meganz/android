@@ -228,7 +228,7 @@ fun TextEditorScreen(
             else lazyListState.firstVisibleItemIndex.toFloat() / (totalItems - 1).toFloat()
             // Read-through is measured in LINES at the bottom of the viewport; see
             // computeReadThroughFraction. This stays accurate even when the whole file is a
-            // single chunk (the common case for files < CHUNK_SIZE lines).
+            // single chunk (the common case for short files).
             val lastItem = info.visibleItemsInfo.lastOrNull()
             val readThroughFraction = if (lastItem == null) 0f else computeReadThroughFraction(
                 chunkStartLine = chunkStartLineProvider(lastItem.index),

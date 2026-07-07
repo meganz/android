@@ -2477,4 +2477,20 @@
     <string name="create_group_chat_ekr_label">加密密钥轮换</string>
     <string name="create_group_chat_get_chat_link_label">获取聊天链接</string>
     <string name="create_group_chat_allow_add_participants_label">允许非主持人添加参与者</string>
+    <string name="subscription_revamp_current_plan_renews">续订日期%1$s</string>
+    <string name="subscription_revamp_current_plan_expires">%1$s到期</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">每月</string>
+    <string name="create_group_chat_ekr_explanation">加密密钥轮换稍稍提高了安全性，但您无法创建聊天链接，且新加入的参与者将看不到以往的消息。</string>
+    <string name="home_pinned_choose_files_and_folders">选择文件和文件夹</string>
+    <string name="subscription_revamp_title">升级至 MEGA Pro</string>
+    <string name="subscription_revamp_why_go_pro_title">为什么升级到 Pro？</string>
+    <string name="subscription_revamp_why_go_pro_storage">最多可存储%1$s的数据</string>
+    <string name="subscription_revamp_why_go_pro_transfer">尽享高达 %1$s 的传输配额</string>
+    <string name="subscription_revamp_why_go_pro_vpn">使用 MEGA VPN，在线更安全</string>
+    <string name="subscription_revamp_why_go_pro_pass">用 MEGA Pass 让密码保持安全</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">年度订阅</string>
+    <string name="subscription_revamp_price_per_month">%1$s/月</string>
+    <string name="subscription_revamp_charged_yearly">%1$s 按年收费</string>
+    <string name="subscription_revamp_save_label">节省高达16%</string>
+    <string name="subscription_revamp_get_plan_button">获取 %1$s</string>
 </resources>

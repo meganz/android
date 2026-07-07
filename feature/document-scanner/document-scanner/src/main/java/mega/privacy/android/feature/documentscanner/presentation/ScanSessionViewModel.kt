@@ -2,12 +2,16 @@ package mega.privacy.android.feature.documentscanner.presentation
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.boundary.StabilityTracker
+import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
+import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelProvider
 import mega.privacy.android.feature.documentscanner.domain.smoother.BoundarySmoother
 import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
@@ -38,6 +42,9 @@ internal class ScanSessionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ScanSessionUiState())
     val uiState: StateFlow<ScanSessionUiState> = _uiState.asStateFlow()
 
+    private var lastFrameTimestampMs: Long = 0L
+    private var lastCaptureTimestampMs: Long? = null
+
     /** Called when camera permission is granted. */
     fun onCameraPermissionGranted() {
         _uiState.update { it.copy(isCameraPermissionGranted = true) }
@@ -46,6 +53,14 @@ internal class ScanSessionViewModel @Inject constructor(
     /** Called when camera permission is denied. */
     fun onCameraPermissionDenied() {
         _uiState.update { it.copy(isCameraPermissionGranted = false) }
+    }
+
+    /** Toggle auto-capture on/off from the top bar (AUTO ↔ MANUAL). */
+    fun onToggleAutoCapture() {
+        _uiState.update {
+            val next = if (it.captureMode == CaptureMode.AUTO) CaptureMode.MANUAL else CaptureMode.AUTO
+            it.copy(captureMode = next)
+        }
     }
 
     /**
@@ -67,6 +82,7 @@ internal class ScanSessionViewModel @Inject constructor(
         rotationDegrees: Int,
         timestamp: Long,
     ) {
+        lastFrameTimestampMs = timestamp
         if (scannerModelProvider.cachedModelFile() == null) {
             _uiState.update { it.copy(isModelMissing = true) }
             return
@@ -87,6 +103,10 @@ internal class ScanSessionViewModel @Inject constructor(
 
         val smoothed = detection.copy(boundary = boundarySmoother.smooth(detection.boundary))
         val stability = stabilityTracker.onDetectionResult(smoothed)
+        val autoCapture = _uiState.value.captureMode == CaptureMode.AUTO &&
+            stability == StabilityState.STABLE &&
+            cooldownElapsed(timestamp)
+        if (autoCapture) lastCaptureTimestampMs = timestamp
         _uiState.update {
             it.copy(
                 boundaryOverlayState = BoundaryOverlayState(
@@ -95,11 +115,33 @@ internal class ScanSessionViewModel @Inject constructor(
                     frameHeight = smoothed.frameHeight,
                 ),
                 stabilityState = stability,
+                captureEvent = if (autoCapture) triggered else it.captureEvent,
             )
         }
     }
 
+    /**
+     * Manual shutter tap — capture immediately, regardless of stability or mode.
+     * Resets the auto-capture cooldown so the two paths don't double-fire.
+     */
+    fun onManualCapture() {
+        lastCaptureTimestampMs = lastFrameTimestampMs
+        _uiState.update { it.copy(captureEvent = triggered) }
+    }
+
+    /** The screen has grabbed the frame for the pending capture. */
+    fun onCaptureHandled() {
+        _uiState.update { it.copy(captureEvent = consumed) }
+    }
+
+    private fun cooldownElapsed(now: Long): Boolean =
+        lastCaptureTimestampMs?.let { now - it >= AUTO_CAPTURE_COOLDOWN_MS } ?: true
+
     override fun onCleared() {
         boundaryDetector.release()
+    }
+
+    private companion object {
+        const val AUTO_CAPTURE_COOLDOWN_MS = 3_000L
     }
 }

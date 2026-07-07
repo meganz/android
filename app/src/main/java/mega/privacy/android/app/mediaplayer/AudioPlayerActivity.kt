@@ -45,7 +45,7 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.trackinfo.TrackInfoFragmentArgs
 import mega.privacy.android.app.presentation.extensions.getStorageState
@@ -231,7 +231,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         }
 
         /**
-         * Called after a successful bind with our AudioPlayerService.
+         * Called after a successful bind with our LegacyAudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
@@ -327,7 +327,7 @@ class AudioPlayerActivity : MediaPlayerActivity() {
         setupToolbar()
         setupNavDestListener()
 
-        val playerServiceIntent = Intent(this, AudioPlayerService::class.java).putExtras(extras)
+        val playerServiceIntent = Intent(this, LegacyAudioPlayerService::class.java).putExtras(extras)
 
         if (savedInstanceState == null) {
             PermissionUtils.checkNotificationsPermission(this)

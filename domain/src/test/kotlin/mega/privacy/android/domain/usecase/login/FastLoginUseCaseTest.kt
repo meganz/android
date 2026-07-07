@@ -2,22 +2,29 @@ package mega.privacy.android.domain.usecase.login
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.repository.security.LoginRepository
+import mega.privacy.android.domain.testutils.hotFlow
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -223,6 +230,30 @@ class FastLoginUseCaseTest {
     }
 
     @Test
+    fun `test that loginMutex is not released until chat initialisation completes when flow is cancelled`() =
+        runTest {
+            val chatInitialised = CompletableDeferred<Unit>()
+            // NonCancellable simulates the native MegaChatApi.init() call, which cannot be
+            // interrupted by coroutine cancellation once started
+            whenever(initialiseMegaChatUseCase(session)).doSuspendableAnswer {
+                withContext(NonCancellable) { chatInitialised.await() }
+            }
+            whenever(loginRepository.fastLoginFlow(session)).thenReturn(hotFlow())
+
+            val collectJob = launch {
+                underTest.invoke(session, false, disableChatApiUseCase).collect { }
+            }
+            advanceUntilIdle()
+            collectJob.cancel()
+            advanceUntilIdle()
+            verify(loginMutex, never()).unlock()
+
+            chatInitialised.complete(Unit)
+            advanceUntilIdle()
+            verify(loginMutex).unlock()
+        }
+
+    @Test
     fun `test that loginMutex is released when coroutine scope is cancelled`() = runTest {
         whenever(initialiseMegaChatUseCase(session))
             .thenThrow(CancellationException("Coroutine scope cancelled"))
@@ -243,17 +274,98 @@ class FastLoginUseCaseTest {
         val exception = RuntimeException("chatLogout failed")
         whenever(initialiseMegaChatUseCase(session)).thenThrow(ChatNotInitializedErrorStatus())
         whenever(chatLogoutUseCase.invoke(disableChatApiUseCase)).thenThrow(exception)
+        whenever(loginRepository.fastLoginFlow(session))
+            .thenReturn(hotFlow())
 
         underTest.invoke(session, false, disableChatApiUseCase).test {
             assertThat(awaitError()).isInstanceOf(RuntimeException::class.java)
         }
 
         verify(initialiseMegaChatUseCase).invoke(session)
-        verifyNoInteractions(loginRepository)
+        verify(loginRepository).fastLoginFlow(session)
         val inOrder = inOrder(loginMutex)
         inOrder.verify(loginMutex).lock()
         inOrder.verify(loginMutex).unlock()
     }
+
+    @Test
+    fun `test that LoginSucceed is not emitted until chat initialisation completes`() = runTest {
+        val chatInitialised = CompletableDeferred<Unit>()
+        whenever(initialiseMegaChatUseCase(session))
+            .doSuspendableAnswer { chatInitialised.await() }
+        whenever(loginRepository.fastLoginFlow(session))
+            .thenReturn(flowOf(LoginStatus.LoginSucceed))
+
+        underTest.invoke(session, false, disableChatApiUseCase).test {
+            advanceUntilIdle()
+            expectNoEvents()
+            chatInitialised.complete(Unit)
+            assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify(initialiseMegaChatUseCase).invoke(session)
+        verify(saveAccountCredentialsUseCase).invoke()
+    }
+
+    @Test
+    fun `test that refreshMegaChatUrl is invoked after chat initialisation when refreshChatUrl is true`() =
+        runTest {
+            whenever(loginRepository.fastLoginFlow(session))
+                .thenReturn(flowOf(LoginStatus.LoginSucceed))
+
+            underTest.invoke(session, true, disableChatApiUseCase).test {
+                assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            val inOrder = inOrder(initialiseMegaChatUseCase, loginRepository)
+            inOrder.verify(initialiseMegaChatUseCase).invoke(session)
+            inOrder.verify(loginRepository).refreshMegaChatUrl()
+        }
+
+    @Test
+    fun `test that error is not emitted until chat initialisation completes when logged out from other location`() =
+        runTest {
+            val chatInitialised = CompletableDeferred<Unit>()
+            whenever(initialiseMegaChatUseCase(session))
+                .doSuspendableAnswer { chatInitialised.await() }
+            whenever(loginRepository.fastLoginFlow(session))
+                .thenReturn(flow { throw LoginLoggedOutFromOtherLocation() })
+
+            underTest.invoke(session, false, disableChatApiUseCase).test {
+                advanceUntilIdle()
+                expectNoEvents()
+                chatInitialised.complete(Unit)
+                assertThat(awaitError())
+                    .isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
+            }
+
+            verifyNoInteractions(chatLogoutUseCase)
+            val inOrder = inOrder(loginMutex)
+            inOrder.verify(loginMutex).lock()
+            inOrder.verify(loginMutex).unlock()
+        }
+
+    @Test
+    fun `test that chatLogout is not invoked until chat initialisation completes when login fails`() =
+        runTest {
+            val chatInitialised = CompletableDeferred<Unit>()
+            whenever(initialiseMegaChatUseCase(session))
+                .doSuspendableAnswer { chatInitialised.await() }
+            whenever(loginRepository.fastLoginFlow(session))
+                .thenReturn(flow { throw LoginRequireValidation() })
+
+            underTest.invoke(session, false, disableChatApiUseCase).test {
+                advanceUntilIdle()
+                verifyNoInteractions(chatLogoutUseCase)
+                chatInitialised.complete(Unit)
+                assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
+            }
+
+            verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+            verify(resetChatSettingsUseCase).invoke()
+        }
 
     @Test
     fun `test that fast login closes with error when resetChatSettingsUseCase throws `() = runTest {

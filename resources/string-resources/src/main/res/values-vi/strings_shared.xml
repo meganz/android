@@ -17,7 +17,7 @@
     <!-- The name of the Device or Folder Sub State when its code is FOREIGN_TARGET_OVERSTORAGE -->
     <string name="general_sync_foreign_target_overshare">Thư&#160;mục không thể đồng&#160;bộ được do tài&#160;khoản của người chia&#160;sẻ thư&#160;mục này đã vượt mức không&#160;gian lưu&#160;trữ</string>
     <!-- The name of the Device or Folder Sub State when its code is SHARE_NON_FULL_ACCESS -->
-    <string name="general_sync_share_non_full_access">Thư&#160;mục không thể đồng&#160;bộ được vì thư&#160;mục này đã chia&#160;sẻ mà không có cấp quyền truy&#160;cập toàn quyền cho bạn</string>
+    <string name="general_sync_share_non_full_access">Thư&#160;mục không thể đồng&#160;bộ được vì thư&#160;mục này đã chia&#160;sẻ mà không có cấp quyền truy&#160;cập toàn&#160;diện cho bạn</string>
     <!-- The name of the Device or Folder Sub State when its code is PUT_NODES_ERROR -->
     <string name="general_sync_put_nodes_error">Các tệp&#160;tin trong thư&#160;mục này không thể đồng&#160;bộ hóa hoặc sao lưu được. Bạn sẽ cần phải kích&#160;hoạt lại đồng&#160;bộ hoặc sao lưu từ app cho máy&#160;tính.</string>
     <!-- The name of the Device or Folder Sub State when its code is ACTIVE_SYNC_BELOW_PATH -->
@@ -755,7 +755,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Phần mở rộng tệp tin là cần thiết</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA sẽ lấy một bản sao tạm thời của tệp&#160;tin này để tạo xem trước cho bạn. Bản này sẽ không được lưu lại hoặc khả&#160;dụng bên ngoài ứng&#160;dụng. %1$s sẽ được tải&#160;xuống.</string>
+    <string name="alert_larger_file_preview">Không thể xem trước tệp này trong MEGA. Hãy tải xuống tệp (%1$s) để mở bằng ứng&#160;dụng khác.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Đang hoàn tất hoạt động: %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -989,7 +989,7 @@
     <!--Camera backup permission screen description-->
     <string name="camera_backup_permission_screen_description">Ký ức của bạn là thứ quan trọng.\n\nĐăng tải camêra sẽ tự động sao lưu ảnh và video của bạn lên Ổ MEGA của bạn, vì vậy bạn không bao giờ phải lo lắng về chuyện mất đi hình ảnh quý giá.</string>
     <!--Camera backup permission banner text to explain why the camera backup permission is needed-->
-    <string name="camera_backup_permission_banner_info_description">Đăng tải camêra yêu cầu [A]toàn quyền truy cập[/A] vào thư viện ảnh của thiết bị</string>
+    <string name="camera_backup_permission_banner_info_description">Đăng&#160;tải camêra cần có quyền [A]truy cập toàn diện[/A] vào thư&#160;viện ảnh của thiết&#160;bị</string>
     <!--Button text to request camera backup permission-->
     <string name="camera_backup_permission_enable_button_text">Bật Đăng Tải Camêra</string>
     <!--Permission screen skip requesting permission button text-->
@@ -1205,13 +1205,13 @@
     <!-- Connection type option in Sync Settings Screen -->
     <string name="settings_sync_connection_type_title">Kiểu kết nối</string>
     <!-- The camera uploads notification title to reminder the camera uploads paused-->
-    <string name="camera_uploads_notification_title_paused_warning">Đăng tải camêra đã tạm dừng</string>
+    <string name="camera_uploads_notification_title_paused_warning">Đăng tải camêra đã tạm&#160;dừng</string>
     <!-- The camera uploads notification content to reminder there is no wifi connection-->
     <string name="camera_uploads_notification_content_no_wifi_connection">Kết&#160;nối Wi-Fi hoặc cho&#160;phép sử&#160;dụng dữ&#160;liệu di&#160;động</string>
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Cho phép dùng mạng di dộng</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Xem trước tệp&#160;tin cỡ lớn</string>
+    <string name="alert_larger_file_preview_title">Không có bản xem trước</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Xem trước ngay</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -1375,7 +1375,7 @@
         <item quantity="other">%1$d vidеos</item>
     </plurals>
     <!-- Stop Backup confirmation dialog Move explanation -->
-    <string name="sync_stop_backup_confirm_dialog_move_explanation">Di chuyển thư mục này vào Ổ Mây của bạn để có được toàn quyền truy cập vào dữ liệu của mình nhưng thư mục sẽ không còn được sao lưu.</string>
+    <string name="sync_stop_backup_confirm_dialog_move_explanation">Di chuyển thư&#160;mục này vào Ổ&#160;Mây của&#160;bạn để có được quyền truy&#160;cập toàn&#160;diện vào dữ&#160;liệu của&#160;mình nhưng thư&#160;mục sẽ không còn được sao lưu.</string>
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Truy cập [A]https://%1$s[/A] với trình duyệt web của bạn.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
@@ -1467,7 +1467,7 @@
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Đây là những thư mục sao lưu và chỉ có thể được chia sẻ dưới dạng chỉ-được-xem</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_share_permission_text">Đây là một thư mục sao lưu và chỉ có thể được chia sẻ dưới dạng chỉ-được-xem</string>
+    <string name="backup_share_permission_text">Đây là một thư&#160;mục sao&#160;lưu và chỉ có thể được chia&#160;sẻ với quyền chỉ-được-xem</string>
     <!-- Button to confirm the action of restarting one transfer-->
     <string name="button_permission_info">OK, hiểu rồi</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
@@ -2027,7 +2027,7 @@
     <string name="prolite_account">Pro Lite</string>
     <string name="general_alert_not_logged_in">Bạn phải đăng nhập để thực&#160;hiện thao&#160;tác này</string>
     <string name="timeline_tab_camera_uploads_limited_access">MEGA chỉ&#160;có quyền truy&#160;cập giới&#160;hạn vào thư&#160;viện ảnh của&#160;bạn và không&#160;thể sao&#160;lưu tất&#160;cả ảnh</string>
-    <string name="timeline_tab_enable_camera_uploads_banner_description">Đăng&#160;tải camêra cần có [A]toàn quyền truy cập[/A] vào thư&#160;viện ảnh của&#160;bạn</string>
+    <string name="timeline_tab_enable_camera_uploads_banner_description">Đăng&#160;tải camêra cần có quyền [A]truy cập toàn diện[/A] vào thư&#160;viện ảnh của&#160;bạn</string>
     <string name="timeline_tab_grid_size_compact">Gọn</string>
     <string name="timeline_tab_grid_size_large">Lớn</string>
     <string name="delete_album_singular_confirmation_dialog_description">Nội&#160;dung của album sẽ không bị xóa</string>
@@ -2135,7 +2135,7 @@
     <string name="pdf_viewer_dialog_text_enter_password">Nhập mật&#160;khẩu để mở tệp&#160;này</string>
     <string name="text_editor_fast_scroll_line_tooltip">Dòng %1$d</string>
     <string name="select_videos_search_empty_view_description">Tìm&#160;kiếm video trong Ổ&#160;Mây của&#160;bạn</string>
-    <string name="new_text_file_invalid_extension_error_message">Sử dụng phần mở rộng tệp hợp&#160;lệ (ví&#160;dụ .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Sử dụng phần mở rộng tệp hợp&#160;lệ (ví&#160;dụ .txt, .md, or .xml)</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
     <string name="label_file_size_exabytes">%s&#160;EB</string>
@@ -2330,7 +2330,7 @@
     <plurals name="viewed_links_remove_selected_links_dialog_title">
         <item quantity="other">Dọn các đường liên&#160;kết đã xem?</item>
     </plurals>
-    <string name="more_options">Hiện thêm tùy chọn</string>
+    <string name="more_options">Thêm lựa&#160;chọn</string>
     <string name="contacts_empty_title">Không tìm thấy tên liên&#160;lạc nào</string>
     <plurals name="general_number_participants">
         <item quantity="other">%1$d người tham&#160;gia</item>
@@ -2342,13 +2342,13 @@
     <string name="general_view_button">Xem</string>
     <string name="video_player_subtitles_empty_hint_description">Tải tệp phụ&#160;đề định&#160;dạng SRT lên Ổ&#160;Mây của&#160;bạn</string>
     <string name="video_player_subtitles_add_subtitles_button">Thêm phụ&#160;đề</string>
-    <string name="scan_dialog_discard_confirmation_title">Bỏ bản quét?</string>
+    <string name="scan_dialog_discard_confirmation_title">Bỏ bản&#160;quét?</string>
     <string name="scan_dialog_discard_confirmation_body">Bản quét này sẽ bị mất</string>
-    <string name="scan_dialog_discard_all_confirmation_title">Bỏ tất cả bản quét?</string>
+    <string name="scan_dialog_discard_all_confirmation_title">Bỏ tất cả bản&#160;quét?</string>
     <string name="scan_dialog_discard_all_confirmation_body">Tài&#160;liệu này sẽ bị mất</string>
     <string name="scan_dialog_discard_confirmation_action">Hủy bỏ</string>
-    <string name="general_file_name">Tên Tệp Tin</string>
-    <string name="general_error_invalid_name">Tên không hợp lệ</string>
+    <string name="general_file_name">Tên tệp</string>
+    <string name="general_error_invalid_name">Tên không hợp&#160;lệ</string>
     <string name="general_file_type">Dạng tệp</string>
     <string name="campaign_name_with_discount">%1$s: giảm %2$d%%</string>
     <string name="general_error_incorrect_name">Vui lòng sửa tên tệp&#160;tin trước khi tiếp&#160;tục</string>
@@ -2357,10 +2357,10 @@
     <string name="file_link_unavaible_ToS_violation">Đường liên kết tệp tin đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
     <string name="contacts_section_requests">Yêu cầu</string>
     <string name="contacts_section_groups">Nhóm</string>
-    <string name="contacts_section_recently_added">Mới thêm gần đây</string>
-    <string name="contacts_action_send_message">Gửi tin nhắn</string>
-    <string name="contacts_action_contact_info">Thông tin liên lạc</string>
-    <string name="contacts_action_remove_contact">Xóa tên liên lạc</string>
+    <string name="contacts_section_recently_added">Mới thêm gần&#160;đây</string>
+    <string name="contacts_action_send_message">Gửi tin&#160;nhắn</string>
+    <string name="contacts_action_contact_info">Thông&#160;tin liên&#160;lạc</string>
+    <string name="contacts_action_remove_contact">Xóa tên liên&#160;lạc</string>
     <string name="cloud_drive_inactivity_banner_title">Tài&#160;khoản của bạn đã không hoạt&#160;động quá&#160;lâu</string>
     <plurals name="cloud_drive_inactivity_banner_message">
         <item quantity="other">Vì tài khoản của bạn đã không hoạt động trong hơn %1$d tháng, các tệp của bạn đã bị xóa theo chính sách không hoạt động của chúng tôi</item>
@@ -2370,12 +2370,12 @@
     <string name="contacts_search_hint">Tìm tên liên&#160;lạc</string>
     <string name="contacts_remove_dialog_title">Xóa tên %1$s?</string>
     <string name="contacts_remove_dialog_message">Tên liên&#160;lạc này sẽ bị xóa khỏi sổ của bạn.</string>
-    <string name="send_contacts">Gửi tên liên lạc</string>
+    <string name="send_contacts">Gửi tên liên&#160;lạc</string>
     <string name="contacts_groups_title">Nhóm</string>
-    <string name="contacts_groups_create_error">Có lỗi phát&#160;sinh ra trong lúc tạo cuộc chat</string>
+    <string name="contacts_groups_create_error">Có lỗi phát&#160;sinh ra trong lúc tạo cuộc&#160;chat</string>
     <string name="home_do_more_with_mega_camera_uploads">Đăng tải camêra</string>
-    <string name="home_do_more_with_mega_add_contact">Thêm tên liên lạc</string>
-    <string name="home_do_more_with_mega_schedule_meeting">Đặt lịch cuộc họp</string>
+    <string name="home_do_more_with_mega_add_contact">Thêm liên&#160;lạc</string>
+    <string name="home_do_more_with_mega_schedule_meeting">Đặt lịch cuộc&#160;họp</string>
     <plurals name="notifications_payment_reminder_will_expire">
         <item quantity="other">Gói Pro sẽ hết&#160;hạn trong %1$d ngày</item>
     </plurals>
@@ -2411,18 +2411,57 @@
     <string name="general_do_not_allow_button">Không cho</string>
     <string name="general_allow_button">Cho phép</string>
     <string name="document_scanner_download_dialog_download_button">Tải xuống</string>
-    <string name="add_participants_title">Thêm thành viên</string>
-    <string name="share_link_access_banner_title">Truy cập đường liên kết</string>
+    <string name="add_participants_title">Thêm người tham&#160;gia</string>
+    <string name="share_link_access_banner_title">Quyền truy&#160;cập đường liên&#160;kết</string>
     <plurals name="share_link_access_banner_description">
-        <item quantity="other">Bất kỳ ai có các đường liên kết này đều có thể xem và tải xuống dữ liệu của bạn</item>
+        <item quantity="other">Bất&#160;kỳ ai có đường liên&#160;kết này đều có thể xem và tải xuống dữ&#160;liệu của&#160;bạn</item>
     </plurals>
     <plurals name="share_link_created_and_copied_snackbar">
-        <item quantity="other">Các đường liên kết đã được tạo và ghi vào bảng nhớ tạm</item>
+        <item quantity="other">Đường liên kết đã được tạo và ghi vào bảng&#160;nhớ&#160;tạm</item>
     </plurals>
-    <string name="add_contacts_phone_contacts_section_title">Danh bạ điện thoại</string>
+    <string name="add_contacts_phone_contacts_section_title">Danh bạ điện&#160;thoại</string>
     <string name="create_group_chat_settings_title">Nhóm mới</string>
     <string name="create_group_chat_name_hint">Điền tên nhóm</string>
     <string name="create_group_chat_ekr_label">Luân phiên chìa khóa mã</string>
     <string name="create_group_chat_get_chat_link_label">Lấy liên kết cuộc&#160;chat</string>
     <string name="create_group_chat_allow_add_participants_label">Cho phép các thành viên không chủ trì mời thêm người</string>
+    <string name="subscription_revamp_current_plan_renews">Tự gia&#160;hạn vào %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Hết hạn vào %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Hàng tháng</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Tải với mạng dữ&#160;liệu di&#160;động</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">Muốn tải với mạng dữ&#160;liệu di&#160;động?</string>
+    <string name="subscription_revamp_charged_yearly">%1$s thu phí hằng năm</string>
+    <string name="home_pinned_choose_files_and_folders">Chọn tệp&#160;tin và thư&#160;mục</string>
+    <string name="create_group_chat_ekr_explanation">Luân phiên chìa&#160;khóa mã có an&#160;toàn hơn một chút, nhưng không cho&#160;phép tạo ra đường liên&#160;kết chat và những người mới tham&#160;gia sẽ không đọc được tin&#160;nhắn đã có trước trong cuộc&#160;chat.</string>
+    <string name="subscription_revamp_get_plan_button">Mua %1$s</string>
+    <string name="add_contacts_mega_contacts_section_title">Sổ liên&#160;lạc MEGA</string>
+    <string name="park_account_screen_title">Đặt lại tài&#160;khoản</string>
+    <string name="subscription_revamp_price_per_month">%1$s/tháng</string>
+    <string name="document_scanner_prepare_reconnecting">Đang tái kết&#160;nối&#8230;</string>
+    <string name="add_contacts_phone_contacts_select">Chọn từ danh&#160;bạ điện&#160;thoại</string>
+    <string name="park_account_screen_start_button">Bắt&#160;đầu tài&#160;khoản mới</string>
+    <string name="document_scanner_prepare_retry_button">Thử lại</string>
+    <string name="subscription_revamp_title">Nâng cấp lên MEGA Pro</string>
+    <string name="add_contacts_phone_contacts_allow_access">Cho phép quyền truy&#160;cập vào danh&#160;bạ</string>
+    <string name="subscription_revamp_why_go_pro_title">Tại&#160;sao nên dùng Pro?</string>
+    <string name="subscription_revamp_why_go_pro_storage">Lưu&#160;trữ đến %1$s dữ&#160;liệu</string>
+    <string name="document_scanner_download_dialog_message">Trình quét tài&#160;liệu mới cần tải&#160;xuống một lần cỡ %1$d&#160;MB trước khi có&#160;thể dùng được.</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Trình quét tài&#160;liệu mới cần tải&#160;xuống một&#160;lần cỡ %1$d&#160;MB. Có&#160;thể phát&#160;sinh cước dữ&#160;liệu di&#160;động.</string>
+    <string name="document_scanner_prepare_error_transient_message">Kiểm tra kết&#160;nối của bạn và thử&#160;lại.</string>
+    <string name="document_scanner_prepare_error_title">Đã không thể thiết&#160;lập trình quét tài&#160;liệu</string>
+    <string name="document_scanner_download_dialog_title">Tải trình quét tài&#160;liệu</string>
+    <string name="subscription_revamp_why_go_pro_transfer">Tận hưởng mức băng&#160;thông truyền lên tới %1$s</string>
+    <string name="park_account_screen_acknowledge">Tôi có hiểu&#160;rõ rằng tôi sẽ bắt&#160;đầu với một tài&#160;khoản mới, rỗng và sẽ mất&#160;đi toàn&#160;bộ dữ&#160;liệu đang có trong tài&#160;khoản hiện&#160;tại trừ khi tôi nhớ lại mật&#160;khẩu hoặc tìm ra chìa&#160;khóa phục&#160;hồi đã xuất.</string>
+    <string name="subscription_revamp_why_go_pro_pass">Giữ an&#160;toàn cho mật&#160;khẩu với MEGA Pass</string>
+    <string name="email_confirmation_resend_button_countdown">Gửi lại email trong %1$s</string>
+    <string name="document_scanner_prepare_title">Đang thiết&#160;lập trình quét tài&#160;liệu</string>
+    <string name="subscription_revamp_why_go_pro_vpn">Giữ an&#160;toàn trực&#160;tuyến với MEGA VPN</string>
+    <string name="document_scanner_prepare_message">Việc này chỉ diễn ra một&#160;lần. Bạn có thể tiếp&#160;tục sử&#160;dụng thiết&#160;bị trong khi chờ.</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Sử dụng bộ quét cũ</string>
+    <string name="document_scanner_prepare_waiting_for_connection">Đang chờ có kết&#160;nối. Quá&#160;trình tải&#160;xuống sẽ tự&#160;động tiếp&#160;tục khi có kết&#160;nối lại mạng.</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">Gói đăng&#160;ký hàng&#160;năm</string>
+    <string name="document_scanner_prepare_error_permanent_message">Bạn vẫn có thể dùng bộ quét cũ.</string>
+    <string name="subscription_revamp_save_label">Tiết kiệm lên tới 16%</string>
+    <string name="park_account_success_message">Tài&#160;khoản cũ của&#160;bạn đã được tạm đặt&#160;mới. Bây&#160;giờ, bạn có thể đăng&#160;nhập vào tài&#160;khoản mới của&#160;mình.</string>
+    <string name="meetings_add_participants_user_limit_warning">Cuộc gọi này giới hạn ở mức 100 người tham&#160;gia. Những người tham gia sau sẽ chỉ có thể gửi chat. Người tổ chức có thể nâng cấp lên gói Pro để gỡ bỏ giới&#160;hạn này.</string>
 </resources>

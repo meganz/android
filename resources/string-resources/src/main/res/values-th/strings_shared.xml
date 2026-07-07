@@ -2466,4 +2466,23 @@
     <string name="create_group_chat_ekr_label">การสลับกุญแจเข้ารหัส</string>
     <string name="create_group_chat_get_chat_link_label">รับลิงก์แชท</string>
     <string name="create_group_chat_allow_add_participants_label">อนุญาตให้ผู้ที่ไม่ใช่ผู้จัดการประชุมเพิ่มผู้เข้าร่วมได้</string>
+    <string name="subscription_revamp_current_plan_renews">ต่ออายุเมื่อวันที่ %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">หมดอายุใน %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">รายเดือน</string>
+    <string name="add_contacts_phone_contacts_allow_access">อนุญาตให้เข้าถึงรายชื่อติดต่อ</string>
+    <string name="add_contacts_phone_contacts_select">เลือกรายชื่อติดต่อในโทรศัพท์</string>
+    <string name="add_contacts_mega_contacts_section_title">รายชื่อติดต่อ MEGA</string>
+    <string name="create_group_chat_ekr_explanation">การหมุนเวียนคีย์เข้ารหัสช่วยเพิ่มความปลอดภัยขึ้นเล็กน้อย แต่จะไม่สามารถสร้างลิงก์แชทได้ และผู้เข้าร่วมใหม่จะไม่เห็นข้อความก่อนหน้านี้</string>
+    <string name="home_pinned_choose_files_and_folders">เลือกไฟล์และโฟลเดอร์</string>
+    <string name="subscription_revamp_title">อัปเกรดเป็น MEGA Pro</string>
+    <string name="subscription_revamp_why_go_pro_title">ทำไมต้องอัปเกรดเป็น Pro</string>
+    <string name="subscription_revamp_why_go_pro_storage">พื้นที่จัดเก็บข้อมูลสูงสุด %1$s</string>
+    <string name="subscription_revamp_why_go_pro_transfer">รับโควตาการถ่ายโอนข้อมูลสูงสุด %1$s</string>
+    <string name="subscription_revamp_why_go_pro_vpn">ท่องอินเทอร์เน็ตอย่างปลอดภัยด้วย MEGA VPN</string>
+    <string name="subscription_revamp_why_go_pro_pass">ปกป้องรหัสผ่านของคุณให้ปลอดภัยด้วย MEGA Pass</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">การสมัครใช้งานรายปี</string>
+    <string name="subscription_revamp_price_per_month">%1$s ต่อเดือน</string>
+    <string name="subscription_revamp_charged_yearly">เรียกเก็บเงินรายปี %1$s</string>
+    <string name="subscription_revamp_save_label">ประหยัดสูงสุด 16%</string>
+    <string name="subscription_revamp_get_plan_button">เลือกซื้อ %1$s</string>
 </resources>

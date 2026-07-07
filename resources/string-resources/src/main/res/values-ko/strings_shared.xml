@@ -2464,4 +2464,23 @@
     <string name="create_group_chat_ekr_label">암호화 키 순환</string>
     <string name="create_group_chat_get_chat_link_label">대화 링크 가져오기</string>
     <string name="create_group_chat_allow_add_participants_label">주최자가 아닌 사람이 참여자를 추가하는 것을 허용</string>
+    <string name="subscription_revamp_current_plan_renews">%1$s에 갱신</string>
+    <string name="subscription_revamp_current_plan_expires">%1$s에 만료</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">월간</string>
+    <string name="add_contacts_phone_contacts_allow_access">연락처에 접근 허용</string>
+    <string name="add_contacts_phone_contacts_select">전화 연락처 선택</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA 연락처</string>
+    <string name="create_group_chat_ekr_explanation">암호화 키 순환은 약간 더 안전하지만, 대화 링크를 생성하거나 새 참여자가 과거 메시지를 보는 것을 허용하지 않습니다.</string>
+    <string name="home_pinned_choose_files_and_folders">파일 및 폴더 선택</string>
+    <string name="subscription_revamp_title">MEGA Pro로 업그레이드</string>
+    <string name="subscription_revamp_why_go_pro_title">왜 Pro를 써야 하나요?</string>
+    <string name="subscription_revamp_why_go_pro_storage">최대 %1$s의 데이터 저장</string>
+    <string name="subscription_revamp_why_go_pro_transfer">최대 %1$s의 전송 할당량을 즐기세요</string>
+    <string name="subscription_revamp_why_go_pro_vpn">MEGA VPN으로 온라인에서 안전하게 지내세요</string>
+    <string name="subscription_revamp_why_go_pro_pass">MEGA Pass로 암호를 안전하게 지키세요</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">연간 구독</string>
+    <string name="subscription_revamp_price_per_month">월 %1$s</string>
+    <string name="subscription_revamp_charged_yearly">매년 %1$s 청구</string>
+    <string name="subscription_revamp_save_label">최대 16% 할인</string>
+    <string name="subscription_revamp_get_plan_button">%1$s 구입</string>
 </resources>

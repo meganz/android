@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "mega.privacy.android.feature.settings"
+    namespace = "mega.privacy.android.feature.chat"
     testOptions {
         unitTests {
             targetSdk = 34

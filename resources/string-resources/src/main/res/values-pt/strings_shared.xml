@@ -401,7 +401,7 @@
     <!-- Step 2: instruction step no.2 to Log in to the MEGA account -->
     <string name="account_cancellation_instructions_login_account">2. Faça login na sua conta do MEGA.</string>
     <!-- Step 3: instruction step no.3 to Click the main menu of the MEGA account on MEGA website-->
-    <string name="account_cancellation_instructions_click_main_menu">3. Acesse o menu principal</string>
+    <string name="account_cancellation_instructions_click_main_menu">3. Acesse o menu principal.</string>
     <!-- Step 4: instruction step no.4 to Click Settings of the MEGA account on MEGA website -->
     <string name="account_cancellation_instructions_click_settings">4. Clique em [A]Configurações.[/A]</string>
     <!-- Step 5: instruction step no.5 to Click on Plan section of the MEGA account on MEGA website-->
@@ -597,7 +597,7 @@
     <!-- Text for the label to select the device folder or source for a new backup folder -->
     <string name="sync_add_new_backup_choose_device_folder_title">Backup de</string>
     <!-- Text for the label to indicate the destiny of a new backup folder -->
-    <string name="sync_add_new_backup_choose_mega_folder_title">Salvar backup em:</string>
+    <string name="sync_add_new_backup_choose_mega_folder_title">Salvar o backup em</string>
     <!-- Backup text for the the button to begin backup -->
     <string name="sync_add_new_backup_proceed_button_label">Fazer backup</string>
     <!-- Title of the dialog to notify the requirement of access storage permission for Sync/Backup feature -->
@@ -635,7 +635,7 @@
     <!-- Title of the synced folder list empty state -->
     <string name="device_center_sync_backup_list_empty_state_title">Ainda não foi configurada nenhuma sincronização ou backup</string>
     <!-- Message of the synced folder list empty state -->
-    <string name="device_center_sync_backup_list_empty_state_message">Sincronize ou faça backup de uma pasta no seu dispositivo com uma pasta no MEGA.</string>
+    <string name="device_center_sync_backup_list_empty_state_message">Sincronize ou faça backup de uma pasta no seu dispositivo com uma pasta no MEGA</string>
     <!-- subtitle of meeting title in schedule meeting for title disclaimer -->
     <string name="meetings_schedule_meeting_meeting_title_disclaimer">O MEGA pode ver o nome e a descrição da sua reunião, mas nós os mantemos privados</string>
     <!-- Capital letters. Text of the label of a new historic notifications-->
@@ -2669,4 +2669,20 @@
     <string name="create_group_chat_ekr_label">Rotação da chave de criptografia</string>
     <string name="create_group_chat_get_chat_link_label">Obter o link do chat</string>
     <string name="create_group_chat_allow_add_participants_label">Permitir adicionar participantes a usuários que não forem anfitriões</string>
+    <string name="create_group_chat_ekr_explanation">A rotação da chave de criptografia é um pouco mais segura, mas não permite criar um link de chat, e novos participantes não verão as mensagens anteriores.</string>
+    <string name="subscription_revamp_current_plan_renews">Renova em %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Expira em %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Mensal</string>
+    <string name="home_pinned_choose_files_and_folders">Selecionar arquivos e pastas</string>
+    <string name="subscription_revamp_title">Faça upgrade a um plano Pro do MEGA</string>
+    <string name="subscription_revamp_why_go_pro_title">Por que escolher um plano Pro?</string>
+    <string name="subscription_revamp_why_go_pro_storage">Armazene até %1$s de dados</string>
+    <string name="subscription_revamp_why_go_pro_transfer">Aproveite até %1$s de cota de transferência</string>
+    <string name="subscription_revamp_why_go_pro_vpn">Mantenha a sua segurança online com a MEGA VPN</string>
+    <string name="subscription_revamp_why_go_pro_pass">Mantenha as suas senhas seguras com o MEGA Pass</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">Assinatura anual</string>
+    <string name="subscription_revamp_price_per_month">%1$s/mês</string>
+    <string name="subscription_revamp_charged_yearly">Pagamento anual de %1$s</string>
+    <string name="subscription_revamp_save_label">Economize até 16%</string>
+    <string name="subscription_revamp_get_plan_button">Obter o plano %1$s</string>
 </resources>

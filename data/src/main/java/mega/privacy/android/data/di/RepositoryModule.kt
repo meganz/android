@@ -60,6 +60,7 @@ import mega.privacy.android.data.repository.PermissionRepositoryImpl
 import mega.privacy.android.data.repository.RegexRepositoryImpl
 import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.SearchRepositoryImpl
+import mega.privacy.android.data.repository.GeocoderRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.VideoRepositoryImpl
@@ -126,6 +127,7 @@ import mega.privacy.android.domain.repository.RegexRepository
 import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.repository.GeocoderRepository
 import mega.privacy.android.domain.repository.SlideshowRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
@@ -157,6 +159,9 @@ import kotlin.contracts.ExperimentalContracts
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+    @Binds
+    abstract fun bindGeocoderRepository(repository: GeocoderRepositoryImpl): GeocoderRepository
+
     @Binds
     abstract fun bindSlideshowRepository(implementation: SlideshowRepositoryImpl): SlideshowRepository
 

@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.fcm.ChatAdvancedNotificationBuilder
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.notifications.CallPushMessageNotificationManager
 import mega.privacy.android.app.utils.CallUtil
@@ -511,7 +511,7 @@ class CallChangesObserver @Inject constructor(
      */
     fun showOneCallNotification(incomingCall: MegaChatCall) {
         Timber.d("Show incoming call notification and start to sound. Chat ID is ${incomingCall.chatid}")
-        AudioPlayerService.pauseAudioPlayer(application)
+        LegacyAudioPlayerService.pauseAudioPlayer(application)
         MegaApplication.getInstance()
             .createOrUpdateAudioManager(false, Constants.AUDIO_MANAGER_CALL_RINGING)
         chatManagement.addNotificationShown(incomingCall.chatid)

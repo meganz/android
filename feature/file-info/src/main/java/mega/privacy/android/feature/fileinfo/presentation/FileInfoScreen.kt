@@ -44,6 +44,7 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
+import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoMapView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
@@ -185,6 +186,13 @@ private fun FileInfoContent(
                 location = location,
                 onClick = onLocationClick,
                 modifier = Modifier.testTag(FILE_INFO_LOCATION_TAG),
+            )
+        }
+
+        uiState.mapCoordinates?.let { coordinates ->
+            FileInfoMapView(
+                coordinates = coordinates,
+                caption = uiState.locationCaption,
             )
         }
     }

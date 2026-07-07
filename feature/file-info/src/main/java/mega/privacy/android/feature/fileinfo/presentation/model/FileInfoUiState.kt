@@ -22,6 +22,8 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * the localized location root label built in the UI. Null while unresolved.
  * @property locationFolders the containing-folder names below the root (empty when the node is in the root)
  * @property locationDestinations the navigation back stack that opens the node's containing folder
+ * @property coordinates the media GPS coordinates, or null when the node has no valid location
+ * @property locationCaption the reverse-geocoded place name for [coordinates], or null when unresolved
  * @property descriptionText the node description, empty when none
  * @property tags the tags associated with the node
  * @property isTakenDown whether the node has been taken down
@@ -48,4 +50,13 @@ internal data class FileInfoUiState(
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
     val isNodeInRubbish: Boolean = false,
     val isNodeInBackups: Boolean = false,
-)
+    val coordinates: Coordinates? = null,
+    val locationCaption: String? = null,
+) {
+    /**
+     * The coordinates whose location map should be shown, or null when there is nothing to show:
+     * the node has no valid location, or the current user is not the owner.
+     */
+    val mapCoordinates: Coordinates?
+        get() = coordinates?.takeIf { accessPermission == AccessPermission.OWNER }
+}

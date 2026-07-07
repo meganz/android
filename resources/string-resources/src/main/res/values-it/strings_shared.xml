@@ -2627,4 +2627,8 @@
     <string name="create_group_chat_ekr_label">Rotazione della chiave di criptazione</string>
     <string name="create_group_chat_get_chat_link_label">Ottieni il link della chat</string>
     <string name="create_group_chat_allow_add_participants_label">Permetti a chi non è host di aggiungere partecipanti</string>
+    <string name="subscription_revamp_why_go_pro_storage">Archivia fino a %1$s di dati</string>
+    <string name="subscription_revamp_current_plan_renews">Si rinnova il %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Scade il %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Mensilmente</string>
 </resources>

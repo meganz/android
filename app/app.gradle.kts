@@ -261,6 +261,7 @@ dependencies {
     implementation(project(":core:passcode:passcode"))
     implementation(project(":core:transfers"))
     implementation(project(":feature:myaccount"))
+    implementation(project(":feature:settings"))
     implementation(project(":third-party-lib:twemoji"))
 
     //Test Modules

@@ -26,6 +26,7 @@ class LocalisedPriceCurrencyCodeStringMapper @Inject constructor() {
         val currencyFormatter = NumberFormat.getCurrencyInstance(locale)
         currencyFormatter.currency = Currency.getInstance(currencyAmount.currency.code)
         val currencyCode = currencyFormatter.currency?.currencyCode ?: "EUR"
+        currencyFormatter.minimumFractionDigits = 0
         return LocalisedProductPrice(currencyFormatter.format(currencyAmount.value), currencyCode)
     }
 }

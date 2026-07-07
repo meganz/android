@@ -2659,4 +2659,22 @@
     <string name="create_group_chat_settings_title">Nouveau groupe</string>
     <string name="create_group_chat_get_chat_link_label">Obtenir le lien de la conversation</string>
     <string name="create_group_chat_allow_add_participants_label">Permettre aux non-hôtes d’ajouter des participants</string>
+    <string name="subscription_revamp_title">Passez à MEGA Pro</string>
+    <string name="subscription_revamp_why_go_pro_storage">Stockez jusqu\’à %1$s de données</string>
+    <string name="subscription_revamp_why_go_pro_transfer">Profitez d\’un quota de transfert allant jusqu\’à %1$s</string>
+    <string name="subscription_revamp_why_go_pro_pass">Protégez vos mots de passe avec MEGA Pass</string>
+    <string name="subscription_revamp_why_go_pro_vpn">Restez en sécurité en ligne avec MEGA VPN</string>
+    <string name="subscription_revamp_why_go_pro_title">Pourquoi passer à Pro ?</string>
+    <string name="subscription_revamp_current_plan_renews">Se renouvelle le %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">Abonnement annuel</string>
+    <string name="subscription_revamp_price_per_month">%1$s/mois</string>
+    <string name="subscription_revamp_charged_yearly">%1$s facturés annuellement</string>
+    <string name="subscription_revamp_save_label">Économisez jusqu’à 16&#160;%</string>
+    <string name="subscription_revamp_get_plan_button">Obtenir %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Expire le %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Mensuel</string>
+    <string name="add_contacts_phone_contacts_allow_access">Autoriser l\’accès aux contacts</string>
+    <string name="add_contacts_phone_contacts_select">Sélectionner les contacts du téléphone</string>
+    <string name="add_contacts_mega_contacts_section_title">Contacts MEGA</string>
+    <string name="home_pinned_choose_files_and_folders">Choisir des fichiers et des dossiers</string>
 </resources>

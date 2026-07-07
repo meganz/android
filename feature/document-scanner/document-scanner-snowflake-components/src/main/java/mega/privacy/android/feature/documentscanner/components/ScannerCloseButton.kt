@@ -1,36 +1,38 @@
-package mega.privacy.android.feature.documentscanner.presentation.component
+package mega.privacy.android.feature.documentscanner.components
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Close button for the scanning screen, positioned at the top.
- *
- * @param onClose Callback to close the scanner
- * @param modifier Modifier for the button
+ * Back / close control for the scanning screen, on a translucent scrim so it
+ * stays legible over the camera feed.
  */
 @Composable
-fun ScannerCloseButton(
+internal fun ScannerCloseButton(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = onClose,
-        modifier = modifier.padding(8.dp),
+        modifier = modifier
+            .clip(CircleShape)
+            .background(Color.Black.copy(alpha = 0.35f)),
     ) {
         Icon(
-            painter = painterResource(IconPackR.drawable.ic_x_medium_regular_outline),
+            painter = painterResource(IconPackR.drawable.ic_chevron_left_medium_thin_outline),
             contentDescription = stringResource(sharedR.string.general_dialog_cancel_button),
-            tint = Color.White,
+            tint = DSTokens.colors.icon.onColor,
         )
     }
 }

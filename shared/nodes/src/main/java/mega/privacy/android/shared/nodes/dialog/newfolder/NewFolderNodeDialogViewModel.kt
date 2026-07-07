@@ -8,10 +8,12 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -28,11 +30,20 @@ class NewFolderNodeDialogViewModel @Inject constructor(
     private val validateNodeNameUseCase: ValidateNodeNameUseCase,
     private val createFolderNodeUseCase: CreateFolderNodeUseCase,
     private val getRootNodeUseCase: GetRootNodeUseCase,
-    private val snackbarEventQueue: SnackbarEventQueue
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val snackbarEventQueue: SnackbarEventQueue,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(NewFolderDialogUiState())
     val uiState: StateFlow<NewFolderDialogUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            monitorConnectivityUseCase()
+                .filter { isConnected -> !isConnected }
+                .collect { _uiState.update { it.copy(dismissOnDisconnectionEvent = triggered) } }
+        }
+    }
 
     /**
      * Creates a folder after validation.
@@ -76,6 +87,13 @@ class NewFolderNodeDialogViewModel @Inject constructor(
      */
     fun clearFolderCreatedEvent() {
         _uiState.update { it.copy(folderCreatedEvent = consumed()) }
+    }
+
+    /**
+     * Clears the dismiss-on-disconnection event.
+     */
+    fun clearDismissOnDisconnectionEvent() {
+        _uiState.update { it.copy(dismissOnDisconnectionEvent = consumed) }
     }
 }
 

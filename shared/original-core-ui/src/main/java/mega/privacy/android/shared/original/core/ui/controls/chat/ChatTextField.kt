@@ -79,7 +79,8 @@ fun ChatTextField(
 ) = Box(modifier = modifier) {
     val colors = TextFieldDefaults.textFieldColors(
         textColor = DSTokens.colors.text.placeholder,
-        backgroundColor = DSTokens.colors.background.surface1,
+        // Transparent so the parent ChatInputTextToolbar's rounded surface2 background shows through
+        backgroundColor = Color.Transparent,
         cursorColor = DSTokens.colors.border.strongSelected,
         errorCursorColor = DSTokens.colors.text.error,
         errorIndicatorColor = DSTokens.colors.text.error,

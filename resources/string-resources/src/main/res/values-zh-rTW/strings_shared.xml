@@ -2474,4 +2474,7 @@
     <string name="create_group_chat_ekr_label">加密金鑰輪替</string>
     <string name="create_group_chat_get_chat_link_label">取得對話連結</string>
     <string name="create_group_chat_allow_add_participants_label">允許非主持人新增參與者</string>
+    <string name="subscription_revamp_current_plan_renews">續訂日期%1$s</string>
+    <string name="subscription_revamp_current_plan_expires">%1$s到期</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">每月</string>
 </resources>

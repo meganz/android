@@ -4,7 +4,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
@@ -13,6 +16,7 @@ import mega.privacy.android.domain.exception.EmptyNodeNameException
 import mega.privacy.android.domain.exception.InvalidNodeNameException
 import mega.privacy.android.domain.exception.NodeNameAlreadyExistsException
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.CreateFolderNodeUseCase
 import mega.privacy.android.domain.usecase.node.ValidateNodeNameUseCase
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
@@ -37,14 +41,21 @@ class NewFolderNodeDialogViewModelTest {
     private val validateFolderNameUseCase = mock<ValidateNodeNameUseCase>()
     private val createFolderNodeUseCase = mock<CreateFolderNodeUseCase>()
     private val getRootNodeUseCase = mock<GetRootNodeUseCase>()
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val snackbarEventQueue = mock<SnackbarEventQueue>()
 
     @BeforeEach
     fun setUp() {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         viewModel = NewFolderNodeDialogViewModel(
             validateNodeNameUseCase = validateFolderNameUseCase,
             createFolderNodeUseCase = createFolderNodeUseCase,
             getRootNodeUseCase = getRootNodeUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             snackbarEventQueue = snackbarEventQueue
         )
     }
@@ -55,6 +66,7 @@ class NewFolderNodeDialogViewModelTest {
             validateFolderNameUseCase,
             createFolderNodeUseCase,
             getRootNodeUseCase,
+            monitorConnectivityUseCase,
             snackbarEventQueue
         )
     }
@@ -230,6 +242,35 @@ class NewFolderNodeDialogViewModelTest {
         assertThat(state.errorEvent.triggeredContent()).isInstanceOf(RuntimeException::class.java)
         assertThat(state.folderCreatedEvent.triggeredContent()).isNull()
         verify(validateFolderNameUseCase).invoke(eq(folderName), eq(parentNodeId))
+    }
+
+    @Test
+    fun `test that init triggers dismissOnDisconnectionEvent when connection is lost`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true, false))
+
+        initViewModel()
+
+        assertThat(viewModel.uiState.value.dismissOnDisconnectionEvent).isEqualTo(triggered)
+    }
+
+    @Test
+    fun `test that init does not trigger dismissOnDisconnectionEvent while connected`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(true))
+
+        initViewModel()
+
+        assertThat(viewModel.uiState.value.dismissOnDisconnectionEvent).isEqualTo(consumed)
+    }
+
+    @Test
+    fun `test that clearDismissOnDisconnectionEvent resets the event`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(flowOf(false))
+        initViewModel()
+        assertThat(viewModel.uiState.value.dismissOnDisconnectionEvent).isEqualTo(triggered)
+
+        viewModel.clearDismissOnDisconnectionEvent()
+
+        assertThat(viewModel.uiState.value.dismissOnDisconnectionEvent).isEqualTo(consumed)
     }
 
     @Test
