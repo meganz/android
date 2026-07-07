@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.settings
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.StateEventWithContentConsumed
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +32,7 @@ import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
+import mega.privacy.android.domain.usecase.RequestAccountDeletion
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.account.IsMultiFactorAuthEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -96,6 +99,7 @@ class SettingsViewModelTest {
     private val setAudioBackgroundPlayEnabledUseCase = mock<SetAudioBackgroundPlayEnabledUseCase>()
     private val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
     private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>()
+    private val requestAccountDeletion = mock<RequestAccountDeletion>()
 
     private val startScreenSummaryMapper = mock<StartScreenSummaryMapper>()
 
@@ -182,7 +186,7 @@ class SettingsViewModelTest {
             setMediaDiscoveryView = setMediaDiscoveryView,
             toggleContactLinksOptionUseCase = toggleContactLinksOptionUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            requestAccountDeletion = mock(),
+            requestAccountDeletion = requestAccountDeletion,
             isChatLoggedIn = isChatLoggedIn,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             monitorPasscodeLockPreferenceUseCase = monitorPasscodeLockPreferenceUseCase,
@@ -229,8 +233,48 @@ class SettingsViewModelTest {
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
             monitorMyAccountUpdateUseCase,
+            requestAccountDeletion,
         )
     }
+
+    @Test
+    fun `test that deleteAccount triggers deleteAccountEvent with true when requestAccountDeletion succeeds`() =
+        runTest {
+            underTest.deleteAccount()
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val event = awaitItem().deleteAccountEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((event as StateEventWithContentTriggered).content).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that deleteAccount triggers deleteAccountEvent with false when requestAccountDeletion fails`() =
+        runTest {
+            requestAccountDeletion.stub {
+                onBlocking { invoke() }.thenThrow(RuntimeException())
+            }
+            underTest.deleteAccount()
+            advanceUntilIdle()
+            underTest.uiState.test {
+                val event = awaitItem().deleteAccountEvent
+                assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat((event as StateEventWithContentTriggered).content).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that deleteAccountEvent is consumed when onDeleteAccountEventConsumed is invoked`() =
+        runTest {
+            underTest.deleteAccount()
+            advanceUntilIdle()
+            underTest.onDeleteAccountEventConsumed()
+            underTest.uiState.test {
+                assertThat(awaitItem().deleteAccountEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
 
     @Test
     fun `test initial value for auto accept is false`() = runTest {

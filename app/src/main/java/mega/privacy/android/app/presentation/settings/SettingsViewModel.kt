@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -290,14 +292,25 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun deleteAccount() = runCatching { requestAccountDeletion() }
-        .fold(
-            { true },
-            { e ->
-                Timber.e(e, "Error when asking for the cancellation link")
-                false
-            }
-        )
+    /**
+     * Request account deletion. The result is exposed as a one-shot
+     * [SettingsState.deleteAccountEvent] so the UI shows the outcome dialog only when resumed,
+     * avoiding lifecycle races. The request runs in [viewModelScope] so it survives
+     * configuration changes.
+     */
+    fun deleteAccount() = viewModelScope.launch {
+        val isSuccess = runCatching { requestAccountDeletion() }
+            .onFailure { Timber.e(it, "Error when asking for the cancellation link") }
+            .isSuccess
+        state.update { it.copy(deleteAccountEvent = triggered(isSuccess)) }
+    }
+
+    /**
+     * Consume the [SettingsState.deleteAccountEvent] once the UI has handled it.
+     */
+    fun onDeleteAccountEventConsumed() {
+        state.update { it.copy(deleteAccountEvent = consumed()) }
+    }
 
     /**
      * Set hide recent activity setting

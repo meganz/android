@@ -20,6 +20,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -177,6 +178,21 @@ class SettingsFragment :
                     }
                     findPreference<SwitchPreferenceCompat>(KEY_MEDIA_DISCOVERY_VIEW)?.isVisible =
                         false
+
+                    if (state.deleteAccountEvent is StateEventWithContentTriggered) {
+                        if (state.deleteAccountEvent.content) {
+                            showInfoDialog(
+                                R.string.email_verification_title,
+                                R.string.email_verification_text,
+                            )
+                        } else {
+                            showInfoDialog(
+                                R.string.general_error_word,
+                                sharedResR.string.general_text_error,
+                            )
+                        }
+                        viewModel.onDeleteAccountEventConsumed()
+                    }
                 }
             }
         }
@@ -476,19 +492,7 @@ class SettingsFragment :
     }
 
     private fun deleteAccount() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (viewModel.deleteAccount()) {
-                showInfoDialog(
-                    R.string.email_verification_title,
-                    R.string.email_verification_text
-                )
-            } else {
-                showInfoDialog(
-                    R.string.general_error_word,
-                    sharedResR.string.general_text_error
-                )
-            }
-        }
+        viewModel.deleteAccount()
     }
 
     private fun showInfoDialog(@StringRes title: Int, @StringRes message: Int) {
