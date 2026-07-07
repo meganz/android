@@ -26,9 +26,9 @@ import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.contact.AddContactToShareComposeActivity
 import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
 import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActivity
-import mega.privacy.android.app.presentation.contact.navigation.intValue
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
+import mega.privacy.android.app.presentation.contact.navigation.intValue
 import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
