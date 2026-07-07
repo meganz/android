@@ -43,7 +43,7 @@ import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.model.AudioSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.model.SpeedPlaybackItem
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.presentation.videoplayer.model.PlaybackPositionStatus
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
@@ -112,7 +112,7 @@ class AudioPlayerFragment : Fragment() {
         }
 
         /**
-         * Called after a successful bind with our AudioPlayerService.
+         * Called after a successful bind with our LegacyAudioPlayerService.
          */
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             if (service is MediaPlayerServiceBinder) {
@@ -147,7 +147,7 @@ class AudioPlayerFragment : Fragment() {
         context?.bindService(
             Intent(
                 requireContext(),
-                AudioPlayerService::class.java
+                LegacyAudioPlayerService::class.java
             ).putExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, false),
             connection,
             BIND_AUTO_CREATE

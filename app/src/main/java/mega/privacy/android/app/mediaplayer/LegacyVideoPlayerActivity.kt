@@ -54,7 +54,7 @@ import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
-import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.app.mediaplayer.service.LegacyAudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerCallback
 import mega.privacy.android.app.mediaplayer.service.Metadata
 import mega.privacy.android.app.mediaplayer.videoplayer.navigation.LegacyVideoPlayerNavigationGraph
@@ -363,7 +363,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
             }
         }
         legacyVideoPlayerViewModel.initVideoPlayerData(intent)
-        AudioPlayerService.pauseAudioPlayer(this)
+        LegacyAudioPlayerService.pauseAudioPlayer(this)
         registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
         setupObserver()
         initMediaSession()
@@ -864,7 +864,7 @@ class LegacyVideoPlayerActivity : PasscodeActivity() {
     override fun onDestroy() {
         mediaPlayerGateway.playerStop()
         mediaPlayerGateway.playerRelease()
-        AudioPlayerService.resumeAudioPlayer(this)
+        LegacyAudioPlayerService.resumeAudioPlayer(this)
         unregisterReceiver(headsetPlugReceiver)
         if (audioManager != null) {
             ChatUtil.abandonAudioFocus(audioFocusListener, audioManager, audioFocusRequest)
