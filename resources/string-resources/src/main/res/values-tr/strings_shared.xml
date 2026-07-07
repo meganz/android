@@ -772,7 +772,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Dosya uzantısı gerekli</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA, ön izleyebilmeniz için bu dosyanın geçici bir kopyasını alacaktır. Bu kopya kaydedilmeyecek veya uygulama dışında kullanılamayacaktır. %1$s indirilecektir.</string>
+    <string name="alert_larger_file_preview">Bu dosya MEGA\’da ön izlenemez. Başka bir uygulamada açmak için dosyayı (%1$s) indirin.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">İşlem tamamlanıyor: %%%1$d</string>
     <!-- Add to album files existed message -->
@@ -1232,7 +1232,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Mobil veriye izin ver</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Büyük dosyanın ön izlemesi</string>
+    <string name="alert_larger_file_preview_title">Ön izlenemiyor</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Hemen ön izle</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2312,7 +2312,7 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">Yanlış şifre</string>
     <string name="text_editor_fast_scroll_line_tooltip">%1$d. satır</string>
     <string name="select_videos_search_empty_view_description">Bulut depolamanızda video arayın</string>
-    <string name="new_text_file_invalid_extension_error_message">Geçerli bir dosya uzantısı kullanın (örn. .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Geçerli bir dosya uzantısı kullanın (örn. .txt, .md ya da .xml)</string>
     <string name="link_decryption_key_dialog_message">Bu bağlantıyı açmak için anahtarı girin.\nAnahtarınız yok mu? Bağlantı sahibiyle iletişime geçin.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2535,7 +2535,7 @@
     <string name="sync_dialog_battery_optimization_title">Şarj optimizasyonu</string>
     <string name="general_do_not_allow_button">İzin verme</string>
     <string name="general_allow_button">İzin ver</string>
-    <string name="video_player_video_not_rendered">Bu video görüntülenemiyor.</string>
+    <string name="video_player_video_not_rendered">Bu video görüntülenemiyor</string>
     <string name="document_scanner_download_dialog_download_button">İndir</string>
     <string name="add_participants_title">Katılımcı ekle</string>
     <string name="share_link_access_banner_title">Bağlantı erişimi</string>
@@ -2553,4 +2553,43 @@
     <string name="create_group_chat_ekr_label">Şifreleme anahtarı döndürme</string>
     <string name="create_group_chat_get_chat_link_label">Sohbet bağlantısını al</string>
     <string name="create_group_chat_allow_add_participants_label">Yönetici olmayanların katılımcı eklemesine izin ver</string>
+    <string name="subscription_revamp_current_plan_renews">%1$s tarihinde yenileniyor</string>
+    <string name="subscription_revamp_current_plan_expires">%1$s tarihinde süresi doluyor</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Aylık</string>
+    <string name="document_scanner_download_dialog_title">Belge tarayıcısını indir</string>
+    <string name="document_scanner_download_dialog_message">Yeni belge tarayıcısını kullanabilmeniz için tek seferlik %1$d MB boyutunda bir indirme yapılması gerekiyor.</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">Mobil veri üzerinden indirilsin mi?</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Yeni belge tarayıcısı tek seferlik %1$d MB indirme gerektiriyor. Mobil veri ücretleri uygulanabilir.</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Mobil veri ile indir</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Eski tarayıcıyı kullan</string>
+    <string name="park_account_screen_title">Hesabı park et</string>
+    <string name="park_account_screen_acknowledge">Yeni ve boş bir hesap başlattığımı ve şifremi hatırlayamadığım veya dışa aktarılmış bir Kurtarma anahtarı bulamadığım sürece, mevcut hesabımdaki tüm verileri kaybedeceğimi kabul ediyorum.</string>
+    <string name="park_account_screen_start_button">Yeni bir hesap başlat</string>
+    <string name="park_account_success_message">Eski hesabınız park edildi. Artık yeni hesabınıza giriş yapabilirsiniz.</string>
+    <string name="meetings_add_participants_user_limit_warning">Bu arama 100 katılımcı ile sınırlıdır. Bu sayıyı aşan kişiler yalnızca sohbet edebilir. Düzenleyici, bu sınırı kaldırmak için Pro\’ya yükseltebilir.</string>
+    <string name="email_confirmation_resend_button_countdown">%1$s içinde tekrar gönder</string>
+    <string name="document_scanner_prepare_title">Belge tarayıcısı ayarlanıyor</string>
+    <string name="document_scanner_prepare_message">Bu işlem yalnızca bir kez gerçekleşecek. İndirme devam ederken cihazınızı kullanmaya devam edebilirsiniz.</string>
+    <string name="document_scanner_prepare_error_title">Belge tarayıcısı ayarlanamadı</string>
+    <string name="document_scanner_prepare_error_transient_message">Bağlantınızı kontrol edin ve tekrar deneyin.</string>
+    <string name="document_scanner_prepare_error_permanent_message">Bunun yerine eski tarayıcıyı kullanabilirsiniz.</string>
+    <string name="document_scanner_prepare_retry_button">Tekrar dene</string>
+    <string name="document_scanner_prepare_waiting_for_connection">Bağlantı bekleniyor. Çevrim içi olduğunuzda indirme işlemi otomatik olarak devam edecektir.</string>
+    <string name="document_scanner_prepare_reconnecting">Yeniden bağlanılıyor&#8230;</string>
+    <string name="add_contacts_phone_contacts_allow_access">Rehbere erişime izin ver</string>
+    <string name="add_contacts_phone_contacts_select">Telefon rehberinden seçin</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA kişileri</string>
+    <string name="create_group_chat_ekr_explanation">Şifreleme anahtarı rotasyonu biraz daha güvenlidir ancak sohbet bağlantısı oluşturmanıza izin vermez ve yeni katılımcılar geçmiş mesajları göremez.</string>
+    <string name="home_pinned_choose_files_and_folders">Dosya ve klasör seçin</string>
+    <string name="subscription_revamp_title">MEGA Pro’ya yükselt</string>
+    <string name="subscription_revamp_why_go_pro_title">Neden Pro’ya geçilmeli?</string>
+    <string name="subscription_revamp_why_go_pro_storage">%1$s’ye kadar veri depolayın</string>
+    <string name="subscription_revamp_why_go_pro_transfer">%1$s’ye kadar aktarım kotasının keyfini çıkarın</string>
+    <string name="subscription_revamp_why_go_pro_vpn">MEGA VPN ile çevrim içi ortamda güvende kalın</string>
+    <string name="subscription_revamp_why_go_pro_pass">MEGA Pass ile şifrelerinizi güvende tutun</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">Yıllık abonelik</string>
+    <string name="subscription_revamp_price_per_month">%1$s/ay</string>
+    <string name="subscription_revamp_charged_yearly">%1$s yıllık faturalandırılır</string>
+    <string name="subscription_revamp_save_label">%16’ya kadar tasarruf edin</string>
+    <string name="subscription_revamp_get_plan_button">%1$s al</string>
 </resources>

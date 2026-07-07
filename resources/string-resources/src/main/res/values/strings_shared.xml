@@ -1136,34 +1136,6 @@
     <string name="general_month">/month</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 charged yearly. [B] and [/B] are span tags for bold styling. -->
     <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nCharged yearly</string>
-    <!-- Title at the top of the redesigned subscription/upgrade page -->
-    <string name="subscription_revamp_title">Upgrade to MEGA Pro</string>
-    <!-- Title of the card highlighting the benefits of a Pro plan on the redesigned subscription page -->
-    <string name="subscription_revamp_why_go_pro_title">Why go Pro?</string>
-    <!-- Storage benefit on the redesigned subscription page. Placeholder is the highest storage amount, e.g. "20 TB". -->
-    <string name="subscription_revamp_why_go_pro_storage">Store up to %1$s of data</string>
-    <!-- Transfer benefit on the redesigned subscription page. Placeholder is the highest transfer quota, e.g. "240 TB". -->
-    <string name="subscription_revamp_why_go_pro_transfer">Enjoy up to %1$s transfer quota</string>
-    <!-- VPN benefit on the redesigned subscription page -->
-    <string name="subscription_revamp_why_go_pro_vpn">Stay safe online with MEGA VPN</string>
-    <!-- Password manager benefit on the redesigned subscription page -->
-    <string name="subscription_revamp_why_go_pro_pass">Keep passwords safe with MEGA Pass</string>
-    <!-- Help text on the current plan card when the subscription will renew. Placeholder is the renewal date, e.g. "8 July 2027". -->
-    <string name="subscription_revamp_current_plan_renews">Renews on %1$s</string>
-    <!-- Help text on the current plan card when the plan will expire (one-off / cancelled). Placeholder is the expiry date, e.g. "8 July 2027". -->
-    <string name="subscription_revamp_current_plan_expires">Expires on %1$s</string>
-    <!-- Billing cycle label on the current plan card for a monthly subscription -->
-    <string name="subscription_revamp_current_plan_cycle_monthly">Monthly</string>
-    <!-- Billing cycle label on the current plan card for a yearly subscription -->
-    <string name="subscription_revamp_current_plan_cycle_yearly">Yearly subscription</string>
-    <!-- Per-month price on a plan card on the redesigned subscription page. Placeholder is the price, e.g. "€4.99". -->
-    <string name="subscription_revamp_price_per_month">%1$s/month</string>
-    <!-- Total amount charged yearly on a plan card on the redesigned subscription page. Placeholder is the total price, e.g. "€29.94". -->
-    <string name="subscription_revamp_charged_yearly">%1$s charged yearly</string>
-    <!-- Savings label shown on the Yearly option of the billing period selector on the redesigned subscription page -->
-    <string name="subscription_revamp_save_label">Save up to 16%</string>
-    <!-- Buy button label on a plan card on the redesigned subscription page. Placeholder is the plan name, e.g. "Pro I". -->
-    <string name="subscription_revamp_get_plan_button">Get %1$s</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d item unhidden</item>
@@ -1411,8 +1383,6 @@
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Choose</string>
-    <!-- Choose folders and files to pin to Home. Used both as the picker's top bar title and as the add button/link on the empty Pinned widget. -->
-    <string name="home_pinned_choose_files_and_folders">Choose files &amp; folders</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Apply to all</string>
     <!-- Sync message when a single issue resolved -->
@@ -3141,4 +3111,34 @@
     <string name="create_group_chat_get_chat_link_label">Get chat link</string>
     <!-- Create group chat: label of the toggle allowing non-host participants to add others -->
     <string name="create_group_chat_allow_add_participants_label">Allow non-hosts to add participants</string>
+    <!-- Choose folders and files to pin to Home. Used both as the picker's top bar title and as the add button/link on the empty Pinned widget. -->
+    <string name="home_pinned_choose_files_and_folders">Choose files &amp; folders</string>
+    <!-- Title at the top of the redesigned subscription/upgrade page -->
+    <string name="subscription_revamp_title">Upgrade to MEGA Pro</string>
+    <!-- Title of the card highlighting the benefits of a Pro plan on the redesigned subscription page -->
+    <string name="subscription_revamp_why_go_pro_title">Why go Pro?</string>
+    <!-- Storage benefit on the redesigned subscription page. Placeholder is the highest storage amount, e.g. "20 TB". -->
+    <string name="subscription_revamp_why_go_pro_storage">Store up to %1$s of data</string>
+    <!-- Transfer benefit on the redesigned subscription page. Placeholder is the highest transfer quota, e.g. "240 TB". -->
+    <string name="subscription_revamp_why_go_pro_transfer">Enjoy up to %1$s transfer quota</string>
+    <!-- VPN benefit on the redesigned subscription page -->
+    <string name="subscription_revamp_why_go_pro_vpn">Stay safe online with MEGA VPN</string>
+    <!-- Password manager benefit on the redesigned subscription page -->
+    <string name="subscription_revamp_why_go_pro_pass">Keep passwords safe with MEGA Pass</string>
+    <!-- Help text on the current plan card when the subscription will renew. Placeholder is the renewal date, e.g. "8 July 2027". -->
+    <string name="subscription_revamp_current_plan_renews">Renews on %1$s</string>
+    <!-- Help text on the current plan card when the plan will expire (one-off / cancelled). Placeholder is the expiry date, e.g. "8 July 2027". -->
+    <string name="subscription_revamp_current_plan_expires">Expires on %1$s</string>
+    <!-- Billing cycle label on the current plan card for a monthly subscription -->
+    <string name="subscription_revamp_current_plan_cycle_monthly">Monthly</string>
+    <!-- Billing cycle label on the current plan card for a yearly subscription -->
+    <string name="subscription_revamp_current_plan_cycle_yearly">Yearly subscription</string>
+    <!-- Per-month price on a plan card on the redesigned subscription page. Placeholder is the price, e.g. "€4.99". -->
+    <string name="subscription_revamp_price_per_month">%1$s/month</string>
+    <!-- Total amount charged yearly on a plan card on the redesigned subscription page. Placeholder is the total price, e.g. "€29.94". -->
+    <string name="subscription_revamp_charged_yearly">%1$s charged yearly</string>
+    <!-- Savings label shown on the Yearly option of the billing period selector on the redesigned subscription page -->
+    <string name="subscription_revamp_save_label">Save up to 16%</string>
+    <!-- Buy button label on a plan card on the redesigned subscription page. Placeholder is the plan name, e.g. "Pro I". -->
+    <string name="subscription_revamp_get_plan_button">Get %1$s</string>
 </resources>

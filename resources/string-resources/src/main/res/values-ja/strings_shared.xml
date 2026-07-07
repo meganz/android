@@ -2479,4 +2479,19 @@
     <string name="create_group_chat_get_chat_link_label">チャットリンクを取得</string>
     <string name="create_group_chat_allow_add_participants_label">主催者以外が参加者を追加できるようにします</string>
     <string name="create_group_chat_ekr_explanation">暗号化キーのローテーションはより安全ですが、チャットリンクを作成できなくなり、新しい参加者は過去のメッセージを閲覧できなくなります。</string>
+    <string name="home_pinned_choose_files_and_folders">ファイルとフォルダを選択</string>
+    <string name="subscription_revamp_title">MEGA Proにアップグレード</string>
+    <string name="subscription_revamp_why_go_pro_title">Proにする理由</string>
+    <string name="subscription_revamp_why_go_pro_storage">最大%1$sのデータを保管</string>
+    <string name="subscription_revamp_why_go_pro_transfer">最大%1$sの転送容量を利用可能</string>
+    <string name="subscription_revamp_why_go_pro_vpn">MEGA VPNでオンラインの安全を確保</string>
+    <string name="subscription_revamp_why_go_pro_pass">MEGA Passでパスワードを安全に管理</string>
+    <string name="subscription_revamp_current_plan_renews">更新日%1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">年間サブスクリプション</string>
+    <string name="subscription_revamp_price_per_month">%1$s/月</string>
+    <string name="subscription_revamp_charged_yearly">%1$s/年（年払い）</string>
+    <string name="subscription_revamp_save_label">最大16%お得</string>
+    <string name="subscription_revamp_get_plan_button">%1$sを購入</string>
+    <string name="subscription_revamp_current_plan_expires">有効期限%1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">月払い</string>
 </resources>

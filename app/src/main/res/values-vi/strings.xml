@@ -1125,7 +1125,7 @@
     <!--  -->
     <string name="file_properties_shared_folder_public_link_name">Đường liên kết</string>
     <!-- Refers to access rights for a file folder. -->
-    <string name="file_properties_shared_folder_full_access">Toàn quyền</string>
+    <string name="file_properties_shared_folder_full_access">Toàn diện</string>
     <!-- Label to explain the read only participant permission in the options panel of the group info screen -->
     <string name="file_properties_shared_folder_read_only">Chỉ-được-xem</string>
     <!-- Refers to access rights for a file folder. (with the & needed. Don’t use the symbol itself. Use &) -->
@@ -2855,7 +2855,7 @@
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Các thư mục này được chia sẻ dưới dạng chỉ-được-xem bởi vì đây là các thư mục lưu dự phòng, bất kỳ thay đổi trong nội dung sẽ vô hiệu hóa việc sao lưu dự phòng.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
-    <string name="backup_share_with_root_permission_text">Vài trong các thư mục chia sẻ này là thư mục lưu dự phòng và chỉ-được-xem. Bạn có muốn tiếp tục không?</string>
+    <string name="backup_share_with_root_permission_text">Vài trong các thư&#160;mục chia &#160;sẻ này là thư&#160;mục lưu dự&#160;phòng và là chỉ-được-xem. Bạn có muốn tiếp&#160;tục không?</string>
     <!-- Title of the button when you want to answer a one to one call -->
     <string name="title_join_one_to_one_call">Trả lời cuộc gọi</string>
     <!-- Title of the menu when the select tracks on playlist page-->
@@ -3169,7 +3169,7 @@
     <!-- Title of the Backups feature when no Backup files or folders exist -->
     <string name="backups_empty_state_title">[B]Không có tệp tin nào trong [/B][A]sao lưu dự phòng[/A]</string>
     <!-- Description of the Backups feature when no Backup files or folders exist -->
-    <string name="backups_empty_state_body">Đây là thư mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.\nBạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
+    <string name="backups_empty_state_body">Đây là thư&#160;mục chứa các tệp tin và thư mục đã được sao lưu dự phòng. Các mục lưu dự&#160;phòng là dạng “chỉ-được-xem” để phòng tránh bị chỉnh sửa trong Ổ&#160;Mây của bạn.\nBạn có thể lưu dự phòng dữ liệu của mình từ máy tính lên MEGA bằng cách sử dụng App MEGA cho Máy&#160;Tính.</string>
     <!-- Message error shown when trying to log in on an account that has been suspended due to breaches of copyright -->
     <string name="dialog_account_suspended_ToS_copyright_message">Tài&#160;khoản MEGA của quý&#160;vị đã bị đình&#160;chỉ do đã nhiều lần bị cáo&#160;buộc vi&#160;phạm bản&#160;quyền. Điều này có nghĩa là quý&#160;vị không được phép truy&#160;cập tài&#160;khoản của mình hoặc bất cứ dữ&#160;liệu bên trong.\nKiểm&#160;tra hộp thư email của quý&#160;vị để biết thêm thông&#160;tin và về cách gửi đơn phản&#160;cáo.</string>
     <!-- Message error shown when trying to log in on an account that has been terminated due to breaches of all reasons of breaching Terms of Service, except copyright. -->
@@ -3584,11 +3584,11 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_first">
-        <item quantity="other">Thứ&#160;Bảy đầu&#160;tiên của mỗi %1$d tháng, có hiệu&#160;lực từ [A]%2$s cho đến %3$s[/A] từ [B]%4$s đến %5$s[/B]</item>
+        <item quantity="other">Thứ&#160;Bảy đầu&#160;tiên của mỗi %1$d tháng, có hiệu lực từ [A]%2$s cho đến %3$s[/A] từ [B]%4$s đến %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first">
-        <item quantity="other">Thứ&#160;Bảy đầu&#160;tiên của mỗi %1$d tháng, có hiệu&#160;lực từ [A]%2$s[/A] từ [B]%3$s đến %4$s[/B]</item>
+        <item quantity="other">Thứ&#160;Bảy đầu&#160;tiên của mỗi %1$d tháng, có hiệu lực từ [A]%2$s[/A] từ [B]%3$s đến %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_second">
@@ -3713,7 +3713,7 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Bắt&#160;đầu</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">Tệp tin này đã bị tháo gỡ theo quy&#160;định có trong [A]Chính Sách Xử Lý Gỡ Bỏ Nội Dung[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Tệp tin này đã bị tháo gỡ theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ Bỏ Nội&#160;Dung[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_folder_warning">Thư mục này đã bị tháo gỡ theo quy định có trong [A]Chính Sách Xử Lý Gỡ Bỏ Nội Dung[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->

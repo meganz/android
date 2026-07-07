@@ -2621,4 +2621,8 @@
     <string name="create_group_chat_settings_title">Nuevo grupo</string>
     <string name="create_group_chat_get_chat_link_label">Obtener enlace de chat</string>
     <string name="create_group_chat_allow_add_participants_label">Permitir a los no anfitriones añadir participantes</string>
+    <string name="subscription_revamp_why_go_pro_storage">Almacena hasta %1$s de datos</string>
+    <string name="subscription_revamp_current_plan_renews">Se renueva el %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Caduca el %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Mensualmente</string>
 </resources>

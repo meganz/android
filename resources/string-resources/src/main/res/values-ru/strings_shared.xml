@@ -2742,4 +2742,7 @@
     <string name="create_group_chat_ekr_label">Чередование ключей шифрования</string>
     <string name="create_group_chat_get_chat_link_label">Ссылка на чат</string>
     <string name="create_group_chat_allow_add_participants_label">Разрешить не организаторам добавлять участников</string>
+    <string name="subscription_revamp_current_plan_renews">Продлевается %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Истекает %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Ежемесячно</string>
 </resources>

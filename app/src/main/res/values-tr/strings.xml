@@ -4678,7 +4678,7 @@
     <!-- Free plan limitation dialog title for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_title">Katılınamıyor</string>
     <!-- Free plan limitation dialogue description for scheduled meeting calls with more than 100 participants -->
-    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Bu arama yalnızca 100 katılımcıyı destekleyebilir. Yöneticiden bu kısıtlamayı kaldırmasını isteyin.</string>
+    <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_description">Bu arama yalnızca 100 katılımcıyı destekleyebilir. Düzenleyiciden bu kısıtlamayı kaldırmasını isteyin.</string>
     <!-- Free plan limitation dialogue button for scheduled meeting calls with more than 100 participants -->
     <string name="meetings_schedule_meeting_free_plan_100_participants_limit_dialog_button">Tamam</string>
     <!-- The snackbar message of hidden nodes operation -->
