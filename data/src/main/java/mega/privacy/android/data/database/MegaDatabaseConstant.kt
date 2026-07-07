@@ -8,7 +8,7 @@ object MegaDatabaseConstant {
     /**
      * Database Version
      */
-    const val DATABASE_VERSION = 122
+    const val DATABASE_VERSION = 123
 
     /**
      * Database Name
@@ -147,4 +147,9 @@ object MegaDatabaseConstant {
      * Table for recently viewed link
      */
     const val TABLE_RECENTLY_VIEWED_LINK = "recently_viewed_link"
+
+    /**
+     * Table for per-folder UI preferences (sort order and view mode)
+     */
+    const val TABLE_FOLDER_PREFERENCE = "folder_preference"
 }

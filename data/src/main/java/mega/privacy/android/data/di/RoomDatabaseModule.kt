@@ -23,6 +23,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.FolderPreferenceDao
 import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
@@ -266,6 +267,11 @@ internal object RoomDatabaseModule {
     @Singleton
     internal fun provideTextEditorScrollDao(database: MegaDatabase): TextEditorScrollDao =
         database.textEditorScrollDao()
+
+    @Provides
+    @Singleton
+    internal fun provideFolderPreferenceDao(database: MegaDatabase): FolderPreferenceDao =
+        database.folderPreferenceDao()
 
     @Provides
     @Singleton

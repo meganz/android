@@ -14,6 +14,7 @@ import mega.privacy.android.data.database.dao.CameraUploadsRecordDao
 import mega.privacy.android.data.database.dao.ChatPendingChangesDao
 import mega.privacy.android.data.database.dao.CompletedTransferDao
 import mega.privacy.android.data.database.dao.ContactDao
+import mega.privacy.android.data.database.dao.FolderPreferenceDao
 import mega.privacy.android.data.database.dao.HomePinnedItemDao
 import mega.privacy.android.data.database.dao.HomeWidgetConfigurationDao
 import mega.privacy.android.data.database.dao.LastPageViewedInPdfDao
@@ -36,6 +37,7 @@ import mega.privacy.android.data.database.entity.ChatPendingChangesEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntity
 import mega.privacy.android.data.database.entity.CompletedTransferEntityLegacy
 import mega.privacy.android.data.database.entity.ContactEntity
+import mega.privacy.android.data.database.entity.FolderPreferenceEntity
 import mega.privacy.android.data.database.entity.HomePinnedItemEntity
 import mega.privacy.android.data.database.entity.HomeWidgetConfigurationEntity
 import mega.privacy.android.data.database.entity.LastPageViewedInPdfEntity
@@ -84,6 +86,7 @@ import timber.log.Timber
         RecentlyUsedEntity::class,
         RecentlyViewedLinkEntity::class,
         TextEditorScrollEntity::class,
+        FolderPreferenceEntity::class,
     ],
     version = MegaDatabaseConstant.DATABASE_VERSION,
     exportSchema = true,
@@ -129,6 +132,7 @@ import timber.log.Timber
         AutoMigration(117, 118, spec = AutoMigrationDeleteActiveTransfersSpec::class),
         AutoMigration(118, 119, spec = AutoMigrationSpec118to119::class),
         AutoMigration(121, 122),
+        AutoMigration(122, 123),
     ],
 )
 internal abstract class MegaDatabase : RoomDatabase() {
@@ -174,6 +178,8 @@ internal abstract class MegaDatabase : RoomDatabase() {
     abstract fun recentlyViewedLinkDao(): RecentlyViewedLinkDao
 
     abstract fun textEditorScrollDao(): TextEditorScrollDao
+
+    abstract fun folderPreferenceDao(): FolderPreferenceDao
 
     companion object {
 
