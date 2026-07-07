@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.navigation.destination.CopyResult
@@ -66,6 +67,20 @@ fun HandleNodeOptionsActionResult(
             val handles = result.nodes.map { it.id.longValue }
             nodeOptionsActionViewModel.triggerShareFolderFromDialogResult(handles)
             navigationHandler.clearResult(ShareFolderDialogNavKey.RESULT)
+        }
+    }
+
+    // Monitor the add-contacts picker result for the folder share flow. The picker
+    // returns the selected emails; the target handles were retained when the share
+    // was triggered.
+    val shareFolderContactsResult by navigationHandler
+        .monitorResult<List<String>?>(AddContactToShareNavKey.KEY)
+        .collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(shareFolderContactsResult) {
+        shareFolderContactsResult?.let { emails ->
+            nodeOptionsActionViewModel.contactSelectedForShareFolder(emails)
+            navigationHandler.clearResult(AddContactToShareNavKey.KEY)
         }
     }
 
@@ -120,7 +135,6 @@ fun HandleNodeOptionsActionResult(
         onCopyPublicLinkFiles = nodeOptionsActionViewModel::copyPublicLinkFile,
         onTransfer = onTransfer,
         onNavigate = navigationHandler::navigate,
-        onShareContactSelected = nodeOptionsActionViewModel::contactSelectedForShareFolder,
         onShareHiddenNodeWarningConfirmed = nodeOptionsActionViewModel::onShareHiddenNodeWarningConfirmed,
         consumeNameCollisionResult = nodeOptionsActionViewModel::markHandleNodeNameCollisionResult,
         consumePublicCopyCollisionResult = nodeOptionsActionViewModel::markHandlePublicCopyCollisionResult,

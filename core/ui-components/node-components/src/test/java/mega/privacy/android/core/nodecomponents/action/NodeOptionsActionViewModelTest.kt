@@ -846,6 +846,27 @@ class NodeOptionsActionViewModelTest {
         }
 
     @Test
+    fun `test that contactSelectedForShareFolder pairs selected emails with the retained share handles`() =
+        runTest {
+            val mockFolderNode = mock<TypedFolderNode>().stub {
+                on { id } doReturn NodeId(456L)
+            }
+            whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
+            whenever(checkBackupNodeTypeUseCase(mockFolderNode))
+                .thenReturn(BackupNodeType.NonBackupNode)
+            initViewModel()
+
+            viewModel.verifyShareFolderAction(mockFolderNode)
+            viewModel.contactSelectedForShareFolder(listOf("sample@mega.co.nz"))
+
+            verify(nodeHandlesToJsonMapper).invoke(listOf(456L))
+            viewModel.uiState.test {
+                assertThat(awaitItem().contactsData)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+            }
+        }
+
+    @Test
     fun `test that chatRequestMessageMapper is called when chatIds is selected`() =
         runTest {
             initViewModel()

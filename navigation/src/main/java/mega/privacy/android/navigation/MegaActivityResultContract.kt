@@ -42,14 +42,6 @@ interface MegaActivityResultContract {
     val selectFolderToCopyActivityResultContract: ActivityResultContract<LongArray, Pair<LongArray, Long>?>
 
     /**
-     * Contract for sharing folders with contacts.
-     *
-     * @return [ActivityResultContract] with input type [LongArray] (folder handles to share)
-     *         and output type [Pair<List<String>, List<Long>>?] (contact IDs and shared folder handles)
-     */
-    val shareFolderActivityResultContract: ActivityResultContract<LongArray, Pair<List<String>, List<Long>>?>
-
-    /**
      * Contract for sending files/folders to chat conversations.
      *
      * @return [ActivityResultContract] with input type [LongArray] (node handles to send)

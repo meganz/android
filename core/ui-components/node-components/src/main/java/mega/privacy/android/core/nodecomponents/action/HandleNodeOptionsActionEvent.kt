@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionRes
 import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
@@ -63,7 +64,6 @@ internal fun HandleNodeOptionsActionEvent(
     onTransfer: (TransferTriggerEvent) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onRestoreSuccess: (RestoreData) -> Unit,
-    onShareContactSelected: (List<String>, List<Long>) -> Unit,
     onShareHiddenNodeWarningConfirmed: (List<Long>) -> Unit,
     consumeNameCollisionResult: () -> Unit,
     consumePublicCopyCollisionResult: () -> Unit,
@@ -96,13 +96,6 @@ internal fun HandleNodeOptionsActionEvent(
             coroutineScope.launch {
                 snackbarQueue.queueMessage(message)
             }
-        }
-    }
-    val shareFolderLauncher = rememberLauncherForActivityResult(
-        contract = megaResultContract.shareFolderActivityResultContract
-    ) { result ->
-        result?.let { (contactIds, nodeHandles) ->
-            onShareContactSelected(contactIds, nodeHandles)
         }
     }
     val nodeHandlesToJsonMapper = remember { NodeHandlesToJsonMapper() }
@@ -241,7 +234,12 @@ internal fun HandleNodeOptionsActionEvent(
         onConsumed = consumeShareFolderEvent,
         action = { handles ->
             onActionTriggered()
-            shareFolderLauncher.launch(handles.toLongArray())
+            onNavigate(
+                AddContactToShareNavKey(
+                    contactType = AddContactToShareNavKey.ContactType.All,
+                    nodeHandle = handles.toList(),
+                )
+            )
         }
     )
 
