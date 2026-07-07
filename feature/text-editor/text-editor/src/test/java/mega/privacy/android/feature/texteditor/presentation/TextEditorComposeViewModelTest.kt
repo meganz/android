@@ -2168,7 +2168,7 @@ internal class TextEditorComposeViewModelTest {
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
             advanceUntilIdle()
 
-            // Line-only chunking (CHUNK_SIZE=1000) would put all 10 lines in 1 chunk.
+            // Line-only chunking would put all 10 lines in 1 chunk.
             // Char-count cap should split into at least 2 chunks.
             assertThat(underTest.getChunkCount()).isGreaterThan(1)
         }

@@ -68,10 +68,6 @@ import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueu
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
-/** Number of lines per chunk in both view and edit modes.
- *  Sized for a good balance between selection range and memory/layout cost. */
-internal const val CHUNK_SIZE = 1000
-
 /** Maximum characters per chunk. Prevents ANRs caused by native text measurement
  *  (`MeasuredText.nBuildMeasuredText`) blocking the main thread when a chunk contains
  *  very long lines (e.g. minified JSON, base64 blobs). */
@@ -94,7 +90,7 @@ private const val CHUNK_SIZE_LINES = 500
  * ViewModel for the Compose text editor screen.
  *
  * The full document is stored as [fullContentLines] during loading and view mode.
- * In edit mode, the document is split into [chunkTexts] (one entry per [CHUNK_SIZE] lines).
+ * In edit mode, the document is split into [chunkTexts] (each capped at [CHUNK_MAX_CHARS] chars).
  * Each visible chunk gets its own [TextFieldState] held in [chunkStates];
  * only the focused one has the cursor. When a chunk scrolls off-screen its edits
  * are flushed back to [chunkTexts] via [disposeChunkState].
@@ -197,10 +193,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      */
     private var lastReadThroughFraction: Float = 0f
 
-    /** Whether long-line chunking (AND-23707) is enabled. Resolved once during init. */
-    @Volatile
-    private var longLineChunkingEnabled: Boolean = true
-
     /** Active content-load job; cancelled if connectivity drops while loading. */
     private var loadJob: Job? = null
 
@@ -225,9 +217,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     }
                     return@launch
                 }
-                longLineChunkingEnabled = runCatching {
-                    getFeatureFlagValueUseCase(ApiFeatures.TextEditorLongLineChunking)
-                }.getOrDefault(true)
                 val markdownRenderingEnabled = runCatching {
                     getFeatureFlagValueUseCase(ApiFeatures.TextEditorMarkdownRendering)
                 }.getOrDefault(false)
@@ -349,7 +338,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     }
                     .collect { chunk ->
                         fullContentLines.addAll(chunk)
-                        if (args.mode != TextEditorMode.Edit && longLineChunkingEnabled) {
+                        if (args.mode != TextEditorMode.Edit) {
                             buildChunkBoundaries()
                         }
                         // In Edit mode keep isLoading=true until buildChunksFromLines() is
@@ -428,21 +417,13 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     fun getChunkCount(): Int {
         return if (isEditMode()) {
             chunkTexts.size.coerceAtLeast(1)
-        } else if (longLineChunkingEnabled) {
-            chunkBoundaries.size.coerceAtLeast(if (fullContentLines.isEmpty()) 0 else 1)
         } else {
-            ceilDiv(fullContentLines.size, CHUNK_SIZE)
+            chunkBoundaries.size.coerceAtLeast(if (fullContentLines.isEmpty()) 0 else 1)
         }
     }
 
     /** Returns the text for a read-only chunk (View mode). */
     fun getChunkText(chunkIndex: Int): String {
-        if (!longLineChunkingEnabled) {
-            val start = chunkIndex * CHUNK_SIZE
-            val end = (start + CHUNK_SIZE).coerceAtMost(fullContentLines.size)
-            if (start >= fullContentLines.size) return ""
-            return fullContentLines.subList(start, end).joinToString("\n")
-        }
         if (chunkIndex >= chunkBoundaries.size) return ""
         val start = chunkBoundaries[chunkIndex]
         val endBoundary = if (chunkIndex + 1 < chunkBoundaries.size) {
@@ -546,22 +527,18 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     /** Rebuilds [fullContentLines] from [chunkTexts].
-     *  When chunking is enabled, chunks that start mid-line ([ChunkBoundary.charOffset] > 0)
-     *  are concatenated with the previous chunk's last line before splitting by newlines. */
+     *  Chunks that start mid-line ([ChunkBoundary.charOffset] > 0) are concatenated with the
+     *  previous chunk's last line before splitting by newlines. */
     private fun rebuildLinesFromChunks() {
         fullContentLines.clear()
 
-        if (longLineChunkingEnabled) {
-            for (i in chunkTexts.indices) {
-                val isMidLine = i < chunkBoundaries.size && chunkBoundaries[i].charOffset > 0
-                if (isMidLine && fullContentLines.isNotEmpty()) {
-                    fullContentLines[fullContentLines.lastIndex] += chunkTexts[i]
-                } else {
-                    fullContentLines.addAll(chunkTexts[i].split("\n"))
-                }
+        for (i in chunkTexts.indices) {
+            val isMidLine = i < chunkBoundaries.size && chunkBoundaries[i].charOffset > 0
+            if (isMidLine && fullContentLines.isNotEmpty()) {
+                fullContentLines[fullContentLines.lastIndex] += chunkTexts[i]
+            } else {
+                fullContentLines.addAll(chunkTexts[i].split("\n"))
             }
-        } else {
-            chunkTexts.forEach { fullContentLines.addAll(it.split("\n")) }
         }
     }
 
@@ -1029,39 +1006,24 @@ class TextEditorComposeViewModel @AssistedInject constructor(
 
     private fun buildChunksFromLines() {
         chunkTexts.clear()
-        if (longLineChunkingEnabled) {
-            buildChunkBoundaries()
-            for (i in chunkBoundaries.indices) {
-                val start = chunkBoundaries[i]
-                val end = if (i + 1 < chunkBoundaries.size) {
-                    chunkBoundaries[i + 1]
-                } else {
-                    ChunkBoundary(fullContentLines.size)
-                }
-                chunkTexts.add(extractChunkText(start, end))
+        buildChunkBoundaries()
+        for (i in chunkBoundaries.indices) {
+            val start = chunkBoundaries[i]
+            val end = if (i + 1 < chunkBoundaries.size) {
+                chunkBoundaries[i + 1]
+            } else {
+                ChunkBoundary(fullContentLines.size)
             }
-        } else {
-            for (i in fullContentLines.indices step CHUNK_SIZE) {
-                val end = (i + CHUNK_SIZE).coerceAtMost(fullContentLines.size)
-                chunkTexts.add(fullContentLines.subList(i, end).joinToString("\n"))
-            }
+            chunkTexts.add(extractChunkText(start, end))
         }
         if (chunkTexts.isEmpty()) chunkTexts.add("")
     }
 
     /**
-     * Builds [chunkBoundaries] from [fullContentLines].
-     * When [longLineChunkingEnabled], caps each chunk at [CHUNK_MAX_CHARS] characters,
-     * splitting long lines mid-character when needed.
-     * When disabled, uses the original fixed [CHUNK_SIZE] line-count grouping.
+     * Builds [chunkBoundaries] from [fullContentLines], capping each chunk at [CHUNK_MAX_CHARS]
+     * characters, splitting long lines mid-character when needed.
      */
     private fun buildChunkBoundaries() {
-        if (!longLineChunkingEnabled) {
-            chunkBoundaries = (0 until ceilDiv(fullContentLines.size, CHUNK_SIZE))
-                .map { ChunkBoundary(it * CHUNK_SIZE) }
-
-            return
-        }
         val boundaries = mutableListOf<ChunkBoundary>()
         var lineIdx = 0
         var charOff = 0
@@ -1090,8 +1052,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         chunkBoundaries = boundaries
     }
 
-    private fun ceilDiv(a: Int, b: Int): Int = (a + b - 1) / b
-
     private fun clearEditState() {
         chunkStates.clear()
         chunkOriginals.clear()
@@ -1101,7 +1061,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     }
 
     private fun rebuildStartLineCache() {
-        if (!isEditMode() && longLineChunkingEnabled) {
+        if (!isEditMode()) {
             buildChunkBoundaries()
         }
         val count = getChunkCount()
@@ -1114,13 +1074,9 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     ?: chunkTexts.getOrElse(i) { "" }
                 line += text.count { it == '\n' } + 1
             }
-        } else if (longLineChunkingEnabled) {
-            for (i in 0 until count) {
-                cachedStartLines[i] = chunkBoundaries[i].lineIndex + 1
-            }
         } else {
             for (i in 0 until count) {
-                cachedStartLines[i] = i * CHUNK_SIZE + 1
+                cachedStartLines[i] = chunkBoundaries[i].lineIndex + 1
             }
         }
     }

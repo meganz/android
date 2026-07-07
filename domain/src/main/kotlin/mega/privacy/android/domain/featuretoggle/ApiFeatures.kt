@@ -141,17 +141,6 @@ enum class ApiFeatures(
     ),
 
     /**
-     * Text editor Compose migration (AND-22552).
-     * When enabled, opens the text editor in the Compose screen (Nav3 + Material 3) instead of the legacy Activity.
-     */
-    TextEditorCompose(
-        experimentName = "andte",
-        description = "Convert the text editor to Compose (Nav3 + Material 3)",
-        singleCheckPerRun = true,
-        defaultValue = false
-    ),
-
-    /**
      * PDF Viewer Compose UI.
      * When enabled, PDF files are displayed using the new Compose-based
      * PdfViewerScreen. When disabled, the legacy PdfViewerActivity is used.
@@ -280,18 +269,6 @@ enum class ApiFeatures(
         experimentName = "dmwm",
         description = "Promotes MEGA’s core features and encourages adoption through progressive onboarding",
         defaultValue = false
-    ),
-
-    /**
-     * Text editor long-line chunking fix (AND-23707).
-     * When enabled, splits very long lines into smaller segments to prevent ANRs
-     * caused by native text measurement blocking the main thread.
-     */
-    TextEditorLongLineChunking(
-        experimentName = "tellc",
-        description = "Split long lines in text editor to prevent ANRs",
-        singleCheckPerRun = true,
-        defaultValue = true,
     ),
 
     /**
