@@ -1671,6 +1671,31 @@ class VideoPlayerViewModelV2Test {
         }
 
     @Test
+    fun `test that onPlayerError triggers blockedError when onMediaItemTransition resets playerRetry and video is taken down`() =
+        runTest {
+            initViewModel()
+            // First video fails — playerRetry becomes 1. checkNodeAccessibilityUseCase is called
+            // but completes normally (no throw), so execution continues to the retry path.
+            whenever(checkNodeAccessibilityUseCase(any())).thenAnswer { }
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            advanceUntilIdle()
+            // Transition to next video (taken down) — must reset playerRetry to 0.
+            underTest.onMediaItemTransition(testHandle.toString(), false)
+            // Make the use case throw BlockedMegaException for the new video.
+            whenever(checkNodeAccessibilityUseCase(any())).thenAnswer {
+                throw BlockedMegaException(0, "blocked")
+            }
+            // Second video fails — playerRetry becomes 1 again, so checkNodeAccessibilityUseCase
+            // is invoked and blockedError must be triggered.
+            underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            advanceUntilIdle()
+            underTest.uiState.test {
+                assertThat(awaitItem().blockedError).isEqualTo(triggered)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that onPlayerError triggers retryFailedEvent immediately when error type is FILE_NOT_SUPPORTED`() =
         runTest {
             whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.FILE_NOT_SUPPORTED)

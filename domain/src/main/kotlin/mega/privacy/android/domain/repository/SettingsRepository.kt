@@ -9,9 +9,11 @@ import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.home.PinnedHomeItem
+import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
 import mega.privacy.android.domain.entity.meeting.UsersCallLimitReminders
 import mega.privacy.android.domain.entity.meeting.WaitingRoomReminders
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import java.io.File
@@ -639,6 +641,19 @@ interface SettingsRepository {
      * Remove all pinned home items.
      */
     suspend fun clearPinnedHomeItems()
+
+    /**
+     * Monitor the persisted sort preference for the pinned home items View-all list.
+     */
+    fun monitorPinnedItemsSortPreference(): Flow<Pair<PinnedHomeItemsSortField, SortDirection>>
+
+    /**
+     * Persist the sort preference for the pinned home items View-all list.
+     */
+    suspend fun setPinnedItemsSortPreference(
+        sortField: PinnedHomeItemsSortField,
+        sortDirection: SortDirection,
+    )
 
     /**
      * Get the last version feature shown to the user

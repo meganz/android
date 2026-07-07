@@ -2271,7 +2271,7 @@
     <string name="select_videos_search_empty_view_description">Pesquisar vídeos na sua Nuvem de arquivos</string>
     <string name="link_decryption_key_dialog_title">Digite a chave de decodificação</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Chave de decodificação inválida</string>
-    <string name="new_text_file_invalid_extension_error_message">Use uma extensão de arquivo válida (por exemplo, .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Use uma extensão de arquivo válida (por exemplo, .txt, .md, ou .xml)</string>
     <string name="link_decryption_key_dialog_message">Digite a chave para acessar este link.\nNão tem a chave? Entre em contato com o proprietário do link.</string>
     <string name="upload_bottom_sheet_action_upload_files">Fazer upload de arquivos</string>
     <string name="upload_bottom_sheet_action_upload_folder">Fazer upload de pasta</string>
@@ -2639,4 +2639,34 @@
     <string name="park_account_screen_start_button">Criar uma nova conta</string>
     <string name="park_account_success_message">A sua conta antiga foi estacionada. Agora você pode fazer login na sua nova conta.</string>
     <string name="add_participants_title">Adicionar participantes</string>
+    <string name="meetings_add_participants_user_limit_warning">Esta chamada está limitada a 100 participantes. Os demais participantes somente poderão enviar mensagens de texto. O organizador da reunião pode fazer o upgrade a um plano Pro para remover essa limitação.</string>
+    <string name="email_confirmation_resend_button_countdown">Reenviar email em %1$s</string>
+    <string name="document_scanner_prepare_title">Configurando o scanner de documentos</string>
+    <string name="document_scanner_prepare_message">Isso só será feito uma vez. Você pode continuar usando o seu dispositivo enquanto estiver fazendo o download.</string>
+    <string name="document_scanner_prepare_error_title">Não foi possível configurar o scanner de documentos</string>
+    <string name="document_scanner_prepare_error_transient_message">Verifique a sua conexão e tente novamente.</string>
+    <string name="document_scanner_prepare_error_permanent_message">Você pode usar o scanner antigo.</string>
+    <string name="document_scanner_prepare_retry_button">Tentar novamente</string>
+    <string name="share_link_access_banner_title">Acesso ao link</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Qualquer pessoa com este link pode ver e fazer o download dos dados</item>
+        <item quantity="many">Qualquer pessoa com estes links pode ver e fazer o download dos dados</item>
+        <item quantity="other">Qualquer pessoa com estes links pode ver e fazer o download dos dados</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link criado e copiado para a área de transferência</item>
+        <item quantity="many">Links criados e copiados para a área de transferência</item>
+        <item quantity="other">Links criados e copiados para a área de transferência</item>
+    </plurals>
+    <string name="document_scanner_prepare_waiting_for_connection">Aguardando conexão. O download vai continuar automaticamente assim que você estiver online.</string>
+    <string name="document_scanner_prepare_reconnecting">Reconectando&#8230;</string>
+    <string name="add_contacts_phone_contacts_section_title">Contatos do telefone</string>
+    <string name="add_contacts_phone_contacts_allow_access">Permitir o acesso aos contatos</string>
+    <string name="add_contacts_phone_contacts_select">Selecionar contatos do telefone</string>
+    <string name="add_contacts_mega_contacts_section_title">Contatos no MEGA</string>
+    <string name="create_group_chat_settings_title">Novo grupo</string>
+    <string name="create_group_chat_name_hint">Digite o nome do grupo</string>
+    <string name="create_group_chat_ekr_label">Rotação da chave de criptografia</string>
+    <string name="create_group_chat_get_chat_link_label">Obter o link do chat</string>
+    <string name="create_group_chat_allow_add_participants_label">Permitir adicionar participantes a usuários que não forem anfitriões</string>
 </resources>

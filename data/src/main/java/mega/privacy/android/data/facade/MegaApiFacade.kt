@@ -1377,6 +1377,15 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getBandwidthOverQuotaDelay() = megaApi.bandwidthOverquotaDelay
 
+    override suspend fun getNumNodes(): Long = megaApi.numNodes.toLong()
+
+    override suspend fun getOverquotaDeadlineTs(): Long = megaApi.overquotaDeadlineTs
+
+    override suspend fun getOverquotaWarningsTs(): List<Long> =
+        megaApi.overquotaWarningsTs?.let { list ->
+            (0 until list.size()).map { list.get(it) }
+        }.orEmpty()
+
     override fun disableExport(node: MegaNode, listener: MegaRequestListenerInterface) =
         megaApi.disableExport(node, listener)
 

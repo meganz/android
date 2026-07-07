@@ -12,7 +12,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.dialogs.BasicInputDialog
 import mega.privacy.android.domain.exception.DotNameException
@@ -87,7 +86,6 @@ fun NewTextFileNodeDialog(
                 keyboardType = KeyboardType.Text,
                 capitalization = KeyboardCapitalization.Sentences,
                 onDismiss = onDismiss,
-                inputTextAlign = TextAlign.End
             )
         }
 

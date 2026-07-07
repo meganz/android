@@ -30,6 +30,25 @@ internal class ExplorerNodeClickTest {
     }
 
     @Test
+    fun `test that clicking a folder navigates but keeps the selection when folder selection is allowed`() {
+        var clickedFolder: NodeId? = null
+        val selectionState = NodeSelectionState(initialSelectedIds = setOf(NodeId(99L)))
+        val click = explorerNodeClick(
+            selectionState = selectionState,
+            disabledNodeIds = emptySet(),
+            videosOnly = false,
+            isSelectionModeEnabled = true,
+            onFolderClick = { clickedFolder = it },
+            allowsFolderSelection = true,
+        )
+
+        click(previewFolderNodeUiItem(FOLDER_ID.longValue))
+
+        assertThat(clickedFolder).isEqualTo(FOLDER_ID)
+        assertThat(selectionState.selectedNodeIds).containsExactly(NodeId(99L))
+    }
+
+    @Test
     fun `test that clicking a disabled node does nothing`() {
         var clickedFolder: NodeId? = null
         val selectionState = NodeSelectionState()

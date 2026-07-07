@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,13 +19,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
@@ -49,7 +53,9 @@ import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEna
 import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorMediaNodeContentChangesUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.photos.SignalMediaCountChangesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
@@ -83,8 +89,11 @@ import kotlin.time.Duration.Companion.milliseconds
  * Sections come from [GetMediaTimelineSectionsUseCase] and lay out the grid (a header plus
  * `count` slots each). Each section is paginated **independently** through
  * [ListMediaNodesByOffsetUseCase] (its query is scoped to the section's date range), so a deep section
- * loads directly without paging through the ones before it. Loaded items are cached by global index
- * with a bounded LRU and only the currently visible window is fetched.
+ * loads directly without paging through the ones before it. Loaded items are cached by section identity
+ * (group id + section-local index) with a bounded LRU, and only the currently visible window is fetched.
+ *
+ * Media added or removed mid-session triggers a silent refresh (see [monitorTimelineSections]):
+ * sections are re-fetched without a loading state and the cache is reconciled section by section.
  */
 @HiltViewModel
 class TimelineRevampViewModel @Inject constructor(
@@ -98,12 +107,17 @@ class TimelineRevampViewModel @Inject constructor(
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val getNodeListByIdsUseCase: GetNodeListByIdsUseCase,
+    private val signalMediaCountChangesUseCase: SignalMediaCountChangesUseCase,
+    private val monitorMediaNodeContentChangesUseCase: MonitorMediaNodeContentChangesUseCase,
 ) : ViewModel() {
 
-    private val sections = MutableStateFlow<List<MediaTimelineSection>>(emptyList())
+    private val sectionsState = MutableStateFlow<SectionsState>(SectionsState.Loading)
     private val loadedNodes = MutableStateFlow<Map<Int, PhotosNodeContentItemV2>>(emptyMap())
     private val targetRange = MutableStateFlow(IntRange.EMPTY)
+    private val isScrollingFlow = MutableStateFlow(false)
     private val mediaLoaderStarted = AtomicBoolean(false)
+    private val sectionsMonitorStarted = AtomicBoolean(false)
+    private val contentMonitorStarted = AtomicBoolean(false)
 
     /**
      * Backs [TimelineRevampUiState.Data.takenDownDialogEvent]; folded into [uiState] so the screen
@@ -163,7 +177,12 @@ class TimelineRevampViewModel @Inject constructor(
                 preferenceMap = newFilter ?: preferenceMap,
                 shouldApplyFilterFromPreference = newFilter != null,
             )
-        }.asUiStateFlow(viewModelScope, TimelineFilterUiState())
+        }
+            .catch { e ->
+                Timber.e(e, "Failed to map timeline filter ui state")
+                emit(TimelineFilterUiState())
+            }
+            .asUiStateFlow(viewModelScope, TimelineFilterUiState())
     }
 
     /**
@@ -196,7 +215,12 @@ class TimelineRevampViewModel @Inject constructor(
             }
             timelineFilterUiStateMapper(filter, getCameraUploadFolderHandles())
                 .copy(sensitivity = sensitivity)
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
+        }
+            .catch { e ->
+                Timber.e(e, "Failed to derive current filter")
+                emit(DEFAULT_FILTER)
+            }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, DEFAULT_FILTER)
     }
 
     /**
@@ -215,28 +239,40 @@ class TimelineRevampViewModel @Inject constructor(
     private var cachedSections: List<MediaTimelineSection>? = null
 
     /**
-     * Prefix index over [cachedSections], rebuilt only when the sections change:
-     * [sectionStartOffsets]`[i]` is the global slot index where section `i` begins, and
-     * [totalSlots] is the grand total. Lets the media loader locate visible sections without re-summing
-     * every section's count on each scroll. Only touched by the single media-loader coroutine.
+     * Global start slot of each section, keyed by [MediaTimelineSection.groupId] ([totalSlots] is the
+     * total). Lets [getAndUpdateLoadedNodes] map a cache entry to its global index. Rebuilt on section change.
      */
-    private var sectionStartOffsets: List<Int> = emptyList()
+    private var sectionStartByGroupId: Map<String, Int> = emptyMap()
 
     private var totalSlots = 0
 
     /**
-     * Cache loaded items, keyed by global index. Drops the oldest entries once
-     * [MAX_CACHED_ITEMS] is exceeded. Only mutated by the single media-loader coroutine.
+     * Loaded items keyed by [SlotKey], with an LRU bound of [MAX_CACHED_ITEMS]. Only mutated by the
+     * media-loader coroutine.
      */
-    private val mediaCache = object : LinkedHashMap<Int, PhotosNodeContentItemV2>() {
+    private val mediaCache = object : LinkedHashMap<SlotKey, PhotosNodeContentItemV2>() {
         override fun removeEldestEntry(
-            eldest: MutableMap.MutableEntry<Int, PhotosNodeContentItemV2>,
+            eldest: MutableMap.MutableEntry<SlotKey, PhotosNodeContentItemV2>,
         ): Boolean = size > MAX_CACHED_ITEMS
+    }
+
+    /**
+     * Emits when a media node changes in a way that can alter the timeline sections. Debounced +
+     * conflated so a burst (e.g. a Camera Uploads run) collapses into one refresh, and shared so the
+     * grid and period cards use one monitor.
+     */
+    @OptIn(FlowPreview::class)
+    private val monitorMediaChanges: Flow<Unit> by lazy(LazyThreadSafetyMode.NONE) {
+        signalMediaCountChangesUseCase()
+            .debounce(MEDIA_CHANGE_DEBOUNCE_MS.milliseconds)
+            .conflate()
+            .catch { Timber.e(it, "Failed to monitor media node updates") }
+            .shareIn(viewModelScope, SharingStarted.Lazily, replay = 0)
     }
 
     val uiState: StateFlow<TimelineRevampUiState> by lazy(LazyThreadSafetyMode.NONE) {
         val gridFlow = combine(
-            monitorTimelineSections(),
+            sectionsState.onStart { monitorTimelineSections() },
             loadedNodes,
             isHiddenNodesEnabled,
             gridSizeFlow,
@@ -245,7 +281,12 @@ class TimelineRevampViewModel @Inject constructor(
             GridBundle(sectionsState, loaded, hiddenNodesEnabled, gridSize, currentSort)
         }
 
-        combine(gridFlow, selectedTimePeriodFlow, periodCards) { grid, period, cards ->
+        combine(
+            gridFlow,
+            selectedTimePeriodFlow,
+            periodCards,
+            _takenDownDialogEvent,
+        ) { grid, period, cards, takenDownDialogEvent ->
             when (val sectionsState = grid.sectionsState) {
                 SectionsState.Loading -> TimelineRevampUiState.Loading
                 is SectionsState.Loaded ->
@@ -257,18 +298,17 @@ class TimelineRevampViewModel @Inject constructor(
                         currentSort = grid.currentSort,
                         selectedPeriod = period,
                         periodCards = cards.forPeriod(period),
-                    )
+                        arePeriodCardsLoading = cards.isLoading,
+                    ).let { state ->
+                        // Inject the taken-down dialog event so the screen observes a single object.
+                        if (state is TimelineRevampUiState.Data) {
+                            state.copy(takenDownDialogEvent = takenDownDialogEvent)
+                        } else {
+                            state
+                        }
+                    }
             }
         }
-            // Inject the taken-down dialog event into the loaded state so the screen observes a
-            // single uiState object; kept out of the main combine (already at its 5-arg limit).
-            .combine(_takenDownDialogEvent) { state, takenDownDialogEvent ->
-                if (state is TimelineRevampUiState.Data) {
-                    state.copy(takenDownDialogEvent = takenDownDialogEvent)
-                } else {
-                    state
-                }
-            }
             .catch { e -> Timber.e(e, "Failed to load media timeline sections") }
             .asUiStateFlow(
                 viewModelScope,
@@ -279,15 +319,18 @@ class TimelineRevampViewModel @Inject constructor(
     /**
      * The Year and Month summary cards (with their thumbnails). Built lazily the first time a card
      * period is selected for the current [currentFilter], then reused while that filter/sort holds —
-     * toggling between periods does not rebuild them. Rebuilt only when the filter or sort changes,
-     * mirroring the grid's one-shot load in [monitorTimelineSections]: neither reflects media added
-     * mid-session until the filter or sort changes (or the screen reloads).
+     * toggling between periods does not rebuild them. Rebuilt when the filter or sort changes, and
+     * (like the grid) when media is added or removed, via [monitorMediaChanges].
      *
      * The Year and Month queries are independent, so they run concurrently.
      */
     @OptIn(ExperimentalCoroutinesApi::class)
     private val periodCards: StateFlow<PeriodCards> by lazy(LazyThreadSafetyMode.NONE) {
-        combine(currentFilter, sortOptionsFlow) { filter, sort -> filter to sort }
+        combine(
+            currentFilter,
+            sortOptionsFlow,
+            monitorMediaChanges.onStart { emit(Unit) },
+        ) { filter, sort, _ -> filter to sort }
             .flatMapLatest { (filter, sort) ->
                 selectedTimePeriodFlow
                     .map { it.isCardPeriod() }
@@ -316,9 +359,13 @@ class TimelineRevampViewModel @Inject constructor(
                             )
                         }
                     }
-                    .onStart { emit(PeriodCards.Empty) }
+                    .onStart { emit(PeriodCards.Loading) }
             }
-            .asUiStateFlow(viewModelScope, PeriodCards.Empty)
+            .catch { e ->
+                Timber.e(e, "Failed to build period cards")
+                emit(PeriodCards.Empty)
+            }
+            .asUiStateFlow(viewModelScope, PeriodCards.Loading)
     }
 
     /**
@@ -395,29 +442,6 @@ class TimelineRevampViewModel @Inject constructor(
     private fun MediaTimePeriod.isCardPeriod(): Boolean =
         this == MediaTimePeriod.Years || this == MediaTimePeriod.Months
 
-    private data class GridBundle(
-        val sectionsState: SectionsState,
-        val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
-        val isHiddenNodesEnabled: Boolean,
-        val gridSize: TimelineGridSize,
-        val currentSort: TimelineTabSortOptions,
-    )
-
-    private data class PeriodCards(
-        val yearCards: List<PhotosNodeListCard>,
-        val monthCards: List<PhotosNodeListCard>,
-    ) {
-        fun forPeriod(period: MediaTimePeriod): List<PhotosNodeListCard> = when (period) {
-            MediaTimePeriod.Years -> yearCards
-            MediaTimePeriod.Months -> monthCards
-            else -> emptyList()
-        }
-
-        companion object {
-            val Empty = PeriodCards(emptyList(), emptyList())
-        }
-    }
-
     /**
      * Toolbar action state for the shared top bar (same type as the tab). [TimelineTabActionUiState.isReady]
      * follows the loading state reactively (ready once sections finish loading), while
@@ -436,30 +460,74 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * For each [currentFilter] or [sortOptionsFlow] change, resets the timeline to loading and
-     * re-fetches its sections: emits [SectionsState.Loading] while clearing the previous sections and
-     * loaded media (the media-loader coroutine clears its own cache when it sees [sections] cleared),
-     * then emits [SectionsState.Loaded] with the freshly-fetched sections (or empty if the fetch fails).
-     * The sort order also flips the section orientation (newest-first vs oldest-first).
+     * Starts the single coroutine driving [sectionsState] (once, on first [uiState] subscription).
+     *
+     * A filter or sort change resets to [SectionsState.Loading] and clears the loaded media before
+     * publishing the new sections. A [monitorMediaChanges] emission instead refreshes silently — no loading
+     * state, held until the grid stops scrolling ([awaitScrollIdle]) so the layout never reflows mid-scroll.
      */
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private fun monitorTimelineSections(): Flow<SectionsState> =
-        combine(currentFilter, sortOptionsFlow) { filter, sort -> filter to sort }
-            .flatMapLatest { (filter, sort) ->
-                flow {
-                    emit(SectionsState.Loading)
-                    sections.update { emptyList() }
-                    loadedNodes.update { emptyMap() }
-
-                    val loadedSections = getTimelineSections(filter, sort.sortOrder)
-                    sections.update { loadedSections }
-                    emit(SectionsState.Loaded(loadedSections))
+    private fun monitorTimelineSections() {
+        if (!sectionsMonitorStarted.compareAndSet(false, true)) return
+        viewModelScope.launch {
+            combine(currentFilter, sortOptionsFlow) { filter, sort -> filter to sort }
+                .collectLatest { (filter, sort) ->
+                    loadSections(filter, sort.sortOrder)
+                    refreshSectionsOnMediaChange(filter, sort.sortOrder)
                 }
+        }
+    }
+
+    /**
+     * Loads the sections for [filter]/[order] from scratch, showing the loading state first.
+     */
+    private suspend fun loadSections(filter: MediaTimelineFilter, order: SortOrder) {
+        sectionsState.update { SectionsState.Loading }
+        loadedNodes.update { emptyMap() }
+        val loaded = getTimelineSections(filter, order)
+        sectionsState.update { SectionsState.Loaded(loaded) }
+    }
+
+    /**
+     * On every media change, silently re-fetches the sections and applies them once the grid is idle.
+     * Never returns; cancelled by [monitorTimelineSections] when the filter/sort changes.
+     */
+    private suspend fun refreshSectionsOnMediaChange(filter: MediaTimelineFilter, order: SortOrder) {
+        monitorMediaChanges.collectLatest {
+            val refreshed = getTimelineSections(filter, order)
+            if (refreshed != sectionsState.value.sectionsOrEmpty()) {
+                Timber.d("TimelineRevamp::awaitIdle")
+                awaitScrollIdle()
+                sectionsState.update { SectionsState.Loaded(refreshed) }
+                Timber.d("TimelineRevamp::refreshed")
             }
+        }
+    }
+
+    /**
+     * The currently-loaded sections, or empty while still loading.
+     */
+    private fun SectionsState.sectionsOrEmpty(): List<MediaTimelineSection> =
+        (this as? SectionsState.Loaded)?.sections.orEmpty()
+
+    /**
+     * Suspends until the grid is not being scrolled, so a silent refresh's re-layout lands only once
+     * the user is at rest. Returns immediately when already idle.
+     */
+    private suspend fun awaitScrollIdle() {
+        isScrollingFlow.first { !it }
+    }
+
+    /**
+     * Reports the grid's scroll state from the screen, gating silent refreshes (see [awaitScrollIdle]).
+     */
+    fun onScrollingChanged(isScrolling: Boolean) {
+        isScrollingFlow.update { isScrolling }
+    }
 
     private suspend fun getTimelineSections(filter: MediaTimelineFilter, order: SortOrder) =
         runCatching { getMediaTimelineSectionsUseCase(filter, order) }
             .getOrDefault(emptyList())
+            .distinctBy { it.groupId }
 
     private fun toUiState(
         sections: List<MediaTimelineSection>,
@@ -469,6 +537,7 @@ class TimelineRevampViewModel @Inject constructor(
         currentSort: TimelineTabSortOptions,
         selectedPeriod: MediaTimePeriod,
         periodCards: List<PhotosNodeListCard>,
+        arePeriodCardsLoading: Boolean,
     ): TimelineRevampUiState =
         if (sections.isEmpty()) {
             TimelineRevampUiState.Empty
@@ -482,19 +551,9 @@ class TimelineRevampViewModel @Inject constructor(
                 currentSort = currentSort,
                 selectedPeriod = selectedPeriod,
                 periodCards = periodCards,
+                arePeriodCardsLoading = arePeriodCardsLoading,
             )
         }
-
-    /**
-     * The loading state of the timeline sections for the current filter, kept separate from the
-     * per-node [loadedNodes] so a filter change can reset to loading immediately.
-     */
-    private sealed interface SectionsState {
-        data object Loading : SectionsState
-        data class Loaded(
-            val sections: List<MediaTimelineSection>,
-        ) : SectionsState
-    }
 
     /**
      * Called by the screen when the set of visible media slots changes.
@@ -504,41 +563,99 @@ class TimelineRevampViewModel @Inject constructor(
      */
     fun onVisibleRangeChanged(firstIndex: Int, lastIndex: Int) {
         if (firstIndex !in 0..lastIndex) return
-        val loadBuffer = lastIndex - firstIndex
-        // Load what is visible plus a buffer (same count of items as visible items) of items before and after it,
-        // so scrolling either way is instant.
+        val loadBuffer = (lastIndex - firstIndex).coerceAtLeast(MIN_LOAD_BUFFER)
         targetRange.update {
             (firstIndex - loadBuffer)
                 .coerceAtLeast(0)..(lastIndex + loadBuffer)
         }
         ensureMediaLoaderStarted()
+        ensureContentMonitorStarted()
     }
 
-    @OptIn(FlowPreview::class)
     private fun ensureMediaLoaderStarted() {
         if (!mediaLoaderStarted.compareAndSet(false, true)) return
         viewModelScope.launch {
-            combine(targetRange, sections) { range, currentSections -> range to currentSections }
-                .debounce(SCROLL_SETTLE_DEBOUNCE_MS.milliseconds)
+            combine(
+                targetRange,
+                sectionsState.map { it.sectionsOrEmpty() }.distinctUntilChanged(),
+            ) { range, currentSections -> range to currentSections }
                 .collectLatest { (range, newSections) ->
-                    resetMediaCache(newSections)
+                    updateMediaCache(newSections)
+                    delay(SCROLL_SETTLE_DEBOUNCE_MS.milliseconds)
                     ensureRangeLoaded(range, newSections)
                 }
         }
     }
 
-    private fun resetMediaCache(newSections: List<MediaTimelineSection>) {
-        if (newSections != cachedSections) {
-            cachedSections = newSections
-            rebuildSectionsOffset(newSections)
-            mediaCache.clear()
-            loadedNodes.update { emptyMap() }
+    /**
+     * Starts the single coroutine (once) that patches cached items in place when a media node's
+     * render-affecting content (favourite / sensitivity) changes, so the affected thumbnails re-render
+     * without a section reload or a shimmer.
+     */
+    private fun ensureContentMonitorStarted() {
+        if (!contentMonitorStarted.compareAndSet(false, true)) return
+        viewModelScope.launch {
+            monitorMediaNodeContentChangesUseCase().collect(::replaceAndUpdateCache)
         }
     }
 
-    private fun rebuildSectionsOffset(sections: List<MediaTimelineSection>) {
-        sectionStartOffsets = sectionStartOffsetsOf(sections)
+    /**
+     * Re-fetches the changed nodes we currently hold, re-maps them, and replaces their cache entries in
+     * place (same [SlotKey]); nodes not in the cache are ignored. Runs on the same dispatcher as the
+     * media loader, so cache access stays confined to one thread.
+     */
+    private suspend fun replaceAndUpdateCache(targetNodeIds: Set<Long>) {
+        val cachedIds = mediaCache.values.mapTo(mutableSetOf()) { it.id }
+        val idsToPatch = targetNodeIds intersect cachedIds
+        if (idsToPatch.isEmpty()) return
+
+        val refreshedById = runCatching { getNodeListByIdsUseCase(idsToPatch.map { NodeId(it) }) }
+            .onFailure { Timber.e(it, "Failed to refresh changed media nodes") }
+            .getOrDefault(emptyList())
+            .filterIsInstance<TypedFileNode>()
+            .associateBy { it.id.longValue }
+        if (refreshedById.isEmpty()) return
+
+        val replacements = mediaCache.entries
+            .mapNotNull { (slot, item) ->
+                refreshedById[item.id]?.let { slot to mediaTimelineNodeUiItemMapper(it) }
+            }
+        if (replacements.isEmpty()) return
+        replacements.forEach { (slot, item) -> mediaCache[slot] = item }
+        loadedNodes.update { getAndUpdateLoadedNodes() }
+    }
+
+    private fun updateMediaCache(newSections: List<MediaTimelineSection>) {
+        if (newSections == cachedSections) return
+        val previousCounts = cachedSections
+            ?.associate { it.groupId to it.count.toInt() }
+            .orEmpty()
+        val newCounts = newSections.associate { it.groupId to it.count.toInt() }
+        mediaCache.keys.removeAll { slot ->
+            val newCount = newCounts[slot.groupId]
+            newCount == null ||
+                    newCount != previousCounts[slot.groupId] ||
+                    slot.localIndex >= newCount
+        }
+        cachedSections = newSections
+        updateSectionOffsets(newSections)
+        loadedNodes.update { getAndUpdateLoadedNodes() }
+    }
+
+    private fun updateSectionOffsets(sections: List<MediaTimelineSection>) {
+        val offsets = sectionStartOffsetsOf(sections)
+        sectionStartByGroupId = sections.indices.associate { sections[it].groupId to offsets[it] }
         totalSlots = sections.sumOf { it.count }.toInt()
+    }
+
+    private fun getAndUpdateLoadedNodes(): Map<Int, PhotosNodeContentItemV2> {
+        if (mediaCache.isEmpty()) return emptyMap()
+        val loadedNodes = HashMap<Int, PhotosNodeContentItemV2>(mediaCache.size)
+        for ((slot, item) in mediaCache) {
+            val base = sectionStartByGroupId[slot.groupId] ?: continue
+            loadedNodes[base + slot.localIndex] = item
+        }
+        return loadedNodes
     }
 
     private fun sectionStartOffsetsOf(sections: List<MediaTimelineSection>): List<Int> {
@@ -549,12 +666,8 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * Loads the media for the currently visible slots (plus the load buffer already baked into the
-     * target range by [onVisibleRangeChanged]).
-     *
-     * The grid is a single list of slots; each section owns a contiguous block of it. Using the
-     * cached [sectionStartOffsets], this jumps to the first on-screen section and loads the visible
-     * slice (in section-local indices) of each on-screen section until it passes the visible window.
+     * Loads the media for the visible slots in [range]. Walks the sections with a running start offset
+     * and loads the visible slice of each section overlapping the window, stopping once past it.
      */
     private suspend fun ensureRangeLoaded(
         range: IntRange,
@@ -567,11 +680,9 @@ class TimelineRevampViewModel @Inject constructor(
         val visibleTo = range.last.coerceAtMost(totalSlots - 1)
         if (visibleTo < visibleFrom) return
 
-        var index = findSectionIndexOf(visibleFrom)
-        while (index < sections.size) {
-            val sectionStartOffset = sectionStartOffsets[index]
+        var sectionStartOffset = 0
+        for (section in sections) {
             if (sectionStartOffset > visibleTo) break // every later section is past the visible window
-            val section = sections[index]
             val slotCount = section.count.toInt()
             val sectionEnd = sectionStartOffset + slotCount - 1
             if (sectionEnd >= visibleFrom) {
@@ -580,22 +691,13 @@ class TimelineRevampViewModel @Inject constructor(
                 val localWindowEnd = (visibleTo - sectionStartOffset).coerceAtMost(slotCount - 1)
                 loadSectionWindow(
                     section = section,
-                    sectionGlobalStart = sectionStartOffset,
                     localWindowStart = localWindowStart,
                     localWindowEnd = localWindowEnd,
                 )
             }
-            index++
+            sectionStartOffset += slotCount
         }
     }
-
-    /**
-     * Index of the section whose slot block where [targetIndex] is located at.
-     */
-    private fun findSectionIndexOf(targetIndex: Int): Int =
-        sectionStartOffsets
-            .indexOfLast { startOffset -> startOffset <= targetIndex }
-            .coerceAtLeast(0)
 
     /**
      * Loads the section-local window `[localWindowStart, localWindowEnd]` of [section]: locates the
@@ -604,18 +706,17 @@ class TimelineRevampViewModel @Inject constructor(
      */
     private suspend fun loadSectionWindow(
         section: MediaTimelineSection,
-        sectionGlobalStart: Int,
         localWindowStart: Int,
         localWindowEnd: Int,
     ) {
         val uncachedRange = findUncachedRange(
-            sectionGlobalStart = sectionGlobalStart,
+            groupId = section.groupId,
             localWindowStart = localWindowStart,
             localWindowEnd = localWindowEnd,
         ) ?: return // the whole window is already cached
 
         val nodes = fetchSectionNodes(section, uncachedRange) ?: return
-        cacheSectionNodes(sectionGlobalStart, uncachedRange.first, nodes)
+        cacheSectionNodes(section, uncachedRange.first, nodes)
     }
 
     /**
@@ -623,14 +724,14 @@ class TimelineRevampViewModel @Inject constructor(
      * not yet in [mediaCache], or null when every slot in the window is already cached.
      */
     private fun findUncachedRange(
-        sectionGlobalStart: Int,
+        groupId: String,
         localWindowStart: Int,
         localWindowEnd: Int,
     ): IntRange? {
         var firstUncached = -1
         var lastUncached = -1
         for (localIndex in localWindowStart..localWindowEnd) {
-            if (sectionGlobalStart + localIndex !in mediaCache) {
+            if (SlotKey(groupId, localIndex) !in mediaCache) {
                 if (firstUncached == -1) {
                     firstUncached = localIndex
                 }
@@ -667,19 +768,20 @@ class TimelineRevampViewModel @Inject constructor(
     }
 
     /**
-     * Caches [nodes] at their global indices — the run starts at section-local [localStart], i.e.
-     * global index `sectionGlobalStart + localStart` — and publishes the updated cache to the UI.
+     * Caches [nodes] against [section] — the run starts at section-local [localStart] — and publishes
+     * the re-projected cache to the UI.
      */
     private fun cacheSectionNodes(
-        sectionGlobalStart: Int,
+        section: MediaTimelineSection,
         localStart: Int,
         nodes: List<TypedFileNode>,
     ) {
         if (nodes.isEmpty()) return
         nodes.forEachIndexed { i, node ->
-            mediaCache[sectionGlobalStart + localStart + i] = mediaTimelineNodeUiItemMapper(node)
+            mediaCache[SlotKey(section.groupId, localStart + i)] =
+                mediaTimelineNodeUiItemMapper(node)
         }
-        loadedNodes.update { HashMap(mediaCache) }
+        loadedNodes.update { getAndUpdateLoadedNodes() }
     }
 
     /**
@@ -834,9 +936,54 @@ class TimelineRevampViewModel @Inject constructor(
         _takenDownDialogEvent.update { consumed }
     }
 
+    /**
+     * The loading state of the timeline sections for the current filter, kept separate from the
+     * per-node [loadedNodes] so a filter change can reset to loading immediately.
+     */
+    private sealed interface SectionsState {
+        data object Loading : SectionsState
+        data class Loaded(
+            val sections: List<MediaTimelineSection>,
+        ) : SectionsState
+    }
+
+    private data class GridBundle(
+        val sectionsState: SectionsState,
+        val loadedNodes: Map<Int, PhotosNodeContentItemV2>,
+        val isHiddenNodesEnabled: Boolean,
+        val gridSize: TimelineGridSize,
+        val currentSort: TimelineTabSortOptions,
+    )
+
+    private data class PeriodCards(
+        val yearCards: List<PhotosNodeListCard>,
+        val monthCards: List<PhotosNodeListCard>,
+        val isLoading: Boolean = false,
+    ) {
+        fun forPeriod(period: MediaTimePeriod): List<PhotosNodeListCard> = when (period) {
+            MediaTimePeriod.Years -> yearCards
+            MediaTimePeriod.Months -> monthCards
+            else -> emptyList()
+        }
+
+        companion object {
+            val Loading = PeriodCards(emptyList(), emptyList(), isLoading = true)
+            val Empty = PeriodCards(emptyList(), emptyList())
+        }
+    }
+
+    /**
+     * A media slot keyed by its section ([MediaTimelineSection.groupId]) and section-local position.
+     * Keying the cache this way (not by global index) keeps a thumbnail valid when another section
+     * shifts its global index, so an insertion elsewhere doesn't flash the grid back to shimmer.
+     */
+    private data class SlotKey(val groupId: String, val localIndex: Int)
+
     private companion object {
         private const val MAX_CACHED_ITEMS = 480
-        private const val SCROLL_SETTLE_DEBOUNCE_MS = 500L
+        private const val SCROLL_SETTLE_DEBOUNCE_MS = 250L
+        private const val MEDIA_CHANGE_DEBOUNCE_MS = 1_000L
+        private const val MIN_LOAD_BUFFER = 24
 
         /**
          * The filter [currentFilter] starts with. Its options become user-controllable in later

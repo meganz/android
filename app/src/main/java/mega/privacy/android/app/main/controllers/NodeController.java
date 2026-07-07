@@ -2,8 +2,6 @@ package mega.privacy.android.app.main.controllers;
 
 import static mega.privacy.android.app.listeners.ShareListener.REMOVE_SHARE_LISTENER;
 import static mega.privacy.android.app.listeners.ShareListener.SHARE_LISTENER;
-import static mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CONTACT;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_COPY;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FOLDER_TO_MOVE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
@@ -16,6 +14,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import androidx.activity.result.ActivityResultLauncher;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +26,10 @@ import mega.privacy.android.app.listeners.CleanRubbishBinListener;
 import mega.privacy.android.app.listeners.ShareListener;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
-import mega.privacy.android.app.main.legacycontact.AddContactActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.utils.MegaNodeUtil;
+import mega.privacy.android.navigation.MegaNavigatorEntryPointKt;
+import mega.privacy.android.navigation.destination.AddContactToShareNavKey;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -152,7 +153,7 @@ public class NodeController {
         return dBT;
     }
 
-    public void selectContactToShareFolders(ArrayList<Long> handleList) {
+    public void selectContactToShareFolders(ArrayList<Long> handleList, ActivityResultLauncher<Intent> launcher) {
         Timber.d("shareFolders ArrayListLong");
 
 
@@ -161,37 +162,30 @@ public class NodeController {
             return;
         }
 
-        Intent intent = new Intent();
-        intent.setClass(context, AddContactActivity.class);
-        intent.putExtra("contactType", CONTACT_TYPE_BOTH);
-
-        long[] handles = new long[handleList.size()];
-        int j = 0;
-        for (int i = 0; i < handleList.size(); i++) {
-            handles[j] = handleList.get(i);
-            j++;
-        }
-        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handles);
-        //Multiselect=1 (multiple folders)
-        intent.putExtra("MULTISELECT", 1);
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+        MegaNavigatorEntryPointKt.getMegaNavigator(context).openAddContactToShare(
+                context,
+                launcher,
+                AddContactToShareNavKey.ContactType.All,
+                handleList
+        );
     }
 
-    public void selectContactToShareFolder(MegaNode node) {
+    public void selectContactToShareFolder(MegaNode node, ActivityResultLauncher<Intent> launcher) {
         Timber.d("shareFolder");
         long handle = node.getHandle();
 
-        selectContactToShareFolder(handle);
+        selectContactToShareFolder(handle, launcher);
     }
 
-    public void selectContactToShareFolder(long handle) {
-        Intent intent = new Intent();
-        intent.setClass(context, AddContactActivity.class);
-        intent.putExtra("contactType", CONTACT_TYPE_BOTH);
-        //Multiselect=0
-        intent.putExtra("MULTISELECT", 0);
-        intent.putExtra(AddContactActivity.EXTRA_NODE_HANDLE, handle);
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_SELECT_CONTACT);
+    public void selectContactToShareFolder(long handle, ActivityResultLauncher<Intent> launcher) {
+        List<Long> handleList = new ArrayList<>();
+        handleList.add(handle);
+        MegaNavigatorEntryPointKt.getMegaNavigator(context).openAddContactToShare(
+                context,
+                launcher,
+                AddContactToShareNavKey.ContactType.All,
+                handleList
+        );
     }
 
     public int checkParentNodeToOpenFolder(long folderHandle) {

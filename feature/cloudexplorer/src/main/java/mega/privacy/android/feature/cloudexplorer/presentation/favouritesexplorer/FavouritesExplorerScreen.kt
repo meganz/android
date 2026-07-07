@@ -65,6 +65,7 @@ internal fun FavouritesExplorerContent(
     isSelectionModeEnabled: Boolean = false,
     disabledNodeIds: Set<NodeId> = emptySet(),
     videosOnly: Boolean = false,
+    allowsFolderSelection: Boolean = false,
     emptyView: @Composable () -> Unit = { EmptyFolder(isFolderPicker) },
 ) {
     when (uiState) {
@@ -86,21 +87,24 @@ internal fun FavouritesExplorerContent(
                 videosOnly = videosOnly,
                 isSelectionModeEnabled = isSelectionModeEnabled,
                 onFolderClick = onFolderClick,
+                allowsFolderSelection = allowsFolderSelection,
             )
             NodeViewWithHeader(
                 items = visibleItems,
                 nodeSourceType = uiState.nodeSourceType,
                 nodesLoadingState = uiState.nodesLoadingState,
                 emptyView = emptyView,
-                itemListView = {
+                itemListView = { nodeItem ->
                     ExplorerNodeListItem(
-                        item = it,
-                        isSelected = selectionState.selectedNodeIds.contains(it.id),
+                        item = nodeItem,
+                        isSelected = selectionState.selectedNodeIds.contains(nodeItem.id),
                         isSelectionModeEnabled = isSelectionModeEnabled,
                         isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                         videosOnly = videosOnly,
                         disabledNodeIds = disabledNodeIds,
-                        onItemClicked = { onItemClicked(it) },
+                        allowsFolderSelection = allowsFolderSelection,
+                        onSelectionCheckedChange = { selectionState.toggleSelection(nodeItem.id) },
+                        onItemClicked = { onItemClicked(nodeItem) },
                     )
                 },
                 itemGridView = {
@@ -163,11 +167,14 @@ internal fun TabsScope.FavouritesExplorerTab(
             )
         }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val signal = remember(uiState, isSelectionModeEnabled, disabledNodeIds, videosOnly) {
+    val signal = remember(
+        uiState, isSelectionModeEnabled, disabledNodeIds, videosOnly, explorerMode,
+    ) {
         uiState.toTabSignal(
             disabledNodeIds = disabledNodeIds,
             videosOnly = videosOnly,
             isFileSelectionEnabled = isSelectionModeEnabled,
+            allowsFolderSelection = explorerMode.allowsFolderSelection,
         )
     }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
@@ -224,6 +231,7 @@ internal fun TabsScope.FavouritesExplorerTab(
                 isSelectionModeEnabled = isSelectionModeEnabled,
                 disabledNodeIds = disabledNodeIds,
                 videosOnly = videosOnly,
+                allowsFolderSelection = explorerMode.allowsFolderSelection,
                 modifier = modifier,
             )
         }

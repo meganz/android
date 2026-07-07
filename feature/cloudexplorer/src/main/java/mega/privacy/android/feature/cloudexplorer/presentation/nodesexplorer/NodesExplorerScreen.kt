@@ -220,6 +220,7 @@ internal fun NodesExplorerScreenContent(
     videosOnly: Boolean = false,
     restrictedNodeIds: Set<NodeId> = emptySet(),
     onRestrictedNodeClick: (NodeId) -> Unit = {},
+    allowsFolderSelection: Boolean = false,
     emptyView: @Composable () -> Unit = {
         if (uiState is NodeExplorerUiState.Data && !uiState.isRoot) EmptyFolder() else EmptyRoot()
     },
@@ -240,6 +241,7 @@ internal fun NodesExplorerScreenContent(
                 onFolderClick = onFolderClick,
                 restrictedNodeIds = restrictedNodeIds,
                 onRestrictedNodeClick = onRestrictedNodeClick,
+                allowsFolderSelection = allowsFolderSelection,
             )
 
             EventEffect(
@@ -252,17 +254,19 @@ internal fun NodesExplorerScreenContent(
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 nodesLoadingState = uiState.nodesLoadingState,
                 emptyView = emptyView,
-                itemListView = {
+                itemListView = { nodeItem ->
                     ExplorerNodeListItem(
-                        item = it,
-                        isSelected = selectionState.selectedNodeIds.contains(it.id),
+                        item = nodeItem,
+                        isSelected = selectionState.selectedNodeIds.contains(nodeItem.id),
                         isSelectionModeEnabled = isSelectionModeEnabled,
                         isHiddenNodesEnabled = uiState.isHiddenNodesEnabled,
                         videosOnly = videosOnly,
                         disabledNodeIds = disabledNodeIds,
                         restrictedNodeIds = restrictedNodeIds,
-                        showLink = it.showLink,
-                        onItemClicked = { onItemClicked(it) },
+                        showLink = nodeItem.showLink,
+                        allowsFolderSelection = allowsFolderSelection,
+                        onSelectionCheckedChange = { selectionState.toggleSelection(nodeItem.id) },
+                        onItemClicked = { onItemClicked(nodeItem) },
                     )
                 },
                 itemGridView = {

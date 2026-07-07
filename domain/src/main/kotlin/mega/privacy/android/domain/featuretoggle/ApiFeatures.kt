@@ -314,6 +314,18 @@ enum class ApiFeatures(
         description = "Render Markdown files in the text editor as a formatted preview",
         singleCheckPerRun = true,
         defaultValue = false,
+    ),
+
+    /**
+     * Subscription page discount design revamp (AND-23922 / DSN-3131).
+     * When enabled, the upgrade screen shows the new "no-offer" design: a "Why go Pro?" card,
+     * a current plan card with renewal/expiry date, a billing-period segmented control, and
+     * per-plan buy buttons. When disabled, the existing upgrade screen is shown.
+     */
+    SubscriptionDiscountRevamp(
+        experimentName = "subrv",
+        description = "New subscription page design",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

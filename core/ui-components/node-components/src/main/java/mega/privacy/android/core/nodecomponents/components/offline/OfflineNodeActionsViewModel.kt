@@ -17,6 +17,7 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.ZipFileTypeInfo
@@ -24,11 +25,13 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeShareContentUri
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
+import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentFromPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
 import mega.privacy.android.shared.nodes.R as NodesR
@@ -43,6 +46,7 @@ import javax.inject.Inject
 class OfflineNodeActionsViewModel @Inject constructor(
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase,
+    private val getFileTypeInfoByContentFromPathUseCase: GetFileTypeInfoByContentFromPathUseCase,
     private val exportNodesUseCase: ExportNodesUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
@@ -168,7 +172,15 @@ class OfflineNodeActionsViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val localFile = getOfflineFileUseCase(info.nodeInfo)
-                val fileType = info.fileTypeInfo
+                val storedType = info.fileTypeInfo
+                val fileType = if (storedType == null || storedType is UnMappedFileTypeInfo) {
+                    getFileTypeInfoByContentFromPathUseCase(
+                        localFile.absolutePath,
+                        storedType?.toDuration()?.inWholeSeconds?.toInt() ?: 0,
+                    ) ?: storedType
+                } else {
+                    storedType
+                }
                 val nodeId = NodeId(info.handle.toLong())
                 when {
                     fileType is PdfFileTypeInfo -> OfflineNodeActionUiEntity.Pdf(

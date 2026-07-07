@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.chat.message.GetCachedOriginalPathUse
 import mega.privacy.android.domain.usecase.chat.message.GetMessageIdsByTypeUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.ImportTypedNodesUseCase
@@ -77,6 +78,7 @@ class NodeAttachmentMessageViewModelTest {
     private val getMessageIdsByTypeUseCase = mock<GetMessageIdsByTypeUseCase>()
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getNodePreviewFileUseCase = mock<GetNodePreviewFileUseCase>()
+    private val getFileTypeInfoByContentUseCase = mock<GetFileTypeInfoByContentUseCase>()
     private val getCachedOriginalPathUseCase = mock<GetCachedOriginalPathUseCase>()
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
     private val removeOfflineNodeUseCase = mock<RemoveOfflineNodeUseCase>()
@@ -98,6 +100,7 @@ class NodeAttachmentMessageViewModelTest {
             getMessageIdsByTypeUseCase = getMessageIdsByTypeUseCase,
             getNodeContentUriUseCase = getNodeContentUriUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             getCachedOriginalPathUseCase = getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase = isAvailableOfflineUseCase,
             removeOfflineNodeUseCase = removeOfflineNodeUseCase,
@@ -119,6 +122,7 @@ class NodeAttachmentMessageViewModelTest {
             getMessageIdsByTypeUseCase,
             getNodeContentUriUseCase,
             getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase,
             getCachedOriginalPathUseCase,
             isAvailableOfflineUseCase,
             removeOfflineNodeUseCase,

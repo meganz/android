@@ -28,6 +28,7 @@ import mega.privacy.android.domain.usecase.GetPathFromNodeContentUseCase
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentFromPathUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFilesUseCase
 import mega.privacy.android.shared.nodes.R as NodesR
 import org.junit.jupiter.api.AfterEach
@@ -56,6 +57,8 @@ import kotlin.time.Duration
 class OfflineNodeActionsViewModelTest {
     private val getOfflineFileUseCase: GetOfflineFileUseCase = mock()
     private val getOfflineFilesUseCase: GetOfflineFilesUseCase = mock()
+    private val getFileTypeInfoByContentFromPathUseCase: GetFileTypeInfoByContentFromPathUseCase =
+        mock()
     private val exportNodesUseCase: ExportNodesUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val snackBarHandler: SnackBarHandler = mock()
@@ -83,6 +86,7 @@ class OfflineNodeActionsViewModelTest {
         underTest = OfflineNodeActionsViewModel(
             getOfflineFileUseCase = getOfflineFileUseCase,
             getOfflineFilesUseCase = getOfflineFilesUseCase,
+            getFileTypeInfoByContentFromPathUseCase = getFileTypeInfoByContentFromPathUseCase,
             exportNodesUseCase = exportNodesUseCase,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getOfflineFileInformationByIdUseCase = mock(),
@@ -449,7 +453,8 @@ class OfflineNodeActionsViewModelTest {
             nodeShareContentUrisIntentMapper,
             getOfflineFileUseCase,
             getPathFromNodeContentUseCase,
-            getFeatureFlagValueUseCase
+            getFeatureFlagValueUseCase,
+            getFileTypeInfoByContentFromPathUseCase,
         )
     }
 }

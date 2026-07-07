@@ -40,6 +40,7 @@ import mega.privacy.android.navigation.destination.ImportNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.MoveResult
 import mega.privacy.android.navigation.destination.NodesExplorerNavKey
+import mega.privacy.android.navigation.destination.PinToHomeNavKey
 import mega.privacy.android.navigation.destination.SelectCUFolderNavKey
 import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SelectSyncFolderNavKey
@@ -135,6 +136,18 @@ class CloudExplorerFeatureDestination : FeatureDestination {
                 disabledNodeIds = { it.addedVideoIds.toSet() },
                 onFilesPicked = { key, nodeIds ->
                     onVideosPicked(nodeIds)
+                    navigationHandler.remove(key)
+                },
+            )
+            val onPinnedItemsPicked: (List<NodeId>) -> Unit = { nodeIds ->
+                navigationHandler.returnResult(PinToHomeNavKey.RESULT, nodeIds)
+            }
+            nodePickerDestination<PinToHomeNavKey>(
+                explorerMode = ExplorerMode.PinToHome,
+                onNavigateBack = navigationHandler::remove,
+                onNavigate = navigationHandler::navigate,
+                onFilesPicked = { key, nodeIds ->
+                    onPinnedItemsPicked(nodeIds)
                     navigationHandler.remove(key)
                 },
             )

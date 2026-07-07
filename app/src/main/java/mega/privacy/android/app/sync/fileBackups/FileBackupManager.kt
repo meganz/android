@@ -1,6 +1,9 @@
 package mega.privacy.android.app.sync.fileBackups
 
 import android.content.DialogInterface
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -53,6 +56,10 @@ class FileBackupManager(
     private val megaApplication = MegaApplication.getInstance()
     private val megaApi = megaApplication.megaApi
     private var nodeController: NodeController? = null
+
+    // No host of this backup-share path consumes the picker result, so the callback is empty.
+    private val selectContactToShareLauncher: ActivityResultLauncher<Intent> =
+        activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { }
 
     var backupWarningDialog: AlertDialog? = null
     var backupHandleList: ArrayList<Long>? = null
@@ -122,14 +129,17 @@ class FileBackupManager(
                             handle = megaNode.handle,
                             nodeName = megaNode.name
                         )
-                    } else {
-                        nodeController?.selectContactToShareFolder(megaNode)
+                    } else if (megaNode != null) {
+                        nodeController?.selectContactToShareFolder(
+                            megaNode,
+                            selectContactToShareLauncher
+                        )
                     }
                 }
 
-                ACTION_MENU_BACKUP_SHARE_FOLDER -> nodeController?.selectContactToShareFolders(
-                    handleList
-                )
+                ACTION_MENU_BACKUP_SHARE_FOLDER -> handleList?.let {
+                    nodeController?.selectContactToShareFolders(it, selectContactToShareLauncher)
+                }
             }
         }
     }

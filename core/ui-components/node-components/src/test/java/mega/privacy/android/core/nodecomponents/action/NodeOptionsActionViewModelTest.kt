@@ -90,6 +90,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeLocationUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
@@ -162,6 +163,7 @@ class NodeOptionsActionViewModelTest {
     private val getNodeContentUriUseCase: GetNodeContentUriUseCase = mock()
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase = mock()
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase = mock()
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase = mock()
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
@@ -246,6 +248,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -334,6 +337,7 @@ class NodeOptionsActionViewModelTest {
             getNodeContentUriUseCase,
             getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase,
             updateNodeSensitiveUseCase,
             monitorAccountDetailUseCase,
             get1On1ChatIdUseCase,
@@ -1076,6 +1080,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -1150,6 +1155,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -1218,6 +1224,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,
@@ -1278,6 +1285,7 @@ class NodeOptionsActionViewModelTest {
             nodeContentUriIntentMapper = nodeContentUriIntentMapper,
             getPathFromNodeContentUseCase = getPathFromNodeContentUseCase,
             getNodePreviewFileUseCase = getNodePreviewFileUseCase,
+            getFileTypeInfoByContentUseCase = getFileTypeInfoByContentUseCase,
             applicationScope = applicationScope,
             nodeMenuProviderRegistry = nodeMenuProviderRegistry,
             nodeSelectionModeActionMapper = nodeSelectionModeActionMapper,

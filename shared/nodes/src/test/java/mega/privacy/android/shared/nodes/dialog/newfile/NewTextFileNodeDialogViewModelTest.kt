@@ -338,6 +338,31 @@ class NewTextFileNodeDialogViewModelTest {
         }
 
     @Test
+    fun `test that validateFileName skips isValidTextFileUseCase and succeeds when name has no extension`() =
+        runTest {
+            val parentNodeId = NodeId(123L)
+            val underTest = newViewModel(parentNodeId)
+            val fileName = "myFile"
+            whenever(validateNodeNameUseCase(eq(fileName), eq(parentNodeId))).thenReturn(Unit)
+
+            underTest.uiState.test {
+                assertThat(awaitData().fileName).isEqualTo(DEFAULT_TEXT_FILE_EXTENSION)
+
+                underTest.onFileNameChanged(fileName)
+                assertThat(awaitData().fileName).isEqualTo(fileName)
+
+                underTest.validateFileName()
+                val state = awaitData()
+                assertThat(state.fileNameException).isNull()
+                val triggered = state.validationSuccessEvent
+                        as StateEventWithContentTriggered<String>
+                assertThat(triggered.content).isEqualTo(fileName)
+            }
+            verify(validateNodeNameUseCase).invoke(eq(fileName), eq(parentNodeId))
+            verifyNoInteractions(isValidTextFileUseCase)
+        }
+
+    @Test
     fun `test that onValidationSuccessEventConsumed clears the success event`() = runTest {
         val parentNodeId = NodeId(123L)
         val underTest = newViewModel(parentNodeId)

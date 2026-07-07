@@ -155,6 +155,15 @@ interface FileSystemRepository {
     fun readLinesFromPathInChunks(path: String, chunkSizeLines: Int): Flow<List<String>>
 
     /**
+     * Read at most [length] bytes from the start of the file at the given path.
+     *
+     * @param path Absolute path to the file.
+     * @param length Maximum number of bytes to read.
+     * @return the read bytes, or null if the file does not exist.
+     */
+    suspend fun readFirstBytesFromPath(path: String, length: Int): ByteArray?
+
+    /**
      * Write text to a file at the given path (UTF-8). Overwrites if the file exists.
      *
      * @param path Absolute path to the file.
@@ -458,6 +467,16 @@ interface FileSystemRepository {
      * @return [FileTypeInfo] object
      */
     fun getFileTypeInfoByName(name: String, duration: Int = 0): FileTypeInfo
+
+    /**
+     * Get file type info from the first bytes of a file's content (magic numbers), used to
+     * identify files that have no extension.
+     *
+     * @param header the first bytes of the file
+     * @param duration duration of the file, when known
+     * @return the detected [FileTypeInfo], or null when the content cannot be recognised
+     */
+    fun getFileTypeInfoFromContent(header: ByteArray, duration: Int = 0): FileTypeInfo?
 
     /**
      * Check if the node is openable text file

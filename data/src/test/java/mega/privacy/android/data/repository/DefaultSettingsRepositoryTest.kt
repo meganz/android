@@ -21,11 +21,14 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.AppVersionMapper
+import mega.privacy.android.data.preferences.PinnedItemsSortPreferenceDataStore
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.home.HomeWidgetConfiguration
 import mega.privacy.android.domain.entity.home.PinnedHomeItem
+import mega.privacy.android.domain.entity.home.PinnedHomeItemsSortField
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.preference.StartScreenDestinationPreference
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
@@ -75,6 +78,7 @@ internal class DefaultSettingsRepositoryTest {
     private val getAccountTypeUseCase: GetAccountTypeUseCase = mock()
     private val megaLocalRoomGateway = mock<MegaLocalRoomGateway>()
     private val appVersionMapper = mock<AppVersionMapper>()
+    private val pinnedItemsSortPreferenceDataStore = mock<PinnedItemsSortPreferenceDataStore>()
 
     @BeforeAll
     fun setUp() {
@@ -93,7 +97,8 @@ internal class DefaultSettingsRepositoryTest {
             fileVersionsOptionCache = fileVersionsOptionCache,
             getAccountTypeUseCase = getAccountTypeUseCase,
             megaLocalRoomGateway = megaLocalRoomGateway,
-            appVersionMapper = appVersionMapper
+            appVersionMapper = appVersionMapper,
+            pinnedItemsSortPreferenceDataStore = pinnedItemsSortPreferenceDataStore,
         )
     }
 
@@ -112,7 +117,8 @@ internal class DefaultSettingsRepositoryTest {
             fileManagementPreferencesGateway,
             fileVersionsOptionCache,
             megaLocalRoomGateway,
-            appVersionMapper
+            appVersionMapper,
+            pinnedItemsSortPreferenceDataStore,
         )
     }
 
@@ -591,6 +597,35 @@ internal class DefaultSettingsRepositoryTest {
         underTest.clearPinnedHomeItems()
 
         verify(megaLocalRoomGateway).deleteAllPinnedHomeItems()
+    }
+
+    @Test
+    fun `test that monitorPinnedItemsSortPreference returns the values from the data store`() =
+        runTest {
+            val expected = PinnedHomeItemsSortField.Name to SortDirection.Ascending
+            pinnedItemsSortPreferenceDataStore.stub {
+                on { monitorSortPreference() }.thenReturn(flow {
+                    emit(expected)
+                    awaitCancellation()
+                })
+            }
+
+            underTest.monitorPinnedItemsSortPreference().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+            }
+        }
+
+    @Test
+    fun `test that setPinnedItemsSortPreference delegates to the data store`() = runTest {
+        underTest.setPinnedItemsSortPreference(
+            PinnedHomeItemsSortField.DateAdded,
+            SortDirection.Descending,
+        )
+
+        verify(pinnedItemsSortPreferenceDataStore).setSortPreference(
+            PinnedHomeItemsSortField.DateAdded,
+            SortDirection.Descending,
+        )
     }
 
     @ParameterizedTest(name = "flag: {0}")

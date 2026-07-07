@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
@@ -444,6 +445,66 @@ class UpgradeAccountViewModelTest {
         }
 
         verify(ageSignalUseCase, never()).invoke()
+    }
+
+    @Test
+    fun `test that loadCurrentSubscriptionPlan updates state with subscription status, renew and expiry times`() =
+        runTest {
+            val expectedRenewTime = 1_815_000_000L
+            val expectedExpiryTime = 1_820_000_000L
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.VALID)
+                on { subscriptionRenewTime }.thenReturn(expectedRenewTime)
+                on { proExpirationTime }.thenReturn(expectedExpiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.subscriptionStatus).isEqualTo(SubscriptionStatus.VALID)
+                Truth.assertThat(state.subscriptionRenewTime).isEqualTo(expectedRenewTime)
+                Truth.assertThat(state.proExpirationTime).isEqualTo(expectedExpiryTime)
+                Truth.assertThat(state.isCurrentSubscriptionRenewing).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that renew and expiry times are null when level detail returns zero`() = runTest {
+        val levelDetail = mock<AccountLevelDetail> {
+            on { accountType }.thenReturn(AccountType.PRO_I)
+            on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+            on { subscriptionStatus }.thenReturn(SubscriptionStatus.INVALID)
+            on { subscriptionRenewTime }.thenReturn(0L)
+            on { proExpirationTime }.thenReturn(0L)
+        }
+        val accountDetail = mock<AccountDetail> {
+            on { this.levelDetail }.thenReturn(levelDetail)
+        }
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        initViewModel()
+
+        underTest.state.test {
+            val state = awaitItem()
+            Truth.assertThat(state.subscriptionRenewTime).isNull()
+            Truth.assertThat(state.proExpirationTime).isNull()
+            Truth.assertThat(state.isCurrentSubscriptionRenewing).isFalse()
+        }
     }
 
 

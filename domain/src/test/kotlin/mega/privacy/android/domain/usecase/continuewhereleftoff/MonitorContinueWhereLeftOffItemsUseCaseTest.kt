@@ -63,8 +63,8 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             getNodeByIdUseCase,
             isNodeInRubbishOrDeletedUseCase,
         )
-        // Defaults: hidden-nodes feature off, no node updates, nothing trashed. Combined with the
-        // use case's fail-open onStart values, this leaves items untouched unless a test opts in.
+        // Defaults: eligibility unresolved (emptyFlow -> the use case's null placeholder), no node
+        // updates, nothing trashed. This leaves items untouched unless a test opts in.
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(emptyFlow())
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(emptyFlow())
         whenever(monitorNodeUpdatesUseCase()).thenReturn(emptyFlow())
@@ -89,10 +89,37 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             .thenReturn(flowOf(items))
 
         underTest(10).test {
-            assertThat(awaitItem()).isEqualTo(items)
+            assertThat(awaitItem().items).isEqualTo(items)
             cancelAndIgnoreRemainingEvents()
         }
         verify(repository).monitorContinueWhereLeftOffItems(10, null, null)
+    }
+
+    @Test
+    fun `test that isHiddenResolved is false until eligibility resolves and true afterwards`() =
+        runTest {
+            whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+                .thenReturn(flowOf(listOf(item(1L))))
+            // Unresolved eligibility (emptyFlow -> null placeholder) must be reported as not resolved
+            // so consumers keep showing their loading state instead of the unblurred placeholder.
+            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(emptyFlow())
+
+            underTest(10).test {
+                assertThat(awaitItem().isHiddenResolved).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that isHiddenResolved is true once the real eligibility value arrives`() = runTest {
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(listOf(item(1L))))
+        whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(false))
+
+        underTest(10).test {
+            assertThat(awaitItem().isHiddenResolved).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -101,7 +128,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             .thenReturn(flowOf(emptyList()))
 
         underTest(10).test {
-            assertThat(awaitItem()).isEmpty()
+            assertThat(awaitItem().items).isEmpty()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -112,7 +139,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             .thenReturn(flowOf(emptyList()))
 
         underTest(20).test {
-            awaitItem()
+            awaitItem().items
             cancelAndIgnoreRemainingEvents()
         }
         verify(repository).monitorContinueWhereLeftOffItems(20, null, null)
@@ -133,7 +160,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             sortField = ContinueWhereLeftOffSortField.Timestamp,
             sortDirection = SortDirection.Descending,
         ).test {
-            awaitItem()
+            awaitItem().items
             cancelAndIgnoreRemainingEvents()
         }
         verify(repository).monitorContinueWhereLeftOffItems(
@@ -157,7 +184,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(getNodeByIdUseCase(NodeId(2L))).thenReturn(plainNode)
 
             underTest(10).test {
-                assertThat(awaitItem().map { it.nodeHandle }).doesNotContain(1L)
+                assertThat(awaitItem().items.map { it.nodeHandle }).doesNotContain(1L)
                 cancelAndIgnoreRemainingEvents()
             }
             verify(repository).removeRecentlyUsedItem(1L)
@@ -175,7 +202,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(inheritedSensitiveNode)
 
             underTest(10).test {
-                assertThat(awaitItem()).isEmpty()
+                assertThat(awaitItem().items).isEmpty()
                 cancelAndIgnoreRemainingEvents()
             }
             verify(repository).removeRecentlyUsedItem(1L)
@@ -192,7 +219,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(sensitiveNode)
 
         underTest(10).test {
-            assertThat(awaitItem().map { it.nodeHandle }).containsExactly(1L)
+            assertThat(awaitItem().items.map { it.nodeHandle }).containsExactly(1L)
             cancelAndIgnoreRemainingEvents()
         }
         verify(repository, never()).removeRecentlyUsedItem(any())
@@ -210,7 +237,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(sensitiveNode)
 
             underTest(10).test {
-                val result = awaitItem()
+                val result = awaitItem().items
                 assertThat(result.map { it.nodeHandle }).containsExactly(1L)
                 assertThat(result.single().isSensitive).isTrue()
                 cancelAndIgnoreRemainingEvents()
@@ -230,7 +257,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(inheritedSensitiveNode)
 
             underTest(10).test {
-                assertThat(awaitItem().single().isSensitive).isTrue()
+                assertThat(awaitItem().items.single().isSensitive).isTrue()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -247,7 +274,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(plainNode)
 
             underTest(10).test {
-                assertThat(awaitItem().single().isSensitive).isFalse()
+                assertThat(awaitItem().items.single().isSensitive).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -263,7 +290,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(true))
 
             underTest(10).test {
-                assertThat(awaitItem().single().isSensitive).isFalse()
+                assertThat(awaitItem().items.single().isSensitive).isFalse()
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -280,7 +307,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(getNodeByIdUseCase(any())).thenReturn(plainNode)
 
             underTest(10).test {
-                assertThat(awaitItem().map { it.nodeHandle }).containsExactly(1L, 2L).inOrder()
+                assertThat(awaitItem().items.map { it.nodeHandle }).containsExactly(1L, 2L).inOrder()
                 cancelAndIgnoreRemainingEvents()
             }
             verify(repository, never()).removeRecentlyUsedItem(any())
@@ -295,7 +322,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(isNodeInRubbishOrDeletedUseCase(2L)).thenReturn(false)
 
         underTest(10).test {
-            assertThat(awaitItem().map { it.nodeHandle }).containsExactly(2L)
+            assertThat(awaitItem().items.map { it.nodeHandle }).containsExactly(2L)
             cancelAndIgnoreRemainingEvents()
         }
         verify(repository).removeRecentlyUsedItem(1L)
@@ -311,7 +338,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(isNodeInRubbishOrDeletedUseCase(1L)).thenReturn(true)
 
         underTest(10).test {
-            assertThat(awaitItem()).isEmpty()
+            assertThat(awaitItem().items).isEmpty()
             cancelAndIgnoreRemainingEvents()
         }
         verify(repository).removeRecentlyUsedItem(1L)
@@ -325,7 +352,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(isNodeInRubbishOrDeletedUseCase(any())).thenReturn(false)
 
         underTest(10).test {
-            assertThat(awaitItem().map { it.nodeHandle }).containsExactly(1L, 2L).inOrder()
+            assertThat(awaitItem().items.map { it.nodeHandle }).containsExactly(1L, 2L).inOrder()
             cancelAndIgnoreRemainingEvents()
         }
         verify(repository, never()).removeRecentlyUsedItem(any())
@@ -348,7 +375,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
             whenever(getNodeByIdUseCase(NodeId(3L))).thenReturn(plainNode)
 
             underTest(10).test {
-                assertThat(awaitItem().map { it.nodeHandle }).containsExactly(3L)
+                assertThat(awaitItem().items.map { it.nodeHandle }).containsExactly(3L)
                 cancelAndIgnoreRemainingEvents()
             }
             verify(repository).removeRecentlyUsedItem(1L)
@@ -364,7 +391,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(renamedNode)
 
         underTest(10).test {
-            assertThat(awaitItem().single().title).isEqualTo("renamed.pdf")
+            assertThat(awaitItem().items.single().title).isEqualTo("renamed.pdf")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -377,7 +404,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
 
         underTest(10).test {
-            assertThat(awaitItem().single().title).isEqualTo("file-1.pdf")
+            assertThat(awaitItem().items.single().title).isEqualTo("file-1.pdf")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -391,7 +418,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(blankNameNode)
 
         underTest(10).test {
-            assertThat(awaitItem().single().title).isEqualTo("file-1.pdf")
+            assertThat(awaitItem().items.single().title).isEqualTo("file-1.pdf")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -404,7 +431,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(isNodeInRubbishOrDeletedUseCase(1L)).thenReturn(true)
 
         underTest(10).test {
-            assertThat(awaitItem()).isEmpty()
+            assertThat(awaitItem().items).isEmpty()
             cancelAndIgnoreRemainingEvents()
         }
         verify(getNodeByIdUseCase, never()).invoke(NodeId(1L))
@@ -419,7 +446,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(takenDownNode)
 
         underTest(10).test {
-            assertThat(awaitItem().single().isTakenDown).isTrue()
+            assertThat(awaitItem().items.single().isTakenDown).isTrue()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -433,7 +460,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(plainNode)
 
         underTest(10).test {
-            assertThat(awaitItem().single().isTakenDown).isFalse()
+            assertThat(awaitItem().items.single().isTakenDown).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -446,7 +473,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(null)
 
         underTest(10).test {
-            assertThat(awaitItem().single().isTakenDown).isFalse()
+            assertThat(awaitItem().items.single().isTakenDown).isFalse()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -461,7 +488,7 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
         whenever(isNodeInRubbishOrDeletedUseCase(1L)).thenReturn(true)
 
         underTest(10).test {
-            assertThat(awaitItem()).isEmpty()
+            assertThat(awaitItem().items).isEmpty()
             cancelAndIgnoreRemainingEvents()
         }
         verify(getNodeByIdUseCase, never()).invoke(NodeId(1L))

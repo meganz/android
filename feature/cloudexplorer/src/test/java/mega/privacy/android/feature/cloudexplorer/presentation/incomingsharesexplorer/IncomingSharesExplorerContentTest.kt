@@ -2,7 +2,10 @@ package mega.privacy.android.feature.cloudexplorer.presentation.incomingsharesex
 
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.filterToOne
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -21,6 +24,7 @@ import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderP
 import mega.privacy.android.shared.nodes.components.previewdata.previewIncomingShareFolderNodeUiItem
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -161,12 +165,68 @@ internal class IncomingSharesExplorerContentTest {
         assertThat(clickedFolderId).isEqualTo(NodeId(1L))
     }
 
+    @Test
+    fun `test that clicking a folder navigates and keeps selection when folder selection is allowed`() {
+        var clickedFolderId: NodeId? = null
+        val selectionState = NodeSelectionState(initialSelectedIds = setOf(NodeId(2L)))
+        setContent(
+            uiState = nodeExplorerDataState(
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                items = listOf(
+                    previewIncomingShareFolderNodeUiItem(
+                        id = 1L,
+                        name = FOLDER_NAME,
+                        access = AccessPermission.READWRITE,
+                    ),
+                ),
+            ),
+            selectionState = selectionState,
+            isSelectionModeEnabled = true,
+            allowsFolderSelection = true,
+            onFolderClick = { clickedFolderId = it },
+        )
+
+        composeTestRule.onNodeWithText(FOLDER_NAME, useUnmergedTree = true).performClick()
+
+        assertThat(clickedFolderId).isEqualTo(NodeId(1L))
+        assertThat(selectionState.selectedNodeIds).containsExactly(NodeId(2L))
+    }
+
+    @Test
+    fun `test that toggling the checkbox selects a folder when folder selection is allowed`() {
+        val selectionState = NodeSelectionState()
+        setContent(
+            uiState = nodeExplorerDataState(
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                items = listOf(
+                    previewIncomingShareFolderNodeUiItem(
+                        id = 1L,
+                        name = FOLDER_NAME,
+                        access = AccessPermission.READWRITE,
+                    ),
+                ),
+            ),
+            selectionState = selectionState,
+            isSelectionModeEnabled = true,
+            allowsFolderSelection = true,
+        )
+
+        composeTestRule.onAllNodesWithTag(CHECKBOX_TAG, useUnmergedTree = true)
+            .filterToOne(hasClickAction())
+            .performClick()
+
+        assertThat(selectionState.selectedNodeIds).containsExactly(NodeId(1L))
+    }
+
     private fun setContent(
         uiState: NodeExplorerUiState,
         onFolderClick: (NodeId) -> Unit = {},
         onNavigateBack: () -> Unit = {},
         consumeNavigateBack: () -> Unit = {},
         requiresFullAccessShares: Boolean = false,
+        selectionState: NodeSelectionState = NodeSelectionState(),
+        isSelectionModeEnabled: Boolean = false,
+        allowsFolderSelection: Boolean = false,
     ) {
         composeTestRule.setContent {
             AndroidThemeForPreviews {
@@ -183,6 +243,9 @@ internal class IncomingSharesExplorerContentTest {
                         onFolderClick = onFolderClick,
                         onRefreshNodes = {},
                         requiresFullAccessShares = requiresFullAccessShares,
+                        selectionState = selectionState,
+                        isSelectionModeEnabled = isSelectionModeEnabled,
+                        allowsFolderSelection = allowsFolderSelection,
                     )
                 }
             }
@@ -191,5 +254,8 @@ internal class IncomingSharesExplorerContentTest {
 
     private companion object {
         const val FOLDER_NAME = "Test shared folder"
+
+        // Mirrors the internal NodeListViewItem checkbox tag from :shared:nodes.
+        const val CHECKBOX_TAG = "node_list_view_item:checkbox"
     }
 }

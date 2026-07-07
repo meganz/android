@@ -1,10 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.timeline
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import android.Manifest.permission.READ_EXTERNAL_STORAGE
-import android.Manifest.permission.READ_MEDIA_IMAGES
-import android.Manifest.permission.READ_MEDIA_VIDEO
-import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
@@ -533,39 +529,6 @@ private fun TimelineTabContent(
         )
     }
 }
-
-private fun getCameraUploadsPermissions() =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-        arrayOf(
-            getImagePermissionByVersion(),
-            getVideoPermissionByVersion(),
-            READ_MEDIA_VISUAL_USER_SELECTED,
-        )
-    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        arrayOf(
-            getImagePermissionByVersion(),
-            getVideoPermissionByVersion()
-        )
-    } else {
-        arrayOf(
-            getImagePermissionByVersion(),
-            getVideoPermissionByVersion()
-        )
-    }
-
-private fun getImagePermissionByVersion() =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        READ_MEDIA_IMAGES
-    } else {
-        READ_EXTERNAL_STORAGE
-    }
-
-private fun getVideoPermissionByVersion() =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        READ_MEDIA_VIDEO
-    } else {
-        READ_EXTERNAL_STORAGE
-    }
 
 private fun trackTimePeriodSelection(timePeriod: MediaTimePeriod) {
     when (timePeriod) {

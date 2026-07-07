@@ -45,6 +45,7 @@ internal fun CloudExplorerListViewItem(
     showBlurEffect: Boolean = false,
     isHighlighted: Boolean = false,
     enableClick: Boolean = enabled,
+    onSelectionCheckedChange: ((Boolean) -> Unit)? = null,
     onItemClicked: () -> Unit,
 ) {
     NodeListViewItem(
@@ -73,6 +74,7 @@ internal fun CloudExplorerListViewItem(
         showBlurEffect = showBlurEffect,
         isHighlighted = isHighlighted,
         enableClick = enableClick,
+        onSelectionCheckedChange = onSelectionCheckedChange,
         onItemClicked = onItemClicked,
     )
 }
@@ -139,11 +141,15 @@ internal fun ExplorerNodeListItem(
     onItemClicked: () -> Unit,
     showLink: Boolean = false,
     restrictedNodeIds: Set<NodeId> = emptySet(),
+    allowsFolderSelection: Boolean = false,
+    onSelectionCheckedChange: ((Boolean) -> Unit)? = null,
 ) {
     val isAlreadyAdded = item.id in disabledNodeIds
     val isUnsupportedFile = videosOnly && !item.isFolderNode && !item.isVideoNode
     val isRestricted = item.id in restrictedNodeIds
     val isDisabled = isAlreadyAdded || isUnsupportedFile || isRestricted
+    val isSelectable =
+        item.node is FileNode || (allowsFolderSelection && item.isFolderNode)
     CloudExplorerListViewItem(
         title = item.title.text,
         subtitle = item.subtitle.text(),
@@ -152,7 +158,7 @@ internal fun ExplorerNodeListItem(
         tags = item.tags,
         thumbnailData = item.thumbnailData,
         isSelected = isSelected || isAlreadyAdded,
-        isInSelectionMode = isSelectionModeEnabled && (item.node is FileNode),
+        isInSelectionMode = isSelectionModeEnabled && isSelectable,
         showIsVerified = item.showIsVerified,
         isTakenDown = item.isTakenDown,
         label = item.nodeLabel,
@@ -160,6 +166,8 @@ internal fun ExplorerNodeListItem(
         isSensitive = item.isSensitive && isHiddenNodesEnabled,
         showBlurEffect = item.showBlurEffect && isHiddenNodesEnabled,
         isHighlighted = item.isHighlighted,
+        onSelectionCheckedChange = onSelectionCheckedChange
+            ?.takeIf { allowsFolderSelection && item.isFolderNode && !isDisabled },
         onItemClicked = onItemClicked,
         enabled = (item.isFolderNode || isSelectionModeEnabled) && !isDisabled,
         enableClick = ((item.isFolderNode || isSelectionModeEnabled) && !isDisabled) || isRestricted,
@@ -227,8 +235,9 @@ internal fun selectableNodeIds(
     items: List<NodeViewItem<TypedNode>>,
     disabledNodeIds: Set<NodeId>,
     videosOnly: Boolean,
+    allowsFolderSelection: Boolean = false,
 ): Set<NodeId> = items.asSequence()
-    .filterNot { it.isFolderNode }
+    .filterNot { !allowsFolderSelection && it.isFolderNode }
     .filterNot { it.id in disabledNodeIds }
     .filter { !videosOnly || it.isVideoNode }
     .map { it.id }
@@ -247,6 +256,7 @@ internal fun explorerNodeClick(
     onFolderClick: (NodeId) -> Unit,
     restrictedNodeIds: Set<NodeId> = emptySet(),
     onRestrictedNodeClick: (NodeId) -> Unit = {},
+    allowsFolderSelection: Boolean = false,
 ): (NodeViewItem<TypedNode>) -> Unit = { item ->
     when {
         item.id in disabledNodeIds -> Unit
@@ -255,7 +265,7 @@ internal fun explorerNodeClick(
 
         item.isFolderNode -> {
             onFolderClick(item.id)
-            selectionState.deselectAll()
+            if (!allowsFolderSelection) selectionState.deselectAll()
         }
 
         videosOnly && !item.isVideoNode -> Unit

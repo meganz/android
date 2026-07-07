@@ -14,6 +14,9 @@ package mega.privacy.android.domain.entity.cloudexplorer
  * @property requiresFullAccessShares Whether incoming shares need full access permission to be
  *   selectable or navigable (e.g. syncing a shared folder requires full access), instead of the
  *   default write permission.
+ * @property allowsFolderSelection Whether folders are checkbox-selectable alongside files in a
+ *   multi-select (file-picker) mode. Only meaningful when [isFolderPicker] is false; lets a mode
+ *   select a mix of folders and files in one pass (e.g. pinning items to Home).
  */
 enum class ExplorerMode(
     val isFolderPicker: Boolean,
@@ -21,6 +24,7 @@ enum class ExplorerMode(
     val isChatAvailable: Boolean,
     val isVideoPicker: Boolean,
     val requiresFullAccessShares: Boolean = false,
+    val allowsFolderSelection: Boolean = false,
 ) {
     /** Upload files shared from an external app to a MEGA folder. */
     ShareFilesToMega(
@@ -125,5 +129,14 @@ enum class ExplorerMode(
         isIncomingAvailable = false,
         isChatAvailable = false,
         isVideoPicker = false,
+    ),
+
+    /** Select a mix of folders and files to pin to the Home screen. */
+    PinToHome(
+        isFolderPicker = false,
+        isIncomingAvailable = true,
+        isChatAvailable = false,
+        isVideoPicker = false,
+        allowsFolderSelection = true,
     ),
 }

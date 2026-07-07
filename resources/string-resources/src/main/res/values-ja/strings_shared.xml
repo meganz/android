@@ -2148,7 +2148,7 @@
     <string name="text_editor_fast_scroll_line_tooltip">%1$d 行目</string>
     <string name="select_videos_search_empty_view_description">クラウドドライブ内の動画を検索</string>
     <string name="folder_link_unavailable_tos_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
-    <string name="new_text_file_invalid_extension_error_message">有効なファイル拡張子を使用してください（例：.txt）</string>
+    <string name="new_text_file_invalid_extension_error_message">有効なファイル拡張子を使用してください（例：.txt、.md、または.xml）</string>
     <string name="link_decryption_key_dialog_title">復号キーを入力してください</string>
     <string name="link_decryption_key_dialog_error_invalid_key">復号キーが無効です</string>
     <string name="link_decryption_key_dialog_message">このリンクを開くにはキーを入力してください。\nお持ちでない場合は、リンク所有者に連絡してください。</string>
@@ -2452,4 +2452,31 @@
     <string name="park_account_screen_start_button">新しいアカウントを開始</string>
     <string name="park_account_success_message">古いアカウントが保留されました。新しいアカウントにログインできます。</string>
     <string name="add_participants_title">参加者を追加</string>
+    <string name="meetings_add_participants_user_limit_warning">この通話の参加者は100名に制限されています。上限を超える参加者は、チャットのみご利用いただけます。主催者の方がProにアップグレードすると、この制限を解除できます。</string>
+    <string name="email_confirmation_resend_button_countdown">%1$s後にメールを再送</string>
+    <string name="document_scanner_prepare_title">ドキュメントスキャナーをセットアップ中</string>
+    <string name="document_scanner_prepare_message">これは初回のみ実行されます。ダウンロード中もデバイスをそのまま使用できます。</string>
+    <string name="document_scanner_prepare_error_title">ドキュメントスキャナーをセットアップできませんでした</string>
+    <string name="document_scanner_prepare_error_transient_message">接続を確認して、もう一度お試しください。</string>
+    <string name="document_scanner_prepare_error_permanent_message">代わりに従来の（元の）スキャナーをご利用いただけます。</string>
+    <string name="document_scanner_prepare_retry_button">もう一度試す</string>
+    <string name="document_scanner_prepare_waiting_for_connection">接続を待機しています。オンラインに戻ると、ダウンロードが自動的に再開されます。</string>
+    <string name="document_scanner_prepare_reconnecting">再接続中&#8230;</string>
+    <string name="share_link_access_banner_title">リンクアクセス</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="other">これらのリンクを知っている人は誰でも、あなたのデータを表示およびダウンロードできます</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="other">リンクが作成され、クリップボードにコピーされました</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_allow_access">連絡先へのアクセスを許可</string>
+    <string name="add_contacts_phone_contacts_select">電話の連絡先を選択</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA連絡先</string>
+    <string name="add_contacts_phone_contacts_section_title">電話連絡先</string>
+    <string name="create_group_chat_settings_title">新しいグループ</string>
+    <string name="create_group_chat_name_hint">グループ名を入力</string>
+    <string name="create_group_chat_ekr_label">暗号化キーローテーション</string>
+    <string name="create_group_chat_get_chat_link_label">チャットリンクを取得</string>
+    <string name="create_group_chat_allow_add_participants_label">主催者以外が参加者を追加できるようにします</string>
+    <string name="create_group_chat_ekr_explanation">暗号化キーのローテーションはより安全ですが、チャットリンクを作成できなくなり、新しい参加者は過去のメッセージを閲覧できなくなります。</string>
 </resources>

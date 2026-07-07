@@ -1,17 +1,16 @@
 package mega.privacy.android.feature.fileinfo.presentation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import mega.android.core.ui.components.MegaText
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.LegacyFileInfoNavKey
 
@@ -29,12 +28,26 @@ fun EntryProviderScope<NavKey>.fileInfoScreen(
                 }
             }
         ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                MegaText("File Info Revamp")
+            val viewModel = hiltViewModel<FileInfoViewModel, FileInfoViewModel.Factory> { factory ->
+                factory.create(key.nodeHandle)
             }
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            FileInfoScreen(
+                uiState = uiState,
+                onBack = navigationHandler::back,
+                onLocationClick = {
+                    uiState.locationDestinations?.let { destinations ->
+                        // Close File Info before opening the folder so the back stack
+                        // doesn't loop folder -> file -> info -> folder.
+                        navigationHandler.remove(key)
+                        navigationHandler.navigate(
+                            destinations = destinations,
+                            navOptions = navOptions { launchSingleTop = true },
+                        )
+                    }
+                },
+            )
         }
     }
 }

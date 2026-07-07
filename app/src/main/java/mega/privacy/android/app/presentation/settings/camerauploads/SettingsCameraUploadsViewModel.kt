@@ -553,6 +553,9 @@ internal class SettingsCameraUploadsViewModel @Inject constructor(
             runCatching {
                 setupCameraUploadsSettingUseCase(isEnabled = true)
                 setCameraUploadsEnabled(true)
+                _uiState.update {
+                    it.copy(shouldKeepUploadFileNames = areUploadFileNamesKeptUseCase())
+                }
                 broadcastCameraUploadsSettingsActionUseCase(CameraUploadsSettingsAction.CameraUploadsEnabled)
             }.onSuccess {
                 Analytics.tracker.trackEvent(CameraUploadsEnabledEvent)

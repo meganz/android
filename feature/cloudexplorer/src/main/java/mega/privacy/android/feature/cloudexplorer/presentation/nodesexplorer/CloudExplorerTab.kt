@@ -48,17 +48,21 @@ internal fun TabsScope.CloudExplorerTab(
     videosOnly: Boolean,
     restrictedNodeIds: Set<NodeId> = emptySet(),
     onRestrictedNodeClick: (NodeId) -> Unit = {},
+    allowsFolderSelection: Boolean = false,
 ) {
     val viewModel =
         hiltViewModel<NodesExplorerViewModel, NodesExplorerViewModel.Factory> { factory ->
             factory.create(NodeExplorerSharedViewModel.Args(nodeExplorerId, nodeSourceType))
         }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val signal = remember(uiState, isFileSelectionEnabled, disabledNodeIds, videosOnly) {
+    val signal = remember(
+        uiState, isFileSelectionEnabled, disabledNodeIds, videosOnly, allowsFolderSelection,
+    ) {
         uiState.toTabSignal(
             disabledNodeIds = disabledNodeIds,
             videosOnly = videosOnly,
             isFileSelectionEnabled = isFileSelectionEnabled,
+            allowsFolderSelection = allowsFolderSelection,
         )
     }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
@@ -117,6 +121,7 @@ internal fun TabsScope.CloudExplorerTab(
                 videosOnly = videosOnly,
                 restrictedNodeIds = restrictedNodeIds,
                 onRestrictedNodeClick = onRestrictedNodeClick,
+                allowsFolderSelection = allowsFolderSelection,
                 modifier = modifier,
             )
         }

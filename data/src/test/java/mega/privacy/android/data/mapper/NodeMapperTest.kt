@@ -10,6 +10,7 @@ import mega.privacy.android.data.mapper.node.FetchChildrenMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
 import mega.privacy.android.data.mapper.node.FolderNodeMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
+import mega.privacy.android.data.mapper.node.NodeMediaTypeMapper
 import mega.privacy.android.data.mapper.node.OfflineAvailabilityMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.data.model.node.DefaultFileNode
@@ -88,6 +89,7 @@ class NodeMapperTest {
                 cacheGateway = mock(),
                 megaApiGateway = megaApiGateway,
                 fileTypeInfoMapper = fileTypeInfoMapper,
+                nodeMediaTypeMapper = NodeMediaTypeMapper(),
                 offlineAvailabilityMapper = offlineAvailabilityMapper,
                 stringListMapper = stringListMapper,
                 nodeLabelMapper = nodeLabelMapper,

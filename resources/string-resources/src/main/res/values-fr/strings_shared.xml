@@ -781,7 +781,7 @@
     <!-- The Scan Confirmation screen error message shown when the filename has no file extension -->
     <string name="document_scanning_settings_file_extension_required_error_message">Une extension de fichier est nécessaire</string>
     <!-- Alert text before download a big file for preview. Please do not modify the %s placeholder as it will be replaced by the size to be donwloaded -->
-    <string name="alert_larger_file_preview">MEGA récupérera une copie temporaire de ce fichier afin que vous puissiez le prévisualiser. Il ne sera ni enregistré ni disponible en dehors de l\’application. %1$s sera téléchargé.</string>
+    <string name="alert_larger_file_preview">Ce fichier ne peut pas être prévisualisé dans MEGA. Téléchargez le fichier (%1$s) pour l\’ouvrir dans une autre application.</string>
     <!-- Message displayed with progress percentage while the app is doing some background operation -->
     <string name="login_completing_operation">Finalisation de l\’opération : %1$d%%</string>
     <!-- Add to album files existed message -->
@@ -1245,7 +1245,7 @@
     <!-- The camera uploads notification action text to allow mobile data-->
     <string name="camera_uploads_notification_action_allow_mobile_data">Autoriser l\’utilisation des données mobiles</string>
     <!-- Alert title before download a big file for preview. -->
-    <string name="alert_larger_file_preview_title">Prévisualisation du fichier volumineux</string>
+    <string name="alert_larger_file_preview_title">Prévisualisation non disponible</string>
     <!-- Alert confirm button before download a big file for preview -->
     <string name="alert_larger_file_preview_confirm_button">Prévisualiser maintenant</string>
     <!-- Alert always allow button before download a big file for preview -->
@@ -2278,7 +2278,7 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">Mot de passe incorrect</string>
     <string name="text_editor_fast_scroll_line_tooltip">Ligne %1$d</string>
     <string name="select_videos_search_empty_view_description">Rechercher des vidéos dans votre disque Cloud</string>
-    <string name="new_text_file_invalid_extension_error_message">Utilisez une extension de fichier valide (par exemple .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Utilisez une extension de fichier valide (par exemple .txt, .md, or .xml)</string>
     <string name="link_decryption_key_dialog_message">Entrez la clé pour ouvrir ce lien.\nVous ne l\’avez pas&#160;? Contactez le propriétaire du lien.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;Po</string>
@@ -2569,7 +2569,7 @@
     <string name="contacts_action_audio_call">Appel audio</string>
     <string name="contacts_action_video_call">Appel vidéo</string>
     <string name="contacts_search_hint">Rechercher des contacts</string>
-    <string name="contacts_remove_dialog_title">Supprimer %1$s ?</string>
+    <string name="contacts_remove_dialog_title">Supprimer %1$s ?</string>
     <string name="contacts_remove_dialog_message">Ce contact sera supprimé de votre liste de contacts.</string>
     <plurals name="general_selection_num_selected">
         <item quantity="one">%1$d sélectionné</item>
@@ -2588,7 +2588,7 @@
         <item quantity="other">[A]%1$s [/A][B]a mis à jour %2$d éléments.[/B]</item>
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">Effacer l\’historique</string>
-    <string name="home_cwlo_clear_history_dialog_message">Êtes-vous sûr de vouloir effacer votre historique ? Cela ne peut pas être annulé.</string>
+    <string name="home_cwlo_clear_history_dialog_message">Êtes-vous sûr de vouloir effacer votre historique ? Cela ne peut pas être annulé.</string>
     <string name="search_placeholder_chat">Rechercher dans la discussion</string>
     <string name="search_landing_chat_explorer_subtitle">Recherchez des contacts, des discussions et des réunions</string>
     <string name="home_do_more_with_mega_title">Faites-en plus avec MEGA</string>
@@ -2621,4 +2621,42 @@
     <string name="general_allow_button">Autoriser</string>
     <string name="document_scanner_download_dialog_download_button">Télécharger</string>
     <string name="add_participants_title">Ajouter des participants</string>
+    <string name="meetings_add_participants_user_limit_warning">Cet appel est limité à 100 participants. Toute personne dépassant ce seuil ne peut que discuter via la discussion. L\’organisateur peut passer à un abonnement Pro pour supprimer cette limite.</string>
+    <string name="document_scanner_download_dialog_title">Télécharger le scanner de documents</string>
+    <string name="document_scanner_download_dialog_message">Le nouveau scanner de documents nécessite un téléchargement unique de %1$d Mo avant de pouvoir l\’utiliser.</string>
+    <string name="document_scanner_download_dialog_mobile_data_title">Télécharger via les données mobiles ?</string>
+    <string name="document_scanner_download_dialog_mobile_data_message">Le nouveau scanner de documents nécessite un téléchargement unique de %1$d Mo. Des frais de données mobiles peuvent s\’appliquer.</string>
+    <string name="document_scanner_download_dialog_download_over_mobile_data_button">Télécharger via les données mobiles</string>
+    <string name="document_scanner_download_dialog_use_old_scanner_button">Utiliser l\’ancien scanner</string>
+    <string name="park_account_screen_title">Archiver le compte</string>
+    <string name="park_account_screen_acknowledge">Je reconnais que je commence un nouveau compte vide et que je perdrai toutes les données de mon compte actuel, à moins de me souvenir de mon mot de passe ou de trouver une Clé de récupération exportée.</string>
+    <string name="park_account_screen_start_button">Commencer un nouveau compte</string>
+    <string name="park_account_success_message">Votre ancien compte a été archivé. Vous pouvez maintenant vous connecter à votre nouveau compte.</string>
+    <string name="email_confirmation_resend_button_countdown">Renvoyer l’e-mail dans %1$s</string>
+    <string name="document_scanner_prepare_title">Configuration du scanner de documents</string>
+    <string name="document_scanner_prepare_message">Cela n\’arrive qu\’une seule fois. Vous pouvez continuer à utiliser votre appareil pendant le téléchargement.</string>
+    <string name="document_scanner_prepare_error_title">Impossible de configurer le scanner de documents</string>
+    <string name="document_scanner_prepare_error_transient_message">Vérifiez votre connexion et réessayez.</string>
+    <string name="document_scanner_prepare_error_permanent_message">Vous pouvez utiliser l\’ancien scanner à la place.</string>
+    <string name="document_scanner_prepare_retry_button">Réessayer</string>
+    <string name="share_link_access_banner_title">Accès au lien</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Quiconque disposant de ce lien peut consulter et télécharger vos données</item>
+        <item quantity="many">Quiconque disposant de ces liens peut consulter et télécharger vos données</item>
+        <item quantity="other">Quiconque disposant de ces liens peut consulter et télécharger vos données</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Le lien a été créé et copié dans votre presse-papiers</item>
+        <item quantity="many">Les liens ont été créés et copiés dans votre presse-papiers</item>
+        <item quantity="other">Les liens ont été créés et copiés dans votre presse-papiers</item>
+    </plurals>
+    <string name="document_scanner_prepare_waiting_for_connection">En attente de connexion. Le téléchargement reprendra automatiquement une fois que vous serez de retour en ligne.</string>
+    <string name="document_scanner_prepare_reconnecting">Reconnexion&#8230;</string>
+    <string name="add_contacts_phone_contacts_section_title">Contacts du téléphone</string>
+    <string name="create_group_chat_name_hint">Saisissez le nom du groupe</string>
+    <string name="create_group_chat_ekr_label">Rotation de la clé de chiffrement</string>
+    <string name="create_group_chat_ekr_explanation">La rotation des clés de chiffrement est légèrement plus sécurisée, mais ne vous permet pas de créer un lien de conversation et les nouveaux participants ne verront pas les messages antérieurs.</string>
+    <string name="create_group_chat_settings_title">Nouveau groupe</string>
+    <string name="create_group_chat_get_chat_link_label">Obtenir le lien de la conversation</string>
+    <string name="create_group_chat_allow_add_participants_label">Permettre aux non-hôtes d’ajouter des participants</string>
 </resources>

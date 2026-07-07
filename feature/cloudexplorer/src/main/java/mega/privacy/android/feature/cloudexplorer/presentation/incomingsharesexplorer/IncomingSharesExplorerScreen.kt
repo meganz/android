@@ -25,6 +25,7 @@ import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -57,6 +58,8 @@ import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
 import mega.privacy.android.shared.nodes.model.NodeViewItem
 import mega.privacy.android.shared.nodes.model.text
+import mega.privacy.android.shared.nodes.selection.NodeSelectionState
+import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 
 @Composable
@@ -68,6 +71,10 @@ internal fun IncomingSharesExplorerContent(
     onRefreshNodes: () -> Unit,
     modifier: Modifier = Modifier,
     requiresFullAccessShares: Boolean = false,
+    selectionState: NodeSelectionState = rememberNodeSelectionState(),
+    isSelectionModeEnabled: Boolean = false,
+    allowsFolderSelection: Boolean = false,
+    disabledNodeIds: Set<NodeId> = emptySet(),
     emptyView: @Composable () -> Unit = { EmptyFolder() },
 ) {
     val snackbarHostState = LocalSnackBarHostState.current
@@ -85,6 +92,8 @@ internal fun IncomingSharesExplorerContent(
             )
             val onItemClicked: (NodeViewItem<TypedNode>) -> Unit = { item ->
                 when {
+                    item.id in disabledNodeIds -> Unit
+
                     item.isFolderNode -> {
                         if ((item.node as? ShareFolderNode)?.shareData?.access
                                 ?.satisfies(requiresFullAccessShares) == false
@@ -102,8 +111,11 @@ internal fun IncomingSharesExplorerContent(
                             }
                         } else {
                             onFolderClick(item.id)
+                            if (!allowsFolderSelection) selectionState.deselectAll()
                         }
                     }
+
+                    isSelectionModeEnabled -> selectionState.toggleSelection(item.id)
                 }
             }
 
@@ -117,22 +129,31 @@ internal fun IncomingSharesExplorerContent(
                 nodeSourceType = uiState.nodeSourceType,
                 nodesLoadingState = uiState.nodesLoadingState,
                 emptyView = emptyView,
-                itemListView = {
+                itemListView = { node ->
                     CloudExplorerListViewItem(
-                        title = it.title.text,
-                        subtitle = it.subtitle.text(),
-                        icon = it.iconRes,
-                        description = it.formattedDescription?.text,
-                        tags = it.tags,
-                        thumbnailData = it.thumbnailData,
-                        isTakenDown = it.isTakenDown,
-                        showIsVerified = it.showIsVerified,
-                        label = it.nodeLabel,
-                        isSensitive = it.isSensitive && isHiddenNodesEnabled,
-                        showBlurEffect = it.showBlurEffect && isHiddenNodesEnabled,
-                        isHighlighted = it.isHighlighted,
-                        onItemClicked = { onItemClicked(it) },
-                        enabled = (it.node as? ShareFolderNode)?.shareData?.access
+                        title = node.title.text,
+                        subtitle = node.subtitle.text(),
+                        icon = node.iconRes,
+                        description = node.formattedDescription?.text,
+                        tags = node.tags,
+                        thumbnailData = node.thumbnailData,
+                        isSelected = selectionState.selectedNodeIds.contains(node.id)
+                            || node.id in disabledNodeIds,
+                        isInSelectionMode = isSelectionModeEnabled &&
+                            (node.node is FileNode || (allowsFolderSelection && node.isFolderNode)),
+                        isTakenDown = node.isTakenDown,
+                        showIsVerified = node.showIsVerified,
+                        label = node.nodeLabel,
+                        isSensitive = node.isSensitive && isHiddenNodesEnabled,
+                        showBlurEffect = node.showBlurEffect && isHiddenNodesEnabled,
+                        isHighlighted = node.isHighlighted,
+                        onSelectionCheckedChange = if (
+                            allowsFolderSelection && node.isFolderNode && node.id !in disabledNodeIds
+                        ) {
+                            { selectionState.toggleSelection(node.id) }
+                        } else null,
+                        onItemClicked = { onItemClicked(node) },
+                        enabled = (node.node as? ShareFolderNode)?.shareData?.access
                             ?.satisfies(requiresFullAccessShares) != false,
                         enableClick = true,
                     )
@@ -186,10 +207,20 @@ internal fun TabsScope.IncomingExplorerTab(
     protectedUserTap: (() -> Unit) -> Unit,
     onNavigate: (NavKey) -> Unit,
     onNavigateBack: () -> Unit,
+    selectionState: NodeSelectionState = rememberNodeSelectionState(),
+    isSelectionModeEnabled: Boolean = false,
+    allowsFolderSelection: Boolean = false,
+    disabledNodeIds: Set<NodeId> = emptySet(),
 ) {
     val viewModel = hiltViewModel<IncomingSharesExplorerViewModel>()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val signal = remember(uiState) { uiState.toTabSignal() }
+    val signal = remember(uiState, isSelectionModeEnabled, disabledNodeIds, allowsFolderSelection) {
+        uiState.toTabSignal(
+            disabledNodeIds = disabledNodeIds,
+            isFileSelectionEnabled = isSelectionModeEnabled,
+            allowsFolderSelection = allowsFolderSelection,
+        )
+    }
     val explorerViewModel = hiltViewModel<ExplorerViewModel>()
     val explorerUiState by explorerViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -233,6 +264,10 @@ internal fun TabsScope.IncomingExplorerTab(
                     onNavigate = onNavigate,
                 ),
                 onRefreshNodes = viewModel::refreshNodes,
+                selectionState = selectionState,
+                isSelectionModeEnabled = isSelectionModeEnabled,
+                allowsFolderSelection = allowsFolderSelection,
+                disabledNodeIds = disabledNodeIds,
                 modifier = modifier,
             )
         }

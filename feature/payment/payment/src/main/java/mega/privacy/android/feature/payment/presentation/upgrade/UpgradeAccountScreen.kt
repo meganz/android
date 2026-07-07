@@ -54,6 +54,7 @@ import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
+import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.components.AdditionalBenefitProPlanView
 import mega.privacy.android.feature.payment.components.BuyPlanBottomBar
@@ -81,6 +82,7 @@ fun UpgradeAccountScreen(
     accountStorageUiState: AccountStorageUIState = AccountStorageUIState(),
     isNewCreationAccount: Boolean = false,
     isUpgradeAccount: Boolean = false,
+    isSubscriptionRevampEnabled: Boolean = false,
     onSubscriptionUnavailableLearnMoreClick: () -> Unit = {},
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
@@ -203,7 +205,7 @@ fun UpgradeAccountScreen(
             MegaSnackbar(snackBarHostState = snackBarHostState)
         },
         bottomBar = {
-            if (uiState.isSubscriptionFeatureAvailable == true) {
+            if (!isSubscriptionRevampEnabled && uiState.isSubscriptionFeatureAvailable == true) {
                 chosenPlan?.takeIf {
                     !isCurrentPlan(
                         uiState = uiState,
@@ -252,49 +254,61 @@ fun UpgradeAccountScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            item("get_more_with_pro_plan") {
-                MegaText(
-                    text = stringResource(sharedR.string.choose_account_screen_get_more_with_pro_plan_title),
-                    style = MaterialTheme.typography.headlineSmall,
-                    textColor = TextColor.Primary,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
-                        .testTag(TEST_TAG_TITLE)
-                )
-                MegaText(
-                    text = stringResource(id = sharedR.string.pro_plan_features_section_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    textColor = TextColor.Primary,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
-                        .testTag(TEST_TAG_FEATURES_SECTION_TITLE)
-                )
-            }
-            items(proFeatures, key = { it.title }) { feature ->
-                val index = proFeatures.indexOf(feature)
-                NewFeatureRow(
-                    painter = rememberVectorPainter(feature.icon),
-                    title = feature.title,
-                    description = feature.description,
-                    testTag = feature.testTag,
-                    modifier = Modifier.testTag("$TEST_TAG_FEATURE_ROW$index")
-                )
-            }
-
-            if (uiState.isSubscriptionFeatureAvailable == false) {
-                subscriptionUnavailableContent(onLearnMoreClick = onSubscriptionUnavailableLearnMoreClick)
-            } else {
-                subscriptionAvailableContent(
+            if (isSubscriptionRevampEnabled) {
+                subscriptionRevampContent(
                     uiState = uiState,
                     isMonthly = isMonthly,
                     onMonthlyChange = { isMonthly = it },
-                    chosenPlan = chosenPlan,
-                    onPlanSelected = { chosenPlan = it },
-                    hasDiscount = hasDiscount,
-                    context = context,
                     locale = locale,
                     isUpgradeAccount = isUpgradeAccount,
+                    onInAppCheckoutClick = onInAppCheckoutClick,
+                    onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
                 )
+            } else {
+                item("get_more_with_pro_plan") {
+                    MegaText(
+                        text = stringResource(sharedR.string.choose_account_screen_get_more_with_pro_plan_title),
+                        style = MaterialTheme.typography.headlineSmall,
+                        textColor = TextColor.Primary,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                            .testTag(TEST_TAG_TITLE)
+                    )
+                    MegaText(
+                        text = stringResource(id = sharedR.string.pro_plan_features_section_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        textColor = TextColor.Primary,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                            .testTag(TEST_TAG_FEATURES_SECTION_TITLE)
+                    )
+                }
+                items(proFeatures, key = { it.title }) { feature ->
+                    val index = proFeatures.indexOf(feature)
+                    NewFeatureRow(
+                        painter = rememberVectorPainter(feature.icon),
+                        title = feature.title,
+                        description = feature.description,
+                        testTag = feature.testTag,
+                        modifier = Modifier.testTag("$TEST_TAG_FEATURE_ROW$index")
+                    )
+                }
+
+                if (uiState.isSubscriptionFeatureAvailable == false) {
+                    subscriptionUnavailableContent(onLearnMoreClick = onSubscriptionUnavailableLearnMoreClick)
+                } else {
+                    subscriptionAvailableContent(
+                        uiState = uiState,
+                        isMonthly = isMonthly,
+                        onMonthlyChange = { isMonthly = it },
+                        chosenPlan = chosenPlan,
+                        onPlanSelected = { chosenPlan = it },
+                        hasDiscount = hasDiscount,
+                        context = context,
+                        locale = locale,
+                        isUpgradeAccount = isUpgradeAccount,
+                    )
+                }
             }
 
             item("additional_benefits") {
@@ -304,7 +318,10 @@ fun UpgradeAccountScreen(
                         stringResource(id = sharedR.string.pro_plan_benefit_password_protected_links),
                         stringResource(id = sharedR.string.pro_plan_benefit_links_with_expiry_dates),
                         stringResource(id = sharedR.string.pro_plan_benefit_auto_sync_mobile),
-                        stringResource(id = sharedR.string.pro_plan_benefit_rewind_days, 60),
+                        stringResource(
+                            id = sharedR.string.pro_plan_benefit_rewind_days,
+                            if (isSubscriptionRevampEnabled) 180 else 60
+                        ),
                         stringResource(id = sharedR.string.pro_plan_benefit_host_calls_unlimited),
                         stringResource(id = sharedR.string.pro_plan_benefit_schedule_rubbish_bin_clearing),
                         stringResource(id = sharedR.string.pro_plan_benefit_priority_support),
@@ -423,6 +440,36 @@ internal fun UpgradeAccountScreenPreview(
             ),
             isNewCreationAccount = false,
             isUpgradeAccount = true,
+            onInAppCheckoutClick = { },
+            onFreePlanClicked = {},
+            maybeLaterClicked = {},
+            onBack = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+internal fun UpgradeAccountScreenRevampPreview(
+    @PreviewParameter(UpgradeAccountPreviewProvider::class) state: UpgradeAccountState,
+) {
+    AndroidTheme(isSystemInDarkTheme()) {
+        UpgradeAccountScreen(
+            uiState = state.copy(
+                isSubscriptionFeatureAvailable = true,
+                currentSubscriptionPlan = AccountType.PRO_I,
+                subscriptionCycle = AccountSubscriptionCycle.YEARLY,
+                subscriptionStatus = SubscriptionStatus.VALID,
+                subscriptionRenewTime = 1_815_000_000L,
+                cheapestSubscriptionAvailable = state.localisedSubscriptionsList.getOrNull(2),
+            ),
+            accountStorageUiState = AccountStorageUIState(
+                baseStorage = 15L * 1024 * 1024 * 1024,
+                totalStorage = 100L * 1024 * 1024 * 1024,
+            ),
+            isNewCreationAccount = false,
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
             onInAppCheckoutClick = { },
             onFreePlanClicked = {},
             maybeLaterClicked = {},

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
+import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffResult
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
 import mega.privacy.android.domain.entity.node.NodeId
@@ -85,7 +86,7 @@ class ContinueWhereLeftOffViewModelTest {
         )
         monitorContinueWhereLeftOffItemsUseCase.stub {
             on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
-                emit(items)
+                emit(result(items))
                 awaitCancellation()
             }
         }
@@ -96,6 +97,35 @@ class ContinueWhereLeftOffViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    @Test
+    fun `test that isLoading stays true until the hidden nodes state is resolved`() =
+        runTest {
+            val items = listOf(
+                ContinueWhereLeftOffItem(
+                    nodeHandle = 1L,
+                    type = RecentlyUsedType.PDF,
+                    title = "test.pdf",
+                    lastAccessedTimestamp = 1000L,
+                )
+            )
+            val fakeFlow = MutableSharedFlow<ContinueWhereLeftOffResult>()
+            monitorContinueWhereLeftOffItemsUseCase.stub {
+                on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn fakeFlow
+            }
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isLoading).isTrue()
+                // Unresolved emission (hidden state not yet known) must keep the skeleton, even
+                // though items are already available.
+                fakeFlow.emit(result(items, isHiddenResolved = false))
+                assertThat(awaitItem().isLoading).isTrue()
+                // Resolved emission reveals the (correctly blurred) items.
+                fakeFlow.emit(result(items, isHiddenResolved = true))
+                assertThat(awaitItem().isLoading).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `test that blank title is resolved from node when available`() = runTest {
@@ -113,7 +143,7 @@ class ContinueWhereLeftOffViewModelTest {
         whenever(getNodeByIdUseCase(NodeId(10L))).thenReturn(typedNode)
         monitorContinueWhereLeftOffItemsUseCase.stub {
             on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
-                emit(items)
+                emit(result(items))
                 awaitCancellation()
             }
         }
@@ -139,7 +169,7 @@ class ContinueWhereLeftOffViewModelTest {
         )
         monitorContinueWhereLeftOffItemsUseCase.stub {
             on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
-                emit(items)
+                emit(result(items))
                 awaitCancellation()
             }
         }
@@ -154,7 +184,7 @@ class ContinueWhereLeftOffViewModelTest {
 
     @Test
     fun `test that resolved name is cached and not fetched again`() = runTest {
-        val fakeFlow = MutableSharedFlow<List<ContinueWhereLeftOffItem>>()
+        val fakeFlow = MutableSharedFlow<ContinueWhereLeftOffResult>()
         monitorContinueWhereLeftOffItemsUseCase.stub {
             on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn fakeFlow
         }
@@ -173,11 +203,11 @@ class ContinueWhereLeftOffViewModelTest {
 
         underTest.uiState.test {
             awaitItem() // initial empty
-            fakeFlow.emit(items)
+            fakeFlow.emit(result(items))
             awaitItem() // blank name (first transformLatest emit)
             assertThat(awaitItem().items[0].title).isEqualTo("resolved.pdf")
             // re-emit with different timestamp to force new state
-            fakeFlow.emit(listOf(items[0].copy(lastAccessedTimestamp = 2000L)))
+            fakeFlow.emit(result(listOf(items[0].copy(lastAccessedTimestamp = 2000L))))
             // cached name applied immediately in first transformLatest emit
             assertThat(awaitItem().items[0].title).isEqualTo("resolved.pdf")
             verify(getNodeByIdUseCase, times(1)).invoke(NodeId(30L))
@@ -276,9 +306,14 @@ class ContinueWhereLeftOffViewModelTest {
     private fun stubEmptyItems() {
         monitorContinueWhereLeftOffItemsUseCase.stub {
             on { invoke(any(), anyOrNull(), anyOrNull()) } doReturn flow {
-                emit(emptyList<ContinueWhereLeftOffItem>())
+                emit(result(emptyList()))
                 awaitCancellation()
             }
         }
     }
+
+    private fun result(
+        items: List<ContinueWhereLeftOffItem>,
+        isHiddenResolved: Boolean = true,
+    ) = ContinueWhereLeftOffResult(items = items, isHiddenResolved = isHiddenResolved)
 }

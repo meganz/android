@@ -2110,7 +2110,7 @@
     <string name="media_discovery_screen_dropdown_action_zoom_out">Diminuisci lo zoom</string>
     <string name="pdf_viewer_dialog_title_enter_password">Inserisci la password</string>
     <string name="folder_link_unavailable_tos_violation">Il link della cartella è stato rimosso perché viola i nostri Termini di servizio.</string>
-    <string name="link_decryption_key_dialog_title">Inserisci la chiave di decrittazione</string>
+    <string name="link_decryption_key_dialog_title">Inserisci la chiave di decriptazione</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Chiave di decriptazione non valida</string>
     <string name="upload_bottom_sheet_action_menu_scan_document">Scansiona documento</string>
     <string name="upload_bottom_sheet_action_menu_take_picture">Scatta</string>
@@ -2388,7 +2388,7 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">Password errata</string>
     <string name="text_editor_fast_scroll_line_tooltip">Rigo %1$d</string>
     <string name="select_videos_search_empty_view_description">Cerca video nel tuo Cloud drive</string>
-    <string name="new_text_file_invalid_extension_error_message">Utilizza un\’estensione file valida (es.: .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Utilizza un\’estensione file valida (es.: .txt, .md o .xml)</string>
     <string name="link_decryption_key_dialog_message">Inserisci la chiave per aprire questo link.\nNon ce l\’hai? Contatta il proprietario del link.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2610,4 +2610,21 @@
     <string name="video_player_video_not_rendered">Questo video non può essere visualizzato</string>
     <string name="document_scanner_download_dialog_download_button">Scarica</string>
     <string name="add_participants_title">Aggiungi partecipanti</string>
+    <string name="share_link_access_banner_title">Link di accesso</string>
+    <plurals name="share_link_access_banner_description">
+        <item quantity="one">Chiunque con questo link può visualizzare e scaricare i tuoi dati</item>
+        <item quantity="many">Chiunque con questi link può visualizzare e scaricare i tuoi dati</item>
+        <item quantity="other">Chiunque con questi link può visualizzare e scaricare i tuoi dati</item>
+    </plurals>
+    <plurals name="share_link_created_and_copied_snackbar">
+        <item quantity="one">Link creato e copiato negli appunti</item>
+        <item quantity="many">Link creati e copiati negli appunti</item>
+        <item quantity="other">Link creati e copiati negli appunti</item>
+    </plurals>
+    <string name="add_contacts_phone_contacts_section_title">Contatti telefonici</string>
+    <string name="create_group_chat_settings_title">Nuovo gruppo</string>
+    <string name="create_group_chat_name_hint">Inserisci nome gruppo</string>
+    <string name="create_group_chat_ekr_label">Rotazione della chiave di criptazione</string>
+    <string name="create_group_chat_get_chat_link_label">Ottieni il link della chat</string>
+    <string name="create_group_chat_allow_add_participants_label">Permetti a chi non è host di aggiungere partecipanti</string>
 </resources>

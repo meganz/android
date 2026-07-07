@@ -12,8 +12,10 @@ import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.feature.payment.presentation.storage.AccountStorageViewModel
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.payment.toSource
@@ -66,57 +68,66 @@ fun UpgradeAccountRoute(
         }
     }
 
-    UpgradeAccountScreen(
-        uiState = uiState,
-        accountStorageUiState = accountStorageUiState,
-        isNewCreationAccount = isNewCreationAccount,
-        isUpgradeAccount = isUpgradeAccount,
-        onFreePlanClicked = {
-            Analytics.tracker.trackEvent(
-                GetStartedForFreeUpgradePlanButtonPressedEvent
-            )
-            activity?.let {
-                onFreeClick(
-                    activity = it,
-                    onBack = onBack
+    val screen: @Composable (Boolean) -> Unit = { isSubscriptionRevampEnabled ->
+        UpgradeAccountScreen(
+            uiState = uiState,
+            accountStorageUiState = accountStorageUiState,
+            isNewCreationAccount = isNewCreationAccount,
+            isUpgradeAccount = isUpgradeAccount,
+            isSubscriptionRevampEnabled = isSubscriptionRevampEnabled,
+            onFreePlanClicked = {
+                Analytics.tracker.trackEvent(
+                    GetStartedForFreeUpgradePlanButtonPressedEvent
                 )
-            }
-        },
-        maybeLaterClicked = {
-            Analytics.tracker.trackEvent(
-                MaybeLaterUpgradeAccountButtonPressedEvent
-            )
-            activity?.let {
-                onFreeClick(
-                    activity = it,
-                    onBack = onBack
+                activity?.let {
+                    onFreeClick(
+                        activity = it,
+                        onBack = onBack
+                    )
+                }
+            },
+            maybeLaterClicked = {
+                Analytics.tracker.trackEvent(
+                    MaybeLaterUpgradeAccountButtonPressedEvent
                 )
-            }
-        },
-        onInAppCheckoutClick = { subscription ->
-            sendAccountTypeAnalytics(
-                isUpgradeAccount = isUpgradeAccount,
-                openFromSource = openFromSource,
-                planType = subscription.accountType,
-                isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds()
-            )
-            activity?.let {
-                billingViewModel.startPurchase(
-                    activity = activity,
-                    subscription = subscription,
-                    source = openFromSource.toSource()
+                activity?.let {
+                    onFreeClick(
+                        activity = it,
+                        onBack = onBack
+                    )
+                }
+            },
+            onInAppCheckoutClick = { subscription ->
+                sendAccountTypeAnalytics(
+                    isUpgradeAccount = isUpgradeAccount,
+                    openFromSource = openFromSource,
+                    planType = subscription.accountType,
+                    isUpgradeAccountDueToAds = accountStorageViewModel.isUpgradeAccountDueToAds()
                 )
-            }
-        },
-        onSubscriptionUnavailableLearnMoreClick = {
-            activity?.let {
-                megaNavigator.launchUrl(it, SUBSCRIPTION_UNAVAILABLE_LEARN_MORE_URL)
-            }
-        },
-        onBack = {
-            Analytics.tracker.trackEvent(BackButtonPressedEvent)
-            onBack()
-        },
+                activity?.let {
+                    billingViewModel.startPurchase(
+                        activity = activity,
+                        subscription = subscription,
+                        source = openFromSource.toSource()
+                    )
+                }
+            },
+            onSubscriptionUnavailableLearnMoreClick = {
+                activity?.let {
+                    megaNavigator.launchUrl(it, SUBSCRIPTION_UNAVAILABLE_LEARN_MORE_URL)
+                }
+            },
+            onBack = {
+                Analytics.tracker.trackEvent(BackButtonPressedEvent)
+                onBack()
+            },
+        )
+    }
+
+    FeatureFlagGate(
+        feature = ApiFeatures.SubscriptionDiscountRevamp,
+        disabled = { screen(false) },
+        enabled = { screen(true) },
     )
 }
 

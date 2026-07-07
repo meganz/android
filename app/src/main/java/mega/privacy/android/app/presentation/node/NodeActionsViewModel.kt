@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.app.presentation.meeting.chat.model.InfoToShow
 import mega.privacy.android.app.presentation.node.model.NodeActionState
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
+import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UrlFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -54,11 +54,13 @@ import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
+import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -102,6 +104,7 @@ class NodeActionsViewModel @Inject constructor(
     private val nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     private val getNodePreviewFileUseCase: GetNodePreviewFileUseCase,
     private val getPathFromNodeContentUseCase: GetPathFromNodeContentUseCase,
+    private val getFileTypeInfoByContentUseCase: GetFileTypeInfoByContentUseCase,
     private val updateNodeSensitiveUseCase: UpdateNodeSensitiveUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
@@ -485,34 +488,44 @@ class NodeActionsViewModel @Inject constructor(
      *
      * @param fileNode
      */
-    suspend fun handleFileNodeClicked(fileNode: TypedFileNode) = when {
-        fileNode.type is PdfFileTypeInfo -> FileNodeContent.Pdf(
-            uri = getNodeContentUriUseCase(fileNode)
-        )
-
-        fileNode.type is ImageFileTypeInfo -> FileNodeContent.ImageForNode
-
-        fileNode.type is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
-
-        fileNode.type is VideoFileTypeInfo || fileNode.type is AudioFileTypeInfo -> {
-            FileNodeContent.AudioOrVideo(
+    suspend fun handleFileNodeClicked(fileNode: TypedFileNode): FileNodeContent {
+        val fileType = resolveFileType(fileNode)
+        return when {
+            fileType is PdfFileTypeInfo -> FileNodeContent.Pdf(
                 uri = getNodeContentUriUseCase(fileNode)
             )
-        }
 
-        fileNode.type is UrlFileTypeInfo -> {
-            val content = getNodeContentUriUseCase(fileNode)
-            val path = getPathFromNodeContentUseCase(content)
-            FileNodeContent.UrlContent(
-                uri = content,
-                path = path
+            fileType is ImageFileTypeInfo -> FileNodeContent.ImageForNode
+
+            fileType is TextFileTypeInfo && fileNode.size <= TextFileTypeInfo.MAX_SIZE_OPENABLE_TEXT_FILE -> FileNodeContent.TextContent
+
+            fileType is VideoFileTypeInfo || fileType is AudioFileTypeInfo -> {
+                FileNodeContent.AudioOrVideo(
+                    uri = getNodeContentUriUseCase(fileNode)
+                )
+            }
+
+            fileType is UrlFileTypeInfo -> {
+                val content = getNodeContentUriUseCase(fileNode)
+                val path = getPathFromNodeContentUseCase(content)
+                FileNodeContent.UrlContent(
+                    uri = content,
+                    path = path
+                )
+            }
+
+            else -> FileNodeContent.Other(
+                localFile = getNodePreviewFileUseCase(fileNode)
             )
         }
-
-        else -> FileNodeContent.Other(
-            localFile = getNodePreviewFileUseCase(fileNode)
-        )
     }
+
+    private suspend fun resolveFileType(fileNode: TypedFileNode) =
+        if (fileNode.type is UnMappedFileTypeInfo) {
+            getFileTypeInfoByContentUseCase(fileNode)
+        } else {
+            fileNode.type
+        }
 
     /**
      * Apply node content uri

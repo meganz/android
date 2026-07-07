@@ -148,7 +148,12 @@ class UpgradeAccountViewModel @AssistedInject constructor(
                     _state.update {
                         it.copy(
                             subscriptionCycle = levelDetail.accountSubscriptionCycle,
-                            currentSubscriptionPlan = levelDetail.accountType
+                            currentSubscriptionPlan = levelDetail.accountType,
+                            subscriptionStatus = levelDetail.subscriptionStatus,
+                            subscriptionRenewTime = levelDetail.subscriptionRenewTime
+                                .takeIf { time -> time > 0 },
+                            proExpirationTime = levelDetail.proExpirationTime
+                                .takeIf { time -> time > 0 },
                         )
                     }
                 }

@@ -70,6 +70,30 @@ class ContinueWhereLeftOffCarouselTest {
     }
 
     @Test
+    fun `test that loading view is displayed when isLoading is true`() {
+        setContent(items = emptyList(), isLoading = true)
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LOADING_TEST_TAG)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that empty view is not displayed when isLoading is true`() {
+        setContent(items = emptyList(), isLoading = true)
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_EMPTY_TEXT_TEST_TAG)
+            .assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that loading view is not displayed when isLoading is false`() {
+        setContent(items = emptyList(), isLoading = false)
+
+        composeRule.onNodeWithTag(CONTINUE_WHERE_LEFT_OFF_LOADING_TEST_TAG)
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that chevron is hidden when items is empty`() {
         setContent(items = emptyList())
 
@@ -191,6 +215,7 @@ class ContinueWhereLeftOffCarouselTest {
             AndroidThemeForPreviews {
                 ContinueWhereLeftOffCarousel(
                     items = items.value,
+                    isLoading = false,
                     onItemClick = {},
                     onViewAllClick = {},
                 )
@@ -201,6 +226,7 @@ class ContinueWhereLeftOffCarouselTest {
 
     private fun setContent(
         items: List<ContinueWhereLeftOffItem>,
+        isLoading: Boolean = false,
         onItemClick: (ContinueWhereLeftOffItem) -> Unit = {},
         onViewAllClick: () -> Unit = {},
     ) {
@@ -208,6 +234,7 @@ class ContinueWhereLeftOffCarouselTest {
             AndroidThemeForPreviews {
                 ContinueWhereLeftOffCarousel(
                     items = items,
+                    isLoading = isLoading,
                     onItemClick = onItemClick,
                     onViewAllClick = onViewAllClick,
                 )

@@ -18,6 +18,7 @@ internal class ExplorerModeExtensionTest {
             assertThat(mode.titleStringId).isAnyOf(
                 sharedR.string.video_section_video_selected_top_bar_title,
                 sharedR.string.cloud_explorer_select_destination_title,
+                sharedR.string.home_pinned_choose_files_and_folders,
             )
         }
     }
@@ -59,6 +60,10 @@ internal class ExplorerModeExtensionTest {
                 ExplorerMode.Move,
                 sharedR.string.cloud_explorer_select_destination_title,
             ),
+            Arguments.of(
+                ExplorerMode.PinToHome,
+                sharedR.string.home_pinned_choose_files_and_folders,
+            ),
         )
 
         @JvmStatic
@@ -87,6 +92,10 @@ internal class ExplorerModeExtensionTest {
             Arguments.of(
                 ExplorerMode.AddVideosToPlaylist,
                 sharedR.string.video_to_playlist_add_button,
+            ),
+            Arguments.of(
+                ExplorerMode.PinToHome,
+                sharedR.string.general_dialog_choose_button,
             ),
         )
     }

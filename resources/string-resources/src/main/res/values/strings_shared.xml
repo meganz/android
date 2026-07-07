@@ -884,8 +884,6 @@
     <string name="email_confirmation_content">We’ve sent an email to [P]%s[/P] with a link. Tap the link to verify your email address and activate your account. \n\nIf you didn’t receive the email, check your spam folder or try again. For any other issues, please visit our [A]Help Centre[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Resend</string>
-    <!-- Disabled state of the resend button showing the remaining cooldown time before the user can resend the confirmation email again. %1$s is the remaining time formatted as minutes and seconds, e.g. "1:00". -->
-    <string name="email_confirmation_resend_button_countdown">Resend email in %1$s</string>
     <!-- General change email address -->
     <string name="general_change_email_address">Change email address</string>
     <!-- Title for the cancel registration dialog -->
@@ -1138,6 +1136,34 @@
     <string name="general_month">/month</string>
     <!-- Label of the plan in upgrade/choose account page. Placeholder is to display the total amount billed yearly, e.g €199.99 charged yearly. [B] and [/B] are span tags for bold styling. -->
     <string name="choose_account_screen_billed_yearly">[B]%1$s[/B]\nCharged yearly</string>
+    <!-- Title at the top of the redesigned subscription/upgrade page -->
+    <string name="subscription_revamp_title">Upgrade to MEGA Pro</string>
+    <!-- Title of the card highlighting the benefits of a Pro plan on the redesigned subscription page -->
+    <string name="subscription_revamp_why_go_pro_title">Why go Pro?</string>
+    <!-- Storage benefit on the redesigned subscription page. Placeholder is the highest storage amount, e.g. "20 TB". -->
+    <string name="subscription_revamp_why_go_pro_storage">Store up to %1$s of data</string>
+    <!-- Transfer benefit on the redesigned subscription page. Placeholder is the highest transfer quota, e.g. "240 TB". -->
+    <string name="subscription_revamp_why_go_pro_transfer">Enjoy up to %1$s transfer quota</string>
+    <!-- VPN benefit on the redesigned subscription page -->
+    <string name="subscription_revamp_why_go_pro_vpn">Stay safe online with MEGA VPN</string>
+    <!-- Password manager benefit on the redesigned subscription page -->
+    <string name="subscription_revamp_why_go_pro_pass">Keep passwords safe with MEGA Pass</string>
+    <!-- Help text on the current plan card when the subscription will renew. Placeholder is the renewal date, e.g. "8 July 2027". -->
+    <string name="subscription_revamp_current_plan_renews">Renews on %1$s</string>
+    <!-- Help text on the current plan card when the plan will expire (one-off / cancelled). Placeholder is the expiry date, e.g. "8 July 2027". -->
+    <string name="subscription_revamp_current_plan_expires">Expires on %1$s</string>
+    <!-- Billing cycle label on the current plan card for a monthly subscription -->
+    <string name="subscription_revamp_current_plan_cycle_monthly">Monthly</string>
+    <!-- Billing cycle label on the current plan card for a yearly subscription -->
+    <string name="subscription_revamp_current_plan_cycle_yearly">Yearly subscription</string>
+    <!-- Per-month price on a plan card on the redesigned subscription page. Placeholder is the price, e.g. "€4.99". -->
+    <string name="subscription_revamp_price_per_month">%1$s/month</string>
+    <!-- Total amount charged yearly on a plan card on the redesigned subscription page. Placeholder is the total price, e.g. "€29.94". -->
+    <string name="subscription_revamp_charged_yearly">%1$s charged yearly</string>
+    <!-- Savings label shown on the Yearly option of the billing period selector on the redesigned subscription page -->
+    <string name="subscription_revamp_save_label">Save up to 16%</string>
+    <!-- Buy button label on a plan card on the redesigned subscription page. Placeholder is the plan name, e.g. "Pro I". -->
+    <string name="subscription_revamp_get_plan_button">Get %1$s</string>
     <!-- The snackbar message of unhidden nodes operation -->
     <plurals name="unhidden_nodes_result_message">
         <item quantity="one">%1$d item unhidden</item>
@@ -1385,6 +1411,8 @@
     <string name="sync_stalled_issue_general_explanation">This action will be applied to resolve the conflict</string>
     <!-- Dialog choose option -->
     <string name="general_dialog_choose_button">Choose</string>
+    <!-- Choose folders and files to pin to Home. Used both as the picker's top bar title and as the add button/link on the empty Pinned widget. -->
+    <string name="home_pinned_choose_files_and_folders">Choose files &amp; folders</string>
     <!-- Text label of Apply to all -->
     <string name="sync_apply_to_all_checkbox">Apply to all</string>
     <!-- Sync message when a single issue resolved -->
@@ -2477,7 +2505,7 @@
     <!-- Bullet point shown when a folder link has been removed due to ToS violation -->
     <string name="folder_link_unavailable_tos_violation">The folder link has been removed as it violated our Terms of Service.</string>
     <!--Error message to show when adding a new text file with invalid text extension-->
-    <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt)</string>
+    <string name="new_text_file_invalid_extension_error_message">Use a valid file extension (e.g. .txt, .md, or .xml)</string>
     <!-- Title for the decryption key dialog when a folder/file link requires a key -->
     <string name="link_decryption_key_dialog_title">Enter decryption key</string>
     <!-- Two line message for the decryption key dialog prompting user to enter the key -->
@@ -2953,21 +2981,11 @@
     <string name="contacts_remove_dialog_message">This contact will be removed from your contact list.</string>
     <!-- Add contacts picker: toolbar title shown when selecting contacts to send to a chat -->
     <string name="send_contacts">Send contacts</string>
-    <!-- Add contacts picker: header of the collapsible section that lists the contacts stored on the user's phone -->
-    <string name="add_contacts_phone_contacts_section_title">Phone contacts</string>
-    <!-- Add contacts picker: call to action asking the user to grant access to their phone's contacts -->
-    <string name="add_contacts_phone_contacts_allow_access">Allow access to contacts</string>
-    <!-- Add contacts picker: call to action to open the system picker and choose contacts from the phone -->
-    <string name="add_contacts_phone_contacts_select">Select phone contacts</string>
-    <!-- Add contacts picker: header of the section that lists the user's MEGA contacts, shown to separate them from the phone contacts section -->
-    <string name="add_contacts_mega_contacts_section_title">MEGA contacts</string>
     <!-- Multi-select picker: toolbar title showing how many items are currently selected. %1$d is the count. -->
     <plurals name="general_selection_num_selected">
         <item quantity="one">%1$d selected</item>
         <item quantity="other">%1$d selected</item>
     </plurals>
-    <!-- Add participants picker: warning shown when the meeting call has reached its participant limit -->
-    <string name="meetings_add_participants_user_limit_warning">Only 100 participants can join the call. Any additional participants will only be able to send and receive messages. The organiser can upgrade to Pro to remove these restrictions.</string>
     <!-- Contact groups: screen/top bar title for the list of the user's group chats -->
     <string name="contacts_groups_title">Groups</string>
     <!-- Contact groups: placeholder displayed inside the search field on the groups screen -->
@@ -3051,22 +3069,6 @@
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Download over mobile data</string>
     <!-- Button that dismisses the download dialog and opens the old document scanner instead -->
     <string name="document_scanner_download_dialog_use_old_scanner_button">Use old scanner</string>
-    <!-- Title of the loading screen shown while the document scanner is being downloaded and set up for the first time -->
-    <string name="document_scanner_prepare_title">Setting up document scanner</string>
-    <!-- Message shown on the loading screen while the document scanner downloads, reassuring the user it is a one-time setup -->
-    <string name="document_scanner_prepare_message">This only happens once. You can keep using your device while it downloads.</string>
-    <!-- Message shown on the document scanner loading screen when the device is offline; the download resumes automatically once back online -->
-    <string name="document_scanner_prepare_waiting_for_connection">Waiting for connection. The download resumes automatically once you\'re back online.</string>
-    <!-- Message shown on the document scanner loading screen while the download recovers from a temporary connection problem -->
-    <string name="document_scanner_prepare_reconnecting">Reconnecting…</string>
-    <!-- Title of the error state shown when the document scanner download fails -->
-    <string name="document_scanner_prepare_error_title">Couldn\'t set up the document scanner</string>
-    <!-- Error description shown when the download fails for a reason that may be fixed by retrying, such as a lost connection -->
-    <string name="document_scanner_prepare_error_transient_message">Check your connection and try again.</string>
-    <!-- Error description shown when the download fails permanently and retrying won\'t help -->
-    <string name="document_scanner_prepare_error_permanent_message">You can use the old scanner instead.</string>
-    <!-- Button that retries the failed document scanner download -->
-    <string name="document_scanner_prepare_retry_button">Try again</string>
     <!-- Title of the park account confirmation screen, shown when the user opens a park-account confirmation link. -->
     <string name="park_account_screen_title">Park account</string>
     <!-- Message of the confirmation dialog shown when the user taps the start-new-account button on the park account screen. The user must confirm they understand they are starting a fresh account and will lose existing data. -->
@@ -3077,6 +3079,18 @@
     <string name="park_account_success_message">Your old account has been parked. You can now log in to your new account.</string>
     <!-- Add contacts picker: toolbar title shown when selecting contacts to add as chat participants -->
     <string name="add_participants_title">Add participants</string>
+    <!-- Add participants picker: warning shown when the meeting call has reached its participant limit -->
+    <string name="meetings_add_participants_user_limit_warning">This call is limited to 100 participants. Anyone beyond that can only chat. The organiser can upgrade to Pro to remove this limit.</string>
+    <!-- Disabled state of the resend button showing the remaining cooldown time before the user can resend the confirmation email again. %1$s is the remaining time formatted as minutes and seconds, e.g. "1:00". -->
+    <string name="email_confirmation_resend_button_countdown">Resend email in %1$s</string>
+    <string name="document_scanner_prepare_title">Setting up document scanner</string>
+    <string name="document_scanner_prepare_message">This only happens once. You can keep using your device while it downloads.</string>
+    <string name="document_scanner_prepare_error_title">Couldnt set up the document scanner</string>
+    <string name="document_scanner_prepare_error_transient_message">Check your connection and try again.</string>
+    <string name="document_scanner_prepare_error_permanent_message">You can use the old scanner instead.</string>
+    <string name="document_scanner_prepare_retry_button">Try again</string>
+    <string name="document_scanner_prepare_waiting_for_connection">Waiting for connection. The download resumes automatically once youre back online.</string>
+    <string name="document_scanner_prepare_reconnecting">Reconnecting&#8230;</string>
     <!-- Share link revamp: title of the "Link access" info banner on the Share link screen -->
     <string name="share_link_access_banner_title">Link access</string>
     <!-- Share link revamp: body of the "Link access" info banner -->
@@ -3089,6 +3103,14 @@
         <item quantity="one">Link created and copied to your clipboard</item>
         <item quantity="other">Links created and copied to your clipboard</item>
     </plurals>
+    <!-- Add contacts picker: header of the collapsible section that lists the contacts stored on the user's phone -->
+    <string name="add_contacts_phone_contacts_section_title">Phone contacts</string>
+    <!-- Add contacts picker: call to action asking the user to grant access to their phone's contacts -->
+    <string name="add_contacts_phone_contacts_allow_access">Allow access to contacts</string>
+    <!-- Add contacts picker: call to action to open the system picker and choose contacts from the phone -->
+    <string name="add_contacts_phone_contacts_select">Select phone contacts</string>
+    <!-- Add contacts picker: header of the section that lists the user's MEGA contacts, shown to separate them from the phone contacts section -->
+    <string name="add_contacts_mega_contacts_section_title">MEGA contacts</string>
     <!-- Create group chat: toolbar title of the group settings step where the group name and options are set -->
     <string name="create_group_chat_settings_title">New group</string>
     <!-- Create group chat: hint of the group name text field. The name is optional. -->
@@ -3096,7 +3118,7 @@
     <!-- Create group chat: label of the encryption key rotation toggle -->
     <string name="create_group_chat_ekr_label">Encryption key rotation</string>
     <!-- Create group chat: explanation shown under the encryption key rotation toggle -->
-    <string name="create_group_chat_ekr_explanation">Encryption key rotation is slightly more secure, but does not allow you to create a chat link and new participants will not see past messages.</string>
+    <string name="create_group_chat_ekr_explanation">Encryption key rotation is slightly more secure, but doesn’t allow you to create a chat link and new participants won’t see past messages.</string>
     <!-- Create group chat: label of the get chat link toggle -->
     <string name="create_group_chat_get_chat_link_label">Get chat link</string>
     <!-- Create group chat: label of the toggle allowing non-host participants to add others -->

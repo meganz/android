@@ -22,3 +22,10 @@ internal annotation class ContinueWhereLeftOffSortPreference
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
 internal annotation class ViewedLinksSortPreference
+
+/**
+ * Annotation for PinnedItemsSortPreferenceDataStore
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+internal annotation class PinnedItemsSortPreference

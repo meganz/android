@@ -11,6 +11,7 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":navigation"))
+    implementation(project(":feature:document-scanner:document-scanner-snowflake-components"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))
     implementation(project(":core:navigation-contract"))
