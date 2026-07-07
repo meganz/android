@@ -102,6 +102,14 @@
 			app:iconSpaceReserved="false"
 			app:useSimpleSummaryProvider="true" />
 
+		<Preference
+			android:key="settings_sorting_view_mode"
+			android:title="@string/settings_sorting_and_view_mode_title"
+			app:allowDividerAbove="true"
+			app:allowDividerBelow="true"
+			app:iconSpaceReserved="false"
+			app:isPreferenceVisible="false" />
+
 		<mega.privacy.android.app.presentation.settings.MegaSwitchPreference
 			android:defaultValue="false"
 			android:key="settings_hide_recent_activity"

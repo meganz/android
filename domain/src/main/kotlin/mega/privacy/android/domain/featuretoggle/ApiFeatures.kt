@@ -303,6 +303,16 @@ enum class ApiFeatures(
         experimentName = "subrv",
         description = "New subscription page design",
         defaultValue = false,
+    ),
+
+    /**
+     * Sorting and view mode settings.
+     * Enables the "Sorting and view mode" settings screen and its per-folder behaviour.
+     */
+    SortingAndViewMode(
+        experimentName = "svms",
+        description = "Enable the Sorting and view mode settings",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

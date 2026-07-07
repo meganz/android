@@ -3143,18 +3143,16 @@
     <string name="subscription_revamp_get_plan_button">Get %1$s</string>
     <!-- Settings: title of the Sorting and view mode screen -->
     <string name="settings_sorting_and_view_mode_title">Sorting and view mode</string>
-    <!-- Settings: subtext of the Sorting and view mode entry in the User interface settings section -->
-    <string name="settings_sorting_and_view_mode_setting_summary">Configure sorting order and the default view (list or thumbnail).</string>
     <!-- Settings: title of the sorting preference option -->
     <string name="settings_sorting_preference_title">Sorting preference</string>
     <!-- Settings: description of the sorting preference option -->
-    <string name="settings_sorting_preference_description">Configure column sorting order on a per-folder basis, or use the same order for all folders.</string>
+    <string name="settings_sorting_preference_description">Apply sorting per folder, or use the same sorting for all folders.</string>
     <!-- Settings: title of the view mode preference option -->
     <string name="settings_view_mode_preference_title">View mode preference</string>
     <!-- Settings: description of the view mode preference option -->
-    <string name="settings_view_mode_preference_description">Select view mode (list or thumbnail) on a per-folder basis, or use the same view mode for all folders.</string>
+    <string name="settings_view_mode_preference_description">Apply view mode per folder, or use the same view mode for all folders.</string>
     <!-- Settings: preference option that keeps the sorting order or view mode per folder -->
     <string name="settings_preference_option_per_folder">Per folder</string>
     <!-- Settings: preference option that uses the same sorting order or view mode for all folders -->
-    <string name="settings_preference_option_all_folders">All folders</string>
+    <string name="settings_preference_option_all_folders">Same for all</string>
 </resources>

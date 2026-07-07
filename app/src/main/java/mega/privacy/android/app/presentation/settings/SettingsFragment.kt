@@ -52,6 +52,7 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_MEDIA_DISCOVERY_
 import mega.privacy.android.app.constants.SettingsConstants.KEY_PASSCODE_LOCK
 import mega.privacy.android.app.constants.SettingsConstants.KEY_QR_CODE_AUTO_ACCEPT
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RECOVERY_KEY
+import mega.privacy.android.app.constants.SettingsConstants.KEY_SORTING_VIEW_MODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_START_SCREEN
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
@@ -68,12 +69,15 @@ import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRe
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.presentation.settings.passcode.PasscodeSettingsActivity
+import mega.privacy.android.app.presentation.settings.sortingviewmode.SortingAndViewModeSettingsActivity
 import mega.privacy.android.app.presentation.settings.transfers.TransfersSettingsActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.presentation.verifytwofactor.VerifyTwoFactorActivity
 import mega.privacy.android.app.service.RATE_APP_URL
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.settings.SettingsSyncActivity
 import mega.privacy.android.shared.resources.R as sharedResR
 import timber.log.Timber
@@ -90,6 +94,9 @@ class SettingsFragment :
 
     @Inject
     lateinit var viewModelPreferenceDataStoreFactory: ViewModelPreferenceDataStoreFactory
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private var numberOfClicksAppVersion = 0
 
@@ -118,6 +125,16 @@ class SettingsFragment :
         observeState()
         navigateToInitialPreference()
         navigateToShowHiddenItemsPreference()
+        updateSortingAndViewModeVisibility()
+    }
+
+    private fun updateSortingAndViewModeVisibility() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val enabled = runCatching {
+                getFeatureFlagValueUseCase(ApiFeatures.SortingAndViewMode)
+            }.getOrDefault(false)
+            findPreference<Preference>(KEY_SORTING_VIEW_MODE)?.isVisible = enabled
+        }
     }
 
     private fun observeState() {
@@ -285,6 +302,14 @@ class SettingsFragment :
                     Intent(
                         context,
                         TransfersSettingsActivity::class.java
+                    )
+                )
+
+            KEY_SORTING_VIEW_MODE ->
+                startActivity(
+                    Intent(
+                        context,
+                        SortingAndViewModeSettingsActivity::class.java
                     )
                 )
 

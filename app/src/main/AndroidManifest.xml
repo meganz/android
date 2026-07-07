@@ -473,6 +473,10 @@
             android:label="@string/general_section_transfers"
             android:launchMode="singleTop" />
         <activity
+            android:name=".presentation.settings.sortingviewmode.SortingAndViewModeSettingsActivity"
+            android:label="@string/settings_sorting_and_view_mode_title"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".activities.settingsActivities.FileManagementPreferencesActivity"
             android:label="@string/settings_file_management_category"
             android:launchMode="singleTop" />

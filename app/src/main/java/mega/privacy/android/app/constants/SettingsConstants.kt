@@ -68,6 +68,7 @@ object SettingsConstants {
     const val KEY_MEDIA_DISCOVERY_VIEW = "settings_media_discovery_view"
     const val KEY_SUB_FOLDER_MEDIA_DISCOVERY = "settings_sub_folder_media_discovery"
     const val KEY_HIDDEN_ITEMS = "settings_hidden_items"
+    const val KEY_SORTING_VIEW_MODE = "settings_sorting_view_mode"
 
     /* Cookie settings  */
     const val KEY_COOKIE_ACCEPT = "settings_cookie_accept"
