@@ -1013,6 +1013,71 @@ internal class MegaNavigatorImpl @Inject constructor(
         }
     }
 
+    @Suppress("deprecation")
+    override fun openAddChatParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        requestCode: Int,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddParticipantsComposeActivity.getChatIntent(
+                    context = activity,
+                    chatId = chatId,
+                )
+            } else {
+                Intent(activity, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        activity.getString(R.string.add_participants_menu_item)
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
+    }
+
+    override fun openAddChatParticipantsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        chatId: Long,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddParticipantsComposeActivity.getChatIntent(
+                    context = context,
+                    chatId = chatId,
+                )
+            } else {
+                Intent(context, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatId)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        context.getString(R.string.add_participants_menu_item)
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
     override fun openHomeScreen(context: Context) {
         navigateForSingleActivity(context, HomeScreensNavKey())
     }

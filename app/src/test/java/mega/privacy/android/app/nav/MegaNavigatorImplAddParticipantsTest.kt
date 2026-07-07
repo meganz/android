@@ -2,6 +2,8 @@ package mega.privacy.android.app.nav
 
 import android.app.Activity
 import android.content.ComponentName
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
@@ -25,7 +27,9 @@ import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
@@ -106,6 +110,106 @@ class MegaNavigatorImplAddParticipantsTest {
                     ComponentName(
                         ApplicationProvider.getApplicationContext(),
                         AddContactActivity::class.java
+                    )
+                )
+        }
+
+    @Test
+    fun `test that openAddChatParticipantsForResult with requestCode launches the Compose host when the ContactsComposeUI flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            val activity = buildActivity()
+            val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
+
+            navigator.openAddChatParticipantsForResult(
+                activity = activity,
+                chatId = 123L,
+                requestCode = REQUEST_CODE,
+            )
+            advanceUntilIdle()
+
+            val started = shadowOf(activity).nextStartedActivityForResult
+            assertThat(started.requestCode).isEqualTo(REQUEST_CODE)
+            assertThat(started.intent.component)
+                .isEqualTo(
+                    ComponentName(
+                        ApplicationProvider.getApplicationContext(),
+                        AddParticipantsComposeActivity::class.java
+                    )
+                )
+        }
+
+    @Test
+    fun `test that openAddChatParticipantsForResult with requestCode launches the legacy AddContactActivity when the ContactsComposeUI flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            val activity = buildActivity()
+            val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
+
+            navigator.openAddChatParticipantsForResult(
+                activity = activity,
+                chatId = 123L,
+                requestCode = REQUEST_CODE,
+            )
+            advanceUntilIdle()
+
+            val started = shadowOf(activity).nextStartedActivityForResult
+            assertThat(started.requestCode).isEqualTo(REQUEST_CODE)
+            assertThat(started.intent.component)
+                .isEqualTo(
+                    ComponentName(
+                        ApplicationProvider.getApplicationContext(),
+                        AddContactActivity::class.java
+                    )
+                )
+        }
+
+    @Test
+    fun `test that openAddChatParticipantsForResult with launcher launches the Compose host when the ContactsComposeUI flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            val launcher = mock<ActivityResultLauncher<Intent>>()
+            val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
+
+            navigator.openAddChatParticipantsForResult(
+                context = ApplicationProvider.getApplicationContext(),
+                launcher = launcher,
+                chatId = 123L,
+            )
+            advanceUntilIdle()
+
+            val captor = argumentCaptor<Intent>()
+            verify(launcher).launch(captor.capture())
+            assertThat(captor.firstValue.component)
+                .isEqualTo(
+                    ComponentName(
+                        ApplicationProvider.getApplicationContext(),
+                        AddParticipantsComposeActivity::class.java,
+                    )
+                )
+        }
+
+    @Test
+    fun `test that openAddChatParticipantsForResult with launcher launches the legacy AddContactActivity when the ContactsComposeUI flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            val launcher = mock<ActivityResultLauncher<Intent>>()
+            val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
+
+            navigator.openAddChatParticipantsForResult(
+                context = ApplicationProvider.getApplicationContext(),
+                launcher = launcher,
+                chatId = 123L,
+            )
+            advanceUntilIdle()
+
+            val captor = argumentCaptor<Intent>()
+            verify(launcher).launch(captor.capture())
+            assertThat(captor.firstValue.component)
+                .isEqualTo(
+                    ComponentName(
+                        ApplicationProvider.getApplicationContext(),
+                        AddContactActivity::class.java,
                     )
                 )
         }

@@ -624,5 +624,28 @@ interface AppNavigator {
         callUsersLimit: Int?,
         requestCode: Int,
     )
+
+    /**
+     * Opens the chat "add participants" picker for a result, choosing the Compose contacts UI or
+     * the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered to
+     * [activity]'s onActivityResult under [requestCode], mirroring the legacy AddContactActivity
+     * contract (RESULT_OK + EXTRA_CONTACTS).
+     */
+    fun openAddChatParticipantsForResult(
+        activity: Activity,
+        chatId: Long,
+        requestCode: Int,
+    )
+
+    /**
+     * Opens the chat "add participants" picker for a result, choosing the Compose contacts UI or
+     * the legacy AddContactActivity based on the ContactsComposeUI flag. The result is delivered to
+     * [launcher], mirroring the legacy AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS).
+     */
+    fun openAddChatParticipantsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        chatId: Long,
+    )
 }
 

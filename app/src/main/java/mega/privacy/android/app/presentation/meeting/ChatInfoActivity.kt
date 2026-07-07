@@ -58,10 +58,6 @@ import mega.privacy.android.app.presentation.meeting.view.ChatInfoView
 import mega.privacy.android.app.utils.AlertDialogUtil
 import mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.app.utils.ScheduledMeetingDateUtil
@@ -286,21 +282,10 @@ class ChatInfoActivity : PasscodeActivity(), SnackbarShower {
                 if (shouldOpen) {
                     viewModel.removeAddContact()
                     Timber.d("Open Invite participants screen")
-                    addContactLauncher.launch(
-                        Intent(
-                            this@ChatInfoActivity,
-                            AddContactActivity::class.java
-                        )
-                            .putExtra(
-                                INTENT_EXTRA_KEY_CONTACT_TYPE,
-                                Constants.CONTACT_TYPE_MEGA
-                            )
-                            .putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                            .putExtra(INTENT_EXTRA_KEY_CHAT_ID, state.chatId)
-                            .putExtra(
-                                INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                getString(R.string.add_participants_menu_item)
-                            )
+                    navigator.openAddChatParticipantsForResult(
+                        context = this@ChatInfoActivity,
+                        launcher = addContactLauncher,
+                        chatId = state.chatId,
                     )
                 }
             }
