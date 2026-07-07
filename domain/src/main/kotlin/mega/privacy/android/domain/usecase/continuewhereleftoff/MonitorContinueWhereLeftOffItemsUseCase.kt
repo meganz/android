@@ -1,18 +1,21 @@
 package mega.privacy.android.domain.usecase.continuewhereleftoff
 
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffResult
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
-import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SortDirection
@@ -64,9 +67,10 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
         limit: Int,
         sortField: ContinueWhereLeftOffSortField? = null,
         sortDirection: SortDirection? = null,
-    ): Flow<ContinueWhereLeftOffResult> =
-        combine(
-            repository.monitorContinueWhereLeftOffItems(limit, sortField, sortDirection),
+    ): Flow<ContinueWhereLeftOffResult> {
+        val itemsFlow = repository.monitorContinueWhereLeftOffItems(limit, sortField, sortDirection)
+        return combine(
+            itemsFlow,
             // Emit a null placeholder until the real eligibility loads so the list is never blocked
             // waiting for the account, while still telling consumers (via isHiddenResolved) that the
             // sensitivity is not yet known. A null placeholder is treated as "feature disabled" here
@@ -74,49 +78,71 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
             // keep showing their loading state instead of rendering these unresolved items.
             monitorHiddenNodesEnabledUseCase().map<Boolean, Boolean?> { it }.onStart { emit(null) },
             monitorShowHiddenItemsUseCase().onStart { emit(true) },
-            // Re-evaluate when a node moves (e.g. into the rubbish bin), is deleted, has its
-            // sensitivity changed (e.g. the user hides the open file), or is renamed, since none
-            // of these alter the recently-used table on their own.
-            relevantNodeChanges(),
+            relevantNodeUpdates(itemsFlow),
         ) { items, hiddenNodesEnabledOrNull, showHiddenItems, _ ->
-            val isHiddenResolved = hiddenNodesEnabledOrNull != null
-            val hiddenNodesEnabled = hiddenNodesEnabledOrNull == true
-
-            // Items moved to the rubbish bin or deleted are never resumable, so drop them
-            // regardless of the hidden-nodes feature or the "show hidden items" setting.
-            val trashedHandles = items.trashedNodeHandles()
-            trashedHandles.forEach { repository.removeRecentlyUsedItem(it) }
-            val resumableItems = items.filterNot { it.nodeHandle in trashedHandles }
-
-            val visibleItems = when {
-                // Eligibility not resolved yet, or feature off for this account: nothing is
-                // sensitive, show as-is. Nothing is removed while unresolved.
-                !hiddenNodesEnabled -> resumableItems
-                // Feature on and showing hidden items: keep the hidden ones but flag them so the
-                // carousel blurs them, the same way the node lists render sensitive content.
-                showHiddenItems -> {
-                    val hiddenHandles = resumableItems.hiddenNodeHandles()
-                    resumableItems.map { it.copy(isSensitive = it.nodeHandle in hiddenHandles) }
-                }
-                // Feature on and not showing hidden items: drop the hidden ones entirely.
-                else -> {
-                    val hiddenHandles = resumableItems.hiddenNodeHandles()
-                    hiddenHandles.forEach { repository.removeRecentlyUsedItem(it) }
-                    resumableItems.filterNot { it.nodeHandle in hiddenHandles }
-                }
-            }
-            ContinueWhereLeftOffResult(
-                items = visibleItems.withRefreshedNodeInfo(),
-                isHiddenResolved = isHiddenResolved,
-            )
+            buildResult(items, hiddenNodesEnabledOrNull, showHiddenItems)
         }.distinctUntilChanged()
+    }
 
-    private fun relevantNodeChanges(): Flow<NodeUpdate> =
-        monitorNodeUpdatesUseCase()
-            .filter { update ->
-                update.changes.values.any { changes ->
-                    changes.any { it in RELEVANT_NODE_CHANGES }
-                }
+    /**
+     * Applies the current hidden-nodes settings to [items] and refreshes each surviving item from
+     * its live node. Trashed/deleted items are always dropped; hidden items are dropped or flagged
+     * depending on the feature state and the "show hidden items" setting.
+     */
+    private suspend fun buildResult(
+        items: List<ContinueWhereLeftOffItem>,
+        hiddenNodesEnabledOrNull: Boolean?,
+        showHiddenItems: Boolean,
+    ): ContinueWhereLeftOffResult {
+        val isHiddenResolved = hiddenNodesEnabledOrNull != null
+        val hiddenNodesEnabled = hiddenNodesEnabledOrNull == true
+
+        // Items moved to the rubbish bin or deleted are never resumable, so drop them regardless of
+        // the hidden-nodes feature or the "show hidden items" setting.
+        val trashedHandles = items.trashedNodeHandles()
+        trashedHandles.forEach { repository.removeRecentlyUsedItem(it) }
+        val resumableItems = items.filterNot { it.nodeHandle in trashedHandles }
+
+        val visibleItems = when {
+            // Eligibility not resolved yet, or feature off for this account: nothing is
+            // sensitive, show as-is. Nothing is removed while unresolved.
+            !hiddenNodesEnabled -> resumableItems
+            // Feature on and showing hidden items: keep the hidden ones but flag them so the
+            // carousel blurs them, the same way the node lists render sensitive content.
+            showHiddenItems -> {
+                val hiddenHandles = resumableItems.hiddenNodeHandles()
+                resumableItems.map { it.copy(isSensitive = it.nodeHandle in hiddenHandles) }
+            }
+            // Feature on and not showing hidden items: drop the hidden ones entirely.
+            else -> {
+                val hiddenHandles = resumableItems.hiddenNodeHandles()
+                hiddenHandles.forEach { repository.removeRecentlyUsedItem(it) }
+                resumableItems.filterNot { it.nodeHandle in hiddenHandles }
+            }
+        }
+        return ContinueWhereLeftOffResult(
+            items = visibleItems.withRefreshedNodeInfo(),
+            isHiddenResolved = isHiddenResolved,
+        )
+    }
+
+    /**
+     * Ticks whenever a node update touches one of the current carousel items. The node-update
+     * stream is global — it fires for every node in the app — so it is scoped to the handles of the
+     * latest [itemsFlow] emission and matched on node identity rather than change type: takedown or
+     * restore has no dedicated SDK flag (it arrives as a public-link change), so filtering by
+     * *which* node changed — not *what* changed — keeps the taken-down icon in sync without reacting
+     * to unrelated changes elsewhere. The initial tick lets the combine produce a first value before
+     * any node change; debounce coalesces bursts.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private fun relevantNodeUpdates(itemsFlow: Flow<List<ContinueWhereLeftOffItem>>): Flow<NodeUpdate> =
+        itemsFlow
+            .flatMapLatest { items ->
+                val handles = items.mapTo(mutableSetOf()) { it.nodeHandle }
+                monitorNodeUpdatesUseCase()
+                    .filter { update -> update.changes.keys.any { it.id.longValue in handles } }
+                    .debounce(NODE_UPDATE_DEBOUNCE_MILLIS)
             }
             .onStart { emit(NodeUpdate(emptyMap())) }
 
@@ -181,15 +207,10 @@ class MonitorContinueWhereLeftOffItemsUseCase @Inject constructor(
 
     private companion object {
         /**
-         * Node changes that affect a recently-used item's display or whether it is still resumable:
-         * a move into the rubbish bin ([NodeChanges.Parent]), a deletion ([NodeChanges.Remove]), a
-         * change in sensitivity ([NodeChanges.Sensitive]), or a rename ([NodeChanges.Name]).
+         * Coalesces bursts of node updates (e.g. during a sync) so the per-item node lookups run
+         * once per quiet window rather than per raw update. Mirrors the debounce the Recents widget
+         * applies to the same node-update stream.
          */
-        private val RELEVANT_NODE_CHANGES = setOf(
-            NodeChanges.Parent,
-            NodeChanges.Remove,
-            NodeChanges.Sensitive,
-            NodeChanges.Name,
-        )
+        private const val NODE_UPDATE_DEBOUNCE_MILLIS = 500L
     }
 }

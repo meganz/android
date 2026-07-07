@@ -2,13 +2,17 @@ package mega.privacy.android.domain.usecase.continuewhereleftoff
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffItem
 import mega.privacy.android.domain.entity.continuewhereleftoff.ContinueWhereLeftOffSortField
 import mega.privacy.android.domain.entity.continuewhereleftoff.RecentlyUsedType
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.ContinueWhereLeftOffRepository
@@ -461,6 +465,49 @@ class MonitorContinueWhereLeftOffItemsUseCaseTest {
 
         underTest(10).test {
             assertThat(awaitItem().items.single().isTakenDown).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that taken down flag is refreshed when an update touches a carousel item`() = runTest {
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(listOf(item(1L))))
+        // A takedown (or restore) has no dedicated SDK change flag; it arrives as a public-link
+        // change on the item's own node. An update touching a carousel item must trigger a re-read
+        // of the live node so the flag flips without the recently-used table itself changing.
+        val nodeUpdates = MutableSharedFlow<NodeUpdate>()
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdates)
+        val node = mock<TypedNode>()
+        whenever(node.isTakenDown).thenReturn(false, true)
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(node)
+        val changedNode = mock<Node> { on { id } doReturn NodeId(1L) }
+
+        underTest(10).test {
+            assertThat(awaitItem().items.single().isTakenDown).isFalse()
+            nodeUpdates.emit(NodeUpdate(mapOf(changedNode to listOf(NodeChanges.Public_link))))
+            assertThat(awaitItem().items.single().isTakenDown).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that a node update for an unrelated node does not refresh items`() = runTest {
+        whenever(repository.monitorContinueWhereLeftOffItems(10, null, null))
+            .thenReturn(flowOf(listOf(item(1L))))
+        // The node-update stream is global; an update for a node that is not in the carousel must
+        // NOT trigger a re-read. If it did, the sequential stub below would flip the flag to true.
+        val nodeUpdates = MutableSharedFlow<NodeUpdate>()
+        whenever(monitorNodeUpdatesUseCase()).thenReturn(nodeUpdates)
+        val node = mock<TypedNode>()
+        whenever(node.isTakenDown).thenReturn(false, true)
+        whenever(getNodeByIdUseCase(NodeId(1L))).thenReturn(node)
+        val unrelatedNode = mock<Node> { on { id } doReturn NodeId(999L) }
+
+        underTest(10).test {
+            assertThat(awaitItem().items.single().isTakenDown).isFalse()
+            nodeUpdates.emit(NodeUpdate(mapOf(unrelatedNode to listOf(NodeChanges.Public_link))))
+            expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }

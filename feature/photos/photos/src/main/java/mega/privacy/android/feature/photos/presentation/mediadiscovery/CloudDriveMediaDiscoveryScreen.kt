@@ -104,6 +104,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.nodes.components.NodeHeaderItem
 import mega.privacy.android.shared.nodes.components.NodeSelectionModeAppBar
+import mega.privacy.android.shared.nodes.dialog.TakeDownDialog
 import mega.privacy.android.shared.nodes.dialog.newfolder.rememberNewFolderResult
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
@@ -323,6 +324,7 @@ internal fun CloudDriveMediaDiscoveryScreen(
     var isDropdownVisible by remember { mutableStateOf(false) }
     var showSortByDialog by remember { mutableStateOf(false) }
     var showFilterDialog by remember { mutableStateOf(false) }
+    var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
 
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.fillMaxSize(),
@@ -461,8 +463,24 @@ internal fun CloudDriveMediaDiscoveryScreen(
                                 onScrollingListener = { isScrolling ->
                                     isPeriodVisible = !isScrolling
                                 },
-                                onItemClicked = onItemClicked,
-                                onItemLongPressed = onItemLongPressed,
+                                onItemClicked = { photo ->
+                                    // Taken-down items must not be previewed; show the dispute
+                                    // dialog instead, mirroring the node lists and timeline.
+                                    if (photo.shouldDisputeTakenDownOnClick(uiState.isInSelectionMode)) {
+                                        showTakenDownDialog = true
+                                    } else {
+                                        onItemClicked(photo)
+                                    }
+                                },
+                                onItemLongPressed = { photo ->
+                                    // Taken-down items must not be selectable for bulk actions
+                                    // either; show the dispute dialog instead of selecting.
+                                    if (photo.isTakenDown) {
+                                        showTakenDownDialog = true
+                                    } else {
+                                        onItemLongPressed(photo)
+                                    }
+                                },
                                 zoomIn = onClickZoomIn,
                                 zoomOut = onClickZoomOut,
                             )
@@ -538,9 +556,26 @@ internal fun CloudDriveMediaDiscoveryScreen(
             },
         )
     }
+
+    if (showTakenDownDialog) {
+        TakeDownDialog(
+            isFolder = false,
+            onDismiss = { showTakenDownDialog = false },
+        )
+    }
 }
 
 internal const val MEDIA_DISCOVERY_FAB_TAG = "media_discovery_screen:add_content_fab"
+
+/**
+ * Whether tapping this photo should open the taken-down dispute dialog instead of the viewer.
+ *
+ * Only applies outside selection mode (in selection mode a tap toggles selection). Photos and
+ * videos are always files, so there is no folder case to exclude, mirroring how the node lists and
+ * the timeline handle taken-down nodes.
+ */
+internal fun Photo.shouldDisputeTakenDownOnClick(isInSelectionMode: Boolean): Boolean =
+    !isInSelectionMode && isTakenDown
 
 @Composable
 private fun MediaDiscoveryGridView(
