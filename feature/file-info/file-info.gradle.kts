@@ -45,6 +45,10 @@ dependencies {
     implementation(androidx.bundles.compose.bom)
     implementation(androidx.material3)
 
+    // Maps (file location for geo-tagged media)
+    implementation(google.services.maps)
+    implementation(google.maps.compose)
+
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
     testImplementation(platform(testlib.junit5.bom))

@@ -9,7 +9,10 @@ import kotlinx.coroutines.test.runTest
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeLocation
@@ -18,6 +21,9 @@ import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.usecase.GetAddressFromCoordinatesUseCase
+import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
@@ -25,6 +31,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,6 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -51,6 +59,8 @@ internal class FileInfoViewModelTest {
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase = mock()
     private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase = mock()
+    private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase = mock()
+    private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase = mock()
     private val nodeDestinationMapper: NodeDestinationMapper = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
@@ -67,6 +77,8 @@ internal class FileInfoViewModelTest {
             fileTypeIconMapper = fileTypeIconMapper,
             getNodePathByIdUseCase = getNodePathByIdUseCase,
             getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
+            getImageNodeByIdUseCase = getImageNodeByIdUseCase,
+            getAddressFromCoordinatesUseCase = getAddressFromCoordinatesUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             nodeHandle = nodeHandle,
         )
@@ -83,6 +95,8 @@ internal class FileInfoViewModelTest {
             fileTypeIconMapper,
             getNodePathByIdUseCase,
             getNodeLocationByIdUseCase,
+            getImageNodeByIdUseCase,
+            getAddressFromCoordinatesUseCase,
             nodeDestinationMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
@@ -119,6 +133,16 @@ internal class FileInfoViewModelTest {
         on { description } doReturn null
         on { tags } doReturn null
         on { isTakenDown } doReturn false
+    }
+
+    private fun mockImageNode(
+        type: FileTypeInfo = StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = "jpg"),
+        latitude: Double = 52.09,
+        longitude: Double = 5.12,
+    ): ImageNode = mock {
+        on { this.type } doReturn type
+        on { this.latitude } doReturn latitude
+        on { this.longitude } doReturn longitude
     }
 
     @Test
@@ -315,6 +339,123 @@ internal class FileInfoViewModelTest {
                 assertThat(locationDestinations).isNull()
             }
         }
+
+    @Test
+    fun `test that map location is shown for a geo-tagged image owned by the user`() = runTest {
+        val node = mockFileNode()
+        val imageNode = mockImageNode(latitude = 52.09, longitude = 5.12)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(imageNode)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.mapCoordinates)
+            .isEqualTo(Coordinates(latitude = 52.09, longitude = 5.12))
+    }
+
+    @Test
+    fun `test that the location caption is resolved from the coordinates`() = runTest {
+        val node = mockFileNode()
+        val imageNode = mockImageNode(latitude = 52.09, longitude = 5.12)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(imageNode)
+        whenever(getAddressFromCoordinatesUseCase(52.09, 5.12)).thenReturn("Utrecht, Netherlands")
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.locationCaption).isEqualTo("Utrecht, Netherlands")
+    }
+
+    @Test
+    fun `test that map location is hidden for a non-media node`() = runTest {
+        val node = mockFileNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(null)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.mapCoordinates).isNull()
+    }
+
+    @Test
+    fun `test that map location is hidden for a geo-tagged video`() = runTest {
+        val node = mockFileNode()
+        val videoNode = mockImageNode(
+            type = VideoFileTypeInfo(mimeType = "video/mp4", extension = "mp4", duration = 1.seconds),
+            latitude = 52.09,
+            longitude = 5.12,
+        )
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(videoNode)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.mapCoordinates).isNull()
+    }
+
+    @Test
+    fun `test that map location is hidden for an image without coordinates`() = runTest {
+        val node = mockFileNode()
+        val imageNode = mockImageNode(latitude = 0.0, longitude = 0.0)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(imageNode)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.mapCoordinates).isNull()
+    }
+
+    @Test
+    fun `test that map location is hidden when only one coordinate is set`() = runTest {
+        val node = mockFileNode()
+        val imageNode = mockImageNode(latitude = 52.09, longitude = 0.0)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(imageNode)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.mapCoordinates).isNull()
+    }
+
+    @Test
+    fun `test that map location is hidden for out-of-range coordinates`() = runTest {
+        val node = mockFileNode()
+        val imageNode = mockImageNode(latitude = 200.0, longitude = 5.12)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(imageNode)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.mapCoordinates).isNull()
+    }
+
+    @Test
+    fun `test that map location is hidden when the user is not the owner`() = runTest {
+        val node = mockFileNode()
+        val imageNode = mockImageNode(latitude = 52.09, longitude = 5.12)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.READ)
+        whenever(getImageNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(imageNode)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.mapCoordinates).isNull()
+    }
 
     private companion object {
         const val NODE_HANDLE = 99113034474275L

@@ -16,12 +16,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.usecase.GetAddressFromCoordinatesUseCase
+import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
@@ -29,6 +32,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -44,6 +48,8 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
     private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase,
+    private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase,
+    private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase,
     private val nodeDestinationMapper: NodeDestinationMapper,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
@@ -56,6 +62,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     init {
         loadNodeInfo()
         loadLocation()
+        loadMapLocation()
         monitorNodeUpdates()
     }
 
@@ -171,12 +178,32 @@ internal class FileInfoViewModel @AssistedInject constructor(
         }
     }
 
+    private fun loadMapLocation() {
+        viewModelScope.launch {
+            val coordinates = runCatching { getImageNodeByIdUseCase(nodeId) }
+                .onFailure { Timber.e(it, "Failed to load image node for $nodeHandle") }
+                .getOrNull()
+                ?.takeIf { it.type is ImageFileTypeInfo }
+                ?.let { Coordinates.createOrNull(latitude = it.latitude, longitude = it.longitude) }
+            _uiState.update { it.copy(coordinates = coordinates) }
+
+            val caption = coordinates?.let {
+                runCatching { getAddressFromCoordinatesUseCase(it.latitude, it.longitude) }
+                    .onFailure { e -> Timber.e(e, "Failed to resolve address for $nodeHandle") }
+                    .getOrNull()
+            }
+
+            _uiState.update { it.copy(locationCaption = caption) }
+        }
+    }
+
     private fun monitorNodeUpdates() {
         monitorNodeUpdatesById(nodeId)
             .catch { Timber.e(it, "Error monitoring node updates for $nodeHandle") }
             .onEach {
                 loadNodeInfo()
                 loadLocation()
+                loadMapLocation()
             }
             .launchIn(viewModelScope)
     }
