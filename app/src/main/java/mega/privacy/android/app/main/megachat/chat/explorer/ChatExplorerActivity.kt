@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.usecase.contact.MonitorChatPresenceLastGreenUpdatesUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
@@ -47,6 +48,9 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
 
     @Inject
     lateinit var monitorChatPresenceLastGreenUpdatesUseCase: MonitorChatPresenceLastGreenUpdatesUseCase
+
+    @Inject
+    lateinit var megaNavigator: MegaNavigator
 
     private var fragmentContainer: FrameLayout? = null
     var chatExplorerFragment: ChatExplorerFragment? = null
@@ -411,13 +415,10 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
                     return
                 }
 
-                val intent = Intent(
-                    this,
-                    AddContactActivity::class.java
+                megaNavigator.openCreateGroupChatForResult(
+                    activity = this,
+                    requestCode = Constants.REQUEST_CREATE_CHAT,
                 )
-                intent.putExtra(CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                intent.putExtra("onlyCreateGroup", true)
-                startActivityForResult(intent, Constants.REQUEST_CREATE_CHAT)
             } else {
                 Timber.w("Online but not megaApi")
                 Util.showErrorAlertDialog(

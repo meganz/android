@@ -142,27 +142,16 @@ class ContactGroupsFragment : Fragment() {
         binding.listScroller.setRecyclerView(binding.list)
 
         binding.btnCreateGroup.setOnClickListener {
-            val intent = Intent(
-                requireContext(),
-                AddContactActivity::class.java
-            ).apply {
-                putExtra(AddContactActivity.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
-            }
-            intentToCreateGroupChat(intent)
+            navigator.openCreateGroupChatForResult(
+                context = requireContext(),
+                launcher = createGroupChatLauncher,
+            )
         }
 
         binding.viewEmpty.text = binding.viewEmpty.text.toString()
             .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
             .formatColorTag(requireContext(), 'B', R.color.grey_900_grey_100)
             .toSpannedHtmlText()
-    }
-
-    /**
-     * Launches an Intent to open create group chat room screen.
-     */
-    private fun intentToCreateGroupChat(intent: Intent) {
-        createGroupChatLauncher.launch(intent)
     }
 
     private fun setupObservers() {

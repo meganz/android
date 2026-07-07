@@ -647,5 +647,27 @@ interface AppNavigator {
         launcher: ActivityResultLauncher<Intent>,
         chatId: Long,
     )
+
+    /**
+     * Opens the "create group chat" flow for a result, choosing the Compose contacts UI or the
+     * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
+     * result is delivered to [activity]'s onActivityResult under [requestCode], mirroring the legacy
+     * AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS plus the group-chat extras).
+     */
+    fun openCreateGroupChatForResult(
+        activity: Activity,
+        requestCode: Int,
+    )
+
+    /**
+     * Opens the "create group chat" flow for a result, choosing the Compose contacts UI or the
+     * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
+     * result is delivered to [launcher], mirroring the legacy AddContactActivity contract (RESULT_OK
+     * + EXTRA_CONTACTS plus the group-chat extras).
+     */
+    fun openCreateGroupChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+    )
 }
 

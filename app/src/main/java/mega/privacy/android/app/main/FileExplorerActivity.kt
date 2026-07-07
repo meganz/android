@@ -91,7 +91,6 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CONTACTS
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CONTACT_TYPE
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_EKR
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_ONLY_CREATE_GROUP
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerListItem
@@ -2729,10 +2728,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            createChatLauncher.launch(
-                                Intent(this, AddContactActivity::class.java)
-                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
-                                    .putExtra(EXTRA_ONLY_CREATE_GROUP, true)
+                            megaNavigator.openCreateGroupChatForResult(
+                                context = this,
+                                launcher = createChatLauncher,
                             )
                         }
                     }

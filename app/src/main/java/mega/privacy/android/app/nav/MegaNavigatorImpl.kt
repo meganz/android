@@ -25,6 +25,7 @@ import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.contact.AddContactToShareComposeActivity
 import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
+import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActivity
 import mega.privacy.android.app.presentation.contact.navigation.intValue
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
@@ -1074,6 +1075,47 @@ internal class MegaNavigatorImpl @Inject constructor(
             }
             withContext(mainDispatcher) {
                 launcher.launch(intent)
+            }
+        }
+    }
+
+    @Suppress("deprecation")
+    override fun openCreateGroupChatForResult(
+        activity: Activity,
+        requestCode: Int,
+    ) {
+        applicationScope.launch {
+            val intent = createGroupChatIntent(activity)
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
+    }
+
+    override fun openCreateGroupChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+    ) {
+        applicationScope.launch {
+            val intent = createGroupChatIntent(context)
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
+    private suspend fun createGroupChatIntent(context: Context): Intent {
+        val isContactsComposeUIEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        }.getOrDefault(false)
+        return if (isContactsComposeUIEnabled) {
+            CreateGroupChatComposeActivity.getIntent(context)
+        } else {
+            Intent(context, AddContactActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
             }
         }
     }
