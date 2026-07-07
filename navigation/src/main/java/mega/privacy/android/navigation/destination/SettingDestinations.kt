@@ -20,3 +20,6 @@ data object SettingsCameraUploadsNavKey : NavKey, Parcelable
 
 @Serializable
 data object TransfersSettingsNavKey : NavKey
+
+@Serializable
+data object SortingAndViewModeSettingsNavKey : NavKey
