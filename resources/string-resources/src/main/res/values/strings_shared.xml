@@ -3111,6 +3111,16 @@
         <item quantity="one">Link created and copied to your clipboard</item>
         <item quantity="other">Links created and copied to your clipboard</item>
     </plurals>
+    <!-- Share link revamp: title of the Link settings screen -->
+    <string name="share_link_settings_title">Link settings</string>
+    <!-- Share link revamp: title of the row that toggles setting an expiry date on the link -->
+    <string name="share_link_set_expiry_date">Set expiry date</string>
+    <!-- Share link revamp: subtitle explaining the "Set expiry date" row -->
+    <string name="share_link_expiry_subtitle">Disable the link on a specific date</string>
+    <!-- Share link revamp: title of the row that toggles protecting the link with a password -->
+    <string name="share_link_set_password">Set password</string>
+    <!-- Share link revamp: subtitle explaining the "Set password" row -->
+    <string name="share_link_password_subtitle">Limit access with a password</string>
     <!-- Add contacts picker: header of the collapsible section that lists the contacts stored on the user's phone -->
     <string name="add_contacts_phone_contacts_section_title">Phone contacts</string>
     <!-- Add contacts picker: call to action asking the user to grant access to their phone's contacts -->
