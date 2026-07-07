@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.boundary.StabilityTracker
+import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
 import mega.privacy.android.feature.documentscanner.domain.entity.DetectionResult
 import mega.privacy.android.feature.documentscanner.domain.entity.DocumentBoundary
 import mega.privacy.android.feature.documentscanner.domain.entity.Point
@@ -67,6 +68,26 @@ class ScanSessionViewModelTest {
         underTest.onCameraPermissionGranted()
         underTest.uiState.test {
             assertThat(awaitItem().isCameraPermissionGranted).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that the initial capture mode is AUTO`() = runTest {
+        underTest.uiState.test {
+            assertThat(awaitItem().captureMode).isEqualTo(CaptureMode.AUTO)
+        }
+    }
+
+    @Test
+    fun `test that onToggleAutoCapture switches AUTO to MANUAL and back`() = runTest {
+        underTest.onToggleAutoCapture()
+        underTest.uiState.test {
+            assertThat(awaitItem().captureMode).isEqualTo(CaptureMode.MANUAL)
+        }
+
+        underTest.onToggleAutoCapture()
+        underTest.uiState.test {
+            assertThat(awaitItem().captureMode).isEqualTo(CaptureMode.AUTO)
         }
     }
 

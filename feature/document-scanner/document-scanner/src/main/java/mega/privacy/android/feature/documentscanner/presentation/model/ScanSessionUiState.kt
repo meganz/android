@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.documentscanner.presentation.model
 
+import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
 import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 
 /**
@@ -14,10 +15,14 @@ import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
  *   detection cannot run. The screen routes back / surfaces an error instead of
  *   calling the detector. Normally the prepare screen guarantees the model is
  *   cached before this screen is shown.
+ * @property captureMode Whether capture fires automatically on a stable document
+ *   ([CaptureMode.AUTO]) or only on the manual shutter ([CaptureMode.MANUAL]).
+ *   Toggled from the scanner top bar; the auto-capture trigger itself lands in U7.
  */
 internal data class ScanSessionUiState(
     val isCameraPermissionGranted: Boolean = false,
     val boundaryOverlayState: BoundaryOverlayState = BoundaryOverlayState(),
     val stabilityState: StabilityState = StabilityState.SEARCHING,
     val isModelMissing: Boolean = false,
+    val captureMode: CaptureMode = CaptureMode.AUTO,
 )

@@ -3069,6 +3069,14 @@
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Download over mobile data</string>
     <!-- Button that dismisses the download dialog and opens the old document scanner instead -->
     <string name="document_scanner_download_dialog_use_old_scanner_button">Use old scanner</string>
+    <!-- Label for the auto-capture toggle in the document scanner top bar -->
+    <string name="document_scanner_auto_capture_label">Auto</string>
+    <!-- Accessibility description for the auto-capture toggle when auto-capture is on -->
+    <string name="document_scanner_auto_capture_on">Auto-capture on</string>
+    <!-- Accessibility description for the auto-capture toggle when auto-capture is off -->
+    <string name="document_scanner_auto_capture_off">Auto-capture off</string>
+    <!-- Accessibility description for the manual shutter (capture) button in the document scanner -->
+    <string name="document_scanner_capture_button">Capture</string>
     <!-- Title of the park account confirmation screen, shown when the user opens a park-account confirmation link. -->
     <string name="park_account_screen_title">Park account</string>
     <!-- Message of the confirmation dialog shown when the user taps the start-new-account button on the park account screen. The user must confirm they understand they are starting a fresh account and will lose existing data. -->

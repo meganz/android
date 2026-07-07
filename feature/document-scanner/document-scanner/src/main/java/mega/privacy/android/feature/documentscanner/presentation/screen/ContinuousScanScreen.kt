@@ -9,11 +9,14 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -25,6 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -35,10 +40,12 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.documentscanner.components.BoundaryOverlay
 import mega.privacy.android.feature.documentscanner.components.ScanBoundaryStability
+import mega.privacy.android.feature.documentscanner.components.ScannerControlBar
+import mega.privacy.android.feature.documentscanner.components.ScannerTopBar
+import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
 import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 import mega.privacy.android.feature.documentscanner.presentation.ScanSessionViewModel
 import mega.privacy.android.feature.documentscanner.presentation.analyzer.ScanFrameAnalyzer
-import mega.privacy.android.feature.documentscanner.presentation.component.ScannerCloseButton
 import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
 import java.util.concurrent.Executors
 import mega.privacy.android.shared.resources.R as sharedR
@@ -51,11 +58,13 @@ private const val ANALYSIS_INTERVAL_MS = 200L
  * Main scanning screen with CameraX preview, permission handling, and close button.
  *
  * @param onClose Callback when the user closes the scanner
+ * @param onSwitchToLegacy Callback to switch to the legacy ML Kit scanner
  * @param viewModel ViewModel managing camera and session state
  */
 @Composable
 internal fun ContinuousScanScreen(
     onClose: () -> Unit,
+    onSwitchToLegacy: () -> Unit,
     viewModel: ScanSessionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -92,7 +101,10 @@ internal fun ContinuousScanScreen(
         CameraContent(
             boundaryOverlayState = uiState.boundaryOverlayState,
             stabilityState = uiState.stabilityState,
+            captureMode = uiState.captureMode,
+            onToggleAutoCapture = viewModel::onToggleAutoCapture,
             onClose = onClose,
+            onSwitchToLegacy = onSwitchToLegacy,
             onFrame = viewModel::onAnalysisFrame,
         )
     } else {
@@ -107,7 +119,10 @@ internal fun ContinuousScanScreen(
 private fun CameraContent(
     boundaryOverlayState: BoundaryOverlayState,
     stabilityState: StabilityState,
+    captureMode: CaptureMode,
+    onToggleAutoCapture: () -> Unit,
     onClose: () -> Unit,
+    onSwitchToLegacy: () -> Unit,
     onFrame: (ByteArray, Int, Int, Int, Long) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -131,11 +146,33 @@ private fun CameraContent(
             modifier = Modifier.fillMaxSize(),
         )
 
-        ScannerCloseButton(
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .height(140.dp)
+                .background(
+                    Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.5f), Color.Transparent)),
+                ),
+        )
+
+        ScannerTopBar(
+            isAutoOn = captureMode == CaptureMode.AUTO,
+            onToggleAutoCapture = onToggleAutoCapture,
             onClose = onClose,
             modifier = Modifier
-                .align(Alignment.TopStart)
+                .align(Alignment.TopCenter)
                 .statusBarsPadding(),
+        )
+
+        ScannerControlBar(
+            onManualShutter = {},
+            onSwitchToLegacy = onSwitchToLegacy,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .navigationBarsPadding(),
         )
     }
 }

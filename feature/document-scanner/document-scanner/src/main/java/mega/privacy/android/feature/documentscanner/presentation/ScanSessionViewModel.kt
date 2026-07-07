@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.boundary.StabilityTracker
+import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
 import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelProvider
 import mega.privacy.android.feature.documentscanner.domain.smoother.BoundarySmoother
 import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
@@ -46,6 +47,14 @@ internal class ScanSessionViewModel @Inject constructor(
     /** Called when camera permission is denied. */
     fun onCameraPermissionDenied() {
         _uiState.update { it.copy(isCameraPermissionGranted = false) }
+    }
+
+    /** Toggle auto-capture on/off from the top bar (AUTO ↔ MANUAL). */
+    fun onToggleAutoCapture() {
+        _uiState.update {
+            val next = if (it.captureMode == CaptureMode.AUTO) CaptureMode.MANUAL else CaptureMode.AUTO
+            it.copy(captureMode = next)
+        }
     }
 
     /**
