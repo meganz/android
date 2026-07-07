@@ -2763,4 +2763,23 @@
     <string name="create_group_chat_ekr_label">Rotacja klucza szyfrowania</string>
     <string name="create_group_chat_get_chat_link_label">Uzyskaj link do czatu</string>
     <string name="create_group_chat_allow_add_participants_label">Umożliwienie dodawania uczestników przez osoby niebędące gospodarzami</string>
+    <string name="subscription_revamp_current_plan_renews">Odnawia na w %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Wygasa dnia %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Miesięcznie</string>
+    <string name="add_contacts_phone_contacts_allow_access">Zezwól na dostęp do kontaktów</string>
+    <string name="add_contacts_phone_contacts_select">Wybierz kontakty z telefonu</string>
+    <string name="add_contacts_mega_contacts_section_title">Kontakty MEGA</string>
+    <string name="create_group_chat_ekr_explanation">Rotacja klucza szyfrowania jest nieco bezpieczniejsza, ale nie pozwala na tworzenie linku do czatu, a nowi uczestnicy nie będą widzieć wcześniejszych wiadomości.</string>
+    <string name="home_pinned_choose_files_and_folders">Wybierz pliki i foldery</string>
+    <string name="subscription_revamp_title">Przejdź na MEGA Pro</string>
+    <string name="subscription_revamp_why_go_pro_title">Dlaczego warto przejść na Pro?</string>
+    <string name="subscription_revamp_why_go_pro_storage">Przechowuj do %1$s danych</string>
+    <string name="subscription_revamp_why_go_pro_transfer">Korzystaj z limitu transferu do %1$s</string>
+    <string name="subscription_revamp_why_go_pro_vpn">Bądź bezpieczny w sieci z MEGA VPN</string>
+    <string name="subscription_revamp_why_go_pro_pass">Przechowuj hasła bezpiecznie dzięki MEGA Pass</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">Roczna subskrypcja</string>
+    <string name="subscription_revamp_price_per_month">%1$s/miesiąc</string>
+    <string name="subscription_revamp_charged_yearly">%1$s pobierane rocznie</string>
+    <string name="subscription_revamp_save_label">Oszczędź do 16%</string>
+    <string name="subscription_revamp_get_plan_button">Wybierz %1$s</string>
 </resources>

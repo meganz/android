@@ -349,7 +349,7 @@
     <!-- success message when removing a node from MEGA -->
     <string name="context_correctly_removed">Item deletado</string>
     <!-- error message -->
-    <string name="context_no_removed">Erro. Não foi removido do MEGA</string>
+    <string name="context_no_removed">Erro. Não foi possível deletar</string>
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">%d itens foram copiados</string>
     <!-- error message when sending multiple files -->

@@ -2570,4 +2570,23 @@
     <string name="create_group_chat_ekr_label">Coderingssleutel rotatie</string>
     <string name="create_group_chat_get_chat_link_label">Gesprekslink ophalen</string>
     <string name="create_group_chat_allow_add_participants_label">Toestaan dat non-hosts deelnemers kunnen toevoegen</string>
+    <string name="subscription_revamp_current_plan_renews">Wordt verlengd op %1$s</string>
+    <string name="subscription_revamp_current_plan_expires">Vervalt op %1$s</string>
+    <string name="subscription_revamp_current_plan_cycle_monthly">Maandelijks</string>
+    <string name="add_contacts_phone_contacts_allow_access">Toegang tot contacten toestaan</string>
+    <string name="add_contacts_phone_contacts_select">Telefooncontacten selecteren</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA contacten</string>
+    <string name="create_group_chat_ekr_explanation">Rotatie van coderingssleutels is iets veiliger, maar hiermee kunt u geen chatlink aanmaken nieuwe deelnemers zien geen eerdere berichten.</string>
+    <string name="home_pinned_choose_files_and_folders">Bestanden &amp; mappen kiezen</string>
+    <string name="subscription_revamp_title">Upgrade naar MEGA Pro</string>
+    <string name="subscription_revamp_why_go_pro_title">Waarom kiezen voor Pro?</string>
+    <string name="subscription_revamp_why_go_pro_storage">Sla tot %1$s aan gegevens op</string>
+    <string name="subscription_revamp_why_go_pro_transfer">Profiteer van een overdrachtslimiet tot %1$s</string>
+    <string name="subscription_revamp_why_go_pro_vpn">Blijf veilig online met MEGA VPN</string>
+    <string name="subscription_revamp_why_go_pro_pass">Houd wachtwoorden veilig met MEGA Pass</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">Jaarabonnement</string>
+    <string name="subscription_revamp_price_per_month">%1$s/maand</string>
+    <string name="subscription_revamp_charged_yearly">%1$s jaarlijks in rekening gebracht</string>
+    <string name="subscription_revamp_save_label">Bespaar tot 16%</string>
+    <string name="subscription_revamp_get_plan_button">Krijg %1$s</string>
 </resources>
