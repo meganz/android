@@ -59,6 +59,13 @@ internal class FileWrapperFactory(
                             overwrite = overwrite
                         )?.let { invoke(it) }
                     },
+                    moveDocumentFunction = { sourceParentUriString, targetParentUriString ->
+                        fileGateway.moveDocumentSync(
+                            uriPath = uriPath,
+                            sourceParentUriPath = UriPath(sourceParentUriString),
+                            targetParentUriPath = UriPath(targetParentUriString),
+                        )?.let { invoke(it) }
+                    },
                     getChildByNameFunction = { name ->
                         fileGateway.getChildByName(uriPath, name)?.value
                     },
@@ -73,6 +80,16 @@ internal class FileWrapperFactory(
                             createIfMissing = createIfMissing,
                             lastAsFolder = lastAsFolder
                         )?.value
+                    },
+                    getChildrenWithMetadataFunction = {
+                        // For non-folders the empty list is a deterministic answer, not a
+                        // failure — return empty rather than null so the C++ side does not
+                        // see SCAN_INACCESSIBLE for a regular file.
+                        if (isFolder) {
+                            fileGateway.getChildrenWithMetadataSync(uriPath.toUri())
+                        } else {
+                            emptyList()
+                        }
                     }
                 )
             }

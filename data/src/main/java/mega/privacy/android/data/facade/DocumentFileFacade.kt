@@ -72,14 +72,17 @@ class DocumentFileFacade @Inject constructor(
     override fun getDocumentId(documentFile: DocumentFile): String =
         DocumentsContract.getDocumentId(documentFile.uri)
 
-    override fun fromUri(uri: Uri): DocumentFile? {
-        val file = getFile(uri)
+    override fun fromUri(uri: Uri): DocumentFile? = fromUri(uri, existsCheck = true)
 
-        return when {
-            file?.exists() == true -> DocumentFile.fromFile(file)
-            DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri).takeIf { it?.exists() == true }
-            else -> fromSingleUri(uri).takeIf { it?.exists() == true }
-        }
+    override fun fromUri(uri: Uri, existsCheck: Boolean): DocumentFile? {
+        // Tree-URI parsing is in-process and cheap; resolving via SAF tree avoids the
+        // Samsung/MIUI fallback work in getFile() which would never apply to a tree URI.
+        val documentFile = when {
+            DocumentsContract.isTreeUri(uri) -> fromTreeUri(uri)
+            else -> getFile(uri)?.let(DocumentFile::fromFile) ?: fromSingleUri(uri)
+        } ?: return null
+
+        return if (existsCheck) documentFile.takeIf { it.exists() } else documentFile
     }
 
     /**
