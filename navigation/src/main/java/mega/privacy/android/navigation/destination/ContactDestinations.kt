@@ -3,7 +3,6 @@ package mega.privacy.android.navigation.destination
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
-import mega.privacy.android.navigation.destination.CreateGroupChatNavKey.KEY
 
 /**
  * Cannot verify contact dialog nav key
@@ -16,10 +15,14 @@ data class CannotVerifyContactDialogNavKey(val email: String) : DialogNavKey
 /**
  * Add contacts nav key. Opens the MEGA-contacts multi-select picker; the selected
  * contact emails are published as a `List<String>` under [KEY].
+ *
+ * @property preselectedHandles handles of contacts to pre-select when the picker opens.
  */
 @Serializable
-data object AddContactsNavKey : NavKey {
-    const val KEY: String = "add_contacts"
+data class AddContactsNavKey(val preselectedHandles: List<Long>) : NavKey {
+    companion object {
+        const val KEY: String = "add_contacts"
+    }
 }
 
 /**

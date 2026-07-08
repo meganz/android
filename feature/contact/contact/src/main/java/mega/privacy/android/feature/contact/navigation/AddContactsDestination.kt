@@ -21,12 +21,14 @@ import mega.privacy.android.shared.resources.R as sharedR
  * Hosted by the app module's gated `AddContactsNavKey` destination (behind `ContactsComposeUI`).
  *
  * @param navigationHandler
+ * @param preselectedHandles handles of contacts to pre-select when the picker opens.
  * @param showPhoneContacts whether to surface the collapsible phone-contacts section.
  */
 @SuppressLint("ComposeViewModelInjection")
 @Composable
 fun AddContactsEntry(
     navigationHandler: NavigationHandler,
+    preselectedHandles: List<Long> = emptyList(),
     showPhoneContacts: Boolean = false,
 ) {
     val viewModel = hiltViewModel<AddContactViewModel, AddContactViewModel.Factory> { factory ->
@@ -46,10 +48,11 @@ fun AddContactsEntry(
                 viewModel.emailsForSelected(handles, phoneEmails),
             )
         },
-        onBack = { navigationHandler.remove(AddContactsNavKey) },
+        onBack = { navigationHandler.remove(AddContactsNavKey(preselectedHandles = preselectedHandles)) },
         onReadContactsPermissionGranted = viewModel::onReadContactsPermissionGranted,
         onContactsPicked = viewModel::onContactsPicked,
         onPhoneContactsPickedConsumed = viewModel::onPhoneContactsPickedConsumed,
+        initialSelectedHandles = preselectedHandles.toSet(),
     )
 }
 

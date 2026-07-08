@@ -27,7 +27,7 @@ import mega.privacy.android.navigation.destination.AddContactsNavKey
  * TODO: Move this entry to the feature module once the feature flag is removed
  */
 fun EntryProviderScope<NavKey>.addContactsDestination(navigationHandler: NavigationHandler) {
-    entry<AddContactsNavKey> {
+    entry<AddContactsNavKey> { navKey ->
         FeatureFlagGate(
             feature = AppFeatures.ContactsComposeUI,
             disabled = {
@@ -38,7 +38,10 @@ fun EntryProviderScope<NavKey>.addContactsDestination(navigationHandler: Navigat
                 )
             },
             enabled = {
-                AddContactsEntry(navigationHandler = navigationHandler)
+                AddContactsEntry(
+                    navigationHandler = navigationHandler,
+                    preselectedHandles = navKey.preselectedHandles,
+                )
             },
         )
     }
