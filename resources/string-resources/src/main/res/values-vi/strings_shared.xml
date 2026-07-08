@@ -2464,4 +2464,16 @@
     <string name="subscription_revamp_save_label">Tiết kiệm lên tới 16%</string>
     <string name="park_account_success_message">Tài&#160;khoản cũ của&#160;bạn đã được tạm đặt&#160;mới. Bây&#160;giờ, bạn có thể đăng&#160;nhập vào tài&#160;khoản mới của&#160;mình.</string>
     <string name="meetings_add_participants_user_limit_warning">Cuộc gọi này giới hạn ở mức 100 người tham&#160;gia. Những người tham gia sau sẽ chỉ có thể gửi chat. Người tổ chức có thể nâng cấp lên gói Pro để gỡ bỏ giới&#160;hạn này.</string>
+    <string name="document_scanner_capture_button">Chụp</string>
+    <string name="share_link_set_password">Đặt mật khẩu</string>
+    <string name="document_scanner_auto_capture_label">Tự&#160;động</string>
+    <string name="share_link_settings_title">Thiết đặt đường liên&#160;kết</string>
+    <string name="share_link_set_expiry_date">Đặt ngày hết hạn</string>
+    <string name="share_link_expiry_subtitle">Vô&#160;hiệu đường liên&#160;kết vào một ngày cụ&#160;thể</string>
+    <string name="share_link_password_subtitle">Hạn&#160;chế truy&#160;cập bằng mật&#160;khẩu</string>
+    <string name="settings_sorting_and_view_mode_title">Kiểu xem và cách sắp&#160;xếp</string>
+    <string name="settings_sorting_preference_title">Tùy chỉnh việc sắp xếp</string>
+    <string name="settings_view_mode_preference_title">Tùy chỉnh chế độ xem</string>
+    <string name="settings_preference_option_per_folder">Riêng từng thư mục</string>
+    <string name="settings_preference_option_all_folders">Giống nhau hết</string>
 </resources>

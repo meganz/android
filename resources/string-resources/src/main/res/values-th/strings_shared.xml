@@ -2485,4 +2485,16 @@
     <string name="subscription_revamp_charged_yearly">เรียกเก็บเงินรายปี %1$s</string>
     <string name="subscription_revamp_save_label">ประหยัดสูงสุด 16%</string>
     <string name="subscription_revamp_get_plan_button">เลือกซื้อ %1$s</string>
+    <string name="document_scanner_capture_button">จับภาพ</string>
+    <string name="share_link_set_password">ตั้งรหัสผ่าน</string>
+    <string name="document_scanner_auto_capture_label">อัตโนมัติ</string>
+    <string name="share_link_settings_title">การตั้งค่าลิงก์</string>
+    <string name="share_link_set_expiry_date">กำหนดวันหมดอายุ</string>
+    <string name="share_link_expiry_subtitle">ปิดใช้งานการระบุวันที่ในลิงก์</string>
+    <string name="share_link_password_subtitle">จำกัดการเข้าถึงด้วยรหัสผ่าน</string>
+    <string name="settings_sorting_and_view_mode_title">เรียงลําดับและโหมดมุมมอง</string>
+    <string name="settings_sorting_preference_title">กำหนดลักษณะการจัดเรียง</string>
+    <string name="settings_view_mode_preference_title">กำหนดลักษณะโหมดมุมมอง</string>
+    <string name="settings_preference_option_per_folder">ต่อโฟลเดอร์</string>
+    <string name="settings_preference_option_all_folders">เหมือนกันทั้งหมด</string>
 </resources>

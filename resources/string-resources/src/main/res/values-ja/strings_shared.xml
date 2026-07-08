@@ -2494,4 +2494,20 @@
     <string name="subscription_revamp_get_plan_button">%1$sを購入</string>
     <string name="subscription_revamp_current_plan_expires">有効期限%1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">月払い</string>
+    <string name="document_scanner_capture_button">キャプチャ</string>
+    <string name="share_link_set_password">パスワードを設定</string>
+    <string name="document_scanner_auto_capture_label">自動</string>
+    <string name="document_scanner_auto_capture_on">自動撮影オン</string>
+    <string name="document_scanner_auto_capture_off">自動撮影オフ</string>
+    <string name="share_link_settings_title">リンク設定</string>
+    <string name="share_link_set_expiry_date">有効期限を設定</string>
+    <string name="share_link_expiry_subtitle">指定した日付にリンクを無効化します</string>
+    <string name="share_link_password_subtitle">パスワードでアクセスを制限します</string>
+    <string name="settings_sorting_and_view_mode_title">並べ替えと表示モード</string>
+    <string name="settings_sorting_preference_title">並べ替えの設定</string>
+    <string name="settings_sorting_preference_description">フォルダごとに並べ替えを適用するか、すべてのフォルダに同じ並べ替えを適用できます。</string>
+    <string name="settings_view_mode_preference_title">表示モードの設定</string>
+    <string name="settings_view_mode_preference_description">フォルダごとに表示モードを適用するか、すべてのフォルダに同じ表示モードを適用できます。</string>
+    <string name="settings_preference_option_per_folder">フォルダごと</string>
+    <string name="settings_preference_option_all_folders">すべてのフォルダに同じ</string>
 </resources>

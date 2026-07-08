@@ -2745,4 +2745,26 @@
     <string name="subscription_revamp_current_plan_renews">Продлевается %1$s</string>
     <string name="subscription_revamp_current_plan_expires">Истекает %1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">Ежемесячно</string>
+    <string name="document_scanner_capture_button">Cнимок</string>
+    <string name="share_link_set_password">Задайте пароль</string>
+    <string name="document_scanner_prepare_reconnecting">Переподключение&#8230;</string>
+    <string name="subscription_revamp_why_go_pro_storage">Храните до %1$s данных</string>
+    <string name="subscription_revamp_save_label">Экономия до 16&#160;%</string>
+    <string name="document_scanner_auto_capture_label">Авто</string>
+    <string name="share_link_settings_title">Настройки ссылки</string>
+    <string name="share_link_set_expiry_date">Срок действия</string>
+    <string name="share_link_expiry_subtitle">Отключить ссылку в определённую дату</string>
+    <string name="share_link_password_subtitle">Ограничить доступ паролем</string>
+    <string name="document_scanner_prepare_retry_button">Попробовать ещё раз</string>
+    <string name="settings_sorting_and_view_mode_title">Сортировка и вид</string>
+    <string name="settings_sorting_preference_title">Параметры сортировки</string>
+    <string name="settings_view_mode_preference_title">Параметры режима отображения</string>
+    <string name="settings_preference_option_per_folder">Для папки</string>
+    <string name="settings_preference_option_all_folders">Для всех папок</string>
+    <string name="park_account_screen_title">Заморозка аккаунта</string>
+    <string name="park_account_screen_acknowledge">Я понимаю, что создаю новый пустой аккаунт, и что я потеряю все данные в существующем, если не вспомню пароль или не найду ключ восстановления.</string>
+    <string name="park_account_screen_start_button">Создать новый аккаунт</string>
+    <string name="park_account_success_message">Ваш старый аккаунт прекратил своё существование. Теперь вы можете войти в новый аккаунт.</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA контакты</string>
+    <string name="meetings_add_participants_user_limit_warning">Этот звонок ограничен до 100 участников. Участники сверх этого лимита могут только общаться в чате. Организатор может перейти на Pro, чтобы снять этот лимит.</string>
 </resources>

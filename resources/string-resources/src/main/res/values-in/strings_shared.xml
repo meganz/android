@@ -2419,4 +2419,24 @@
     <string name="subscription_revamp_current_plan_renews">Memperbarui pada %1$s</string>
     <string name="subscription_revamp_current_plan_expires">Kedaluwarsa pada %1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">Bulanan</string>
+    <string name="document_scanner_capture_button">Ambil foto</string>
+    <string name="share_link_set_password">Setel kata sandi</string>
+    <string name="document_scanner_prepare_reconnecting">Menghubungkan kembali &#8230;</string>
+    <string name="subscription_revamp_save_label">Hemat hingga 16%</string>
+    <string name="document_scanner_auto_capture_label">Otomatis</string>
+    <string name="share_link_settings_title">Pengaturan tautan</string>
+    <string name="share_link_set_expiry_date">Set tanggal expiration</string>
+    <string name="share_link_expiry_subtitle">Nonaktifkan tautan pada tanggal tertentu</string>
+    <string name="share_link_password_subtitle">Batasi akses dengan kata sandi</string>
+    <string name="document_scanner_prepare_retry_button">Coba lagi</string>
+    <string name="settings_sorting_and_view_mode_title">Mode Penyortiran Dan Tampilan</string>
+    <string name="settings_sorting_preference_title">Preferensi sorting</string>
+    <string name="settings_view_mode_preference_title">Pilihan view mode</string>
+    <string name="settings_preference_option_all_folders">Sama untuk Semua</string>
+    <string name="settings_preference_option_per_folder">Per folder</string>
+    <string name="park_account_screen_title">Parkir akun</string>
+    <string name="park_account_screen_acknowledge">Saya mengetahui bahwa saya memulai dari awal, akun kosong dan saya akan kehilangan seluruh data di akun terkini saya kecuali saya mengingat password saya atau menemukan Kunci pemulihan yang telah terekspor.</string>
+    <string name="park_account_screen_start_button">Mulai akun baru</string>
+    <string name="park_account_success_message">Akun lama anda telah diparkir. Anda sekarang dapat masuk ke akun baru anda.</string>
+    <string name="add_contacts_mega_contacts_section_title">Kontak MEGA</string>
 </resources>

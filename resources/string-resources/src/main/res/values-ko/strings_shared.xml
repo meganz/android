@@ -2483,4 +2483,18 @@
     <string name="subscription_revamp_charged_yearly">매년 %1$s 청구</string>
     <string name="subscription_revamp_save_label">최대 16% 할인</string>
     <string name="subscription_revamp_get_plan_button">%1$s 구입</string>
+    <string name="document_scanner_capture_button">캡처</string>
+    <string name="share_link_set_password">암호 설정</string>
+    <string name="document_scanner_auto_capture_label">자동</string>
+    <string name="document_scanner_auto_capture_on">자동 캡처 켬</string>
+    <string name="document_scanner_auto_capture_off">자동 캡처 끔</string>
+    <string name="share_link_settings_title">링크 설정</string>
+    <string name="share_link_set_expiry_date">만료일 설정</string>
+    <string name="share_link_expiry_subtitle">특정 날짜에 링크 비활성화</string>
+    <string name="share_link_password_subtitle">암호로 접근 제한</string>
+    <string name="settings_sorting_and_view_mode_title">정렬과 보기 모드</string>
+    <string name="settings_sorting_preference_title">정렬 설정</string>
+    <string name="settings_view_mode_preference_title">보기 모드 설정</string>
+    <string name="settings_preference_option_per_folder">폴더마다</string>
+    <string name="settings_preference_option_all_folders">모두 동일</string>
 </resources>

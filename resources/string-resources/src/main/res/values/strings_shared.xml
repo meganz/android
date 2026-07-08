@@ -3039,14 +3039,6 @@
     <string name="document_scanner_download_dialog_download_over_mobile_data_button">Download over mobile data</string>
     <!-- Button that dismisses the download dialog and opens the old document scanner instead -->
     <string name="document_scanner_download_dialog_use_old_scanner_button">Use old scanner</string>
-    <!-- Label for the auto-capture toggle in the document scanner top bar -->
-    <string name="document_scanner_auto_capture_label">Auto</string>
-    <!-- Accessibility description for the auto-capture toggle when auto-capture is on -->
-    <string name="document_scanner_auto_capture_on">Auto-capture on</string>
-    <!-- Accessibility description for the auto-capture toggle when auto-capture is off -->
-    <string name="document_scanner_auto_capture_off">Auto-capture off</string>
-    <!-- Accessibility description for the manual shutter (capture) button in the document scanner -->
-    <string name="document_scanner_capture_button">Capture</string>
     <!-- Title of the park account confirmation screen, shown when the user opens a park-account confirmation link. -->
     <string name="park_account_screen_title">Park account</string>
     <!-- Message of the confirmation dialog shown when the user taps the start-new-account button on the park account screen. The user must confirm they understand they are starting a fresh account and will lose existing data. -->
@@ -3081,16 +3073,6 @@
         <item quantity="one">Link created and copied to your clipboard</item>
         <item quantity="other">Links created and copied to your clipboard</item>
     </plurals>
-    <!-- Share link revamp: title of the Link settings screen -->
-    <string name="share_link_settings_title">Link settings</string>
-    <!-- Share link revamp: title of the row that toggles setting an expiry date on the link -->
-    <string name="share_link_set_expiry_date">Set expiry date</string>
-    <!-- Share link revamp: subtitle explaining the "Set expiry date" row -->
-    <string name="share_link_expiry_subtitle">Disable the link on a specific date</string>
-    <!-- Share link revamp: title of the row that toggles protecting the link with a password -->
-    <string name="share_link_set_password">Set password</string>
-    <!-- Share link revamp: subtitle explaining the "Set password" row -->
-    <string name="share_link_password_subtitle">Limit access with a password</string>
     <!-- Add contacts picker: header of the collapsible section that lists the contacts stored on the user's phone -->
     <string name="add_contacts_phone_contacts_section_title">Phone contacts</string>
     <!-- Add contacts picker: call to action asking the user to grant access to their phone's contacts -->
@@ -3141,6 +3123,24 @@
     <string name="subscription_revamp_save_label">Save up to 16%</string>
     <!-- Buy button label on a plan card on the redesigned subscription page. Placeholder is the plan name, e.g. "Pro I". -->
     <string name="subscription_revamp_get_plan_button">Get %1$s</string>
+    <!-- Label for the auto-capture toggle in the document scanner top bar -->
+    <string name="document_scanner_auto_capture_label">Auto</string>
+    <!-- Accessibility description for the auto-capture toggle when auto-capture is on -->
+    <string name="document_scanner_auto_capture_on">Auto-capture on</string>
+    <!-- Accessibility description for the auto-capture toggle when auto-capture is off -->
+    <string name="document_scanner_auto_capture_off">Auto-capture off</string>
+    <!-- Accessibility description for the manual shutter (capture) button in the document scanner -->
+    <string name="document_scanner_capture_button">Capture</string>
+    <!-- Share link revamp: title of the Link settings screen -->
+    <string name="share_link_settings_title">Link settings</string>
+    <!-- Share link revamp: title of the row that toggles setting an expiry date on the link -->
+    <string name="share_link_set_expiry_date">Set expiry date</string>
+    <!-- Share link revamp: subtitle explaining the "Set expiry date" row -->
+    <string name="share_link_expiry_subtitle">Disable the link on a specific date</string>
+    <!-- Share link revamp: title of the row that toggles protecting the link with a password -->
+    <string name="share_link_set_password">Set password</string>
+    <!-- Share link revamp: subtitle explaining the "Set password" row -->
+    <string name="share_link_password_subtitle">Limit access with a password</string>
     <!-- Settings: title of the Sorting and view mode screen -->
     <string name="settings_sorting_and_view_mode_title">Sorting and view mode</string>
     <!-- Settings: title of the sorting preference option -->

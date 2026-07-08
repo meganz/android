@@ -2592,4 +2592,20 @@
     <string name="subscription_revamp_charged_yearly">%1$s yıllık faturalandırılır</string>
     <string name="subscription_revamp_save_label">%16’ya kadar tasarruf edin</string>
     <string name="subscription_revamp_get_plan_button">%1$s al</string>
+    <string name="document_scanner_capture_button">Yakala</string>
+    <string name="share_link_set_password">Şifre ayarla</string>
+    <string name="document_scanner_auto_capture_label">Otomatik</string>
+    <string name="document_scanner_auto_capture_on">Oto-yakalama açık</string>
+    <string name="document_scanner_auto_capture_off">Oto-yakalama kapalı</string>
+    <string name="share_link_settings_title">Bağlantı ayarları</string>
+    <string name="share_link_set_expiry_date">Son kullanma tarihi ayarla</string>
+    <string name="share_link_expiry_subtitle">Bağlantıyı belirli bir tarihte devre dışı bırakın</string>
+    <string name="share_link_password_subtitle">Erişimi bir şifre ile sınırlayın</string>
+    <string name="settings_sorting_and_view_mode_title">Sıralama ve görünüm modu</string>
+    <string name="settings_sorting_preference_title">Sıralama tercihi</string>
+    <string name="settings_sorting_preference_description">Sıralamayı klasör bazında uygulayın veya tüm klasörler için aynı sıralamayı kullanın.</string>
+    <string name="settings_view_mode_preference_title">Görünüm modu tercihi</string>
+    <string name="settings_view_mode_preference_description">Görüntüleme modunu klasör bazında uygulayın veya tüm klasörler için aynı görüntüleme modunu kullanın.</string>
+    <string name="settings_preference_option_per_folder">Klasör başına</string>
+    <string name="settings_preference_option_all_folders">Tümü için aynı</string>
 </resources>

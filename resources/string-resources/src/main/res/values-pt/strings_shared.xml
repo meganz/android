@@ -1207,7 +1207,7 @@
     <!-- Warning indicating that the storage quota limit has been reached -->
     <string name="transfers_storage_quota_banner_title">Obtenha mais espaço de armazenamento</string>
     <!-- Warning indicating that both, the storage and transfer quota limits have been reached -->
-    <string name="transfers_storage_and_transfer_quota_banner_title">Obtenha mais espaço de armazenamento e cota transferência</string>
+    <string name="transfers_storage_and_transfer_quota_banner_title">Obtenha mais espaço de armazenamento e cota de transferência</string>
     <!-- Title for help centre -->
     <string name="general_help_centre">Central de ajuda</string>
     <!-- Warning informing the transfers queue has been paused -->
@@ -2685,4 +2685,20 @@
     <string name="subscription_revamp_charged_yearly">Pagamento anual de %1$s</string>
     <string name="subscription_revamp_save_label">Economize até 16%</string>
     <string name="subscription_revamp_get_plan_button">Obter o plano %1$s</string>
+    <string name="document_scanner_capture_button">Capturar</string>
+    <string name="share_link_set_password">Definir senha</string>
+    <string name="document_scanner_auto_capture_label">Automático</string>
+    <string name="document_scanner_auto_capture_on">Captura automática ativada</string>
+    <string name="document_scanner_auto_capture_off">Captura automática desativada</string>
+    <string name="share_link_settings_title">Configurações do link</string>
+    <string name="share_link_set_expiry_date">Definir uma data de validade</string>
+    <string name="share_link_expiry_subtitle">Desative o link em uma data específica</string>
+    <string name="share_link_password_subtitle">Limite o acesso com uma senha</string>
+    <string name="settings_sorting_and_view_mode_title">Classificação e tipo de visualização</string>
+    <string name="settings_sorting_preference_title">Preferências de classificação</string>
+    <string name="settings_sorting_preference_description">Aplicar o critério de ordenação por pasta ou usar o mesmo critério para todas as pastas.</string>
+    <string name="settings_view_mode_preference_title">Preferências de visualização</string>
+    <string name="settings_view_mode_preference_description">Aplicar as preferências de visualização por pasta ou usar a mesma visualização para todas as pastas.</string>
+    <string name="settings_preference_option_per_folder">Por pasta</string>
+    <string name="settings_preference_option_all_folders">Igual em todas as pastas</string>
 </resources>
