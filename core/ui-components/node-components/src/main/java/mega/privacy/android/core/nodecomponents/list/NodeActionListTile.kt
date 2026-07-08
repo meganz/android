@@ -29,7 +29,6 @@ import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
-import mega.android.core.ui.theme.values.SupportColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.R as IconPackR
 
@@ -107,7 +106,7 @@ fun NodeActionListTile(
                             .size(size = 24.dp),
                         painter = icon,
                         contentDescription = null,
-                        supportTint = SupportColor.Error
+                        tint = IconColor.Brand
                     )
                 } else {
                     MegaIcon(
@@ -128,7 +127,7 @@ fun NodeActionListTile(
                     .fillMaxWidth()
                     .testTag(MENU_ITEM_TEXT_TAG),
                 text = text,
-                textColor = if (isDestructive) TextColor.Error else TextColor.Primary,
+                textColor = if (isDestructive) TextColor.Brand else TextColor.Primary,
                 style = MaterialTheme.typography.bodyLarge,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,

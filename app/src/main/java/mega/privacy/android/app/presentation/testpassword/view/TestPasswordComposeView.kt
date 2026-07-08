@@ -87,6 +87,8 @@ import androidx.print.PrintHelper
 import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.model.TestPasswordAttribute
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
@@ -419,8 +421,7 @@ private fun PasswordReminderModeLayout(
         if (uiState.isLogoutMode) R.string.remember_pwd_dialog_text_logout else R.string.remember_pwd_dialog_text
     @StringRes val dismissButtonText: Int =
         if (uiState.isLogoutMode) R.string.proceed_to_logout else sharedResR.string.general_dismiss_dialog
-    val dismissButtonColor =
-        if (uiState.isLogoutMode) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary
+    val dismissButtonColor = if (uiState.isLogoutMode) TextColor.Brand else TextColor.Accent
 
     ConstraintLayout(
         modifier = modifier
@@ -568,11 +569,13 @@ private fun PasswordReminderModeLayout(
             ),
             enabled = uiState.isLoading.not()
         ) {
-            Text(
+            MegaText(
                 text = stringResource(id = dismissButtonText),
-                style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp),
-                color = dismissButtonColor,
-                fontWeight = FontWeight.Medium
+                textColor = dismissButtonColor,
+                style = MaterialTheme.typography.button.copy(
+                    letterSpacing = 0.25.sp,
+                    fontWeight = FontWeight.Medium
+                ),
             )
         }
     }
