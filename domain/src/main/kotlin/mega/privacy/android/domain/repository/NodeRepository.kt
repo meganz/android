@@ -271,6 +271,11 @@ interface NodeRepository {
     suspend fun convertBase64ToHandle(base64: String): Long
 
     /**
+     * Convert a handle to its Base 64 string
+     */
+    suspend fun convertHandleToBase64(handle: Long): String
+
+    /**
      * Get offline node information
      *
      * @param nodeHandle
