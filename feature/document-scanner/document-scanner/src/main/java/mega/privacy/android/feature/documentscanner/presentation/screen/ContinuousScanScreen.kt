@@ -38,7 +38,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -82,10 +81,6 @@ import timber.log.Timber
 
 /** Minimum time between analysed frames (≈5 Hz) — see [ScanFrameAnalyzer]. */
 private const val ANALYSIS_INTERVAL_MS = 200L
-
-// The deck fans at most this many recent thumbnails; older ones are dropped once
-// they scroll out of the fan so memory does not grow with the page count.
-private const val DECK_THUMBNAIL_WINDOW = 4
 
 /**
  * Main scanning screen with CameraX preview, permission handling, and close button.
@@ -136,9 +131,12 @@ internal fun ContinuousScanScreen(
             stabilityState = uiState.stabilityState,
             captureMode = uiState.captureMode,
             captureEvent = uiState.captureEvent,
+            capturedPageThumbnails = uiState.capturedPageThumbnails,
+            capturedPageCount = uiState.capturedPageCount,
             onToggleAutoCapture = viewModel::onToggleAutoCapture,
             onManualCapture = viewModel::onManualCapture,
             onCaptureHandled = viewModel::onCaptureHandled,
+            onFrameCaptured = viewModel::onFrameCaptured,
             onClose = onClose,
             onSwitchToLegacy = onSwitchToLegacy,
             onFrame = viewModel::onAnalysisFrame,
@@ -157,9 +155,12 @@ private fun CameraContent(
     stabilityState: StabilityState,
     captureMode: CaptureMode,
     captureEvent: StateEvent,
+    capturedPageThumbnails: List<String>,
+    capturedPageCount: Int,
     onToggleAutoCapture: () -> Unit,
     onManualCapture: () -> Unit,
     onCaptureHandled: () -> Unit,
+    onFrameCaptured: (ByteArray, Int) -> Unit,
     onClose: () -> Unit,
     onSwitchToLegacy: () -> Unit,
     onFrame: (ByteArray, Int, Int, Int, Long) -> Unit,
@@ -169,25 +170,23 @@ private fun CameraContent(
             .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
             .build()
     }
-    // Decode/rotate/scale of the captured JPEG runs on this executor, off the main thread.
+    // Decode of the captured JPEG runs on this executor, off the main thread.
     val captureExecutor = remember { Executors.newSingleThreadExecutor() }
     DisposableEffect(Unit) {
         onDispose { captureExecutor.shutdown() }
     }
-    // The deck only fans the most recent thumbnails, so we retain a bounded window
-    // and a running count rather than every captured page (full page storage is U8).
-    val deckThumbnails = remember { mutableStateListOf<ImageBitmap>() }
-    var pageCount by remember { mutableIntStateOf(0) }
     var flashKey by remember { mutableIntStateOf(0) }
     var flying by remember { mutableStateOf<ImageBitmap?>(null) }
 
-    // The VM decides WHEN to capture (auto-on-stable or manual); here we grab the
-    // frame, flash, and fly it into the deck. Persistence/dedup is U8.
+    // The VM decides WHEN to capture (auto-on-stable or manual). Here we grab the
+    // frame, flash, animate a quick preview into the deck, and hand the raw bytes to
+    // the VM to warp + persist as a page — the deck then reflects the session pages.
     EventEffect(event = captureEvent, onConsumed = onCaptureHandled) {
-        val thumbnail = captureThumbnail(imageCapture, captureExecutor)
-        if (thumbnail != null) {
+        val frame = captureFrame(imageCapture, captureExecutor)
+        if (frame != null) {
             flashKey++
-            flying = thumbnail
+            flying = frame.thumbnail
+            onFrameCaptured(frame.jpegBytes, frame.rotationDegrees)
         }
     }
 
@@ -233,8 +232,8 @@ private fun CameraContent(
         )
 
         CapturedPagesDeck(
-            pages = deckThumbnails,
-            count = pageCount,
+            thumbnailUris = capturedPageThumbnails,
+            count = capturedPageCount,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .navigationBarsPadding()
@@ -251,17 +250,10 @@ private fun CameraContent(
                 .navigationBarsPadding(),
         )
 
+        // The landed page is shown by the deck via the session's persisted thumbnails;
+        // here we just clear the transient fly-in preview when the animation ends.
         flying?.let { bitmap ->
-            FlyingThumbnail(bitmap = bitmap, onLanded = {
-                deckThumbnails.add(bitmap)
-                pageCount++
-                // Drop the reference only; the compositor may still be drawing this
-                // thumbnail, so let GC reclaim it rather than recycling it here.
-                while (deckThumbnails.size > DECK_THUMBNAIL_WINDOW) {
-                    deckThumbnails.removeAt(0)
-                }
-                flying = null
-            })
+            FlyingThumbnail(bitmap = bitmap, onLanded = { flying = null })
         }
 
         CaptureFlash(triggerKey = flashKey)
@@ -319,7 +311,14 @@ private fun FlyingThumbnail(bitmap: ImageBitmap, onLanded: () -> Unit) {
     }
 }
 
-private suspend fun captureThumbnail(imageCapture: ImageCapture, executor: Executor): ImageBitmap? =
+/** A captured frame: raw JPEG bytes + rotation for persistence, plus a small preview. */
+private class CapturedFrame(
+    val jpegBytes: ByteArray,
+    val rotationDegrees: Int,
+    val thumbnail: ImageBitmap,
+)
+
+private suspend fun captureFrame(imageCapture: ImageCapture, executor: Executor): CapturedFrame? =
     suspendCancellableCoroutine { continuation ->
         imageCapture.takePicture(
             executor,
@@ -328,12 +327,13 @@ private suspend fun captureThumbnail(imageCapture: ImageCapture, executor: Execu
                     val result = runCatching {
                         val buffer = image.planes[0].buffer
                         val bytes = ByteArray(buffer.remaining()).also { buffer.get(it) }
+                        val rotation = image.imageInfo.rotationDegrees
                         val decoded = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                        val rotated = rotateBitmap(decoded, image.imageInfo.rotationDegrees)
+                        val rotated = rotateBitmap(decoded, rotation)
                         if (rotated !== decoded) decoded.recycle()
                         val scaled = scaleToThumbnail(rotated)
                         if (scaled !== rotated) rotated.recycle()
-                        scaled.asImageBitmap()
+                        CapturedFrame(bytes, rotation, scaled.asImageBitmap())
                     }.getOrNull()
                     image.close()
                     continuation.resume(result)

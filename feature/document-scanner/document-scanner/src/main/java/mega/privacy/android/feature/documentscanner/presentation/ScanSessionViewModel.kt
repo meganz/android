@@ -1,21 +1,29 @@
 package mega.privacy.android.feature.documentscanner.presentation
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import mega.privacy.android.feature.documentscanner.domain.boundary.DocumentBoundaryDetector
 import mega.privacy.android.feature.documentscanner.domain.boundary.StabilityTracker
+import mega.privacy.android.feature.documentscanner.domain.capture.DocumentPageCapturer
 import mega.privacy.android.feature.documentscanner.domain.entity.CaptureMode
+import mega.privacy.android.feature.documentscanner.domain.entity.ScannedPage
 import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
 import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelProvider
 import mega.privacy.android.feature.documentscanner.domain.smoother.BoundarySmoother
+import mega.privacy.android.feature.documentscanner.domain.usecase.AddScannedPageUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.MonitorScanSessionUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
 import mega.privacy.android.feature.documentscanner.presentation.model.ScanSessionUiState
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -37,6 +45,9 @@ internal class ScanSessionViewModel @Inject constructor(
     private val boundarySmoother: BoundarySmoother,
     private val stabilityTracker: StabilityTracker,
     private val scannerModelProvider: ScannerModelProvider,
+    private val documentPageCapturer: DocumentPageCapturer,
+    private val addScannedPageUseCase: AddScannedPageUseCase,
+    private val monitorScanSessionUseCase: MonitorScanSessionUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ScanSessionUiState())
@@ -44,6 +55,23 @@ internal class ScanSessionViewModel @Inject constructor(
 
     private var lastFrameTimestampMs: Long = 0L
     private var lastCaptureTimestampMs: Long? = null
+
+    init {
+        viewModelScope.launch {
+            monitorScanSessionUseCase()
+                .catch { Timber.e(it, "[DocScanner] Scan session monitor failed") }
+                .collect { session ->
+                    _uiState.update {
+                        it.copy(
+                            capturedPageThumbnails = session.pages
+                                .takeLast(DECK_THUMBNAIL_WINDOW)
+                                .map(ScannedPage::thumbnailUri),
+                            capturedPageCount = session.pages.size,
+                        )
+                    }
+                }
+        }
+    }
 
     /** Called when camera permission is granted. */
     fun onCameraPermissionGranted() {
@@ -134,6 +162,23 @@ internal class ScanSessionViewModel @Inject constructor(
         _uiState.update { it.copy(captureEvent = consumed) }
     }
 
+    /**
+     * The screen captured a frame — decode, rectify to the current boundary, persist
+     * it, and add it to the session. Runs off the main thread inside the capturer.
+     */
+    fun onFrameCaptured(jpegBytes: ByteArray, rotationDegrees: Int) {
+        // Warp against the latest boundary. Auto-capture only fires while stable, so
+        // this matches the captured frame; a manual capture of a moving document may
+        // rectify to a slightly stale quad, which is acceptable.
+        val boundary = _uiState.value.boundaryOverlayState.boundary
+        viewModelScope.launch {
+            runCatching {
+                val page = documentPageCapturer.capture(jpegBytes, rotationDegrees, boundary)
+                addScannedPageUseCase(page)
+            }.onFailure { Timber.e(it, "[DocScanner] Capture pipeline failed") }
+        }
+    }
+
     private fun cooldownElapsed(now: Long): Boolean =
         lastCaptureTimestampMs?.let { now - it >= AUTO_CAPTURE_COOLDOWN_MS } ?: true
 
@@ -143,5 +188,8 @@ internal class ScanSessionViewModel @Inject constructor(
 
     private companion object {
         const val AUTO_CAPTURE_COOLDOWN_MS = 3_000L
+
+        /** How many recent page thumbnails the bottom deck keeps for its fan. */
+        const val DECK_THUMBNAIL_WINDOW = 4
     }
 }
