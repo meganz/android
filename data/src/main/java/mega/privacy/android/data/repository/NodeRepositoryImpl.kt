@@ -467,6 +467,10 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaApiGateway.base64ToHandle(base64)
     }
 
+    override suspend fun convertHandleToBase64(handle: Long): String = withContext(ioDispatcher) {
+        megaApiGateway.handleToBase64(handle)
+    }
+
     override suspend fun getOfflineNodeInformation(nodeHandle: Long) =
         withContext(ioDispatcher) {
             getOfflineNode(nodeHandle)
