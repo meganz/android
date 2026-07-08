@@ -2,22 +2,31 @@ package mega.privacy.android.app.presentation.overdisk
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.account.AccountDetail
+import mega.privacy.android.domain.entity.account.AccountStorageDetail
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.IsDatabaseEntryStale
+import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.account.GetNumberOfNodesUseCase
+import mega.privacy.android.domain.usecase.account.GetOverDiskQuotaDeadlineUseCase
+import mega.privacy.android.domain.usecase.account.GetOverDiskQuotaWarningTimestampsUseCase
 import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.GetUserDataUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUpdateUserDataUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -28,8 +37,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.random.Random
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OverDiskQuotaPaywallViewModelTest {
@@ -40,141 +49,157 @@ class OverDiskQuotaPaywallViewModelTest {
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase = mock()
     private val getPricing: GetPricing = mock()
     private val getUserDataUseCase: GetUserDataUseCase = mock()
+    private val getCurrentUserEmail: GetCurrentUserEmail = mock()
+    private val getNumberOfNodesUseCase: GetNumberOfNodesUseCase = mock()
+    private val getOverDiskQuotaDeadlineUseCase: GetOverDiskQuotaDeadlineUseCase = mock()
+    private val getOverDiskQuotaWarningTimestampsUseCase: GetOverDiskQuotaWarningTimestampsUseCase =
+        mock()
     private val monitorUpdateUserDataUseCase: MonitorUpdateUserDataUseCase = mock()
     private val myAccountUpdateFlow = MutableStateFlow(
-        MyAccountUpdate(
-            MyAccountUpdate.Action.STORAGE_STATE_CHANGED,
-        )
+        MyAccountUpdate(MyAccountUpdate.Action.STORAGE_STATE_CHANGED)
     )
-    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>() {
-        on { invoke() }.thenReturn(myAccountUpdateFlow)
-    }
-    private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>() {
-        on { invoke() }.thenReturn(emptyFlow())
-    }
+    private val monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase = mock()
+    private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
+    private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
 
     @BeforeEach
-    fun setup() {
+    fun setup() = runTest {
+        whenever(monitorUpdateUserDataUseCase()).thenReturn(emptyFlow())
+        whenever(monitorMyAccountUpdateUseCase()).thenReturn(myAccountUpdateFlow)
+        whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
+        whenever(monitorThemeModeUseCase()).thenReturn(flowOf(ThemeMode.System))
+        whenever(getPricing(false)).thenReturn(Pricing(emptyList()))
+        whenever(isDatabaseEntryStale()).thenReturn(false)
+        whenever(getCurrentUserEmail()).thenReturn("")
+        whenever(getNumberOfNodesUseCase()).thenReturn(0L)
+        whenever(getOverDiskQuotaWarningTimestampsUseCase()).thenReturn(emptyList())
+        whenever(getOverDiskQuotaDeadlineUseCase()).thenReturn(-1L)
         initializeViewModel()
     }
 
     @Test
-    fun `test that pricing state is updated with value from the get pricing use case when the use case successfully executed`() =
-        runTest {
-            // Given
-            val pricing = Pricing(
-                products = listOf(
-                    Product(
-                        handle = Random.nextLong(),
-                        level = Random.nextInt(),
-                        months = Random.nextInt(),
-                        storage = Random.nextInt(),
-                        transfer = Random.nextInt(),
-                        amount = Random.nextInt(),
-                        currency = null,
-                        isBusiness = Random.nextBoolean()
+    fun `test that pricing products populate the ui state`() = runTest {
+        val products = listOf(
+            Product(
+                handle = 1L,
+                level = 1,
+                months = 1,
+                storage = 100,
+                transfer = 100,
+                amount = 100,
+                currency = null,
+                isBusiness = false,
+            )
+        )
+        whenever(getPricing(false)).thenReturn(Pricing(products))
+
+        initializeViewModel()
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().products).isEqualTo(products)
+        }
+    }
+
+    @Test
+    fun `test that used storage from monitor account detail populates the ui state`() = runTest {
+        whenever(monitorAccountDetailUseCase()).thenReturn(
+            flowOf(
+                AccountDetail(
+                    storageDetail = AccountStorageDetail(
+                        usedCloudDrive = 0,
+                        usedRubbish = 0,
+                        usedIncoming = 0,
+                        totalStorage = 0,
+                        usedStorage = 1024L,
                     )
                 )
             )
-            whenever(getPricing(false)).thenReturn(pricing)
+        )
 
-            // When
-            initializeViewModel()
+        initializeViewModel()
+        advanceUntilIdle()
 
-            // Then
-            underTest.pricing.test {
-                assertThat(expectMostRecentItem()).isEqualTo(pricing)
-            }
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().usedStorage).isEqualTo(1024L)
         }
+    }
 
     @Test
-    fun `test that pricing state is updated with pricing with empty list when the failed to execute the get pricing use case`() =
-        runTest {
-            // Given
-            whenever(getPricing(false)).thenThrow(RuntimeException())
+    fun `test that account data populates the ui state on init`() = runTest {
+        whenever(getCurrentUserEmail()).thenReturn("user@mega.co.nz")
+        whenever(getNumberOfNodesUseCase()).thenReturn(42L)
+        whenever(getOverDiskQuotaWarningTimestampsUseCase()).thenReturn(listOf(1L, 2L))
+        whenever(getOverDiskQuotaDeadlineUseCase()).thenReturn(99L)
 
-            // When
-            initializeViewModel()
+        initializeViewModel()
+        advanceUntilIdle()
 
-            // Then
-            underTest.pricing.test {
-                val expected = Pricing(emptyList())
-                assertThat(expectMostRecentItem()).isEqualTo(expected)
-            }
+        underTest.uiState.test {
+            val state = expectMostRecentItem()
+            assertThat(state.email).isEqualTo("user@mega.co.nz")
+            assertThat(state.fileCount).isEqualTo(42L)
+            assertThat(state.warningTimestamps).isEqualTo(listOf(1L, 2L))
+            assertThat(state.deadlineTimestamp).isEqualTo(99L)
         }
+    }
 
     @Test
-    fun `test that get specific account detail use case is executed when request storage detail if needed and it's not requested recently`() =
+    fun `test that isLoading is false after account data is loaded`() = runTest {
+        advanceUntilIdle()
+
+        underTest.uiState.test {
+            assertThat(expectMostRecentItem().isLoading).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that get specific account detail use case is executed when database entry is stale`() =
         runTest {
-            // Given
             whenever(isDatabaseEntryStale()).thenReturn(true)
 
-            // When
-            underTest.requestStorageDetailIfNeeded()
+            initializeViewModel()
+            advanceUntilIdle()
 
-            // Then
             verify(getSpecificAccountDetailUseCase).invoke(
                 storage = true,
                 transfer = false,
-                pro = false
+                pro = false,
             )
         }
 
     @Test
-    fun `test that get specific account detail use case is not executed when request storage detail if needed and it's requested recently`() =
+    fun `test that get specific account detail use case is not executed when database entry is not stale`() =
         runTest {
-            // Given
             whenever(isDatabaseEntryStale()).thenReturn(false)
 
-            // When
-            underTest.requestStorageDetailIfNeeded()
+            initializeViewModel()
+            advanceUntilIdle()
 
-            // Then
             verify(getSpecificAccountDetailUseCase, never()).invoke(
                 storage = true,
                 transfer = false,
-                pro = false
+                pro = false,
             )
         }
 
     @Test
-    fun `test that view model receives events emitted by the update user data use case`() =
-        runTest {
-            // Given
-            val updateUserDataEvent = MutableSharedFlow<Unit>()
-            whenever(monitorUpdateUserDataUseCase()).thenReturn(updateUserDataEvent)
-
-            initializeViewModel()
-
-            underTest.monitorUpdateUserData.test {
-                // When
-                updateUserDataEvent.emit(Unit)
-                updateUserDataEvent.emit(Unit)
-
-                // Then
-                assertThat(awaitItem()).isEqualTo(Unit)
-                assertThat(awaitItem()).isEqualTo(Unit)
-            }
-        }
-
-    @Test
-    fun `test that get user data use case is executed when get the user data from view model`() =
-        runTest {
-            // When
-            underTest.getUserData()
-
-            // Then
-            verify(getUserDataUseCase).invoke()
-        }
-
-    @Test
-    fun `test that monitor my account update emits the correct value`() = runTest {
-        val myAccountUpdate = MyAccountUpdate(MyAccountUpdate.Action.UPDATE_ACCOUNT_DETAILS)
-
-        myAccountUpdateFlow.emit(myAccountUpdate)
+    fun `test that get user data use case is executed on init`() = runTest {
+        // The view model is already constructed in setup(); verify the init-time call.
         advanceUntilIdle()
-        underTest.monitorMyAccountUpdate.test {
-            assertThat(awaitItem()).isEqualTo(myAccountUpdate)
+
+        verify(getUserDataUseCase).invoke()
+    }
+
+    @Test
+    fun `test that theme mode reflects the value from the monitor theme mode use case`() = runTest {
+        whenever(monitorThemeModeUseCase()).thenReturn(flowOf(ThemeMode.Dark))
+
+        initializeViewModel()
+        advanceUntilIdle()
+
+        underTest.themeMode.test {
+            assertThat(expectMostRecentItem()).isEqualTo(ThemeMode.Dark)
         }
     }
 
@@ -185,19 +210,31 @@ class OverDiskQuotaPaywallViewModelTest {
             getSpecificAccountDetailUseCase,
             getPricing,
             getUserDataUseCase,
-            monitorUpdateUserDataUseCase
+            getCurrentUserEmail,
+            getNumberOfNodesUseCase,
+            getOverDiskQuotaDeadlineUseCase,
+            getOverDiskQuotaWarningTimestampsUseCase,
+            monitorUpdateUserDataUseCase,
+            monitorMyAccountUpdateUseCase,
+            monitorAccountDetailUseCase,
+            monitorThemeModeUseCase,
         )
     }
 
     private fun initializeViewModel() {
         underTest = OverDiskQuotaPaywallViewModel(
-            isDatabaseEntryStale,
-            getSpecificAccountDetailUseCase,
-            getPricing,
-            getUserDataUseCase,
-            monitorUpdateUserDataUseCase,
-            monitorMyAccountUpdateUseCase,
-            monitorAccountDetailUseCase
+            isDatabaseEntryStale = isDatabaseEntryStale,
+            getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
+            getPricing = getPricing,
+            getUserDataUseCase = getUserDataUseCase,
+            getCurrentUserEmail = getCurrentUserEmail,
+            getNumberOfNodesUseCase = getNumberOfNodesUseCase,
+            getOverDiskQuotaDeadlineUseCase = getOverDiskQuotaDeadlineUseCase,
+            getOverDiskQuotaWarningTimestampsUseCase = getOverDiskQuotaWarningTimestampsUseCase,
+            monitorUpdateUserDataUseCase = monitorUpdateUserDataUseCase,
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            monitorThemeModeUseCase = monitorThemeModeUseCase,
         )
     }
 }
