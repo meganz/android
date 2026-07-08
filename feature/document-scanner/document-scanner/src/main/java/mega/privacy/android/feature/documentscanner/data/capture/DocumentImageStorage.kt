@@ -29,6 +29,23 @@ internal class DocumentImageStorage @Inject constructor(
         return Uri.fromFile(file).toString()
     }
 
+    /**
+     * Deletes the file backing a `file://` URI previously returned by [saveJpeg].
+     * A missing file or a non-file URI is a no-op. Blocking I/O — call off the main thread.
+     */
+    @WorkerThread
+    fun delete(uriString: String) {
+        Uri.parse(uriString).path?.let { File(it).delete() }
+    }
+
+    /**
+     * Removes the entire scans directory. Blocking I/O — call off the main thread.
+     */
+    @WorkerThread
+    fun deleteAll() {
+        File(context.filesDir, SCANS_DIR).deleteRecursively()
+    }
+
     private companion object {
         const val SCANS_DIR = "document_scans"
         const val JPEG_QUALITY = 90
