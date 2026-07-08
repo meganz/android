@@ -76,9 +76,10 @@ class GetFileTypeInfoByContentUseCaseTest {
         )
     }
 
-    private fun stubNode(handle: Long = 1L) = mock<TypedFileNode>().stub {
+    private fun stubNode(handle: Long = 1L, size: Long = 100L) = mock<TypedFileNode>().stub {
         on { type } doReturn UnMappedFileTypeInfo("")
         on { id } doReturn NodeId(handle)
+        on { this.size } doReturn size
     }
 
     @Test
@@ -167,6 +168,21 @@ class GetFileTypeInfoByContentUseCaseTest {
 
         assertThat(underTest(node)).isNull()
         verifyNoInteractions(fileSystemRepository)
+    }
+
+    @Test
+    fun `test that an empty file is reported as text so it stays previewable`() = runTest {
+        val node = stubNode(size = 0L)
+
+        val result = underTest(node)
+
+        assertThat(result).isEqualTo(TextFileTypeInfo("text/plain", ""))
+        verifyNoInteractions(
+            getLocalFileForNodeUseCase,
+            getStreamingUriStringForNode,
+            getPartialDataBytesFromUrlUseCase,
+            fileSystemRepository,
+        )
     }
 
     @Test

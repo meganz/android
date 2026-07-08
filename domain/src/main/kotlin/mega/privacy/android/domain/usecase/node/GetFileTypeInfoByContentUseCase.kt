@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.node
 
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.toDuration
 import mega.privacy.android.domain.repository.FileSystemRepository
@@ -25,7 +26,8 @@ import javax.inject.Inject
  * [getLocalFolderLinkFromMegaApiUseCase], while file links (not present in the folder API) fall
  * back to [getNodeContentUriUseCase].
  *
- * @return the detected [FileTypeInfo], or null when the content cannot be recognised.
+ * @return the detected [FileTypeInfo], or null when the content cannot be recognised. An empty
+ * file has no content to recognise and is reported as [TextFileTypeInfo] so it stays previewable.
  */
 class GetFileTypeInfoByContentUseCase @Inject constructor(
     private val getLocalFileForNodeUseCase: GetLocalFileForNodeUseCase,
@@ -39,6 +41,10 @@ class GetFileTypeInfoByContentUseCase @Inject constructor(
     private val getLocalFolderLinkFromMegaApiUseCase: GetLocalFolderLinkFromMegaApiUseCase,
 ) {
     suspend operator fun invoke(node: TypedFileNode, isLinkNode: Boolean = false): FileTypeInfo? {
+        if (node.size == 0L) {
+            return TextFileTypeInfo(mimeType = "text/plain", extension = node.type.extension)
+        }
+
         val header = readHeader(node, isLinkNode)?.takeIf { it.isNotEmpty() } ?: return null
         val duration = node.type.toDuration()?.inWholeSeconds?.toInt() ?: 0
         return fileSystemRepository.getFileTypeInfoFromContent(header, duration)
