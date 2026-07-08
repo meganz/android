@@ -85,7 +85,10 @@ internal fun FileInfoScreen(
             if (uiState.isLoading) {
                 FileInfoLoading()
             } else {
-                FileInfoContent(uiState = uiState, onLocationClick = onLocationClick)
+                FileInfoContent(
+                    uiState = uiState,
+                    onLocationClick = onLocationClick,
+                )
             }
         }
     }
