@@ -18,7 +18,7 @@ abstract class ScanSessionModule {
      * Binds [DefaultScanSessionRepository] to [ScanSessionRepository].
      */
     @Binds
-    abstract fun bindScanSessionRepository(
+    internal abstract fun bindScanSessionRepository(
         impl: DefaultScanSessionRepository,
     ): ScanSessionRepository
 }
