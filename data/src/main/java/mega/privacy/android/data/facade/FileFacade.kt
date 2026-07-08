@@ -40,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
@@ -47,9 +48,13 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.toUri
+import mega.privacy.android.data.facade.FileFacade.Companion.EXTERNAL_STORAGE_AUTHORITY
+import mega.privacy.android.data.facade.FileFacade.Companion.isDirectQuerySupported
+import mega.privacy.android.data.filewrapper.ChildMetadata
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.mapper.file.DocumentFileMapper
+import mega.privacy.android.data.model.ChildRow
 import mega.privacy.android.data.wrapper.DocumentFileWrapper
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
@@ -72,7 +77,6 @@ import java.util.Stack
 import javax.inject.Inject
 import kotlin.Result.Companion.failure
 import kotlin.Result.Companion.success
-import kotlin.coroutines.coroutineContext
 import kotlin.math.sqrt
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -652,41 +656,50 @@ internal class FileFacade @Inject constructor(
         } else {
             DocumentFile.fromTreeUri(context, uri)
         } ?: throw FileNotFoundException()
-        val files = document.listFiles()
-        val folders = files.filter { it.isDirectory }
-        val countMap = coroutineScope {
-            folders.map {
-                async {
-                    semaphore.withPermit {
-                        val childFiles = it.listFiles()
-                        val totalDirectory = childFiles.count { it.isDirectory }
-                        val totalFiles = childFiles.size - totalDirectory
-                        totalFiles to totalDirectory
-                    }
-                }
-            }
-        }.awaitAll()
-            .mapIndexed { index, pair ->
-                val file = folders[index]
-                file.uri to pair
-            }.toMap()
+        // Single ContentResolver.query() for all children — 1 IPC instead of 1 + N.
+        val rows = mapDocumentChildren(document) { it }
 
-        // length, lastModified is heavy operation, so we do it in parallel
-        val entities = coroutineScope {
-            files.mapNotNull { file ->
+        // For each subfolder, run a single child query to get its (numFiles, numFolders)
+        // counts. Done in parallel to overlap IPCs.
+        val countMap = coroutineScope {
+            rows.filter { it.isFolder }.map { row ->
                 async {
                     semaphore.withPermit {
-                        val documentUri = file.uri
-                        documentFileMapper(
-                            file = file,
-                            numFiles = countMap[documentUri]?.first ?: 0,
-                            numFolders = countMap[documentUri]?.second ?: 0
-                        )
+                        val grandChildren = countChildrenByUri(row.uri)
+                        row.uri to grandChildren
                     }
                 }
             }.awaitAll()
+        }.toMap()
+
+        val entities = rows.map { row ->
+            val (numFiles, numFolders) = countMap[row.uri] ?: (0 to 0)
+            documentFileMapper(
+                uri = row.uri,
+                name = row.name,
+                size = row.size,
+                lastModified = row.lastModified,
+                isFolder = row.isFolder,
+                numFiles = numFiles,
+                numFolders = numFolders,
+            )
         }
         return DocumentFolder(entities)
+    }
+
+    /**
+     * Returns `(numFiles, numFolders)` for the children of [parentUri]. Issues a
+     * single SAF query (or `listFiles()` for `file://` URIs).
+     */
+    private fun countChildrenByUri(parentUri: Uri): Pair<Int, Int> {
+        val parent = getDocumentFileFromUri(parentUri) ?: return 0 to 0
+        var files = 0
+        var folders = 0
+        mapDocumentChildren(parent) { row ->
+            if (row.isFolder) folders++ else files++
+            null
+        }
+        return files to folders
     }
 
     override fun searchFilesInDocumentFolderRecursive(
@@ -694,30 +707,39 @@ internal class FileFacade @Inject constructor(
         query: String,
     ): Flow<DocumentFolder> = flow {
         // using stack to avoid recursive call and optimize memory usage
-        val stack = Stack<DocumentFile>()
+        val stack = Stack<ChildRow>()
         val uri = folder.value.toUri()
         val document = if (isFileUri(folder.value)) {
             DocumentFile.fromFile(uri.toFile())
         } else {
             DocumentFile.fromTreeUri(context, uri)
         } ?: throw FileNotFoundException()
-        stack.addAll(document.listFiles())
+        // Single query per visited folder, 1 IPC instead of 1 + N * fields.
+        stack.addAll(mapDocumentChildren(document) { it })
         val result = mutableListOf<DocumentEntity>()
-        while (stack.isNotEmpty() && coroutineContext.isActive) {
-            val file = stack.pop()
-            val childFiles = if (file.isDirectory) file.listFiles().toList() else emptyList()
-            if (file.name.orEmpty().contains(other = query, ignoreCase = true)) {
+        while (stack.isNotEmpty() && currentCoroutineContext().isActive) {
+            val row = stack.pop()
+            val childRows = if (row.isFolder) {
+                getDocumentFileFromUri(row.uri)
+                    ?.let { mapDocumentChildren(it) { child -> child } }
+                    .orEmpty()
+            } else emptyList()
+            if (row.name.contains(other = query, ignoreCase = true)) {
                 result.add(
                     documentFileMapper(
-                        file = file,
-                        numFiles = childFiles.count { it.isFile },
-                        numFolders = childFiles.count { it.isDirectory },
+                        uri = row.uri,
+                        name = row.name,
+                        size = row.size,
+                        lastModified = row.lastModified,
+                        isFolder = row.isFolder,
+                        numFiles = childRows.count { !it.isFolder },
+                        numFolders = childRows.count { it.isFolder },
                     )
                 )
                 emit(DocumentFolder(result))
             }
-            if (file.isDirectory) {
-                stack.addAll(childFiles)
+            if (row.isFolder) {
+                stack.addAll(childRows)
             }
         }
         emit(DocumentFolder(result))
@@ -783,8 +805,10 @@ internal class FileFacade @Inject constructor(
     }
 
     private fun getFileNameIfHasNameCollision(folder: DocumentFile, fileName: String): String {
-        val files = folder.listFiles()
-        if (files.find { it.name == fileName } == null) return fileName
+        // Snapshot child names with a single SAF query — avoids the per-name IPC
+        // cost the previous listFiles()/find loop incurred on every collision probe.
+        val existingNames = mapDocumentChildren(folder) { it.name }.toHashSet()
+        if (fileName !in existingNames) return fileName
         val fileNameWithoutExtension = fileName.removeFileExtension()
         val extension = fileName.substringAfterLast(".", "")
         for (i in 1..Int.MAX_VALUE) {
@@ -793,7 +817,7 @@ internal class FileFacade @Inject constructor(
             } else {
                 "$fileNameWithoutExtension ($i)"
             }
-            if (files.find { it.name == newFileName } == null) return newFileName
+            if (newFileName !in existingNames) return newFileName
         }
         return fileName
     }
@@ -801,9 +825,26 @@ internal class FileFacade @Inject constructor(
     override suspend fun findFileInDirectory(
         directoryPath: UriPath,
         fileNameToFind: String,
-    ): DocumentFile? =
-        documentFileWrapper.getDocumentFileForSyncContentUri(directoryPath.value)?.listFiles()
-            ?.toList()?.find { it.name == fileNameToFind }
+    ): DocumentFile? {
+        val parentUri = directoryPath.toUri()
+        // Both branches return URIs built via DocumentsContract.buildDocumentUriUsingTree,
+        // so the resulting DocumentFile must be a TreeDocumentFile. fromSingleUri here
+        // would silently break listFiles()/createFile()/createDirectory() on the result —
+        // the only reason the existing caller (SyncDebrisRepositoryImpl) doesn't notice
+        // is that it only reads .uri off the returned DocumentFile.
+
+        // Fast path: 1-row query for ExternalStorageProvider (~5ms vs ~2000ms full scan)
+        queryChildDocumentDirect(parentUri, fileNameToFind)?.let {
+            return documentFileWrapper.fromTreeUri(it)
+        }
+        // Fallback: full scan for other providers
+        val parent = documentFileWrapper.getDocumentFileForSyncContentUri(directoryPath.value)
+            ?: return null
+        val childUri = firstChildMatching(parent) { row ->
+            row.uri.takeIf { row.name == fileNameToFind }
+        } ?: return null
+        return documentFileWrapper.fromTreeUri(childUri)
+    }
 
     override fun isPathInsecure(path: String): Boolean = path.contains("../")
             || path.contains(APP_PRIVATE_DIR1)
@@ -821,11 +862,13 @@ internal class FileFacade @Inject constructor(
     override suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity> {
         return uris.mapNotNull { uri ->
             getDocumentFileFromUri(uri)?.let { doc ->
-                val childFiles = if (doc.isDirectory) doc.listFiles() else emptyArray()
+                val (numFiles, numFolders) = if (doc.isDirectory) {
+                    countChildrenByUri(doc.uri)
+                } else 0 to 0
                 documentFileMapper(
                     file = doc,
-                    numFiles = childFiles.count { it.isFile },
-                    numFolders = childFiles.count { it.isDirectory },
+                    numFiles = numFiles,
+                    numFolders = numFolders,
                 ).let {
                     if (documentFileWrapper.isMIUIGalleryRawUri(uri)
                         || documentFileWrapper.isSamsungDeviceWithAndroidLessThanQ()
@@ -886,13 +929,346 @@ internal class FileFacade @Inject constructor(
     override fun getFolderChildUrisSync(uri: Uri): List<Uri> = runCatching {
         getDocumentFileFromUri(uri)
             ?.takeIf { it.isDirectory }
-            ?.listFiles()
-            ?.map { it.uri }
+            ?.let { mapDocumentChildren(it) { row -> row.uri } }
             ?: emptyList()
     }.getOrDefault(emptyList())
 
+    override fun getChildrenWithMetadataSync(parentUri: Uri): List<ChildMetadata>? = runCatching {
+        val doc = getDocumentFileFromUri(parentUri) ?: return@runCatching null
+        val toMeta = { row: ChildRow ->
+            ChildMetadata(
+                uri = row.uri.toString(),
+                name = row.name,
+                isFolder = row.isFolder,
+                size = row.size,
+                lastModified = row.lastModified,
+                path = row.uri.path?.takeIf { row.uri.scheme == "file" }
+                    ?: row.docId?.let { resolvePathFromDocumentId(it, parentUri) }
+            )
+        }
+        // file:// URIs use java.io.File, which doesn't fail transiently — empty list
+        // here means the directory really has no children.
+        if (doc.uri.scheme == "file") {
+            return@runCatching doc.listFiles().map { child ->
+                toMeta(
+                    ChildRow(
+                        uri = child.uri,
+                        name = child.name.orEmpty(),
+                        mimeType = if (child.isDirectory) {
+                            DocumentsContract.Document.MIME_TYPE_DIR
+                        } else "",
+                        size = child.length(),
+                        lastModified = child.lastModified(),
+                        isFolder = child.isDirectory,
+                        docId = null,
+                    )
+                )
+            }
+        }
+        // SAF: route directly through queryTreeChildren so a query failure
+        // surfaces as null (not the empty list mapDocumentChildren would coalesce
+        // to). null lets the C++ side return SCAN_INACCESSIBLE and retry instead
+        // of treating a transient provider failure as "directory is empty" and
+        // deleting every cached child.
+        queryTreeChildren(doc.uri, toMeta)
+    }.onFailure {
+        Timber.e(it, "getChildrenWithMetadataSync FAILED for $parentUri — sync will stall")
+    }.getOrNull()
+
+
+    /**
+     * Iterates the children of [parent] and applies [transform] to each one.
+     *
+     * For SAF content URIs this issues a single `ContentResolver.query()` for all
+     * children (1 IPC), instead of `DocumentFile.listFiles()` followed by per-child
+     * property accesses (`1 + N * fields` IPCs).
+     *
+     * For `file://`-backed [DocumentFile]s (RawDocumentFile) it falls back to
+     * [DocumentFile.listFiles] — those calls are pure `java.io.File` operations and
+     * incur no IPC cost.
+     */
+    private inline fun <T> mapDocumentChildren(
+        parent: DocumentFile,
+        transform: (ChildRow) -> T?,
+    ): List<T> {
+        if (isFileUri(parent.uri)) {
+            return parent.listFiles().mapNotNull { child ->
+                transform(
+                    ChildRow(
+                        uri = child.uri,
+                        name = child.name.orEmpty(),
+                        mimeType = if (child.isDirectory) {
+                            DocumentsContract.Document.MIME_TYPE_DIR
+                        } else "",
+                        size = child.length(),
+                        lastModified = child.lastModified(),
+                        isFolder = child.isDirectory,
+                        docId = null,
+                    )
+                )
+            }
+        }
+        return queryTreeChildren(parent.uri, transform) ?: emptyList()
+    }
+
+    /**
+     * Runs a single `ContentResolver.query()` for the children of a SAF tree URI and
+     * maps each row via [transform]. Returns null on failure.
+     */
+    private inline fun <T> queryTreeChildren(
+        parentUri: Uri,
+        transform: (ChildRow) -> T?,
+    ): List<T>? = runCatching {
+        // The sync root is a bare tree URI (no /document/ segment), so getDocumentId()
+        // would throw IllegalArgumentException. Use getTreeDocumentId() in that case.
+        val parentDocId = if (DocumentsContract.isDocumentUri(context, parentUri)) {
+            DocumentsContract.getDocumentId(parentUri)
+        } else {
+            DocumentsContract.getTreeDocumentId(parentUri)
+        }
+        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+            parentUri,
+            parentDocId
+        )
+        val projection = arrayOf(
+            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+            DocumentsContract.Document.COLUMN_MIME_TYPE,
+            DocumentsContract.Document.COLUMN_SIZE,
+            DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+        )
+        context.contentResolver.query(childrenUri, projection, null, null, null)
+            ?.use { cursor ->
+                // Resolve column indices once — some OEM providers ignore projection order.
+                val docIdCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                val nameCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                val mimeCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE)
+                val sizeCol = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_SIZE)
+                val mtimeCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED)
+                buildList {
+                    while (cursor.moveToNext()) {
+                        val docId = cursor.getString(docIdCol) ?: continue
+                        val name = cursor.getString(nameCol) ?: continue
+                        val mimeType = cursor.getString(mimeCol) ?: ""
+                        val size = cursor.getLong(sizeCol)
+                        val lastModified = cursor.getLong(mtimeCol)
+                        val isFolder = mimeType == DocumentsContract.Document.MIME_TYPE_DIR
+                        val childUri = DocumentsContract.buildDocumentUriUsingTree(parentUri, docId)
+                        transform(
+                            ChildRow(
+                                uri = childUri,
+                                name = name,
+                                mimeType = mimeType,
+                                size = size,
+                                lastModified = lastModified,
+                                isFolder = isFolder,
+                                docId = docId,
+                            )
+                        )?.let(::add)
+                    }
+                }
+            }
+    }.onFailure {
+        Timber.e(it, "queryTreeChildren failed for $parentUri")
+    }.getOrNull()
+
+    /**
+     * Like [mapDocumentChildren] but stops at the first non-null [transform] result.
+     * Use this for single-match lookups (find by name, exists, has-any-child) so we
+     * don't enumerate the entire parent + allocate a List just to take the first hit.
+     */
+    private inline fun <T : Any> firstChildMatching(
+        parent: DocumentFile,
+        transform: (ChildRow) -> T?,
+    ): T? {
+        if (isFileUri(parent.uri)) {
+            return parent.listFiles().firstNotNullOfOrNull { child ->
+                transform(
+                    ChildRow(
+                        uri = child.uri,
+                        name = child.name.orEmpty(),
+                        mimeType = if (child.isDirectory) {
+                            DocumentsContract.Document.MIME_TYPE_DIR
+                        } else "",
+                        size = child.length(),
+                        lastModified = child.lastModified(),
+                        isFolder = child.isDirectory,
+                        docId = null,
+                    )
+                )
+            }
+        }
+        return queryTreeChildFirst(parent.uri, transform)
+    }
+
+    /**
+     * SAF-only counterpart to [queryTreeChildren]: walks the children cursor and
+     * returns the first non-null [transform] result, breaking iteration immediately.
+     * For large parents (e.g. `.debris/tmp` during finalize) this avoids paging
+     * through every CursorWindow and saves the trailing list allocation.
+     */
+    private inline fun <T : Any> queryTreeChildFirst(
+        parentUri: Uri,
+        transform: (ChildRow) -> T?,
+    ): T? = runCatching {
+        val parentDocId = if (DocumentsContract.isDocumentUri(context, parentUri)) {
+            DocumentsContract.getDocumentId(parentUri)
+        } else {
+            DocumentsContract.getTreeDocumentId(parentUri)
+        }
+        val childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+            parentUri,
+            parentDocId
+        )
+        val projection = arrayOf(
+            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+            DocumentsContract.Document.COLUMN_MIME_TYPE,
+            DocumentsContract.Document.COLUMN_SIZE,
+            DocumentsContract.Document.COLUMN_LAST_MODIFIED,
+        )
+        context.contentResolver.query(childrenUri, projection, null, null, null)
+            ?.use { cursor ->
+                val docIdCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DOCUMENT_ID)
+                val nameCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_DISPLAY_NAME)
+                val mimeCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_MIME_TYPE)
+                val sizeCol = cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_SIZE)
+                val mtimeCol =
+                    cursor.getColumnIndexOrThrow(DocumentsContract.Document.COLUMN_LAST_MODIFIED)
+                while (cursor.moveToNext()) {
+                    val docId = cursor.getString(docIdCol) ?: continue
+                    val name = cursor.getString(nameCol) ?: continue
+                    val mimeType = cursor.getString(mimeCol) ?: ""
+                    val match = transform(
+                        ChildRow(
+                            uri = DocumentsContract.buildDocumentUriUsingTree(parentUri, docId),
+                            name = name,
+                            mimeType = mimeType,
+                            size = cursor.getLong(sizeCol),
+                            lastModified = cursor.getLong(mtimeCol),
+                            isFolder = mimeType == DocumentsContract.Document.MIME_TYPE_DIR,
+                            docId = docId,
+                        )
+                    )
+                    if (match != null) return@use match
+                }
+                null
+            }
+    }.onFailure {
+        Timber.e(it, "queryTreeChildFirst failed for $parentUri")
+    }.getOrNull()
+
+    /**
+     * Locates a child of [parent] by case-insensitive name. Issues a single SAF
+     * query (or `listFiles()` for `file://`) instead of an N-IPC scan. The returned
+     * [DocumentFile] is a tree document so subsequent `createDirectory` /
+     * `createFile` calls work correctly.
+     */
+    private fun findChildDocumentCaseInsensitive(
+        parent: DocumentFile,
+        name: String,
+    ): DocumentFile? {
+        if (isFileUri(parent.uri)) {
+            return parent.listFiles()
+                .firstOrNull { it.name.equals(name, ignoreCase = true) }
+        }
+        // SAF branch only: file:// already returned above. Going through the full
+        // helper would route the file:// uri into DocumentFile.fromTreeUri below,
+        // which is invalid — fromTreeUri is strictly for SAF tree URIs.
+        val childUri = queryTreeChildFirst(parent.uri) { row ->
+            row.uri.takeIf { row.name.equals(name, ignoreCase = true) }
+        } ?: return null
+        return DocumentFile.fromTreeUri(context, childUri)
+    }
+
+    /**
+     * Resolves a DocumentsContract document ID to an absolute filesystem path.
+     *
+     * Only works for [EXTERNAL_STORAGE_AUTHORITY] (`com.android.externalstorage.documents`)
+     * because those doc IDs have the documented format `"<storageId>:<relativePath>"`.
+     * All other authorities return null and the C++ side falls back to [getExternalPathByUriSync].
+     *
+     * This is intentionally scoped to ExternalStorageProvider because sync roots are
+     * always granted from that provider.
+     */
+    private fun resolvePathFromDocumentId(docId: String, parentUri: Uri): String? {
+        if (parentUri.authority != EXTERNAL_STORAGE_AUTHORITY) return null
+        val separator = docId.indexOf(':')
+        if (separator < 0) return null
+        val storageId = docId.substring(0, separator)
+        val relativePath = docId.substring(separator + 1)
+        return if (storageId == "primary") {
+            "${Environment.getExternalStorageDirectory().absolutePath}/$relativePath"
+        } else {
+            "/storage/$storageId/$relativePath"
+        }
+    }
+
+    /**
+     * Whether [name] is safe to splice into a SAF document ID. Reject path separators,
+     * NUL, dot-segments, and the empty string — each of these would silently change
+     * which document the constructed ID resolves to.
+     */
+    private fun isSafeSafChildName(name: String): Boolean {
+        if (name.isEmpty() || name == "." || name == "..") return false
+        return name.none { it == '/' || it == '\\' }
+    }
+
+    /**
+     * Fast single-child lookup for [EXTERNAL_STORAGE_AUTHORITY] tree URIs.
+     *
+     * Builds the child document URI directly from the parent document ID and
+     * verifies it with a 1-row `ContentResolver.query()` (~5 ms) instead of
+     * querying all siblings via [mapDocumentChildren] (~2 000 ms for 500+ files).
+     *
+     * Returns the child [Uri] if found, `null` if the authority is not
+     * ExternalStorageProvider, the parent doc ID cannot be resolved, the child
+     * name is unsafe to splice into a doc ID, or the child does not exist.
+     */
+    private fun queryChildDocumentDirect(parentUri: Uri, childName: String): Uri? {
+        if (parentUri.authority != EXTERNAL_STORAGE_AUTHORITY) return null
+        // Defense-in-depth: childName is concatenated into the SAF document ID, so any
+        // path-traversal-ish character would silently shift which document we resolve
+        // (e.g. "a/b" would query the document one level deeper). All current callers
+        // pass single path components from the SDK sync engine, but validating here
+        // protects future call sites and matches the implicit guarantee from the docs.
+        if (!isSafeSafChildName(childName)) return null
+        if (isDirectQuerySupported == false) return null
+        val parentDocId = runCatching {
+            if (DocumentsContract.isDocumentUri(context, parentUri))
+                DocumentsContract.getDocumentId(parentUri)
+            else
+                DocumentsContract.getTreeDocumentId(parentUri)
+        }.getOrNull() ?: return null
+
+        val childDocId = "$parentDocId/$childName"
+        val childUri = DocumentsContract.buildDocumentUriUsingTree(parentUri, childDocId)
+        val exists = runCatching {
+            context.contentResolver.query(
+                childUri,
+                arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID),
+                null, null, null
+            )?.use { it.count > 0 } ?: false
+        }.getOrDefault(false)
+        if (exists) {
+            isDirectQuerySupported = true
+            return childUri
+        }
+        return null
+    }
+
     private fun getDocumentFileFromUri(uri: Uri): DocumentFile? =
         documentFileWrapper.fromUri(uri)
+
+    private fun getDocumentFileFromUri(uri: Uri, existsCheck: Boolean): DocumentFile? =
+        documentFileWrapper.fromUri(uri, existsCheck)
 
     @RequiresPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
     override suspend fun getFileFromUri(uri: Uri): File? {
@@ -978,18 +1354,23 @@ internal class FileFacade @Inject constructor(
         return null
     }
 
-    override suspend fun getInputStream(uriPath: UriPath): InputStream? =
-        context.contentResolver.openInputStream(uriPath.toUri())
+    override suspend fun getInputStream(uriPath: UriPath): InputStream? {
+        return context.contentResolver.openInputStream(uriPath.toUri())
+    }
 
     override suspend fun canReadUri(stringUri: String) =
         getDocumentFileFromUri(stringUri.toUri())?.canRead() == true
 
     override fun childFileExistsSync(parentFolder: UriPath, childName: String): Boolean {
-        val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())
-        return parentDocumentFile
-            ?.takeIf { it.isDirectory }
-            ?.listFiles()
-            ?.any { it.name == childName } == true
+        val parentUri = parentFolder.toUri()
+        // Fast path: 1-row query for ExternalStorageProvider (~5ms vs ~2000ms full scan)
+        queryChildDocumentDirect(parentUri, childName)?.let { return true }
+        // Fallback: walk children for other providers; bail on first match.
+        val parentDocumentFile = getDocumentFileFromUri(parentUri)
+            ?.takeIf { it.isDirectory } ?: return false
+        return firstChildMatching(parentDocumentFile) { row ->
+            row.takeIf { it.name == childName }
+        } != null
     }
 
     /**
@@ -998,11 +1379,19 @@ internal class FileFacade @Inject constructor(
      * @param name Child file name
      */
     override fun getChildByName(parentFolder: UriPath, name: String): UriPath? {
-        val parentDocumentFile = getDocumentFileFromUri(parentFolder.toUri())
-        return parentDocumentFile
-            ?.listFiles()
-            ?.firstOrNull { it.name == name }
-            ?.let { UriPath(it.uri.toString()) }
+        val uri = parentFolder.toUri()
+        // Fast path: file:// URIs — single kernel stat(), no Binder IPC
+        if (isFileUri(uri)) {
+            val child = File(uri.path ?: return null, name)
+            return if (child.exists()) UriPath(child.toUri().toString()) else null
+        }
+        // Fast path: 1-row query for ExternalStorageProvider (~5ms vs ~2000ms full scan)
+        queryChildDocumentDirect(uri, name)?.let { return UriPath(it.toString()) }
+        // Fallback: walk children for other providers; bail on first name match.
+        val parentDocumentFile = getDocumentFileFromUri(uri) ?: return null
+        return firstChildMatching(parentDocumentFile) { row ->
+            if (row.name == name) UriPath(row.uri.toString()) else null
+        }
     }
 
     override fun createChildFileSync(
@@ -1016,13 +1405,11 @@ internal class FileFacade @Inject constructor(
             asFolder -> parentDocumentFile.createDirectory(childName)
             else -> parentDocumentFile.createFile(getMimeTypeFromFileName(childName), childName)
         }?.let { documentFile ->
-            documentFile.let {
-                if (documentFile.name != childName) {
-                    documentFile.renameTo(childName)
-                }
-
-                UriPath(documentFile.uri.toString())
+            if (documentFile.name != childName) {
+                documentFile.renameTo(childName)
             }
+
+            UriPath(documentFile.uri.toString())
         }
     }
 
@@ -1037,15 +1424,22 @@ internal class FileFacade @Inject constructor(
 
     override fun deleteIfItIsAnEmptyFolder(uriPath: UriPath): Boolean {
         val documentFile = getDocumentFileFromUri(uriPath.toUri())
-        return if (documentFile?.isDirectory == true && documentFile.listFiles().isEmpty()) {
-            documentFile.delete()
-        } else {
-            false
-        }
+        if (documentFile?.isDirectory != true) return false
+        // Stop at the first child — we only need to know if any exist.
+        val hasAnyChild = firstChildMatching(documentFile) { it } != null
+        if (hasAnyChild) return false
+        return documentFile.delete()
     }
 
-    override fun setLastModifiedSync(uriPath: UriPath, newTime: Long): Boolean =
-        updateFileMTime(uriPath, newTime) || updateDocumentFileMTime(uriPath, newTime)
+    override fun setLastModifiedSync(uriPath: UriPath, newTime: Long): Boolean {
+        // For content URIs, File(contentUriString).exists() always returns false — skip directly
+        // to the ContentResolver update path and avoid the redundant system calls.
+        return if (!uriPath.isPath()) {
+            updateDocumentFileMTime(uriPath, newTime)
+        } else {
+            updateFileMTime(uriPath, newTime) || updateDocumentFileMTime(uriPath, newTime)
+        }
+    }
 
     private fun updateFileMTime(uriPath: UriPath, newTime: Long): Boolean =
         runCatching {
@@ -1079,14 +1473,15 @@ internal class FileFacade @Inject constructor(
     }
 
     override fun renameFileSync(uriPath: UriPath, newName: String): UriPath? =
-        renameFileSync(getDocumentFileFromUri(uriPath.toUri()), newName)
+        renameFileSync(getDocumentFileFromUri(uriPath.toUri(), existsCheck = false), newName)
 
-    private fun renameFileSync(documentFile: DocumentFile?, newName: String): UriPath? =
-        if (documentFile?.renameTo(newName) == true) {
+    private fun renameFileSync(documentFile: DocumentFile?, newName: String): UriPath? {
+        return if (documentFile?.renameTo(newName) == true) {
             UriPath(documentFile.uri.toString())
         } else {
             null
         }
+    }
 
     override fun renameFileOverwriteSync(
         uriPath: UriPath,
@@ -1094,30 +1489,41 @@ internal class FileFacade @Inject constructor(
         newName: String,
         overwrite: Boolean,
     ): UriPath? {
-        val documentFile = getDocumentFileFromUri(uriPath.toUri()) ?: return null
-        val displayName = newName.removeFileExtension()
-        val parentFile = getDocumentFileFromUri(parentUriPath.toUri())
-        val newDocumentFile = parentFile?.let {
-            if (documentFile.isFile) {
-                it.createFile(getMimeTypeFromFileName(newName), displayName)
-            } else {
-                it.createDirectory(newName)
-            }
+        // Sync-flow caller has just operated on this file; skip the exists() Binder IPC.
+        val documentFile = getDocumentFileFromUri(uriPath.toUri(), existsCheck = false)
+            ?: return null
+
+        if (!overwrite) {
+            // SAF renameDocument returns failure on name collision, so the parent-side
+            // findFile() pre-check is redundant. Skipping it avoids listing every child of
+            // the source parent (e.g. .debris/tmp during a finalize burst), which is
+            // O(N) IPC and was observed adding 20+ seconds per rename under contention.
+            return renameFileSync(documentFile, newName)
         }
-        val fileDoesNotExist = newDocumentFile?.name?.removeFileExtension() == displayName
 
-        newDocumentFile?.delete()
-
-        return when {
-            fileDoesNotExist -> renameFileSync(documentFile, newName)
-            overwrite -> {
-                parentFile?.findFile(newName)?.delete()
-                renameFileSync(documentFile, newName)
-            }
-
-            else -> null
-        }
+        val parentFile = getDocumentFileFromUri(parentUriPath.toUri(), existsCheck = false)
+            ?: return null
+        parentFile.findFile(newName)?.delete()
+        return renameFileSync(documentFile, newName)
     }
+
+    override fun moveDocumentSync(
+        uriPath: UriPath,
+        sourceParentUriPath: UriPath,
+        targetParentUriPath: UriPath,
+    ): UriPath? = runCatching {
+        val movedUri = DocumentsContract.moveDocument(
+            context.contentResolver,
+            uriPath.toUri(),
+            sourceParentUriPath.toUri(),
+            targetParentUriPath.toUri(),
+        ) ?: return@runCatching null
+        UriPath(movedUri.toString())
+    }.onFailure {
+        // Provider may lack FLAG_SUPPORTS_MOVE, or the move may be cross-tree, etc.
+        // The caller (AndroidFileSystemAccess::renamelocal) falls back to copy+delete.
+        Timber.w(it, "moveDocumentSync failed; caller will fall back to copy+delete")
+    }.getOrNull()
 
     private fun String.removeFileExtension() = this.substringBeforeLast(".")
 
@@ -1125,7 +1531,7 @@ internal class FileFacade @Inject constructor(
 
     private fun isDownloadDocumentUri() = "com.android.providers.downloads.documents"
 
-    private fun isExternalStorageUri() = "com.android.externalstorage.documents"
+    private fun isExternalStorageUri() = EXTERNAL_STORAGE_AUTHORITY
 
     private fun getMimeTypeFromFileName(fileName: String) =
         getMimeTypeFromExtension(fileName.substringAfterLast(".", ""))
@@ -1291,6 +1697,27 @@ internal class FileFacade @Inject constructor(
         }
     }
 
+    /**
+     * Finds a direct child of the given parent document by name.
+     *
+     * Uses [queryChildDocumentDirect] for a fast 1-row query on ExternalStorageProvider,
+     * falling back to [findChildDocumentCaseInsensitive] (single `ContentResolver.query`
+     * for all siblings) for other providers.
+     */
+    private fun findChildDocumentByName(parent: DocumentFile, name: String): DocumentFile? {
+        queryChildDocumentDirect(parent.uri, name)?.let {
+            return DocumentFile.fromTreeUri(context, it)
+        }
+        if (isDirectQuerySupported == true) {
+            return null
+        }
+        val fallbackDoc = findChildDocumentCaseInsensitive(parent, name)
+        if (fallbackDoc != null && isDirectQuerySupported == null) {
+            isDirectQuerySupported = false
+        }
+        return fallbackDoc
+    }
+
     private fun createChildrenFiles(
         parentUri: UriPath,
         children: List<String>,
@@ -1346,10 +1773,9 @@ internal class FileFacade @Inject constructor(
                     nextDocument = null
                 }
 
-                // Find at listFiles
+                // Find via single SAF query (1 IPC) instead of listFiles + per-name access.
                 if (nextDocument == null) {
-                    nextDocument = currentDocument.listFiles()
-                        .firstOrNull { it.name.equals(name, ignoreCase = true) }
+                    nextDocument = findChildDocumentByName(currentDocument, name)
                     if (nextDocument == null) {
                         return failure(Exception("Failed to create or locate '$name'"))
                     }
@@ -1364,16 +1790,8 @@ internal class FileFacade @Inject constructor(
                 }
 
             } else {
-                nextDocument = currentDocument.listFiles()
-                    .firstOrNull { it.name.equals(name, ignoreCase = true) }
+                nextDocument = findChildDocumentByName(currentDocument, name)
                     ?: return failure(Exception("Path component '$name' does not exist"))
-
-                if (shouldBeDirectory && !nextDocument.isDirectory) {
-                    return failure(Exception("Expected directory but found file: '$name'"))
-                }
-                if (!shouldBeDirectory && nextDocument.isDirectory) {
-                    return failure(Exception("Expected file but found directory: '$name'"))
-                }
             }
 
             currentDocument = nextDocument
@@ -1389,7 +1807,18 @@ internal class FileFacade @Inject constructor(
         }.getOrDefault(false)
     }
 
+    /** Resets [isDirectQuerySupported] between unit tests. */
+    internal fun resetDirectQuerySupportedCacheForTests() {
+        isDirectQuerySupported = null
+    }
+
+    internal fun isDirectQuerySupportedForTests(): Boolean? = isDirectQuerySupported
+
     private companion object {
+        @Volatile
+        private var isDirectQuerySupported: Boolean? = null
+
+        const val EXTERNAL_STORAGE_AUTHORITY = "com.android.externalstorage.documents"
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val PHOTO_DIR = "MEGA Photos"
         const val OFFLINE_DIR = "MEGA Offline"
