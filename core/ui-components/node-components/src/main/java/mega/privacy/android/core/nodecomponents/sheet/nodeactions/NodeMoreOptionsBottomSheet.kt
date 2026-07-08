@@ -113,7 +113,7 @@ private fun NodeActionIcon(
                 .size(24.dp),
             painter = action.getIconPainter(),
             contentDescription = contentDescription,
-            textColorTint = TextColor.Error,
+            textColorTint = TextColor.Brand,
         )
     } else {
         MegaIcon(
@@ -146,7 +146,7 @@ private fun HelpIcon(
 
 @Composable
 private fun MenuActionWithIcon.getTextColor(): TextColor = when (this) {
-    is TrashMenuAction -> TextColor.Error
+    is TrashMenuAction -> TextColor.Brand
     else -> TextColor.Primary
 }
 

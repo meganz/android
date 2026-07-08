@@ -840,6 +840,7 @@ private fun MediaScreen.MediaContent(
         MediaScreen.Timeline -> {
             when (uiState.isTimelineRevampEnabled) {
                 true -> {
+                    var revampSelectorVisible by remember { mutableStateOf(true) }
                     Box(modifier = Modifier.fillMaxSize()) {
                         TimelineRevampScreen(
                             modifier = Modifier.fillMaxSize(),
@@ -881,6 +882,8 @@ private fun MediaScreen.MediaContent(
                             onCameraUploadsBannerDismiss = onCUBannerDismissRequest,
                             handleCameraUploadsPermissionsResult = handleCameraUploadsPermissionsResult,
                             handleNotificationPermissionResult = handleNotificationPermissionResult,
+                            onSelectorVisibleChanged = { revampSelectorVisible = it },
+                            contentPadding = timelineContentPadding.excludeTopPadding(),
                         )
 
                         MediaTimePeriodSelector(
@@ -888,7 +891,7 @@ private fun MediaScreen.MediaContent(
                                 .fillMaxWidth()
                                 .navigationBarsPadding()
                                 .align(Alignment.BottomCenter),
-                            isVisible = timelineRevampUiState is TimelineRevampUiState.Data,
+                            isVisible = timelineRevampUiState is TimelineRevampUiState.Data && revampSelectorVisible,
                             selectedTimePeriod = selectedTimePeriod,
                             onMediaTimePeriodSelected = onMediaTimePeriodSelected,
                             periods = listOf(

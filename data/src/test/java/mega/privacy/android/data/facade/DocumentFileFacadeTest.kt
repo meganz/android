@@ -54,27 +54,32 @@ class DocumentFileFacadeTest {
         runTest {
             mockStatic(Uri::class.java).use {
                 mockStatic(DocumentFile::class.java).use {
-                    val testUri =
-                        "content://com.miui.gallery.open/raw/%2Fstorage%2Femulated%2F0%2Fscreen-recording-1738156692736.mp4"
-                    val uri = mock<Uri> {
-                        on { authority } doReturn MIUI_GALLERY_AUTHORITY
-                        on { path } doReturn "/raw/storage/emulated/0/screen-recording-1738156692736.mp4"
+                    mockStatic(DocumentsContract::class.java).use {
+                        val testUri =
+                            "content://com.miui.gallery.open/raw/%2Fstorage%2Femulated%2F0%2Fscreen-recording-1738156692736.mp4"
+                        val uri = mock<Uri> {
+                            on { authority } doReturn MIUI_GALLERY_AUTHORITY
+                            on { path } doReturn "/raw/storage/emulated/0/screen-recording-1738156692736.mp4"
+                        }
+                        val expected = mock<DocumentFile> {
+                            on { exists() } doReturn true
+                        }
+
+                        // Recreate the exact File path that DocumentFileFacade will build:
+                        // It removes the prefix "/raw/" resulting in a RELATIVE path: "storage/emulated/0/..."
+                        val relativePath = uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
+                        val file = File(relativePath ?: "")
+                        file.parentFile?.mkdirs()
+                        if (!file.exists()) file.createNewFile()
+
+                        whenever(Uri.parse(testUri)).thenReturn(uri)
+                        whenever(DocumentsContract.isTreeUri(uri)) doReturn false
+                        whenever(DocumentFile.fromFile(file)) doReturn expected
+
+                        val actual = underTest.fromUri(uri)
+
+                        assertThat(actual).isEqualTo(expected)
                     }
-                    val expected = mock<DocumentFile>()
-
-                    // Recreate the exact File path that DocumentFileFacade will build:
-                    // It removes the prefix "/raw/" resulting in a RELATIVE path: "storage/emulated/0/..."
-                    val relativePath = uri.path?.removePrefix(MIUI_RAW_PREFIX_PATH)
-                    val file = File(relativePath ?: "")
-                    file.parentFile?.mkdirs()
-                    if (!file.exists()) file.createNewFile()
-
-                    whenever(Uri.parse(testUri)).thenReturn(uri)
-                    whenever(DocumentFile.fromFile(file)) doReturn expected
-
-                    val actual = underTest.fromUri(uri)
-
-                    assertThat(actual).isEqualTo(expected)
                 }
             }
         }
@@ -84,41 +89,46 @@ class DocumentFileFacadeTest {
         runTest {
             mockStatic(Uri::class.java).use {
                 mockStatic(DocumentFile::class.java).use {
-                    val testUri = "content://media/external/images/media/5701"
-                    val uri = mock<Uri> {
-                        on { path } doReturn testUri
-                        on { scheme } doReturn "content"
+                    mockStatic(DocumentsContract::class.java).use {
+                        val testUri = "content://media/external/images/media/5701"
+                        val uri = mock<Uri> {
+                            on { path } doReturn testUri
+                            on { scheme } doReturn "content"
+                        }
+                        val file = File(temporaryFolder, "picture20231109_162622_.jpg")
+                        file.createNewFile()
+                        val expected = mock<DocumentFile> {
+                            on { exists() } doReturn true
+                        }
+                        val contentResolver = mock<ContentResolver>()
+                        val cursor = mock<Cursor>()
+                        val projection = arrayOf(MediaStore.MediaColumns.DATA)
+                        val columnIndex = 0
+
+                        whenever(Uri.parse(testUri)).thenReturn(uri)
+                        whenever(DocumentsContract.isTreeUri(uri)) doReturn false
+                        whenever(context.contentResolver) doReturn contentResolver
+                        whenever(
+                            contentResolver.query(
+                                uri,
+                                projection,
+                                null,
+                                null,
+                                null
+                            )
+                        ) doReturn cursor
+                        whenever(cursor.moveToFirst()) doReturn true
+                        whenever(cursor.getColumnIndex(MediaStore.MediaColumns.DATA)) doReturn columnIndex
+                        whenever(cursor.getString(columnIndex)) doReturn file.absolutePath
+                        whenever(deviceGateway.getSdkVersionInt()) doReturn Build.VERSION_CODES.P
+                        whenever(deviceGateway.getManufacturerName()) doReturn "Samsung"
+                        whenever(DocumentFile.fromFile(file)) doReturn expected
+                        whenever(Uri.parse(testUri)).thenReturn(uri)
+
+                        val actual = underTest.fromUri(uri)
+
+                        assertThat(actual).isEqualTo(expected)
                     }
-                    val file = File(temporaryFolder, "picture20231109_162622_.jpg")
-                    file.createNewFile()
-                    val expected = mock<DocumentFile>()
-                    val contentResolver = mock<ContentResolver>()
-                    val cursor = mock<Cursor>()
-                    val projection = arrayOf(MediaStore.MediaColumns.DATA)
-                    val columnIndex = 0
-
-                    whenever(Uri.parse(testUri)).thenReturn(uri)
-                    whenever(context.contentResolver) doReturn contentResolver
-                    whenever(
-                        contentResolver.query(
-                            uri,
-                            projection,
-                            null,
-                            null,
-                            null
-                        )
-                    ) doReturn cursor
-                    whenever(cursor.moveToFirst()) doReturn true
-                    whenever(cursor.getColumnIndex(MediaStore.MediaColumns.DATA)) doReturn columnIndex
-                    whenever(cursor.getString(columnIndex)) doReturn file.absolutePath
-                    whenever(deviceGateway.getSdkVersionInt()) doReturn Build.VERSION_CODES.P
-                    whenever(deviceGateway.getManufacturerName()) doReturn "Samsung"
-                    whenever(DocumentFile.fromFile(file)) doReturn expected
-                    whenever(Uri.parse(testUri)).thenReturn(uri)
-
-                    val actual = underTest.fromUri(uri)
-
-                    assertThat(actual).isEqualTo(expected)
                 }
             }
         }
@@ -127,21 +137,26 @@ class DocumentFileFacadeTest {
     fun `test that get from uri with a file uri returns the correct document`() = runTest {
         mockStatic(Uri::class.java).use {
             mockStatic(DocumentFile::class.java).use {
-                val testUri = "file:///example"
-                val file = File(temporaryFolder, "file.txt")
-                file.createNewFile()
-                val uri = mock<Uri> {
-                    on { this.scheme } doReturn "file"
-                    on { this.path } doReturn file.path
+                mockStatic(DocumentsContract::class.java).use {
+                    val testUri = "file:///example"
+                    val file = File(temporaryFolder, "file.txt")
+                    file.createNewFile()
+                    val uri = mock<Uri> {
+                        on { this.scheme } doReturn "file"
+                        on { this.path } doReturn file.path
+                    }
+                    val expected = mock<DocumentFile> {
+                        on { exists() } doReturn true
+                    }
+
+                    whenever(Uri.parse(testUri)).thenReturn(uri)
+                    whenever(DocumentsContract.isTreeUri(uri)) doReturn false
+                    whenever(DocumentFile.fromFile(file)) doReturn expected
+
+                    val actual = underTest.fromUri(uri)
+
+                    assertThat(actual).isEqualTo(expected)
                 }
-                val expected = mock<DocumentFile>()
-
-                whenever(Uri.parse(testUri)).thenReturn(uri)
-                whenever(DocumentFile.fromFile(file)) doReturn expected
-
-                val actual = underTest.fromUri(uri)
-
-                assertThat(actual).isEqualTo(expected)
             }
         }
     }

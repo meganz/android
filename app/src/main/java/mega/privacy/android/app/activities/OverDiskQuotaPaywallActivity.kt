@@ -1,124 +1,73 @@
 package mega.privacy.android.app.activities
 
 import android.os.Bundle
-import android.os.CountDownTimer
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.core.text.HtmlCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.runtime.getValue
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.MegaActivity
-import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.extensions.enableEdgeToEdgeAndConsumeInsets
+import mega.privacy.android.app.presentation.container.MegaAppContainer
 import mega.privacy.android.app.presentation.overdisk.OverDiskQuotaPaywallViewModel
-import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.TimeUtils.DATE_LONG_FORMAT
-import mega.privacy.android.app.utils.TimeUtils.formatDate
-import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
-import mega.privacy.android.app.utils.Util.getSizeString
-import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.app.presentation.overdisk.view.OverDiskQuotaPaywallScreen
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
+/**
+ * Over Disk Quota Paywall screen, shown when the account is in over disk quota and the user
+ * must upgrade or risk data deletion.
+ */
 @AndroidEntryPoint
-class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
-
-    @Inject
-    @ApplicationScope
-    lateinit var globalScope: CoroutineScope
+class OverDiskQuotaPaywallActivity : FragmentActivity() {
 
     private val viewModel: OverDiskQuotaPaywallViewModel by viewModels()
 
-    private var timer: CountDownTimer? = null
-
-    private var overDiskQuotaPaywallText: TextView? = null
-    private var deletionWarningText: TextView? = null
-    private var dismissButton: Button? = null
-    private var upgradeButton: Button? = null
-    private var proPlanNeeded: Int? = 0
-
-    private var deadlineTs: Long = -1
-
-    override fun shouldSetStatusBarTextColor() = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdgeAndConsumeInsets(WindowInsetsCompat.Type.navigationBars())
         super.onCreate(savedInstanceState)
 
-        viewModel.requestStorageDetailIfNeeded()
+        enableEdgeToEdge()
+        setContent {
+            val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        viewModel.getUserData()
-
-        setContentView(R.layout.activity_over_disk_quota_paywall)
-
-        overDiskQuotaPaywallText = findViewById(R.id.over_disk_quota_paywall_text)
-        deletionWarningText = findViewById(R.id.over_disk_quota_paywall_deletion_warning)
-
-        updateStrings()
-
-        dismissButton = findViewById(R.id.dismiss_button)
-        dismissButton?.setOnClickListener(this)
-
-        upgradeButton = findViewById(R.id.upgrade_button)
-        upgradeButton?.setOnClickListener(this)
-
-        collectFlows()
-    }
-
-    private fun collectFlows() {
-        collectFlow(viewModel.pricing) {
-            getProPlanNeeded()
-        }
-
-        collectFlow(viewModel.monitorUpdateUserData) {
-            updateStrings()
-        }
-
-        collectFlow(viewModel.monitorMyAccountUpdate) {
-            updateStrings()
-        }
-
-        collectFlow(viewModel.usedStorage) {
-            updateStrings()
-        }
-    }
-
-    override fun onClick(v: View?) {
-        when (v!!.id) {
-            R.id.dismiss_button -> {
-                Timber.i("Over Disk Quota Paywall warning dismissed")
-                if (isTaskRoot) {
-                    launchMegaActivity()
-                }
-                finish()
+            MegaAppContainer(themeMode = themeMode) {
+                OverDiskQuotaPaywallScreen(
+                    uiState = uiState,
+                    onDismiss = ::onDismiss,
+                    onUpgrade = ::onUpgrade,
+                )
             }
+        }
+    }
 
-            R.id.upgrade_button -> {
-                Timber.i("Starting upgrade process after Over Disk Quota Paywall")
-                runCatching {
-                    startActivity(
-                        MegaActivity.getIntentWithExtraDestinations(
-                            context = this,
-                            navKeys = listOf(
-                                UpgradeAccountNavKey(
-                                    source = UpgradeAccountSource.MY_ACCOUNT_SCREEN,
-                                )
-                            ),
+    private fun onDismiss() {
+        Timber.i("Over Disk Quota Paywall warning dismissed")
+        if (isTaskRoot) {
+            launchMegaActivity()
+        }
+        finish()
+    }
+
+    private fun onUpgrade() {
+        Timber.i("Starting upgrade process after Over Disk Quota Paywall")
+        runCatching {
+            startActivity(
+                MegaActivity.getIntentWithExtraDestinations(
+                    context = this,
+                    navKeys = listOf(
+                        UpgradeAccountNavKey(
+                            source = UpgradeAccountSource.MY_ACCOUNT_SCREEN,
                         )
-                    )
-                }.onFailure {
-                    Timber.e(it)
-                }
-                finish()
-            }
+                    ),
+                )
+            )
+        }.onFailure {
+            Timber.e(it)
         }
+        finish()
     }
 
     private fun launchMegaActivity() {
@@ -130,147 +79,5 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         }.onFailure {
             Timber.e(it)
         }
-    }
-
-    /**
-     * Update the strings of the ODQ Paywall warning dialog with all the info needed.
-     * NOTE: call this method any time the related info is updated.
-     */
-    private fun updateStrings() {
-        val email = megaApi.myEmail
-        val warningsTs = megaApi.overquotaWarningsTs
-        val files = megaApi.numNodes
-        val size = getSizeString(viewModel.usedStorage.value, this)
-        deadlineTs = megaApi.overquotaDeadlineTs
-
-        if (warningsTs == null || warningsTs.size() == 0) {
-            overDiskQuotaPaywallText?.text =
-                getString(
-                    R.string.over_disk_quota_paywall_text_no_warning_dates_info,
-                    email, files.toString(), size, getProPlanNeeded()
-                )
-        } else if (warningsTs.size() == 1) {
-            overDiskQuotaPaywallText?.text =
-                resources.getQuantityString(
-                    R.plurals.over_disk_quota_paywall_text,
-                    1,
-                    email,
-                    formatDate(warningsTs.get(0), DATE_LONG_FORMAT, false, this),
-                    files,
-                    size,
-                    getProPlanNeeded()
-                )
-        } else {
-            var dates = String()
-            val lastWarningIndex: Int = warningsTs.size() - 1
-            for (i in 0 until lastWarningIndex) {
-                if (dates.isEmpty()) {
-                    dates += formatDate(
-                        warningsTs.get(i),
-                        DATE_LONG_FORMAT,
-                        false,
-                        this
-                    )
-                } else if (i != lastWarningIndex) {
-                    dates =
-                        dates + ", " + formatDate(warningsTs.get(i), DATE_LONG_FORMAT, false, this)
-                }
-            }
-
-            overDiskQuotaPaywallText?.text =
-                resources.getQuantityString(
-                    R.plurals.over_disk_quota_paywall_text,
-                    warningsTs.size(),
-                    email,
-                    dates,
-                    formatDate(warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false, this),
-                    files,
-                    size,
-                    getProPlanNeeded()
-                )
-        }
-
-        updateDeletionWarningText()
-    }
-
-    /**
-     * Updates the deletion warning text of the ODQ Paywall warning dialog depending on the remaining time.
-     * Uses a @see CountDownTimer to update the remaining time.
-     */
-    private fun updateDeletionWarningText() {
-        var text: String
-        val time = TimeUnit.SECONDS.toMillis(deadlineTs) - System.currentTimeMillis()
-
-        when {
-            deadlineTs < 0 -> {
-                text =
-                    String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_data))
-            }
-
-            TimeUnit.MILLISECONDS.toSeconds(time) <= 0 -> {
-                text =
-                    String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_time_left))
-            }
-
-            else -> {
-                text = String.format(
-                    getString(R.string.over_disk_quota_paywall_deletion_warning),
-                    getHumanizedTimeMs(time)
-                )
-
-                if (timer == null) {
-                    timer = object : CountDownTimer(time, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {
-                            updateDeletionWarningText()
-                        }
-
-                        override fun onFinish() {
-                            updateDeletionWarningText()
-                            timer = null
-                        }
-                    }.start()
-                }
-            }
-        }
-
-        try {
-            text = text.replace("[B]", "<b>")
-            text = text.replace("[/B]", "</b>")
-            text = text.replace(
-                "[M]",
-                "<font color='" + ColorUtils.getThemeColorHexString(
-                    applicationContext,
-                    android.R.attr.colorError
-                ) + "'>"
-            )
-            text = text.replace("[/M]", "</font>")
-        } catch (e: Exception) {
-            Timber.w(e, "Exception formatting string")
-        }
-
-        deletionWarningText?.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
-    }
-
-    /**
-     * Gets the PRO plan needed to be displayed in the ODQ Paywall warning depending on the storage
-     * space used by the user.
-     */
-    private fun getProPlanNeeded(): String {
-        val gb = 1073741824 // 1024(KB) * 1024(MB) * 1024(GB)
-        val products = viewModel.pricing.value.products
-        products.forEach {
-            if (it.storage > viewModel.usedStorage.value / gb) {
-                proPlanNeeded = it.level
-                return when (it.level) {
-                    1 -> getString(R.string.pro1_account)
-                    2 -> getString(R.string.pro2_account)
-                    3 -> getString(R.string.pro3_account)
-                    4 -> getString(R.string.prolite_account)
-                    else -> getString(R.string.pro_account)
-                }
-            }
-        }
-
-        return getString(R.string.pro_account)
     }
 }

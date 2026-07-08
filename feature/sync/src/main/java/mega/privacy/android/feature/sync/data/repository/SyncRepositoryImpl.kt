@@ -144,6 +144,7 @@ internal class SyncRepositoryImpl @Inject constructor(
                 delay(SYNC_REFRESH_DELAY.milliseconds)
             }
             .map { getSyncStalledIssues() }
+            .onStart { emit(getSyncStalledIssues()) }
             .flowOn(ioDispatcher)
             .shareIn(appScope, SharingStarted.Lazily, replay = 1)
     }

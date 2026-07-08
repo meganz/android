@@ -2625,4 +2625,20 @@
     <string name="subscription_revamp_current_plan_renews">Se renueva el %1$s</string>
     <string name="subscription_revamp_current_plan_expires">Caduca el %1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">Mensualmente</string>
+    <string name="document_scanner_capture_button">Capturar</string>
+    <string name="share_link_set_password">Establecer contraseña</string>
+    <string name="document_scanner_prepare_retry_button">Inténtalo de nuevo</string>
+    <string name="document_scanner_prepare_reconnecting">Reconectando&#8230;</string>
+    <string name="add_contacts_mega_contacts_section_title">Contactos en MEGA</string>
+    <string name="subscription_revamp_save_label">Ahorra hasta un 16%</string>
+    <string name="document_scanner_auto_capture_label">Automático</string>
+    <string name="share_link_settings_title">Ajustes del enlace</string>
+    <string name="share_link_set_expiry_date">Establecer fecha de caducidad</string>
+    <string name="share_link_expiry_subtitle">Desactivar el enlace en una fecha específica</string>
+    <string name="share_link_password_subtitle">Limitar el acceso con una contraseña</string>
+    <string name="settings_sorting_and_view_mode_title">Preferencias de ordenación y vista</string>
+    <string name="settings_sorting_preference_title">Preferencias de ordenación</string>
+    <string name="settings_view_mode_preference_title">Preferencias del modo de vista</string>
+    <string name="settings_preference_option_per_folder">Por carpeta</string>
+    <string name="settings_preference_option_all_folders">Igual para todo</string>
 </resources>

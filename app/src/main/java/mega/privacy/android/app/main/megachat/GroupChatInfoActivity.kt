@@ -64,10 +64,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -492,17 +488,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 val dialog = AddParticipantsNoContactsLeftToAddDialogFragment.newInstance()
                 dialog.show(supportFragmentManager, dialog.tag)
             } else {
-                val intent = Intent(this, AddContactActivity::class.java)
-                intent.putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                intent.putExtra(INTENT_EXTRA_KEY_CHAT, true)
-                intent.putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatHandle)
-                intent.putExtra(
-                    INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                    getString(R.string.add_participants_menu_item)
+                navigator.openAddChatParticipantsForResult(
+                    activity = this,
+                    chatId = chatHandle,
+                    requestCode = Constants.REQUEST_ADD_PARTICIPANTS,
                 )
-
-                @Suppress("deprecation")
-                startActivityForResult(intent, Constants.REQUEST_ADD_PARTICIPANTS)
             }
         } else {
             Timber.w("Online but not megaApi")

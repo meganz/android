@@ -114,7 +114,7 @@ fun MenuActionListTile(
                     painter = icon,
                     contentDescription = null,
                     tint = if (isDestructive) {
-                        DSTokens.colors.support.error
+                        DSTokens.colors.icon.brand
                     } else {
                         DSTokens.colors.icon.secondary
                     },
@@ -128,7 +128,7 @@ fun MenuActionListTile(
                             padding(start = 56.dp)
                         },
                     text = text,
-                    textColor = if (isDestructive) TextColor.Error else TextColor.Primary,
+                    textColor = if (isDestructive) TextColor.Brand else TextColor.Primary,
                     style = MaterialTheme.typography.subtitle1,
                     overflow = LongTextBehaviour.Ellipsis(1)
                 )

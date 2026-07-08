@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
@@ -126,6 +127,73 @@ class FileWrapperFactoryTest {
                     listOf(uriChild2)
             val actual2 = underTest(uriPath)
             assertThat(actual2?.getChildrenUris()).containsExactly(uriPathChild2.value)
+        }
+
+    @Test
+    fun `test that getChildrenWithMetadata is not fetched when it is a file`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val (uriPath, uri) = commonStub()
+
+            val actual = underTest(uriPath)
+
+            assertThat(actual?.getChildrenWithMetadata()).isEmpty()
+            verify(fileGateway, times(0)).getChildrenWithMetadataSync(uri)
+        }
+
+    @Test
+    fun `test that getChildrenWithMetadata delegates to gateway for folders`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val (uriPath, uri) = commonStub(
+                "content://folder",
+                documentMetadata = DocumentMetadata("name", true)
+            )
+            val expected = listOf(
+                ChildMetadata(
+                    uri = "content://child1",
+                    name = "file.txt",
+                    isFolder = false,
+                    size = 100L,
+                    lastModified = 200L,
+                    path = "/storage/emulated/0/file.txt"
+                )
+            )
+            whenever(fileGateway.getChildrenWithMetadataSync(uri)) doReturn expected
+
+            val actual = underTest(uriPath)?.getChildrenWithMetadata()
+
+            assertThat(actual).isEqualTo(expected)
+        }
+
+    @Test
+    fun `test that getChildrenWithMetadata returns null when gateway throws`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val (uriPath, uri) = commonStub(
+                "content://folder",
+                documentMetadata = DocumentMetadata("name", true)
+            )
+            whenever(fileGateway.getChildrenWithMetadataSync(uri)) doThrow RuntimeException("test")
+
+            val actual = underTest(uriPath)?.getChildrenWithMetadata()
+
+            assertThat(actual).isNull()
+        }
+
+    @Test
+    fun `test that getChildrenWithMetadata propagates null when gateway returns null`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            // Gateway returns null when SAF query fails (e.g. ContentResolver returns null
+            // cursor or DocumentFile is no longer resolvable). The wrapper must propagate
+            // null — not coerce to empty list — so the C++ directoryScan can return
+            // SCAN_INACCESSIBLE instead of "directory has 0 children, delete the rest."
+            val (uriPath, uri) = commonStub(
+                "content://folder",
+                documentMetadata = DocumentMetadata("name", true)
+            )
+            whenever(fileGateway.getChildrenWithMetadataSync(uri)) doReturn null
+
+            val actual = underTest(uriPath)?.getChildrenWithMetadata()
+
+            assertThat(actual).isNull()
         }
 
     @ParameterizedTest
@@ -243,6 +311,58 @@ class FileWrapperFactoryTest {
             whenever(fileGateway.renameFileSync(uriPath, newName)) doReturn uriPathRenamed
             val actual = underTest(uriPath)?.rename(newName)
             assertThat(actual?.uri).isEqualTo(uriPathRenamed.value)
+        }
+
+    @Test
+    fun `test that moveDocument delegates to gateway moveDocumentSync`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val sourceParentUriString = "content://source-parent"
+            val targetParentUriString = "content://target-parent"
+            val (uriPath, _) = commonStub()
+            val (movedUriPath, _) = commonStub("content://moved")
+
+            whenever(
+                fileGateway.moveDocumentSync(
+                    uriPath = uriPath,
+                    sourceParentUriPath = UriPath(sourceParentUriString),
+                    targetParentUriPath = UriPath(targetParentUriString),
+                )
+            ) doReturn movedUriPath
+
+            val actual = underTest(uriPath)?.moveDocument(
+                sourceParentUriString,
+                targetParentUriString,
+            )
+
+            assertThat(actual?.uri).isEqualTo(movedUriPath.value)
+            verify(fileGateway).moveDocumentSync(
+                uriPath = uriPath,
+                sourceParentUriPath = UriPath(sourceParentUriString),
+                targetParentUriPath = UriPath(targetParentUriString),
+            )
+        }
+
+    @Test
+    fun `test that moveDocument returns null when gateway returns null`() =
+        Mockito.mockStatic(Uri::class.java).useNoResult {
+            val sourceParentUriString = "content://source-parent"
+            val targetParentUriString = "content://target-parent"
+            val (uriPath, _) = commonStub()
+
+            whenever(
+                fileGateway.moveDocumentSync(
+                    uriPath = uriPath,
+                    sourceParentUriPath = UriPath(sourceParentUriString),
+                    targetParentUriPath = UriPath(targetParentUriString),
+                )
+            ) doReturn null
+
+            val actual = underTest(uriPath)?.moveDocument(
+                sourceParentUriString,
+                targetParentUriString,
+            )
+
+            assertThat(actual).isNull()
         }
 
     private fun commonStub(

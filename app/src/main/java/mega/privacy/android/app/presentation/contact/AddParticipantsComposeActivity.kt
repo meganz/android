@@ -122,5 +122,13 @@ class AddParticipantsComposeActivity : AppCompatActivity() {
             Intent(context, AddParticipantsComposeActivity::class.java)
                 .putExtra(EXTRA_CHAT_ID, chatId)
                 .putExtra(EXTRA_IS_MEETING, true)
+
+        /**
+         * Builds an [Intent] to open the picker for adding participants to a chat [chatId].
+         */
+        fun getChatIntent(context: Context, chatId: Long): Intent =
+            Intent(context, AddParticipantsComposeActivity::class.java)
+                .putExtra(EXTRA_CHAT_ID, chatId)
+                .putExtra(EXTRA_IS_MEETING, false)
     }
 }

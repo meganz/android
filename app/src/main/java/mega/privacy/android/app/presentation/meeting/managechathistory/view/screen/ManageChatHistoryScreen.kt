@@ -395,7 +395,7 @@ private fun ClearHistoryOption(title: String, modifier: Modifier = Modifier) {
         GenericTwoLineListItem(
             modifier = Modifier.padding(vertical = 4.dp),
             title = title,
-            titleTextColor = TextColor.Error,
+            titleTextColor = TextColor.Brand,
             subtitle = stringResource(id = R.string.subtitle_properties_chat_clear),
             showEntireSubtitle = true
         )

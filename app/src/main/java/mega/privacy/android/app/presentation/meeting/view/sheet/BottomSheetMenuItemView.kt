@@ -8,22 +8,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 
 /**
  * View of a menu item in the bottom panel
@@ -49,16 +47,9 @@ fun BottomSheetMenuItemView(
             .height(55.dp)
             .clickable(onClick = onClick)
     ) {
-        val iconColor: Color
-        val textColor: Color
-        if (tintRed) {
-            iconColor = MaterialTheme.colors.red_600_red_300
-            textColor = MaterialTheme.colors.red_600_red_300
-        } else {
-            iconColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054
-            textColor = MaterialTheme.colors.textColorPrimary
-        }
-        Icon(
+        val iconColor = if (tintRed) IconColor.Brand else IconColor.Secondary
+        val textColor = if (tintRed) TextColor.Brand else TextColor.Primary
+        MegaIcon(
             modifier = Modifier
                 .padding(start = 16.dp)
                 .size(24.dp)
@@ -67,12 +58,12 @@ fun BottomSheetMenuItemView(
             contentDescription = description,
             tint = iconColor
         )
-        Text(
+        MegaText(
             modifier = Modifier
                 .padding(start = 32.dp, end = 16.dp)
                 .align(Alignment.CenterVertically),
             text = stringResource(id = text),
-            color = textColor,
+            textColor = textColor,
             style = MaterialTheme.typography.subtitle1
         )
     }

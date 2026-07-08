@@ -2631,4 +2631,24 @@
     <string name="subscription_revamp_current_plan_renews">Si rinnova il %1$s</string>
     <string name="subscription_revamp_current_plan_expires">Scade il %1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">Mensilmente</string>
+    <string name="document_scanner_capture_button">Scatta</string>
+    <string name="share_link_set_password">Imposta una password</string>
+    <string name="document_scanner_prepare_reconnecting">Riconnessione&#8230;</string>
+    <string name="subscription_revamp_save_label">Risparmia fino al 16%</string>
+    <string name="document_scanner_auto_capture_label">Automatico</string>
+    <string name="share_link_settings_title">Impostazioni del link</string>
+    <string name="share_link_set_expiry_date">Seleziona data di scadenza</string>
+    <string name="share_link_expiry_subtitle">Disattiva il link in una data specifica</string>
+    <string name="share_link_password_subtitle">Limita l’accesso con una password</string>
+    <string name="document_scanner_prepare_retry_button">Riprova</string>
+    <string name="settings_sorting_and_view_mode_title">Modalità di elencazione e di vista</string>
+    <string name="settings_sorting_preference_title">Preferenze di elencazione</string>
+    <string name="settings_view_mode_preference_title">Preferenze modalità di visualizzazione</string>
+    <string name="settings_preference_option_per_folder">Per cartella</string>
+    <string name="settings_preference_option_all_folders">Stessa per tutte</string>
+    <string name="park_account_screen_title">Resetta account</string>
+    <string name="park_account_screen_acknowledge">Sono a conoscenza del fatto che sto iniziando un nuovo, vuoto account e che perderò tutti i dati nel mio account finché non userò la mia password o una copia della mia Chiave di recupero.</string>
+    <string name="park_account_screen_start_button">Inizia un nuovo account</string>
+    <string name="park_account_success_message">Il tuo vecchio account è stato sospeso. Ora puoi accedere al tuo nuovo account.</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA contatti</string>
 </resources>

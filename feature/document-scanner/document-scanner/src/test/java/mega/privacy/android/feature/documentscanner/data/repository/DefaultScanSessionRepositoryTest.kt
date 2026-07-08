@@ -2,21 +2,29 @@ package mega.privacy.android.feature.documentscanner.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.feature.documentscanner.data.capture.DocumentImageStorage
 import mega.privacy.android.feature.documentscanner.domain.entity.PageQuality
 import mega.privacy.android.feature.documentscanner.domain.entity.ScannedPage
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultScanSessionRepositoryTest {
 
     private lateinit var underTest: DefaultScanSessionRepository
 
+    private val documentImageStorage = mock<DocumentImageStorage>()
+
     @BeforeEach
     fun setUp() {
-        underTest = DefaultScanSessionRepository()
+        reset(documentImageStorage)
+        underTest = DefaultScanSessionRepository(documentImageStorage, UnconfinedTestDispatcher())
     }
 
     private fun createPage(id: String, order: Int = 0) = ScannedPage(
@@ -77,6 +85,35 @@ class DefaultScanSessionRepositoryTest {
         underTest.removePage("unknown")
 
         assertThat(underTest.getPages()).hasSize(1)
+    }
+
+    @Test
+    fun `test that removePage deletes the backing image files`() = runTest {
+        underTest.addPage(createPage("1"))
+
+        underTest.removePage("1")
+
+        verify(documentImageStorage).delete("file:///image_1.jpg")
+        verify(documentImageStorage).delete("file:///thumb_1.jpg")
+    }
+
+    @Test
+    fun `test that replacePage deletes the replaced page files`() = runTest {
+        underTest.addPage(createPage("1"))
+
+        underTest.replacePage("1", createPage("1-new"))
+
+        verify(documentImageStorage).delete("file:///image_1.jpg")
+        verify(documentImageStorage).delete("file:///thumb_1.jpg")
+    }
+
+    @Test
+    fun `test that clearSession deletes all stored images`() = runTest {
+        underTest.addPage(createPage("1"))
+
+        underTest.clearSession()
+
+        verify(documentImageStorage).deleteAll()
     }
 
     @Test

@@ -1,6 +1,5 @@
 package mega.privacy.android.feature.documentscanner.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -13,9 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
@@ -27,31 +26,31 @@ import mega.android.core.ui.tokens.theme.DSTokens
  *
  * Only the most recent thumbnails are fanned, so the caller need only pass a small
  * recent window rather than every captured page. [count] is the running total shown
- * on the badge, which may exceed the number of thumbnails in [pages].
+ * on the badge, which may exceed the number of thumbnails in [thumbnailUris].
  *
- * @param pages Most recent captured page thumbnails, oldest first.
+ * @param thumbnailUris URIs of the most recent captured page thumbnails, oldest first.
  * @param count Total number of pages captured so far.
  * @param modifier Modifier for the deck.
  */
 @Composable
 fun CapturedPagesDeck(
-    pages: List<ImageBitmap>,
+    thumbnailUris: List<String>,
     count: Int,
     modifier: Modifier = Modifier,
 ) {
-    if (pages.isEmpty()) return
+    if (thumbnailUris.isEmpty()) return
 
-    val fanned = pages.takeLast(MAX_FANNED)
+    val fanned = thumbnailUris.takeLast(MAX_FANNED)
     Box(modifier = modifier.size(96.dp), contentAlignment = Alignment.BottomStart) {
-        fanned.forEachIndexed { index, page ->
+        fanned.forEachIndexed { index, uri ->
             // Oldest fanned card leans most; the top (newest) card sits upright.
             val depth = fanned.lastIndex - index
-            Image(
-                bitmap = page,
+            AsyncImage(
+                model = uri,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(width = PAGE_CARD_WIDTH, height = PAGE_CARD_HEIGHT)
                     .rotate(-FAN_DEGREES * depth)
                     .clip(RoundedCornerShape(6.dp))
                     .border(1.dp, DSTokens.colors.icon.onColor, RoundedCornerShape(6.dp)),
@@ -77,3 +76,7 @@ fun CapturedPagesDeck(
 
 private const val MAX_FANNED = 4
 private const val FAN_DEGREES = 6f
+
+// Portrait, page-shaped cards (≈0.72 aspect) so captured pages read as documents, not squares.
+private val PAGE_CARD_WIDTH = 52.dp
+private val PAGE_CARD_HEIGHT = 72.dp

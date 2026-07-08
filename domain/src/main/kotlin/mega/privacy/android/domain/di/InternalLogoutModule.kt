@@ -10,6 +10,7 @@ import mega.privacy.android.domain.usecase.logout.ClearPasscodeDataLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearPersistedFeatureFlagsLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearPinnedHomeItemsLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearRecentSearchesLogoutTask
+import mega.privacy.android.domain.usecase.logout.ClearSortingAndViewModePreferencesLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearVideoPlaybackDataLogoutTask
 import mega.privacy.android.domain.usecase.logout.ClearViewedLinksLogoutTask
 import mega.privacy.android.domain.usecase.logout.LoadMiscFlagsTask
@@ -74,6 +75,11 @@ internal abstract class InternalLogoutModule {
         @Provides
         @IntoSet
         fun provideClearRecentSearchesLogoutTask(task: ClearRecentSearchesLogoutTask): LogoutTask =
+            task
+
+        @Provides
+        @IntoSet
+        fun provideClearSortingAndViewModePreferencesLogoutTask(task: ClearSortingAndViewModePreferencesLogoutTask): LogoutTask =
             task
     }
 }

@@ -46,6 +46,8 @@ import mega.privacy.android.data.repository.FileLinkRepositoryImpl
 import mega.privacy.android.data.repository.FileServiceRepositoryImpl
 import mega.privacy.android.data.repository.FileSystemRepositoryImpl
 import mega.privacy.android.data.repository.FolderLinkRepositoryImpl
+import mega.privacy.android.data.repository.FolderPreferenceRepositoryImpl
+import mega.privacy.android.data.repository.GeocoderRepositoryImpl
 import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.HttpConnectionRepositoryImpl
 import mega.privacy.android.data.repository.InAppUpdateRepositoryImpl
@@ -60,7 +62,6 @@ import mega.privacy.android.data.repository.PermissionRepositoryImpl
 import mega.privacy.android.data.repository.RegexRepositoryImpl
 import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.SearchRepositoryImpl
-import mega.privacy.android.data.repository.GeocoderRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.VideoRepositoryImpl
@@ -108,7 +109,9 @@ import mega.privacy.android.domain.repository.FileLinkRepository
 import mega.privacy.android.domain.repository.FileServiceRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.repository.FolderLinkRepository
+import mega.privacy.android.domain.repository.FolderPreferenceRepository
 import mega.privacy.android.domain.repository.GalleryFilesRepository
+import mega.privacy.android.domain.repository.GeocoderRepository
 import mega.privacy.android.domain.repository.HttpConnectionRepository
 import mega.privacy.android.domain.repository.InAppUpdateRepository
 import mega.privacy.android.domain.repository.InitializationRepository
@@ -127,7 +130,6 @@ import mega.privacy.android.domain.repository.RegexRepository
 import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.repository.GeocoderRepository
 import mega.privacy.android.domain.repository.SlideshowRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
@@ -150,9 +152,9 @@ import mega.privacy.android.domain.repository.files.PdfRepository
 import mega.privacy.android.domain.repository.monitoring.PerformanceReporterRepository
 import mega.privacy.android.domain.repository.psa.PsaRepository
 import mega.privacy.android.domain.repository.security.LoginRepository
-import mega.privacy.android.domain.usecase.logout.LogoutTask
 import mega.privacy.android.domain.repository.security.PasscodeRepository
 import mega.privacy.android.domain.repository.thumbnailpreview.ThumbnailPreviewRepository
+import mega.privacy.android.domain.usecase.logout.LogoutTask
 import javax.inject.Singleton
 import kotlin.contracts.ExperimentalContracts
 
@@ -161,6 +163,9 @@ import kotlin.contracts.ExperimentalContracts
 internal abstract class RepositoryModule {
     @Binds
     abstract fun bindGeocoderRepository(repository: GeocoderRepositoryImpl): GeocoderRepository
+
+    @Binds
+    abstract fun bindFolderPreferenceRepository(implementation: FolderPreferenceRepositoryImpl): FolderPreferenceRepository
 
     @Binds
     abstract fun bindSlideshowRepository(implementation: SlideshowRepositoryImpl): SlideshowRepository

@@ -2782,4 +2782,20 @@
     <string name="subscription_revamp_charged_yearly">%1$s pobierane rocznie</string>
     <string name="subscription_revamp_save_label">Oszczędź do 16%</string>
     <string name="subscription_revamp_get_plan_button">Wybierz %1$s</string>
+    <string name="document_scanner_capture_button">Zrób zdjęcie</string>
+    <string name="share_link_set_password">Ustaw hasło</string>
+    <string name="document_scanner_auto_capture_label">Auto</string>
+    <string name="document_scanner_auto_capture_on">Automatyczne przechwytywanie włączone</string>
+    <string name="document_scanner_auto_capture_off">Automatyczne przechwytywanie wyłączone</string>
+    <string name="share_link_settings_title">Ustawienia linku</string>
+    <string name="share_link_set_expiry_date">Ustaw datę wygaśnięcia</string>
+    <string name="share_link_expiry_subtitle">Wyłącz link w określonym dniu</string>
+    <string name="share_link_password_subtitle">Ogranicz dostęp hasłem</string>
+    <string name="settings_sorting_and_view_mode_title">Tryb sortowania i wyświetlania</string>
+    <string name="settings_sorting_preference_title">Preferencje sortowania</string>
+    <string name="settings_sorting_preference_description">Zastosuj sortowanie dla każdego folderu, lub użyj tego samego sortowania dla wszystkich folderów.</string>
+    <string name="settings_view_mode_preference_title">Preferencje trybu wyświetlania</string>
+    <string name="settings_view_mode_preference_description">Zastosuj tryb widoku dla każdego folderu, lub użyj tego samego trybu widoku dla wszystkich folderów.</string>
+    <string name="settings_preference_option_per_folder">Za folder</string>
+    <string name="settings_preference_option_all_folders">To samo dla wszystkich</string>
 </resources>

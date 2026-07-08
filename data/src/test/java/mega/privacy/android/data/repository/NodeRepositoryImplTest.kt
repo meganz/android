@@ -236,6 +236,15 @@ internal class NodeRepositoryImplTest {
         }
 
     @Test
+    fun `test that handleToBase64 returns properly`() =
+        runTest {
+            val handle = 1234L
+            val expectedBase64 = "a base 64 value"
+            whenever(megaApiGateway.handleToBase64(handle)).thenReturn(expectedBase64)
+            assertThat(underTest.convertHandleToBase64(handle)).isEqualTo(expectedBase64)
+        }
+
+    @Test
     fun `test getFolderVersionInfo queries megaApiGateway`() =
         runTest {
             mockFolderInfoResponse()

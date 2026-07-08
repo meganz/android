@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.isPast
@@ -66,10 +67,9 @@ import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
 import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
+import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.black
 import mega.privacy.android.shared.original.core.ui.theme.grey_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.red_300
-import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.shared.original.core.ui.theme.white
 import mega.privacy.android.shared.original.core.ui.theme.white_alpha_054
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -556,10 +556,10 @@ private fun LeaveGroupButton(
         .fillMaxWidth()
         .wrapContentSize(Alignment.Center),
         verticalAlignment = Alignment.CenterVertically) {
-        Text(textAlign = TextAlign.Center,
+        MegaText(textAlign = TextAlign.Center,
             style = MaterialTheme.typography.button,
             text = stringResource(id = R.string.meetings_scheduled_meeting_info_leave_group_label),
-            color = red_600.takeIf { MaterialTheme.colors.isLight } ?: red_300)
+            textColor = TextColor.Brand)
     }
 }
 

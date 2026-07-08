@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -48,6 +47,8 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.controlssliders.MegaSwitch
+import mega.privacy.android.shared.original.core.ui.controls.dividers.DividerType
+import mega.privacy.android.shared.original.core.ui.controls.dividers.MegaDivider
 import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
 import mega.privacy.android.shared.original.core.ui.controls.sheets.BottomSheet
 import mega.privacy.android.shared.original.core.ui.controls.text.MiddleEllipsisText
@@ -317,7 +318,7 @@ internal fun ImagePreviewBottomSheet(
                 }
 
                 if (isGroup1Visible && (isGroup2Visible || isGroup3Visible || isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
-                    Divider(modifier = Modifier.padding(start = 72.dp))
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
                 }
 
                 // Group 2: Dispute, OpenWith
@@ -342,7 +343,7 @@ internal fun ImagePreviewBottomSheet(
                 }
 
                 if (isGroup2Visible && (isGroup3Visible || isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
-                    Divider(modifier = Modifier.padding(start = 72.dp))
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
                 }
 
                 // Group 3: Forward, SaveToDevice, Import, AvailableOffline
@@ -393,7 +394,7 @@ internal fun ImagePreviewBottomSheet(
                 }
 
                 if (isGroup3Visible && (isGroup4Visible || isGroup5Visible || isGroup6Visible)) {
-                    Divider(modifier = Modifier.padding(start = 72.dp))
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
                 }
 
                 // Group 4: GetLink, RemoveLink, SendToChat, Share
@@ -445,7 +446,7 @@ internal fun ImagePreviewBottomSheet(
                 }
 
                 if (isGroup4Visible && (isGroup5Visible || isGroup6Visible)) {
-                    Divider(modifier = Modifier.padding(start = 72.dp))
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
                 }
 
                 // Group 5: Rename, Hide, Unhide, Move, AddToAlbum
@@ -519,7 +520,7 @@ internal fun ImagePreviewBottomSheet(
                 }
 
                 if (isGroup5Visible && isGroup6Visible) {
-                    Divider(modifier = Modifier.padding(start = 72.dp))
+                    MegaDivider(dividerType = DividerType.BigStartPadding)
                 }
 
                 // Group 6: Copy, Restore, Remove, RemoveOffline, MoveToRubbishBin

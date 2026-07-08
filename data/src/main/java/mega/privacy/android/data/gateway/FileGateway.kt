@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import androidx.documentfile.provider.DocumentFile
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.data.filewrapper.ChildMetadata
 import mega.privacy.android.domain.entity.document.DocumentEntity
 import mega.privacy.android.domain.entity.document.DocumentFolder
 import mega.privacy.android.domain.entity.document.DocumentMetadata
@@ -533,6 +534,27 @@ interface FileGateway {
     fun getFolderChildUrisSync(uri: Uri): List<Uri>
 
     /**
+     * Batch-fetch metadata for all direct children of [parentUri] using a single
+     * [android.content.ContentResolver.query] call.
+     *
+     * This is the high-performance replacement for calling [getFolderChildUrisSync] followed by
+     * N calls to [getDocumentMetadataSync] and [getExternalPathByUriSync].  For a directory
+     * with N files it reduces SAF IPC round-trips from O(N) to O(1).
+     *
+     * Note that this fun is synchronous and must only be used in contexts where there is really
+     * no other option (i.e. from the C++ JNI scan thread).
+     *
+     * @param parentUri tree/document URI of the directory to list
+     * @return list of [mega.privacy.android.data.filewrapper.ChildMetadata] for every direct child;
+     *         empty list when the directory is legitimately empty; **null** when the
+     *         directory cannot be resolved or the SAF query failed. The C++ caller relies
+     *         on this distinction — empty list means "directory has zero children" and the
+     *         sync engine deletes any cached children, while null means SCAN_INACCESSIBLE
+     *         and the sync engine retries without deleting anything.
+     */
+    fun getChildrenWithMetadataSync(parentUri: Uri): List<ChildMetadata>?
+
+    /**
      * Get file from uri
      *
      * @param uri uri of the file
@@ -627,6 +649,20 @@ interface FileGateway {
         parentUriPath: UriPath,
         newName: String,
         overwrite: Boolean,
+    ): UriPath?
+
+    /**
+     * Moves a document from [sourceParentUriPath] to [targetParentUriPath] within the same SAF
+     * tree using [android.provider.DocumentsContract.moveDocument]. Avoids the byte-by-byte
+     * copy fallback used by cross-parent renames in the SDK's Android filesystem layer.
+     * The document keeps its original name; rename it separately at the target parent if needed.
+     * @return the new [UriPath] of the moved document, or null if the provider does not support
+     *   moves (no FLAG_SUPPORTS_MOVE) or the operation otherwise failed.
+     */
+    fun moveDocumentSync(
+        uriPath: UriPath,
+        sourceParentUriPath: UriPath,
+        targetParentUriPath: UriPath,
     ): UriPath?
 
     /**

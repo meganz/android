@@ -23,6 +23,9 @@ import mega.privacy.android.feature.documentscanner.domain.entity.StabilityState
  * @property captureEvent One-shot signal telling the screen to capture the current
  *   frame — fired on a stable document (AUTO, off cooldown) or a manual shutter tap.
  *   The screen grabs the frame, then calls back to consume it.
+ * @property capturedPageThumbnails Thumbnail URIs of the most recent persisted pages
+ *   (oldest first), for the bottom deck. Bounded to a small recent window.
+ * @property capturedPageCount Total number of pages captured in this session so far.
  */
 internal data class ScanSessionUiState(
     val isCameraPermissionGranted: Boolean = false,
@@ -31,4 +34,6 @@ internal data class ScanSessionUiState(
     val isModelMissing: Boolean = false,
     val captureMode: CaptureMode = CaptureMode.AUTO,
     val captureEvent: StateEvent = consumed,
+    val capturedPageThumbnails: List<String> = emptyList(),
+    val capturedPageCount: Int = 0,
 )

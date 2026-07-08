@@ -4,11 +4,15 @@ import android.content.res.Configuration
 import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -17,6 +21,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +32,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -34,6 +40,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.consumed
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
@@ -48,6 +56,9 @@ import mega.privacy.android.core.sharedcomponents.header.StickySectionHeader
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
+import mega.privacy.android.feature.photos.extensions.isScrolledToEnd
+import mega.privacy.android.feature.photos.extensions.isScrolledToTop
+import mega.privacy.android.feature.photos.extensions.isScrollingDown
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -94,6 +105,8 @@ internal fun TimelineRevampScreen(
     handleCameraUploadsPermissionsResult: () -> Unit,
     handleNotificationPermissionResult: () -> Unit,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+    onSelectorVisibleChanged: (Boolean) -> Unit = {},
 ) {
     var showTakenDownDialog by rememberSaveable { mutableStateOf(false) }
     val takenDownDialogEvent =
@@ -136,6 +149,7 @@ internal fun TimelineRevampScreen(
         uiState is TimelineRevampUiState.Data -> {
             TimelineRevampContent(
                 modifier = modifier.fillMaxSize(),
+                contentPadding = contentPadding,
                 sections = uiState.sections,
                 sectionStartOffsets = uiState.sectionStartOffsets,
                 loadedNodes = uiState.loadedNodes,
@@ -152,6 +166,7 @@ internal fun TimelineRevampScreen(
                 onNodeClicked = onNodeClicked,
                 onNodeSelected = onNodeSelected,
                 onScrollingChanged = onScrollingChanged,
+                onSelectorVisibleChanged = onSelectorVisibleChanged,
                 selectedPhotoIds = selectedPhotoIds,
                 bannerContent = if (selectedPhotoIds.isEmpty()) {
                     {
@@ -201,13 +216,27 @@ private fun TimelineRevampContent(
     onNodeClicked: (PhotosNodeContentItemV2?) -> Unit,
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
+    onSelectorVisibleChanged: (Boolean) -> Unit,
     selectedPhotoIds: Set<Long>,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     bannerContent: (@Composable () -> Unit)? = null,
 ) {
     val lazyGridState = rememberLazyGridState()
     val cardListState = rememberLazyListState()
     val configuration = LocalConfiguration.current
+    val layoutDirection = LocalLayoutDirection.current
+
+    // Add bottom clearance so the last item can scroll clear of the floating MediaTimePeriodSelector,
+    // mirroring the legacy Timeline tab.
+    val contentPaddingWithSelector = remember(contentPadding, layoutDirection) {
+        PaddingValues(
+            start = contentPadding.calculateStartPadding(layoutDirection),
+            end = contentPadding.calculateEndPadding(layoutDirection),
+            top = contentPadding.calculateTopPadding(),
+            bottom = contentPadding.calculateBottomPadding() + TIMELINE_REVAMP_SELECTOR_CLEARANCE,
+        )
+    }
     val columns =
         if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             gridSize.portrait
@@ -245,6 +274,16 @@ private fun TimelineRevampContent(
             pendingScroll = null
         }
     }
+    val selectorVisible by rememberSelectorVisibility(selectedPeriod, lazyGridState, cardListState)
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { selectorVisible }
+            .distinctUntilChanged()
+            .collectLatest { visible ->
+                if (!visible) delay(SELECTOR_HIDE_DEBOUNCE_MS)
+                onSelectorVisibleChanged(visible)
+            }
+    }
 
     when (selectedPeriod) {
         MediaTimePeriod.Years, MediaTimePeriod.Months -> {
@@ -253,6 +292,7 @@ private fun TimelineRevampContent(
                     modifier = modifier
                         .fillMaxSize()
                         .testTag(TIMELINE_REVAMP_CARD_LIST_SKELETON_TAG),
+                    contentPadding = contentPaddingWithSelector,
                 )
             } else {
                 PhotosNodeListCardListView(
@@ -262,6 +302,7 @@ private fun TimelineRevampContent(
                     photos = periodCards,
                     isHiddenNodesEnabled = isHiddenNodesEnabled,
                     state = cardListState,
+                    contentPadding = contentPaddingWithSelector,
                     onClick = { card ->
                         when (card.period) {
                             PhotosNodeListCardPeriod.Year -> {
@@ -299,6 +340,7 @@ private fun TimelineRevampContent(
                 onNodeSelected = onNodeSelected,
                 onScrollingChanged = onScrollingChanged,
                 selectedPhotoIds = selectedPhotoIds,
+                contentPadding = contentPaddingWithSelector,
                 bannerContent = bannerContent,
                 modifier = modifier,
             )
@@ -324,6 +366,7 @@ private fun TimelineRevampGrid(
     onNodeSelected: (PhotosNodeContentItemV2) -> Unit,
     onScrollingChanged: (Boolean) -> Unit,
     selectedPhotoIds: Set<Long>,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     bannerContent: (@Composable () -> Unit)? = null,
 ) {
@@ -397,6 +440,7 @@ private fun TimelineRevampGrid(
                 .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
             state = lazyGridState,
             totalItems = totalGridItems,
+            contentPadding = contentPadding,
             fastScrollerVerticalOffset = 36.dp
         ) {
             bannerContent?.let {
@@ -492,6 +536,25 @@ private fun MediaTimelineSection.isInMonth(year: Int, month: Int): Boolean {
 private sealed interface PendingCardScroll {
     data class ToYear(val year: Int) : PendingCardScroll
     data class ToMonth(val year: Int, val month: Int) : PendingCardScroll
+}
+
+@Composable
+private fun rememberSelectorVisibility(
+    selectedPeriod: MediaTimePeriod,
+    gridState: LazyGridState,
+    listState: LazyListState,
+): State<Boolean> {
+    val isGrid = selectedPeriod.isGridPeriod()
+    val isScrollingDown by if (isGrid) gridState.isScrollingDown() else listState.isScrollingDown()
+    val isScrolledToEnd by if (isGrid) gridState.isScrolledToEnd() else listState.isScrolledToEnd()
+    val isScrolledToTop by if (isGrid) gridState.isScrolledToTop() else listState.isScrolledToTop()
+    return remember(selectedPeriod, gridState, listState) {
+        derivedStateOf {
+            val isScrollInProgress =
+                if (isGrid) gridState.isScrollInProgress else listState.isScrollInProgress
+            !isScrollInProgress || (!isScrollingDown && !isScrolledToEnd) || isScrolledToTop
+        }
+    }
 }
 
 /**
@@ -685,6 +748,12 @@ private fun timelineMonthLabel(startDateSeconds: Long, locale: Locale): String {
 }
 
 private const val DAY_RANGE_SEPARATOR = "—"
+
+/** Bottom clearance so timeline content can scroll clear of the floating MediaTimePeriodSelector. */
+private val TIMELINE_REVAMP_SELECTOR_CLEARANCE = 90.dp
+
+/** Grace period before hiding the selector, so a short accidental scroll-down doesn't flicker it away. */
+private const val SELECTOR_HIDE_DEBOUNCE_MS = 200L
 
 internal const val TIMELINE_REVAMP_CONTENT_GRID_TAG = "timeline_revamp_content:grid"
 internal const val TIMELINE_REVAMP_STICKY_HEADER_TAG = "timeline_revamp_content:sticky_header"
