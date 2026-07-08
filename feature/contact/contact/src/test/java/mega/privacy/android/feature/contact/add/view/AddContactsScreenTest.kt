@@ -93,6 +93,40 @@ class AddContactsScreenTest {
     }
 
     @Test
+    fun `test that initialSelectedHandles pre-selects those contacts on first composition`() {
+        composeTestRule.setContent {
+            AddContactsScreen(
+                state = dataState(contact(1L, "Alice"), contact(2L, "Bob")),
+                onSearchQueryChange = {},
+                onConfirm = { _, _ -> },
+                onBack = {},
+                initialSelectedHandles = setOf(1L, 2L),
+            )
+        }
+
+        composeTestRule.onNodeWithText("2 selected").assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that confirming reports the pre-selected handles from initialSelectedHandles`() {
+        var confirmedHandles: Set<Long>? = null
+        composeTestRule.setContent {
+            AddContactsScreen(
+                state = dataState(contact(1L, "Alice"), contact(2L, "Bob")),
+                onSearchQueryChange = {},
+                onConfirm = { handles, _ -> confirmedHandles = handles },
+                onBack = {},
+                initialSelectedHandles = setOf(1L),
+            )
+        }
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_FAB_TAG).performClick()
+
+        assertThat(confirmedHandles).containsExactly(1L)
+    }
+
+    @Test
     fun `test that the phone section header is not displayed when the section is Hidden`() {
         setScreen(dataState(contact(1L, "Alice")))
 

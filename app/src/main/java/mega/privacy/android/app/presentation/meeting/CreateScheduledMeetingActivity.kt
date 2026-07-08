@@ -33,7 +33,6 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.view.CreateScheduledMeetingView
 import mega.privacy.android.app.presentation.meeting.view.CustomRecurrenceView
 import mega.privacy.android.core.passcode.PasscodeCheck
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.meeting.EndsRecurrenceOption
@@ -146,24 +145,11 @@ class CreateScheduledMeetingActivity : PasscodeActivity(), SnackbarShower {
                 if (shouldOpen) {
                     viewModel.setOnOpenAddContactConsumed()
                     Timber.d("Open Invite participants screen")
-                    addContactLauncher.launch(
-                        Intent(
-                            this@CreateScheduledMeetingActivity,
-                            AddContactActivity::class.java
-                        )
-                            .putExtra(
-                                Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
-                                Constants.CONTACT_TYPE_MEGA
-                            )
-                            .putStringArrayListExtra(
-                                Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED,
-                                viewModel.getEmails()
-                            )
-                            .putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
-                            .putExtra(
-                                Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                                getString(R.string.add_participants_menu_item)
-                            )
+                    megaNavigator.openAddContactsForResult(
+                        context = this@CreateScheduledMeetingActivity,
+                        launcher = addContactLauncher,
+                        preselectedHandles = viewModel.getParticipantHandles(),
+                        preselectedEmails = viewModel.getEmails(),
                     )
                 }
             }

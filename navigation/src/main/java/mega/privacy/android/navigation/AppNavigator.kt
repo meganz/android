@@ -669,5 +669,26 @@ interface AppNavigator {
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
     )
+
+    /**
+     * Opens the "add contacts" picker for a result with the already-chosen participants
+     * pre-selected, choosing the Compose contacts UI or the legacy AddContactActivity based on the
+     * ContactsComposeUI flag. The result is delivered to [launcher], mirroring the legacy
+     * AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS).
+     *
+     * The flag boundary is crossed with both [preselectedHandles] (used by the Compose path, which
+     * selects by handle) and [preselectedEmails] (used by the legacy path, which pre-checks by email).
+     *
+     * @param context the launching context.
+     * @param launcher the caller's result launcher receiving the picker's Activity result.
+     * @param preselectedHandles handles of contacts to pre-select in the Compose picker.
+     * @param preselectedEmails emails of contacts to pre-select in the legacy picker.
+     */
+    fun openAddContactsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        preselectedHandles: List<Long>,
+        preselectedEmails: List<String>,
+    )
 }
 

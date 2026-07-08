@@ -24,6 +24,7 @@ import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.mediaplayer.AudioPlayerActivity
 import mega.privacy.android.app.mediaplayer.LegacyVideoPlayerActivity
 import mega.privacy.android.app.presentation.contact.AddContactToShareComposeActivity
+import mega.privacy.android.app.presentation.contact.AddContactsComposeActivity
 import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
 import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
@@ -1070,6 +1071,41 @@ internal class MegaNavigatorImpl @Inject constructor(
                     putExtra(
                         INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
                         context.getString(R.string.add_participants_menu_item)
+                    )
+                }
+            }
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
+    override fun openAddContactsForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+        preselectedHandles: List<Long>,
+        preselectedEmails: List<String>,
+    ) {
+        applicationScope.launch {
+            val isContactsComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactsComposeUIEnabled) {
+                AddContactsComposeActivity.getIntent(
+                    context = context,
+                    preselectedHandles = preselectedHandles,
+                )
+            } else {
+                Intent(context, AddContactActivity::class.java).apply {
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                    putStringArrayListExtra(
+                        Constants.INTENT_EXTRA_KEY_CONTACTS_SELECTED,
+                        ArrayList(preselectedEmails),
+                    )
+                    putExtra(INTENT_EXTRA_KEY_CHAT, true)
+                    putExtra(
+                        INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                        context.getString(R.string.add_participants_menu_item),
                     )
                 }
             }

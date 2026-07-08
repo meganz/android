@@ -866,6 +866,12 @@ class CreateScheduledMeetingViewModel @Inject constructor(
     fun getEmails(): ArrayList<String> = ArrayList(_state.value.getParticipantsEmails())
 
     /**
+     * Get participants handles
+     */
+    fun getParticipantHandles(): List<Long> =
+        state.value.participantItemList.map { it.handle }
+
+    /**
      * Set open invite
      *
      * @param chatId        Chat Id.

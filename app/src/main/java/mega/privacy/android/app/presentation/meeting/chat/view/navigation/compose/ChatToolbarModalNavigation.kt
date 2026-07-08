@@ -25,7 +25,7 @@ internal fun NavGraphBuilder.chatToolbarModal(
         val uiState by viewModel.state.collectAsStateWithLifecycle()
 
         ChatToolbarBottomSheet(
-            onNavigateToAddContacts = { onNavigate(AddContactsNavKey) },
+            onNavigateToAddContacts = { onNavigate(AddContactsNavKey(preselectedHandles = emptyList())) },
             uiState = uiState,
             scaffoldState = scaffoldState,
             onPickLocation = {
