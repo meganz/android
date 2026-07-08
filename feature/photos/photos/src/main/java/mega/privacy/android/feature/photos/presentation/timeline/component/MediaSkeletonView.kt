@@ -85,9 +85,13 @@ fun MediaSkeletonView(modifier: Modifier = Modifier) {
 
 
 @Composable
-fun PeriodCardsSkeletonView(modifier: Modifier = Modifier) {
+fun PeriodCardsSkeletonView(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
+        contentPadding = contentPadding,
         userScrollEnabled = false,
     ) {
         items(count = 4) { index ->
