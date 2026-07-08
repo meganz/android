@@ -2677,4 +2677,16 @@
     <string name="add_contacts_phone_contacts_select">Sélectionner les contacts du téléphone</string>
     <string name="add_contacts_mega_contacts_section_title">Contacts MEGA</string>
     <string name="home_pinned_choose_files_and_folders">Choisir des fichiers et des dossiers</string>
+    <string name="document_scanner_capture_button">Prendre une photo</string>
+    <string name="share_link_settings_title">Paramètres de lien</string>
+    <string name="share_link_set_expiry_date">Définir une date d’expiration</string>
+    <string name="share_link_expiry_subtitle">Désactiver le lien à une date précise</string>
+    <string name="share_link_set_password">Définir un mot de passe</string>
+    <string name="share_link_password_subtitle">Limiter l’accès avec un mot de passe</string>
+    <string name="document_scanner_auto_capture_label">Automatique</string>
+    <string name="settings_sorting_and_view_mode_title">Tri et mode d’affichage</string>
+    <string name="settings_sorting_preference_title">Préférence de tri</string>
+    <string name="settings_view_mode_preference_title">Préférence du mode d’affichage</string>
+    <string name="settings_preference_option_per_folder">Par dossier</string>
+    <string name="settings_preference_option_all_folders">Identique pour tous</string>
 </resources>

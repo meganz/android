@@ -2589,4 +2589,16 @@
     <string name="subscription_revamp_charged_yearly">%1$s jaarlijks in rekening gebracht</string>
     <string name="subscription_revamp_save_label">Bespaar tot 16%</string>
     <string name="subscription_revamp_get_plan_button">Krijg %1$s</string>
+    <string name="document_scanner_capture_button">Vastleggen</string>
+    <string name="share_link_set_password">Wachtwoord instellen</string>
+    <string name="document_scanner_auto_capture_label">Automatisch</string>
+    <string name="share_link_settings_title">Linkinstellingen</string>
+    <string name="share_link_set_expiry_date">Vervaldatum instellen</string>
+    <string name="share_link_expiry_subtitle">De link op een specifieke datum uitschakelen</string>
+    <string name="share_link_password_subtitle">Beperk de toegang met een wachtwoord</string>
+    <string name="settings_sorting_and_view_mode_title">Sorteer- en Weergavemodus</string>
+    <string name="settings_sorting_preference_title">Sorteer voorkeur</string>
+    <string name="settings_view_mode_preference_title">Voorkeur voor weergavemodus</string>
+    <string name="settings_preference_option_per_folder">Per map</string>
+    <string name="settings_preference_option_all_folders">Hetzelfde voor Alles</string>
 </resources>

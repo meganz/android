@@ -2477,4 +2477,19 @@
     <string name="subscription_revamp_current_plan_renews">續訂日期%1$s</string>
     <string name="subscription_revamp_current_plan_expires">%1$s到期</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">每月</string>
+    <string name="document_scanner_capture_button">拍攝</string>
+    <string name="share_link_set_password">設定密碼</string>
+    <string name="subscription_revamp_why_go_pro_storage">儲存高達%1$s的資料</string>
+    <string name="subscription_revamp_save_label">最多節省16%</string>
+    <string name="document_scanner_auto_capture_label">自動</string>
+    <string name="share_link_settings_title">連結設定</string>
+    <string name="share_link_set_expiry_date">設定到期日期</string>
+    <string name="share_link_expiry_subtitle">連結於指定日期之後無效</string>
+    <string name="share_link_password_subtitle">使用密碼限制存取</string>
+    <string name="settings_sorting_and_view_mode_title">排序和檢視模式</string>
+    <string name="settings_sorting_preference_title">優先排序</string>
+    <string name="settings_view_mode_preference_title">縮圖模式優先</string>
+    <string name="settings_preference_option_per_folder">每個資料夾</string>
+    <string name="settings_preference_option_all_folders">所有都相同</string>
+    <string name="add_contacts_mega_contacts_section_title">MEGA聯絡人</string>
 </resources>

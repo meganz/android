@@ -2641,4 +2641,26 @@
     <string name="subscription_revamp_current_plan_renews">Se reînnoiește pe %1$s</string>
     <string name="subscription_revamp_current_plan_expires">Expiră pe %1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">Lunar</string>
+    <string name="document_scanner_capture_button">Captura</string>
+    <string name="share_link_set_password">Setează o parolă</string>
+    <string name="document_scanner_prepare_reconnecting">Se reconectează&#8230;</string>
+    <string name="subscription_revamp_why_go_pro_storage">Depozitați până la %1$s de date</string>
+    <string name="subscription_revamp_save_label">Economisiți până la 16&#160;%</string>
+    <string name="document_scanner_auto_capture_label">Automată</string>
+    <string name="share_link_settings_title">Setări link</string>
+    <string name="share_link_set_expiry_date">Setează o dată de expirare</string>
+    <string name="share_link_expiry_subtitle">Dezactivați linkul la o anumită dată</string>
+    <string name="share_link_password_subtitle">Limitați accesul cu o parolă</string>
+    <string name="document_scanner_prepare_retry_button">Reîncearcă</string>
+    <string name="settings_sorting_and_view_mode_title">Mod de sortare și vizualizare</string>
+    <string name="settings_sorting_preference_title">Preferință pentru sortare</string>
+    <string name="settings_view_mode_preference_title">Preferință pentru modul de vizualizare</string>
+    <string name="settings_preference_option_per_folder">Per folder</string>
+    <string name="settings_preference_option_all_folders">La fel pentru toate</string>
+    <string name="park_account_screen_title">Parchează contul</string>
+    <string name="park_account_screen_acknowledge">Iau la cunoștință faptul că încep un cont nou, gol și că voi pierde toate datele în contul meu prezent, cu excepția cazului în care îmi aduc aminte parola sau găsesc o cheie de recuperare exportată.</string>
+    <string name="park_account_screen_start_button">Începe un cont nou</string>
+    <string name="park_account_success_message">Vechiul dvs. cont a fost parcat. Acum vă puteți conecta la noul cont.</string>
+    <string name="add_contacts_mega_contacts_section_title">Contacte MEGA</string>
+    <string name="meetings_add_participants_user_limit_warning">Acest apel este limitat la 100 de participanți. Oricine depășește această limită poate doar să comunice prin chat. Organizatorul poate trece la Pro pentru a elimina această limită.</string>
 </resources>

@@ -2576,4 +2576,20 @@
     <string name="subscription_revamp_get_plan_button">Ausprobieren %1$s</string>
     <string name="subscription_revamp_current_plan_expires">Läuft am %1$s ab</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">monatlich</string>
+    <string name="document_scanner_capture_button">Foto machen</string>
+    <string name="share_link_settings_title">Link-Einstellungen</string>
+    <string name="share_link_set_expiry_date">Ablaufdatum setzen</string>
+    <string name="share_link_expiry_subtitle">Link an einem bestimmten Datum deaktivieren</string>
+    <string name="share_link_set_password">Passwort setzen</string>
+    <string name="share_link_password_subtitle">Zugang durch ein Passwort beschränken</string>
+    <string name="document_scanner_auto_capture_label">Automatisch</string>
+    <string name="document_scanner_auto_capture_on">Automatische Erfassung ein</string>
+    <string name="document_scanner_auto_capture_off">Automatische Erfassung aus</string>
+    <string name="settings_sorting_and_view_mode_title">Sortierung und Ansicht</string>
+    <string name="settings_sorting_preference_title">Spaltensortierung</string>
+    <string name="settings_sorting_preference_description">Ordnerspezifische Spaltensortierung oder identische Einstellung für alle Ordner.</string>
+    <string name="settings_view_mode_preference_title">Ordnerdarstellung</string>
+    <string name="settings_view_mode_preference_description">Ordnerspezifische Ansicht (Liste oder Thumbnails) oder identische Einstellung für alle Ordner.</string>
+    <string name="settings_preference_option_per_folder">Ordnerspezifisch</string>
+    <string name="settings_preference_option_all_folders">Alle Ordner</string>
 </resources>

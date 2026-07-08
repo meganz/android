@@ -2493,4 +2493,16 @@
     <string name="subscription_revamp_charged_yearly">%1$s 按年收费</string>
     <string name="subscription_revamp_save_label">节省高达16%</string>
     <string name="subscription_revamp_get_plan_button">获取 %1$s</string>
+    <string name="document_scanner_capture_button">拍照</string>
+    <string name="share_link_set_password">设置密码</string>
+    <string name="document_scanner_auto_capture_label">自动</string>
+    <string name="share_link_settings_title">链接设置</string>
+    <string name="share_link_set_expiry_date">设置到期日</string>
+    <string name="share_link_expiry_subtitle">在指定日期禁用链接</string>
+    <string name="share_link_password_subtitle">使用密码限制访问</string>
+    <string name="settings_sorting_and_view_mode_title">排序和视图模式</string>
+    <string name="settings_sorting_preference_title">排序偏好</string>
+    <string name="settings_view_mode_preference_title">视图模式偏好</string>
+    <string name="settings_preference_option_per_folder">每个文件夹</string>
+    <string name="settings_preference_option_all_folders">全部相同</string>
 </resources>

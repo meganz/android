@@ -2918,4 +2918,24 @@
     <string name="subscription_revamp_current_plan_renews">يتجدد بتاريخ %1$s</string>
     <string name="subscription_revamp_current_plan_expires">تنتهي الصلاحية في %1$s</string>
     <string name="subscription_revamp_current_plan_cycle_monthly">شهرياً</string>
+    <string name="document_scanner_capture_button">التقاط</string>
+    <string name="share_link_set_password">إنشاء كلمة مرور</string>
+    <string name="document_scanner_prepare_reconnecting">جاري إعادة اتصال&#8230;</string>
+    <string name="subscription_revamp_save_label">وفر حتى 16٪</string>
+    <string name="document_scanner_auto_capture_label">تلقائي</string>
+    <string name="share_link_settings_title">إعدادات الرابط</string>
+    <string name="share_link_set_expiry_date">حدد تاريخ انتهاء الصلاحية</string>
+    <string name="share_link_expiry_subtitle">قم بتعطيل الرابط بتاريخ محدد</string>
+    <string name="share_link_password_subtitle">تقييد الوصول باستخدام كلمة مرور</string>
+    <string name="document_scanner_prepare_retry_button">حاول مرة أخرى</string>
+    <string name="settings_sorting_and_view_mode_title">شكل الفرز والعرض</string>
+    <string name="settings_sorting_preference_title">فرز الافضلية</string>
+    <string name="settings_view_mode_preference_title">عرض وضع الافضلية</string>
+    <string name="settings_preference_option_per_folder">لكل مجلد</string>
+    <string name="settings_preference_option_all_folders">للجميع</string>
+    <string name="park_account_screen_title">ركن الحساب</string>
+    <string name="park_account_screen_acknowledge">أقر بأنني أبدأ حسابًا جديدًا وفارغًا وأنني سأفقد جميع البيانات الموجودة في حسابي الحالي ما لم أتذكر كلمة المرور الخاصة بي أو أجد مفتاح الاستعادة الذي تم تصديره.</string>
+    <string name="park_account_screen_start_button">بدء حساب جديد</string>
+    <string name="park_account_success_message">لقد تم ركن حسابك القديم بنجاح. يمكنك الآن تسجيل الدخول إلى حسابك الجديد.</string>
+    <string name="add_contacts_mega_contacts_section_title">جهات اتصال MEGA</string>
 </resources>
