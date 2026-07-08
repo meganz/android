@@ -343,6 +343,23 @@ class GetFileNodeContentForFileNodeUseCaseTest {
     }
 
     @Test
+    fun `test that isLinkNode is forwarded to content detection for an unmapped link node`() =
+        runTest {
+            val node = mock<TypedFileNode>().stub {
+                on { type } doReturn UnMappedFileTypeInfo("")
+                on { size } doReturn 10L
+            }
+            whenever(getFileTypeInfoByContentUseCase(node, true)).thenReturn(
+                TextFileTypeInfo(mimeType = "text/plain", extension = "")
+            )
+
+            val result = underTest(node, isLinkNode = true)
+
+            verify(getFileTypeInfoByContentUseCase).invoke(node, true)
+            assertThat(result).isInstanceOf(FileNodeContent.TextContent::class.java)
+        }
+
+    @Test
     fun `test that an extensionless undetected node falls back to Other`() = runTest {
         val node = mock<TypedFileNode>().stub {
             on { type } doReturn UnMappedFileTypeInfo("")
