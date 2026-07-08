@@ -40,7 +40,7 @@ class GetFileNodeContentForFileNodeUseCase @Inject constructor(
         } else {
             getNodeContentUriUseCase::invoke
         }
-        return when (resolveType(fileNode)) {
+        return when (resolveType(fileNode, isLinkNode)) {
             is PdfFileTypeInfo -> FileNodeContent.Pdf(
                 uri = getContentUri(fileNode)
             )
@@ -68,9 +68,9 @@ class GetFileNodeContentForFileNodeUseCase @Inject constructor(
         }
     }
 
-    private suspend fun resolveType(fileNode: TypedFileNode): FileTypeInfo? =
+    private suspend fun resolveType(fileNode: TypedFileNode, isLinkNode: Boolean): FileTypeInfo? =
         if (fileNode.type is UnMappedFileTypeInfo) {
-            getFileTypeInfoByContentUseCase(fileNode)
+            getFileTypeInfoByContentUseCase(fileNode, isLinkNode)
         } else {
             fileNode.type
         }
