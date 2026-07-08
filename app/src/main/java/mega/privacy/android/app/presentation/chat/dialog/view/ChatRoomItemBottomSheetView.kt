@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.list.view.ChatAvatarView
@@ -47,12 +47,10 @@ import mega.privacy.android.domain.entity.chat.ChatRoomItem.NoteToSelfChatRoomIt
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.meeting.ChatRoomItemStatus
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.theme.extensions.grey_alpha_054_white_alpha_054
-import mega.privacy.android.shared.original.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.shared.original.core.ui.theme.extensions.subtitle1medium
-import mega.privacy.android.shared.original.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.shared.resources.R as sharedR
 import kotlin.random.Random
 
@@ -361,16 +359,9 @@ private fun MenuItem(
             .height(55.dp)
             .clickable(onClick = onClick)
     ) {
-        val iconColor: Color
-        val textColor: Color
-        if (tintRed) {
-            iconColor = MaterialTheme.colors.red_600_red_300
-            textColor = MaterialTheme.colors.red_600_red_300
-        } else {
-            iconColor = MaterialTheme.colors.grey_alpha_054_white_alpha_054
-            textColor = MaterialTheme.colors.textColorPrimary
-        }
-        Icon(
+        val iconColor = if (tintRed) IconColor.Brand else IconColor.Secondary
+        val textColor = if (tintRed) TextColor.Brand else TextColor.Primary
+        MegaIcon(
             modifier = Modifier
                 .padding(start = 16.dp)
                 .size(24.dp)
@@ -379,12 +370,12 @@ private fun MenuItem(
             contentDescription = description,
             tint = iconColor
         )
-        Text(
+        MegaText(
             modifier = Modifier
                 .padding(start = 32.dp, end = 16.dp)
                 .align(Alignment.CenterVertically),
             text = stringResource(id = text),
-            color = textColor,
+            textColor = textColor,
             style = MaterialTheme.typography.subtitle1
         )
     }
