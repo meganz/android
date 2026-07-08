@@ -50,7 +50,7 @@ fun CapturedPagesDeck(
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(width = PAGE_CARD_WIDTH, height = PAGE_CARD_HEIGHT)
                     .rotate(-FAN_DEGREES * depth)
                     .clip(RoundedCornerShape(6.dp))
                     .border(1.dp, DSTokens.colors.icon.onColor, RoundedCornerShape(6.dp)),
@@ -76,3 +76,7 @@ fun CapturedPagesDeck(
 
 private const val MAX_FANNED = 4
 private const val FAN_DEGREES = 6f
+
+// Portrait, page-shaped cards (≈0.72 aspect) so captured pages read as documents, not squares.
+private val PAGE_CARD_WIDTH = 52.dp
+private val PAGE_CARD_HEIGHT = 72.dp

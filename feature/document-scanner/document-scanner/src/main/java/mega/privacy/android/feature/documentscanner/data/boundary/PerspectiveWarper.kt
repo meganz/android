@@ -24,7 +24,7 @@ internal class PerspectiveWarper @Inject constructor() {
         if (boundary == null) return source
 
         val quad = boundary.toPixelQuad(source.width, source.height)
-        val (outWidth, outHeight) = quad.warpTargetSize()
+        val (outWidth, outHeight) = quad.warpTargetSize(source.width, source.height)
 
         val srcPoints = floatArrayOf(
             quad.topLeft.x, quad.topLeft.y,
