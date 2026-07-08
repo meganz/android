@@ -95,10 +95,11 @@ replay_pid*
 !/.claude/hooks/
 !/.claude/settings.json
 .claude/settings.local.json
+/.claude/temp
+/.claude/skills/ht-*/
 ./review.md
 review.md
 .trees
-/.claude/temp
 
 /.testrail/results/*
 /.testrail/output/*
