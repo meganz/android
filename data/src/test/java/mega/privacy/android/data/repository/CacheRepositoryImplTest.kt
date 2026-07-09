@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.CacheGateway
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -24,11 +25,12 @@ import java.io.File
 class CacheRepositoryImplTest {
     private val ioDispatcher = UnconfinedTestDispatcher()
     private val cacheFolderGateway: CacheFolderGateway = mock()
-    private val underTest = CacheRepositoryImpl(cacheFolderGateway, ioDispatcher)
+    private val cacheGateway: CacheGateway = mock()
+    private val underTest = CacheRepositoryImpl(cacheFolderGateway, cacheGateway, ioDispatcher)
 
     @BeforeEach
     fun resetMocks() {
-        reset(cacheFolderGateway)
+        reset(cacheFolderGateway, cacheGateway)
     }
 
     @Test
@@ -44,6 +46,12 @@ class CacheRepositoryImplTest {
     fun `test that gateway method is invoked when clear cache is invoked`() = runTest {
         underTest.clearCache()
         verify(cacheFolderGateway).clearCache()
+    }
+
+    @Test
+    fun `test that path cache is cleared when clear cache is invoked`() = runTest {
+        underTest.clearCache()
+        verify(cacheGateway).clearPathCache()
     }
 
     @Test
