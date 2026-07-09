@@ -62,8 +62,10 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeLocation
 import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
@@ -87,6 +89,7 @@ import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
@@ -140,6 +143,8 @@ class NodeOptionsActionViewModelTest {
     private lateinit var viewModel: NodeOptionsActionViewModel
 
     private val checkNodesNameCollisionUseCase = mock<CheckNodesNameCollisionUseCase>()
+    private val checkChatNodesNameCollisionAndCopyUseCase =
+        mock<CheckChatNodesNameCollisionAndCopyUseCase>()
     private val moveNodesUseCase = mock<MoveNodesUseCase>()
     private val copyNodesUseCase = mock<CopyNodesUseCase>()
     private val restoreNodesUseCase = mock<RestoreNodesUseCase>()
@@ -224,6 +229,7 @@ class NodeOptionsActionViewModelTest {
     private fun initViewModel(nodeSourceType: NodeSourceType? = null) {
         viewModel = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
@@ -307,6 +313,7 @@ class NodeOptionsActionViewModelTest {
     fun resetAllMocks() {
         reset(
             checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase,
             copyNodesUseCase,
             restoreNodesUseCase,
@@ -472,6 +479,195 @@ class NodeOptionsActionViewModelTest {
             viewModel.checkMoveNameCollision(nodeIds = emptyList(), target = NodeId(999L))
 
             verifyNoInteractions(checkNodesNameCollisionUseCase)
+        }
+
+    private fun stubChatFile(
+        nodeHandle: Long = 321L,
+        chatId: Long = 100L,
+        messageId: Long = 200L,
+    ) = mock<ChatDefaultFile> {
+        on { id } doReturn NodeId(nodeHandle)
+        on { this.chatId } doReturn chatId
+        on { this.messageId } doReturn messageId
+    }
+
+    @Test
+    fun `test that checkImportNameCollision copies through the chat use case when the selected node is a chat file`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(321L to targetHandle),
+                        conflictNodes = emptyMap(),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = null,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            verify(checkChatNodesNameCollisionAndCopyUseCase).invoke(
+                chatId = 100L,
+                messageIds = listOf(200L),
+                newNodeParent = NodeId(targetHandle),
+            )
+            verifyNoInteractions(checkNodesNameCollisionUseCase)
+        }
+
+    @Test
+    fun `test that checkNodesNameCollision copies through the chat use case when type is COPY and the selected node is the chat file`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(321L to targetHandle),
+                        conflictNodes = emptyMap(),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = null,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkNodesNameCollision(
+                nodes = listOf(321L),
+                targetNode = targetHandle,
+                type = NodeNameCollisionType.COPY,
+            )
+
+            verify(checkChatNodesNameCollisionAndCopyUseCase).invoke(
+                chatId = 100L,
+                messageIds = listOf(200L),
+                newNodeParent = NodeId(targetHandle),
+            )
+            verifyNoInteractions(checkNodesNameCollisionUseCase)
+        }
+
+    @Test
+    fun `test that checkNodesNameCollision uses the generic use case when type is MOVE even if the selected node is a chat file`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            whenever(
+                checkNodesNameCollisionUseCase(
+                    nodes = mapOf(321L to targetHandle),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            ).thenReturn(
+                NodeNameCollisionsResult(
+                    noConflictNodes = emptyMap(),
+                    conflictNodes = emptyMap(),
+                    type = NodeNameCollisionType.MOVE,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkNodesNameCollision(
+                nodes = listOf(321L),
+                targetNode = targetHandle,
+                type = NodeNameCollisionType.MOVE,
+            )
+
+            verifyNoInteractions(checkChatNodesNameCollisionAndCopyUseCase)
+            verify(checkNodesNameCollisionUseCase).invoke(
+                nodes = mapOf(321L to targetHandle),
+                type = NodeNameCollisionType.MOVE,
+            )
+        }
+
+    @Test
+    fun `test that chat copy forwards only conflicts to nodeNameCollisionsResult when there are collisions`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            val chatCollision = mock<NodeNameCollision.Chat>()
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(555L to targetHandle),
+                        conflictNodes = mapOf(321L to chatCollision),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = null,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                val content =
+                    (state.nodeNameCollisionsResult as StateEventWithContentTriggered).content
+                assertThat(content.conflictNodes).containsExactly(321L, chatCollision)
+                assertThat(content.noConflictNodes).isEmpty()
+            }
+        }
+
+    @Test
+    fun `test that chat copy shows the copy result message when the use case copies the node`() =
+        runTest {
+            val targetHandle = 999L
+            val chatFile = stubChatFile()
+            val copyRequestResult = MoveRequestResult.GeneralMovement(1, 0)
+            whenever(moveRequestMessageMapper(copyRequestResult)).thenReturn("copied")
+            whenever(
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = 100L,
+                    messageIds = listOf(200L),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            ).thenReturn(
+                NodeNameCollisionWithActionResult(
+                    collisionResult = NodeNameCollisionsResult(
+                        noConflictNodes = mapOf(321L to targetHandle),
+                        conflictNodes = emptyMap(),
+                        type = NodeNameCollisionType.COPY,
+                    ),
+                    moveRequestResult = copyRequestResult,
+                )
+            )
+            initViewModel()
+            viewModel.updateSelectedNodes(listOf(chatFile))
+
+            viewModel.checkImportNameCollision(targetHandle)
+
+            viewModel.uiState.test {
+                val state = awaitItem()
+                assertThat(state.infoToShowEvent)
+                    .isInstanceOf(StateEventWithContentTriggered::class.java)
+                assertThat(state.nodeNameCollisionsResult)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+            verify(setCopyLatestTargetPathUseCase).invoke(targetHandle)
         }
 
     @Test
@@ -1070,6 +1266,7 @@ class NodeOptionsActionViewModelTest {
         val multipleHandlers = setOf(mockHandler1, mockHandler2, mockHandler3)
         val viewModelWithMultipleHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
@@ -1143,6 +1340,7 @@ class NodeOptionsActionViewModelTest {
         val multipleHandlers = setOf(mockHandler1, mockHandler2, mockHandler3)
         val viewModelWithMultipleHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
@@ -1210,6 +1408,7 @@ class NodeOptionsActionViewModelTest {
     fun `test handleSingleNodeAction with empty handlers set throws exception`() = runTest {
         val viewModelWithEmptyHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             restoreNodesUseCase = restoreNodesUseCase,
@@ -1269,6 +1468,7 @@ class NodeOptionsActionViewModelTest {
     fun `test handleMultipleNodesAction with empty handlers set throws exception`() = runTest {
         val viewModelWithEmptyHandlers = NodeOptionsActionViewModel(
             checkNodesNameCollisionUseCase = checkNodesNameCollisionUseCase,
+            checkChatNodesNameCollisionAndCopyUseCase = checkChatNodesNameCollisionAndCopyUseCase,
             moveNodesUseCase = moveNodesUseCase,
             copyNodesUseCase = copyNodesUseCase,
             restoreNodesUseCase = restoreNodesUseCase,

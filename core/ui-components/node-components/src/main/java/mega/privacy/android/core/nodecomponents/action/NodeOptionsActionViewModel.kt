@@ -63,6 +63,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
+import mega.privacy.android.domain.entity.node.chat.ChatFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -86,6 +87,7 @@ import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
+import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCopyUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
 import mega.privacy.android.domain.usecase.node.GetFileTypeInfoByContentUseCase
@@ -116,6 +118,7 @@ import java.io.File
  * Node actions view model
  *
  * @property checkNodesNameCollisionUseCase
+ * @property checkChatNodesNameCollisionAndCopyUseCase
  * @property moveNodesUseCase
  * @property copyNodesUseCase
  * @property setMoveLatestTargetPathUseCase
@@ -135,6 +138,7 @@ import java.io.File
 @HiltViewModel(assistedFactory = NodeOptionsActionViewModel.Factory::class)
 class NodeOptionsActionViewModel @AssistedInject constructor(
     private val checkNodesNameCollisionUseCase: CheckNodesNameCollisionUseCase,
+    private val checkChatNodesNameCollisionAndCopyUseCase: CheckChatNodesNameCollisionAndCopyUseCase,
     private val moveNodesUseCase: MoveNodesUseCase,
     private val copyNodesUseCase: CopyNodesUseCase,
     private val restoreNodesUseCase: RestoreNodesUseCase,
@@ -248,6 +252,13 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         targetNode: Long,
         type: NodeNameCollisionType,
     ) {
+        val chatFile = selectedChatFile()
+        if (type == NodeNameCollisionType.COPY && chatFile != null
+            && nodes.singleOrNull() == chatFile.id.longValue
+        ) {
+            copyChatNode(chatFile, targetNode)
+            return
+        }
         viewModelScope.launch {
             runCatching {
                 checkNodesNameCollisionUseCase(
@@ -344,10 +355,11 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     }
 
     fun checkImportNameCollision(targetHandle: Long) {
-        if (selectedPublicLinkFile() != null) {
-            checkPublicCopyCollision(targetHandle)
-        } else {
-            checkNodesNameCollision(
+        val chatFile = selectedChatFile()
+        when {
+            selectedPublicLinkFile() != null -> checkPublicCopyCollision(targetHandle)
+            chatFile != null -> copyChatNode(chatFile, targetHandle)
+            else -> checkNodesNameCollision(
                 uiState.value.selectedNodes.map { it.id.longValue },
                 targetHandle,
                 NodeNameCollisionType.COPY,
@@ -357,6 +369,53 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
 
     private fun selectedPublicLinkFile(): PublicLinkFile? =
         uiState.value.selectedNodes.singleOrNull() as? PublicLinkFile
+
+    private fun selectedChatFile(): ChatFile? =
+        uiState.value.selectedNodes.singleOrNull() as? ChatFile
+
+    /**
+     * Copy a chat attachment to the account.
+     *
+     * Attachments received from others are not in the account, so the generic pipeline
+     * ([checkNodesNameCollision] + [copyNodes]) cannot resolve them by handle.
+     * [CheckChatNodesNameCollisionAndCopyUseCase] resolves the node from the chat message,
+     * copies the non-conflicting nodes itself and reports conflicts as
+     * [mega.privacy.android.domain.entity.node.NodeNameCollision.Chat], which the collision
+     * screen resolves with a chat-aware copy.
+     */
+    private fun copyChatNode(chatFile: ChatFile, targetHandle: Long) {
+        applicationScope.launch {
+            runCatching {
+                checkChatNodesNameCollisionAndCopyUseCase(
+                    chatId = chatFile.chatId,
+                    messageIds = listOf(chatFile.messageId),
+                    newNodeParent = NodeId(targetHandle),
+                )
+            }.onSuccess { result ->
+                if (result.collisionResult.conflictNodes.isNotEmpty()) {
+                    // The use case has already copied the non-conflicting nodes, so only
+                    // conflicts are forwarded; otherwise the collision handler would copy
+                    // them a second time.
+                    triggerCollisionsResult(
+                        result.collisionResult.copy(noConflictNodes = emptyMap())
+                    )
+                }
+                result.moveRequestResult?.let { copyResult ->
+                    setCopyTargetPath(targetHandle)
+                    uiState.update {
+                        it.copy(
+                            infoToShowEvent = triggered(
+                                LocalizedText.Literal(moveRequestMessageMapper(copyResult))
+                            )
+                        )
+                    }
+                }
+            }.onFailure {
+                manageCopyMoveError(it)
+                Timber.e(it)
+            }
+        }
+    }
 
     /**
      * Move nodes

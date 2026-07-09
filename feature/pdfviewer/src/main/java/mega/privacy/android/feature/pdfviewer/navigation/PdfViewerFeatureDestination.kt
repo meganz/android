@@ -22,12 +22,14 @@ object PdfViewerFeatureDestination : FeatureDestination {
             // Register the PDF viewer screen
             pdfViewerScreen(
                 onBack = navigationHandler::back,
-                onOpenNodeOptions = { handle, sourceType, publicLinkUrl ->
+                onOpenNodeOptions = { handle, sourceType, publicLinkUrl, chatId, msgId ->
                     navigationHandler.navigate(
                         NodeOptionsBottomSheetNavKey(
                             nodeHandle = handle,
                             nodeSourceType = sourceType,
                             publicLinkUrl = publicLinkUrl,
+                            chatId = chatId,
+                            msgId = msgId,
                         )
                     )
                 },
