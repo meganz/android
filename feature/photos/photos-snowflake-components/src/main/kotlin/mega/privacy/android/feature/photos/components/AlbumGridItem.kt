@@ -51,14 +51,18 @@ fun AlbumGridItem(
     errorPlaceholder: Painter? = null,
     isExported: Boolean = false,
     isSelected: Boolean = false,
-    isSensitive: Boolean = false
+    isSensitive: Boolean = false,
+    enabled: Boolean = true
 ) {
     val albumItemShape = RoundedCornerShape(4.dp)
 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
+            .wrapContentHeight()
+            .conditional(!enabled) {
+                alpha(0.5f)
+            },
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Box(
