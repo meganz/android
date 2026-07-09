@@ -70,6 +70,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.net.URLDecoder
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
@@ -851,16 +852,48 @@ internal class FileFacade @Inject constructor(
             || path.contains(APP_PRIVATE_DIR2)
 
     override fun isMalformedPathFromExternalApp(action: String?, path: String): Boolean {
-        // Method to check if intent is received from external app with action: ACTION_SEND / ACTION_SEND_MULTIPLE
         val isDataFromExternalApp = action != null &&
                 (action == Intent.ACTION_SEND || action == Intent.ACTION_SEND_MULTIPLE)
-        val sanitized = path.replace(" ", "")
+        if (!isDataFromExternalApp) return false
 
-        return isDataFromExternalApp && isPathInsecure(sanitized)
+        return resolvedSharedPaths(path).any { isPathInsecure(it) }
+    }
+
+    /**
+     * The concrete filesystem paths a shared `file://` [rawPath] can resolve to,
+     * mirroring the resolver's percent-decoding and [File] canonicalization so an
+     * encoded or non-canonical path cannot slip a private-dir reference past
+     * [isPathInsecure].
+     */
+    private fun resolvedSharedPaths(rawPath: String): List<String> {
+        val decoded = runCatching {
+            URLDecoder.decode(rawPath.replace("+", "%2B"), Charsets.UTF_8.name())
+        }.getOrDefault(rawPath).replace(" ", "")
+        val filePath = decoded.removePrefix("file://")
+        val canonicalPath = runCatching { File(filePath).canonicalPath }.getOrNull()
+
+        return listOfNotNull(decoded, filePath, canonicalPath)
+    }
+
+    /**
+     * Authoritative guard, independent of the caller: a `file://` [uri] whose resolved
+     * (decoded, canonicalized) path lands inside the app's private storage must never be
+     * materialized for upload, regardless of which share flow supplied it.
+     */
+    private fun resolvesIntoAppPrivateDir(uri: Uri): Boolean {
+        if (uri.scheme != "file") return false
+        val path = uri.path ?: return false
+        val canonicalPath = runCatching { File(path).canonicalPath }.getOrNull()
+
+        return listOfNotNull(path, canonicalPath).any { isPathInsecure(it) }
     }
 
     override suspend fun getDocumentEntities(uris: List<Uri>): List<DocumentEntity> {
-        return uris.mapNotNull { uri ->
+        return uris.filterNot {
+            resolvesIntoAppPrivateDir(it).also { insecure ->
+                if (insecure) Timber.w("Rejected shared uri resolving into app private dir")
+            }
+        }.mapNotNull { uri ->
             getDocumentFileFromUri(uri)?.let { doc ->
                 val (numFiles, numFolders) = if (doc.isDirectory) {
                     countChildrenByUri(doc.uri)

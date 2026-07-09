@@ -35,6 +35,7 @@ data class FileExplorerUiState(
     val isAskingForCollisionsResolution: Boolean = false,
     val nonCollidedFilesUploadedCount: Int = 0,
     val nodeUpdatedEvent: StateEvent = consumed,
+    val noFilesToUploadEvent: StateEvent = consumed,
     val navigateToCloud: StateEventWithContent<NavigateToCloudEvent> = consumed(),
     val isFeatureFlagEnabled: Boolean? = null,
     val disabledTargetId: NodeId? = null,

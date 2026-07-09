@@ -374,8 +374,20 @@ class FileExplorerViewModel @Inject constructor(
         context: Context,
     ) {
         viewModelScope.launch {
-            setDocuments(getDocuments(intent, context))
+            val documents = getDocuments(intent, context)
+            if (documents != null && documents.isEmpty()) {
+                _uiState.update { it.copy(noFilesToUploadEvent = triggered) }
+            } else {
+                setDocuments(documents)
+            }
         }
+    }
+
+    /**
+     * Consumes the [FileExplorerUiState.noFilesToUploadEvent].
+     */
+    fun onConsumeNoFilesToUploadEvent() {
+        _uiState.update { it.copy(noFilesToUploadEvent = consumed) }
     }
 
     private fun grantUriPermission(context: Context, uris: List<Uri>) {
