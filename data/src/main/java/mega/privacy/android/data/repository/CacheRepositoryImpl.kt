@@ -34,8 +34,11 @@ internal class CacheRepositoryImpl @Inject constructor(
         cacheFolderGateway.getCacheFolderAsync(folderName)
     }
 
-    override suspend fun getPreviewFile(fileName: String): File? =
-        cacheFolderGateway.getPreviewFile(fileName)
+    override suspend fun getPreviewFile(
+        fileName: String,
+        fileSize: Long,
+        lastModifiedDate: Long,
+    ): File? = cacheFolderGateway.getPreviewFile(fileName, fileSize, lastModifiedDate)
 
     override suspend fun getPreviewDownloadPathForNode(): String =
         cacheFolderGateway.getPreviewDownloadPathForNode()

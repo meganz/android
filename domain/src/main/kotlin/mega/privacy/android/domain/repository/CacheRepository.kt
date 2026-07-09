@@ -38,11 +38,13 @@ interface CacheRepository {
     fun getCacheFolderNameForTransfer(isForChat: Boolean): String
 
     /**
-     * Get preview file
+     * Get preview file, only if the cached copy still matches the current node.
      *
      * @param fileName The name of the file
+     * @param fileSize The size of the node, used to discard an outdated cached copy
+     * @param lastModifiedDate The modification time (in seconds) of the node, used to discard an outdated cached copy
      */
-    suspend fun getPreviewFile(fileName: String): File?
+    suspend fun getPreviewFile(fileName: String, fileSize: Long, lastModifiedDate: Long): File?
 
     /**
      * Get the path to download file for preview

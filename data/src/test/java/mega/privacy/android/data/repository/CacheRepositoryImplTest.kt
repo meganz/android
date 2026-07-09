@@ -68,10 +68,13 @@ class CacheRepositoryImplTest {
     @Test
     fun `test that file preview path is same as expected and actual`() = runTest {
         val fileName = "file"
+        val fileSize = 1024L
+        val lastModifiedDate = 1_700_000_000L
         val expected = File("path")
-        whenever(cacheFolderGateway.getPreviewFile(fileName)).thenReturn(expected)
-        val actual = underTest.getPreviewFile(fileName)
-        verify(cacheFolderGateway).getPreviewFile(fileName)
+        whenever(cacheFolderGateway.getPreviewFile(fileName, fileSize, lastModifiedDate))
+            .thenReturn(expected)
+        val actual = underTest.getPreviewFile(fileName, fileSize, lastModifiedDate)
+        verify(cacheFolderGateway).getPreviewFile(fileName, fileSize, lastModifiedDate)
         assertEquals(expected, actual)
     }
 
