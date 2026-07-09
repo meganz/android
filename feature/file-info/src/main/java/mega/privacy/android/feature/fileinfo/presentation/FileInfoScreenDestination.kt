@@ -47,6 +47,7 @@ fun EntryProviderScope<NavKey>.fileInfoScreen(
                         )
                     }
                 },
+                onDescriptionChange = viewModel::updateDescription,
             )
         }
     }

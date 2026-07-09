@@ -59,4 +59,12 @@ internal data class FileInfoUiState(
      */
     val mapCoordinates: Coordinates?
         get() = coordinates?.takeIf { accessPermission == AccessPermission.OWNER }
+
+    /**
+     * The description is editable only outside the rubbish bin / Backups and with write access.
+     */
+    val canEditDescription: Boolean
+        get() = !isNodeInRubbish && !isNodeInBackups &&
+                (accessPermission == AccessPermission.FULL ||
+                        accessPermission == AccessPermission.OWNER)
 }

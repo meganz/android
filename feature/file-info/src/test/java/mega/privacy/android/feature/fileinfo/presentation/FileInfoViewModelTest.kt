@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -61,6 +62,7 @@ internal class FileInfoViewModelTest {
     private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase = mock()
     private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase = mock()
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase = mock()
+    private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase = mock()
     private val nodeDestinationMapper: NodeDestinationMapper = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
@@ -79,6 +81,7 @@ internal class FileInfoViewModelTest {
             getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
             getImageNodeByIdUseCase = getImageNodeByIdUseCase,
             getAddressFromCoordinatesUseCase = getAddressFromCoordinatesUseCase,
+            setNodeDescriptionUseCase = setNodeDescriptionUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             nodeHandle = nodeHandle,
         )
@@ -97,6 +100,7 @@ internal class FileInfoViewModelTest {
             getNodeLocationByIdUseCase,
             getImageNodeByIdUseCase,
             getAddressFromCoordinatesUseCase,
+            setNodeDescriptionUseCase,
             nodeDestinationMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
@@ -455,6 +459,56 @@ internal class FileInfoViewModelTest {
         advanceUntilIdle()
 
         assertThat(underTest.uiState.value.mapCoordinates).isNull()
+    }
+
+    @Test
+    fun `test that updateDescription sets the node description`() = runTest {
+        val node = mockFileNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+        initViewModel()
+        advanceUntilIdle()
+        underTest.updateDescription("a new description")
+        advanceUntilIdle()
+
+        verify(setNodeDescriptionUseCase).invoke(NodeId(NODE_HANDLE), "a new description")
+    }
+
+    @Test
+    fun `test that description is editable for an owner outside rubbish and backups`() = runTest {
+        val node = mockFileNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.canEditDescription).isTrue()
+    }
+
+    @Test
+    fun `test that description is not editable with read access`() = runTest {
+        val node = mockFileNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.READ)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.canEditDescription).isFalse()
+    }
+
+    @Test
+    fun `test that description is not editable when the node is in the rubbish bin`() = runTest {
+        val node = mockFileNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(isNodeInRubbishBinUseCase(NodeId(NODE_HANDLE))).thenReturn(true)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        assertThat(underTest.uiState.value.canEditDescription).isFalse()
     }
 
     private companion object {

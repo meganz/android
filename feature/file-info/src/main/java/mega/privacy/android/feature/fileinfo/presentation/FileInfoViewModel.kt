@@ -31,6 +31,7 @@ import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
+import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
@@ -50,6 +51,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase,
     private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase,
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase,
+    private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase,
     private val nodeDestinationMapper: NodeDestinationMapper,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
@@ -212,6 +214,17 @@ internal class FileInfoViewModel @AssistedInject constructor(
         val firstSegment = firstOrNull() ?: return this
         return listOf(firstSegment.substringAfter(':', missingDelimiterValue = firstSegment)) +
                 drop(1)
+    }
+
+    /**
+     * Creates, updates, or clears (empty string) the node description. The change is reflected back
+     * in state through [monitorNodeUpdates].
+     */
+    fun updateDescription(description: String) {
+        viewModelScope.launch {
+            runCatching { setNodeDescriptionUseCase(nodeId, description) }
+                .onFailure { Timber.e(it, "Failed to update description for $nodeHandle") }
+        }
     }
 
     @AssistedFactory

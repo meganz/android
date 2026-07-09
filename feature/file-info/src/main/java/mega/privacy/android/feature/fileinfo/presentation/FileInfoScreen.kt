@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -43,10 +44,12 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoMapView
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.shared.nodes.components.NodeDescriptionField
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.resources.R as sharedR
@@ -64,6 +67,7 @@ internal fun FileInfoScreen(
     uiState: FileInfoUiState,
     onBack: () -> Unit,
     onLocationClick: () -> Unit,
+    onDescriptionChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -88,6 +92,7 @@ internal fun FileInfoScreen(
                 FileInfoContent(
                     uiState = uiState,
                     onLocationClick = onLocationClick,
+                    onDescriptionChange = onDescriptionChange,
                 )
             }
         }
@@ -98,6 +103,7 @@ internal fun FileInfoScreen(
 private fun FileInfoContent(
     uiState: FileInfoUiState,
     onLocationClick: () -> Unit,
+    onDescriptionChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -118,6 +124,7 @@ private fun FileInfoContent(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -196,6 +203,18 @@ private fun FileInfoContent(
             FileInfoMapView(
                 coordinates = coordinates,
                 caption = uiState.locationCaption,
+            )
+        }
+
+        if (uiState.canEditDescription || uiState.descriptionText.isNotBlank()) {
+            NodeDescriptionField(
+                description = uiState.descriptionText,
+                isEditable = uiState.canEditDescription,
+                // TODO extract to localized string resources
+                label = "Description",
+                placeholder = "Add description",
+                onDescriptionChange = onDescriptionChange,
+                modifier = Modifier.testTag(FILE_INFO_DESCRIPTION_TAG),
             )
         }
     }
@@ -317,9 +336,12 @@ private fun FileInfoScreenFilePreview() {
                 modificationTime = 1_749_500_000L,
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 locationFolders = listOf("Documents", "Marketing"),
+                descriptionText = "This is test description",
+                accessPermission = AccessPermission.OWNER
             ),
             onBack = {},
             onLocationClick = {},
+            onDescriptionChange = {},
         )
     }
 }
@@ -341,6 +363,7 @@ private fun FileInfoScreenFolderPreview() {
             ),
             onBack = {},
             onLocationClick = {},
+            onDescriptionChange = {},
         )
     }
 }
@@ -354,6 +377,7 @@ private fun FileInfoScreenLoadingPreview() {
             uiState = FileInfoUiState(isLoading = true),
             onBack = {},
             onLocationClick = {},
+            onDescriptionChange = {},
         )
     }
 }
@@ -367,3 +391,4 @@ internal const val FILE_INFO_ADDED_TAG = "file_info_screen:added"
 internal const val FILE_INFO_LAST_MODIFIED_TAG = "file_info_screen:last_modified"
 internal const val FILE_INFO_LOCATION_TAG = "file_info_screen:location"
 internal const val FILE_INFO_LOADING_TAG = "file_info_screen:loading"
+internal const val FILE_INFO_DESCRIPTION_TAG = "file_info_screen:description"

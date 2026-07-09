@@ -59,7 +59,7 @@ internal fun FileInfoMapView(
             // TODO extract to a localized string resource
             text = "Map",
             textColor = TextColor.Primary,
-            style = AppTheme.typography.titleSmall,
+            style = AppTheme.typography.bodyLarge,
         )
         Box(
             modifier = Modifier
