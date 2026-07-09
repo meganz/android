@@ -15,9 +15,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
+import de.palm.composestateevents.EventEffect
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.snackbar.SnackbarLifetimeController
 import mega.privacy.android.app.appstate.content.transfer.AppTransferViewModel
+import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
+import mega.privacy.android.app.appstate.global.util.show
 import mega.privacy.android.app.presentation.transfers.starttransfer.view.StartTransferComponent
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.FeatureDestination
@@ -91,6 +94,17 @@ fun LegacyActivityScaffold(
 
         CompositionLocalProvider(LocalSnackBarHostState provides snackbarHostState) {
             SnackbarLifetimeController()
+
+            // The global snackbar queue is consumed by the foreground activity; without
+            // this, messages queued here would stay pending until MegaActivity returns.
+            val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
+            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState.collectAsStateWithLifecycle()
+            EventEffect(
+                event = snackbarEventsState,
+                onConsumed = snackbarEventsViewModel::consumeEvent,
+                action = { snackbarHostState.show(it.attributes) },
+            )
+
             NavDisplay(
                 backStack = backStack,
                 onBack = { navigationHandler.back() },
