@@ -94,13 +94,13 @@ class ConfirmEmailViewModel @Inject constructor(
                 .onSuccess { email ->
                     updateRegisteredEmail(email)
                     showSuccessSnackBar()
-                    startResendCountdown()
                 }
                 .onFailure { exception ->
                     Timber.e("Failed to re-send the sign up link: ${exception.message}")
                     val error = resendSignUpLinkErrorMapper(exception = exception)
                     _uiState.update { it.copy(resendSignUpLinkError = triggered(error)) }
                 }
+            startResendCountdown()
             _uiState.update { it.copy(isLoading = false) }
         }
     }

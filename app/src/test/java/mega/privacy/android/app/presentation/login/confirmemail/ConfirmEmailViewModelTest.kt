@@ -284,6 +284,25 @@ class ConfirmEmailViewModelTest {
         }
 
     @Test
+    fun `test that the countdown restarts after failing to resend the sign up link`() =
+        runTest {
+            whenever(
+                resendSignUpLinkUseCase(email = email, fullName = fullName)
+            ) doAnswer { throw CreateAccountException.TooManyAttemptsException }
+            // Let the initial cooldown fully elapse.
+            advanceUntilIdle()
+
+            underTest.resendSignUpLink(email = email, fullName = fullName)
+            runCurrent()
+
+            underTest.uiState.test {
+                val item = expectMostRecentItem()
+                assertThat(item.resendCountdownSeconds).isEqualTo(RESEND_EMAIL_COUNTDOWN_SECONDS)
+                assertThat(item.canResend).isFalse()
+            }
+        }
+
+    @Test
     fun `test that name and email update correctly`() = runTest {
         val ephemeralCredentials = EphemeralCredentials(
             email = "email",
