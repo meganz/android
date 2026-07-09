@@ -151,6 +151,16 @@ internal fun VideoPlayerScreen(
     val configuration = LocalConfiguration.current
     val orientation = configuration.orientation
 
+    // The Android window layout pass (triggered by rotation inside key(orientation)) resets
+    // isNavigationBarContrastEnforced after onConfigurationChanged returns. Re-apply here so the
+    // Compose frame — which runs after the layout pass — wins the race and keeps the scrim off.
+    DisposableEffect(configuration) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            (context as? Activity)?.window?.isNavigationBarContrastEnforced = false
+        }
+        onDispose {}
+    }
+
     var videoPlayerController by remember { mutableStateOf<VideoPlayerController?>(null) }
     var isSpeedOptionsShown by rememberSaveable { mutableStateOf(false) }
 

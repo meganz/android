@@ -200,9 +200,6 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
         Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
         window.clearFlags(FLAG_TRANSLUCENT_STATUS or FLAG_TRANSLUCENT_NAVIGATION)
         enableEdgeToEdge()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            window.isNavigationBarContrastEnforced = false
-        }
         pipManager.initialize()
         setupImmersiveMode()
         exoPlayer = createPlayer()
