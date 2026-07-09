@@ -43,6 +43,12 @@ interface CacheGateway {
      */
     suspend fun clearCacheDirectory()
 
+    /**
+     * Invalidate the in-memory cache of folder paths, so the next path lookup
+     * re-checks the folder on disk and recreates it if needed
+     */
+    suspend fun clearPathCache()
+
 
     /**
      * Return node thumbnail folder
