@@ -172,6 +172,8 @@ internal class DefaultTransfersRepository @Inject constructor(
             flow.emit(emptyMap())
         }
         transferOverQuotaTimestamp = AtomicLong()
+        broadcastTransferOverQuota(false)
+        broadcastStorageOverQuota(false)
         clearCompletedTransfersCache()
         Timber.d("Reset default transfers repository cached values")
     }

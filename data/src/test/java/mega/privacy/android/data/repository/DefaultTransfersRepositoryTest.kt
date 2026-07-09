@@ -1909,6 +1909,17 @@ class DefaultTransfersRepositoryTest {
                 assertThat(underTest.monitorInProgressTransfers().value).isEmpty()
                 assertThat(underTest.getActiveTransfers()).isEmpty()
             }
+
+        @Test
+        fun `test that onLogoutSuccess clears transfer and storage over quota flags`() =
+            runTest {
+                underTest = createDefaultTransfersRepository()
+
+                underTest.onLogoutSuccess()
+
+                verify(appEventGateway).broadcastTransferOverQuota(false)
+                verify(appEventGateway).broadcastStorageOverQuota(false)
+            }
     }
 
     @Nested
