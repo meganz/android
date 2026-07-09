@@ -36,6 +36,7 @@ import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_C
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_MONTHLY_CHIP
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_PLAN_CARD
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_TITLE
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_UPGRADE_HINT
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SAVE_UP_TO_BADGE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_DESC
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_SUBSCRIPTION_INFO_TITLE
@@ -445,6 +446,32 @@ class UpgradeAccountScreenTest {
         )
 
         composeRule.onNodeWithTag(TEST_TAG_CURRENT_PLAN_CARD).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that revamp shows upgrade-on-web hint when current plan is the highest plan`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = AccountType.PRO_III),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_REVAMP_UPGRADE_HINT))
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_UPGRADE_HINT)
+            .performScrollTo()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that revamp hides upgrade-on-web hint when current plan is not the highest plan`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = AccountType.PRO_I),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_UPGRADE_HINT).assertDoesNotExist()
     }
 
     @Test

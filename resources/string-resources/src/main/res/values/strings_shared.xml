@@ -3123,6 +3123,8 @@
     <string name="subscription_revamp_save_label">Save up to 16%</string>
     <!-- Buy button label on a plan card on the redesigned subscription page. Placeholder is the plan name, e.g. "Pro I". -->
     <string name="subscription_revamp_get_plan_button">Get %1$s</string>
+    <!-- Hint shown under the current plan card when the user is already on the highest plan, pointing them to the web pricing page to upgrade. [A] and [/A] wrap the "pricing page" link. -->
+    <string name="subscription_revamp_current_plan_upgrade_on_web">You can upgrade your current subscription on our [A]pricing page[/A].</string>
     <!-- Label for the auto-capture toggle in the document scanner top bar -->
     <string name="document_scanner_auto_capture_label">Auto</string>
     <!-- Accessibility description for the auto-capture toggle when auto-capture is on -->

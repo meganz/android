@@ -38,6 +38,13 @@ data class UpgradeAccountState(
     val isCurrentSubscriptionRenewing: Boolean
         get() = subscriptionStatus == SubscriptionStatus.VALID
 
+    /**
+     * Is PRO_III plan
+     */
+    fun isHighestPlan(): Boolean {
+        return currentSubscriptionPlan == AccountType.PRO_III
+    }
+
     // checking if there is any discount available it's different from current plan
     fun hasDiscount() = localisedSubscriptionsList.any {
         when (subscriptionCycle) {

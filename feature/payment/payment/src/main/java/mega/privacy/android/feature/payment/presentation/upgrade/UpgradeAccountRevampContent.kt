@@ -1,16 +1,25 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
+import mega.android.core.ui.model.SpanStyleWithAnnotation
+import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
@@ -39,6 +48,7 @@ internal fun LazyListScope.subscriptionRevampContent(
     isUpgradeAccount: Boolean,
     onInAppCheckoutClick: (Subscription) -> Unit,
     onSubscriptionUnavailableLearnMoreClick: () -> Unit,
+    onPricingPageClick: () -> Unit,
 ) {
     item("revamp_title") {
         MegaText(
@@ -100,13 +110,21 @@ internal fun LazyListScope.subscriptionRevampContent(
                     stringResource(sharedR.string.subscription_revamp_current_plan_expires, it)
                 }
             }
-            CurrentPlanCard(
-                currentPlanLabel = stringResource(sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label),
-                planName = stringResource(uiState.currentSubscriptionPlan.toUIAccountType().textValue),
-                cycleText = cycleText,
-                helpText = helpText,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                CurrentPlanCard(
+                    currentPlanLabel = stringResource(sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label),
+                    planName = stringResource(uiState.currentSubscriptionPlan.toUIAccountType().textValue),
+                    cycleText = cycleText,
+                    helpText = helpText,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+                if (uiState.isHighestPlan()) {
+                    CurrentPlanUpgradeHint(
+                        onPricingPageClick = onPricingPageClick,
+                        modifier = Modifier.padding(horizontal = 32.dp, vertical = 4.dp),
+                    )
+                }
+            }
         }
     }
 
@@ -237,6 +255,35 @@ private fun currentPlanDate(uiState: UpgradeAccountState, locale: Locale): Strin
     return DateFormat.getDateInstance(DateFormat.LONG, locale).format(Date(timeInSeconds * 1000))
 }
 
+/**
+ * Hint shown under the current plan card when the user is already on the highest available plan,
+ * linking to the web pricing page where they can upgrade further.
+ */
+@Composable
+private fun CurrentPlanUpgradeHint(
+    onPricingPageClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val text = stringResource(sharedR.string.subscription_revamp_current_plan_upgrade_on_web)
+    val linkText = text.substringAfter("[A]").substringBefore("[/A]")
+    LinkSpannedText(
+        modifier = modifier.testTag(TEST_TAG_REVAMP_UPGRADE_HINT),
+        value = text,
+        spanStyles = mapOf(
+            SpanIndicator('A') to SpanStyleWithAnnotation(
+                megaSpanStyle = MegaSpanStyle.LinkColorStyle(
+                    spanStyle = SpanStyle(),
+                    linkColor = LinkColor.Primary,
+                ),
+                annotation = linkText,
+            )
+        ),
+        baseTextColor = TextColor.Primary,
+        baseStyle = MaterialTheme.typography.bodyMedium,
+        onAnnotationClick = { onPricingPageClick() },
+    )
+}
+
 private const val DEFAULT_MAX_STORAGE = "20 TB"
 private const val DEFAULT_MAX_TRANSFER = "240 TB"
 
@@ -249,3 +296,8 @@ internal const val TEST_TAG_REVAMP_TITLE = "subscription_revamp:title"
  * Test tag prefix for each plan card on the redesigned subscription page (append index)
  */
 internal const val TEST_TAG_REVAMP_PLAN_CARD = "subscription_revamp:plan_card_"
+
+/**
+ * Test tag for the "upgrade on pricing page" hint shown when the current plan is the highest plan
+ */
+internal const val TEST_TAG_REVAMP_UPGRADE_HINT = "subscription_revamp:upgrade_hint"

@@ -84,6 +84,7 @@ fun UpgradeAccountScreen(
     isUpgradeAccount: Boolean = false,
     isSubscriptionRevampEnabled: Boolean = false,
     onSubscriptionUnavailableLearnMoreClick: () -> Unit = {},
+    onPricingPageClick: () -> Unit = {},
 ) {
     var chosenPlan by rememberSaveable { mutableStateOf<AccountType?>(null) }
     var isMonthly by rememberSaveable { mutableStateOf(false) }
@@ -263,6 +264,7 @@ fun UpgradeAccountScreen(
                     isUpgradeAccount = isUpgradeAccount,
                     onInAppCheckoutClick = onInAppCheckoutClick,
                     onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
+                    onPricingPageClick = onPricingPageClick,
                 )
             } else {
                 item("get_more_with_pro_plan") {
