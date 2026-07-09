@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.sharelink.presentation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +14,17 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.AnchoredButtonGroup
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -49,13 +55,20 @@ fun LinkSettingsScreen(
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showDiscardDialog by rememberSaveable { mutableStateOf(false) }
+    val onCloseRequest = {
+        if (uiState.hasUnsavedChanges) showDiscardDialog = true else onBack()
+    }
+
+    BackHandler(enabled = uiState.hasUnsavedChanges) { showDiscardDialog = true }
+
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier,
         topBar = {
             MegaTopAppBar(
                 modifier = Modifier.testTag(LINK_SETTINGS_APP_BAR_TAG),
                 title = stringResource(sharedR.string.share_link_settings_title),
-                navigationType = AppBarNavigationType.Close(onBack),
+                navigationType = AppBarNavigationType.Close(onCloseRequest),
             )
         },
         bottomBar = {
@@ -92,6 +105,22 @@ fun LinkSettingsScreen(
                 )
             }
         }
+    }
+
+    if (showDiscardDialog) {
+        BasicDialog(
+            modifier = Modifier.testTag(LINK_SETTINGS_DISCARD_DIALOG_TAG),
+            title = stringResource(sharedR.string.general_dialog_title_discard_changes),
+            description = stringResource(sharedR.string.general_dialog_discard_changes_message),
+            positiveButtonText = stringResource(sharedR.string.general_dialog_discard_button),
+            onPositiveButtonClicked = {
+                showDiscardDialog = false
+                onBack()
+            },
+            negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+            onNegativeButtonClicked = { showDiscardDialog = false },
+            onDismiss = { showDiscardDialog = false },
+        )
     }
 }
 
@@ -217,3 +246,4 @@ internal const val LINK_SETTINGS_EXPIRY_TOGGLE_TAG = "link_settings_screen:toggl
 internal const val LINK_SETTINGS_PASSWORD_ROW_TAG = "link_settings_screen:row_password"
 internal const val LINK_SETTINGS_PASSWORD_TOGGLE_TAG = "link_settings_screen:toggle_password"
 internal const val LINK_SETTINGS_LOADING_TAG = "link_settings_screen:loading"
+internal const val LINK_SETTINGS_DISCARD_DIALOG_TAG = "link_settings_screen:discard_dialog"

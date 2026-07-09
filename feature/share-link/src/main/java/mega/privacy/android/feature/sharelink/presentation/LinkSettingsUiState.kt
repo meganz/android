@@ -19,6 +19,7 @@ data class LinkSettingsUiState(
     val password: String? = null,
     val passwordStrength: PasswordStrength? = null,
     val accountType: AccountType? = null,
+    val hasUnsavedChanges: Boolean = false,
     val isSaveEnabled: Boolean = false,
     val isSaving: Boolean = false,
     val savedEvent: StateEvent = consumed,

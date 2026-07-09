@@ -3,10 +3,14 @@ package mega.privacy.android.feature.sharelink.presentation
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,6 +20,8 @@ class LinkSettingsScreenTest {
 
     @get:Rule
     val composeRule = createComposeRule()
+
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val loaded = LinkSettingsUiState(isLoading = false)
 
@@ -72,6 +78,53 @@ class LinkSettingsScreenTest {
         assertThat(saved).isTrue()
     }
 
+    @Test
+    fun `test that closing without unsaved changes invokes onBack`() {
+        var backed = false
+        setContent(uiState = loaded.copy(hasUnsavedChanges = false), onBack = { backed = true })
+
+        composeRule.onNodeWithContentDescription(NAVIGATION_ICON).performClick()
+
+        assertThat(backed).isTrue()
+    }
+
+    @Test
+    fun `test that closing with unsaved changes shows the discard dialog without going back`() {
+        var backed = false
+        setContent(uiState = loaded.copy(hasUnsavedChanges = true), onBack = { backed = true })
+
+        composeRule.onNodeWithContentDescription(NAVIGATION_ICON).performClick()
+
+        composeRule.onNodeWithText(
+            context.getString(sharedR.string.general_dialog_title_discard_changes)
+        ).assertIsDisplayed()
+        assertThat(backed).isFalse()
+    }
+
+    @Test
+    fun `test that discarding changes invokes onBack`() {
+        var backed = false
+        setContent(uiState = loaded.copy(hasUnsavedChanges = true), onBack = { backed = true })
+
+        composeRule.onNodeWithContentDescription(NAVIGATION_ICON).performClick()
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_dialog_discard_button))
+            .performClick()
+
+        assertThat(backed).isTrue()
+    }
+
+    @Test
+    fun `test that cancelling the discard dialog keeps the user on the screen`() {
+        var backed = false
+        setContent(uiState = loaded.copy(hasUnsavedChanges = true), onBack = { backed = true })
+
+        composeRule.onNodeWithContentDescription(NAVIGATION_ICON).performClick()
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_dialog_cancel_button))
+            .performClick()
+
+        assertThat(backed).isFalse()
+    }
+
     private fun setContent(
         uiState: LinkSettingsUiState,
         onBack: () -> Unit = {},
@@ -88,5 +141,9 @@ class LinkSettingsScreenTest {
                 onSave = onSave,
             )
         }
+    }
+
+    private companion object {
+        const val NAVIGATION_ICON = "Navigation Icon"
     }
 }
