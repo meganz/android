@@ -22,6 +22,7 @@ import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelPro
 import mega.privacy.android.feature.documentscanner.domain.smoother.BoundarySmoother
 import mega.privacy.android.feature.documentscanner.domain.usecase.AddScannedPageUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.MonitorScanSessionUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.ReplaceScannedPageUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -49,6 +50,7 @@ class ScanSessionViewModelTest {
     private val documentPageCapturer = mock<DocumentPageCapturer>()
     private val addScannedPageUseCase = mock<AddScannedPageUseCase>()
     private val monitorScanSessionUseCase = mock<MonitorScanSessionUseCase>()
+    private val replaceScannedPageUseCase = mock<ReplaceScannedPageUseCase>()
 
     private val sessionFlow = MutableStateFlow(emptySession())
 
@@ -65,6 +67,7 @@ class ScanSessionViewModelTest {
             documentPageCapturer,
             addScannedPageUseCase,
             monitorScanSessionUseCase,
+            replaceScannedPageUseCase,
         )
         sessionFlow.value = emptySession()
         whenever(monitorScanSessionUseCase()).thenReturn(sessionFlow)
@@ -76,6 +79,7 @@ class ScanSessionViewModelTest {
             documentPageCapturer = documentPageCapturer,
             addScannedPageUseCase = addScannedPageUseCase,
             monitorScanSessionUseCase = monitorScanSessionUseCase,
+            replaceScannedPageUseCase = replaceScannedPageUseCase,
         )
     }
 
@@ -271,6 +275,23 @@ class ScanSessionViewModelTest {
         verify(documentPageCapturer).capture(bytes, 90, null)
         verify(addScannedPageUseCase).invoke(page)
     }
+
+    @Test
+    fun `test that in retake mode onFrameCaptured replaces the page and fires retakeComplete`() =
+        runTest {
+            val bytes = byteArrayOf(1, 2, 3)
+            val page = scannedPage("new")
+            whenever(documentPageCapturer.capture(any(), any(), anyOrNull())).thenReturn(page)
+            underTest.enterRetakeMode("old")
+
+            underTest.onFrameCaptured(bytes, rotationDegrees = 90)
+
+            verify(replaceScannedPageUseCase).invoke("old", page)
+            verify(addScannedPageUseCase, never()).invoke(any())
+            underTest.uiState.test {
+                assertThat(awaitItem().retakeCompleteEvent).isEqualTo(triggered)
+            }
+        }
 
     @Test
     fun `test that the session pages populate the deck thumbnails and count`() = runTest {

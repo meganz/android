@@ -3131,6 +3131,14 @@
     <string name="document_scanner_auto_capture_off">Auto-capture off</string>
     <!-- Accessibility description for the manual shutter (capture) button in the document scanner -->
     <string name="document_scanner_capture_button">Capture</string>
+    <!-- Title of the screen where the user reviews the pages they have scanned -->
+    <string name="document_scanner_review_title">Review scan</string>
+    <!-- Message shown on the scan review screen when no pages have been captured yet -->
+    <string name="document_scanner_review_empty">No pages scanned yet</string>
+    <!-- Accessibility description for the button that deletes a scanned page from the review grid -->
+    <string name="document_scanner_review_delete_page">Delete page</string>
+    <!-- Label for the action that re-captures (retakes) a scanned page, replacing it in place -->
+    <string name="document_scanner_review_retake_page">Retake</string>
     <!-- Share link revamp: title of the Link settings screen -->
     <string name="share_link_settings_title">Link settings</string>
     <!-- Share link revamp: title of the row that toggles setting an expiry date on the link -->

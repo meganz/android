@@ -36,4 +36,5 @@ internal data class ScanSessionUiState(
     val captureEvent: StateEvent = consumed,
     val capturedPageThumbnails: List<String> = emptyList(),
     val capturedPageCount: Int = 0,
+    val retakeCompleteEvent: StateEvent = consumed,
 )

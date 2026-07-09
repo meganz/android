@@ -87,16 +87,33 @@ private const val ANALYSIS_INTERVAL_MS = 200L
  *
  * @param onClose Callback when the user closes the scanner
  * @param onSwitchToLegacy Callback to switch to the legacy ML Kit scanner
+ * @param onReviewPages Callback to open the page-review screen
+ * @param retakePageId When non-null, the next capture replaces this page in place
+ *   (retake mode) instead of adding a new one.
+ * @param onRetakeDone Callback after a retake capture completes (return to review).
  * @param viewModel ViewModel managing camera and session state
  */
 @Composable
 internal fun ContinuousScanScreen(
     onClose: () -> Unit,
     onSwitchToLegacy: () -> Unit,
+    onReviewPages: () -> Unit,
+    retakePageId: String? = null,
+    onRetakeDone: () -> Unit = {},
     viewModel: ScanSessionViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(retakePageId) {
+        if (retakePageId != null) viewModel.enterRetakeMode(retakePageId)
+    }
+    EventEffect(
+        event = uiState.retakeCompleteEvent,
+        onConsumed = viewModel::onRetakeCompleteHandled,
+    ) {
+        onRetakeDone()
+    }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -139,6 +156,7 @@ internal fun ContinuousScanScreen(
             onFrameCaptured = viewModel::onFrameCaptured,
             onClose = onClose,
             onSwitchToLegacy = onSwitchToLegacy,
+            onReviewPages = onReviewPages,
             onFrame = viewModel::onAnalysisFrame,
         )
     } else {
@@ -163,6 +181,7 @@ private fun CameraContent(
     onFrameCaptured: (ByteArray, Int) -> Unit,
     onClose: () -> Unit,
     onSwitchToLegacy: () -> Unit,
+    onReviewPages: () -> Unit,
     onFrame: (ByteArray, Int, Int, Int, Long) -> Unit,
 ) {
     val imageCapture = remember {
@@ -234,6 +253,7 @@ private fun CameraContent(
         CapturedPagesDeck(
             thumbnailUris = capturedPageThumbnails,
             count = capturedPageCount,
+            onClick = onReviewPages,
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .navigationBarsPadding()
