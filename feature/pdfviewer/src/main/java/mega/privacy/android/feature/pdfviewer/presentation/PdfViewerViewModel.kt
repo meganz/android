@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
@@ -94,6 +95,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getPublicNodeUseCase: GetPublicNodeUseCase,
     private val getPublicNodeByIdUseCase: GetPublicNodeByIdUseCase,
+    private val getChatFileUseCase: GetChatFileUseCase,
     private val getOfflineFileInformationByIdUseCase: GetOfflineFileInformationByIdUseCase,
     private val offlineTypedNodeMapper: OfflineTypedNodeMapper,
 ) : ViewModel() {
@@ -749,6 +751,9 @@ internal class PdfViewerViewModel @AssistedInject constructor(
      * account, so [GetNodeByIdUseCase] (account-only) would return null. It is resolved via
      * [GetPublicNodeByIdUseCase], which falls back to the folder API and authorizes the node.
      *
+     * Chat attachments received from others are not in the account, so the handle lookup returns null,
+     * and they resolve via [GetChatFileUseCase] instead.
+     *
      * No-op for external files (no MEGA node).
      */
     private fun loadCurrentNode() {
@@ -768,7 +773,7 @@ internal class PdfViewerViewModel @AssistedInject constructor(
                         .getOrElse {
                             Timber.e(it, "Failed to resolve node for floating toolbar")
                             null
-                        } ?: loadOfflineFallbackNode(nodeId)
+                        } ?: loadChatFallbackNode() ?: loadOfflineFallbackNode(nodeId)
                 }
             }
             node ?: return@launch
@@ -795,6 +800,15 @@ internal class PdfViewerViewModel @AssistedInject constructor(
             .onFailure { Timber.e(it, "Failed to resolve public node for file-link toolbar") }
             .getOrNull()
             ?.let { PublicLinkFile(it, null) }
+    }
+
+    private suspend fun loadChatFallbackNode(): TypedNode? {
+        if (args.nodeSourceType != NodeSourceType.CHAT) return null
+        val chatId = args.chatId ?: return null
+        val messageId = args.messageId ?: return null
+        return runCatching { getChatFileUseCase(chatId, messageId) }
+            .onFailure { Timber.e(it, "Failed to resolve chat file for floating toolbar") }
+            .getOrNull()
     }
 
     private suspend fun loadOfflineFallbackNode(nodeId: NodeId): TypedNode? {

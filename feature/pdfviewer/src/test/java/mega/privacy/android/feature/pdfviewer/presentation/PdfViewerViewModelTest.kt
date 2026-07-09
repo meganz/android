@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.chat.ChatDefaultFile
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetPublicNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
+import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.offline.GetOfflineFileInformationByIdUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.pdf.GetLastPageViewedInPdfUseCase
@@ -98,6 +100,7 @@ class PdfViewerViewModelTest {
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
     private val getPublicNodeUseCase = mock<GetPublicNodeUseCase>()
     private val getPublicNodeByIdUseCase = mock<GetPublicNodeByIdUseCase>()
+    private val getChatFileUseCase = mock<GetChatFileUseCase>()
     private val getOfflineFileInformationByIdUseCase =
         mock<GetOfflineFileInformationByIdUseCase>()
     private val offlineTypedNodeMapper = mock<OfflineTypedNodeMapper>()
@@ -130,6 +133,7 @@ class PdfViewerViewModelTest {
             getNodeByIdUseCase,
             getPublicNodeUseCase,
             getPublicNodeByIdUseCase,
+            getChatFileUseCase,
             getOfflineFileInformationByIdUseCase,
             offlineTypedNodeMapper,
             context,
@@ -172,6 +176,7 @@ class PdfViewerViewModelTest {
             getNodeByIdUseCase = getNodeByIdUseCase,
             getPublicNodeUseCase = getPublicNodeUseCase,
             getPublicNodeByIdUseCase = getPublicNodeByIdUseCase,
+            getChatFileUseCase = getChatFileUseCase,
             getOfflineFileInformationByIdUseCase = getOfflineFileInformationByIdUseCase,
             offlineTypedNodeMapper = offlineTypedNodeMapper,
         )
@@ -1342,6 +1347,90 @@ class PdfViewerViewModelTest {
             assertThat(awaitItem().currentNode).isNull()
         }
         verifyNoInteractions(offlineTypedNodeMapper)
+    }
+
+    @Test
+    fun `test that currentNode falls back to chat file when node is not in the account`() =
+        runTest {
+            val chatArgs = defaultArgs.copy(
+                nodeSourceType = NodeSourceType.CHAT,
+                chatId = 111L,
+                messageId = 222L,
+            )
+            val chatFile = mock<ChatDefaultFile>()
+            wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+            wheneverBlocking { getChatFileUseCase(111L, 222L) }.thenReturn(chatFile)
+
+            underTest = initViewModel(args = chatArgs)
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().currentNode).isEqualTo(chatFile)
+            }
+        }
+
+    @Test
+    fun `test that chat fallback is not used when node resolves by handle`() = runTest {
+        val chatArgs = defaultArgs.copy(
+            nodeSourceType = NodeSourceType.CHAT,
+            chatId = 111L,
+            messageId = 222L,
+        )
+        val node = mock<TypedFileNode>()
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(node)
+
+        underTest = initViewModel(args = chatArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isEqualTo(node)
+        }
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that chat fallback is not used when chat ids are missing`() = runTest {
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+        underTest = initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that chat fallback is not used when the source type is not chat`() = runTest {
+        val args = defaultArgs.copy(chatId = 111L, messageId = 222L)
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+
+        underTest = initViewModel(args = args)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
+        verifyNoInteractions(getChatFileUseCase)
+    }
+
+    @Test
+    fun `test that currentNode stays null when chat fallback also returns null`() = runTest {
+        val chatArgs = defaultArgs.copy(
+            nodeSourceType = NodeSourceType.CHAT,
+            chatId = 111L,
+            messageId = 222L,
+        )
+        wheneverBlocking { getNodeByIdUseCase(NodeId(12345L)) }.thenReturn(null)
+        wheneverBlocking { getChatFileUseCase(111L, 222L) }.thenReturn(null)
+
+        underTest = initViewModel(args = chatArgs)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().currentNode).isNull()
+        }
     }
 
     @Test

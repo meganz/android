@@ -43,14 +43,15 @@ import mega.privacy.mobile.analytics.event.PdfViewerScreenEvent
  *
  * @param navigationHandler Handler for navigation events and result monitoring
  * @param onBack Callback for back navigation
- * @param onOpenNodeOptions Callback to open node options bottom sheet
+ * @param onOpenNodeOptions Callback to open node options bottom sheet with
+ * (nodeHandle, nodeSourceType, publicLinkUrl, chatId, messageId)
  * @param onTransfer Callback to handle transfer events
  */
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
     navigationHandler: NavigationHandler,
     onBack: () -> Unit,
-    onOpenNodeOptions: (Long, NodeSourceType, String?) -> Unit,
+    onOpenNodeOptions: (Long, NodeSourceType, String?, Long?, Long?) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<PdfViewerNavKey>(
@@ -155,10 +156,14 @@ internal fun EntryProviderScope<NavKey>.pdfViewerScreen(
             onMoreClicked = {
                 // Forward the file-link URL so the node-options sheet resolves the public node
                 // (a file-link node is not in the account); null for non-file-link sources.
+                // Forward the chat ids so the sheet can resolve chat files received from
+                // others (their node is not in the account) via GetChatFileUseCase.
                 onOpenNodeOptions(
                     uiState.nodeHandle,
                     uiState.nodeSourceType,
                     navKey.publicLinkUrl,
+                    navKey.chatId,
+                    navKey.messageId,
                 )
             },
             onPageChanged = viewModel::onPageChanged,
