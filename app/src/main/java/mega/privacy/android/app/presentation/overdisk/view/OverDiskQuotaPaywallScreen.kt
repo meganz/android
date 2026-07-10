@@ -1,11 +1,13 @@
 package mega.privacy.android.app.presentation.overdisk.view
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -24,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -51,6 +54,8 @@ import mega.privacy.android.app.utils.TimeUtils.formatDate
 import mega.privacy.android.app.utils.TimeUtils.getHumanizedTimeMs
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePhoneLandscapePreviews
+import mega.privacy.android.shared.original.core.ui.preview.CombinedThemeTabletLandscapePreviews
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.concurrent.TimeUnit
 
@@ -71,113 +76,157 @@ fun OverDiskQuotaPaywallScreen(
     onUpgrade: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .navigationBarsPadding(),
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            Image(
-                painter = painterResource(id = R.drawable.storage_full_xl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            MegaText(
-                text = stringResource(id = R.string.over_disk_quota_paywall_header),
-                textColor = TextColor.Accent,
-                style = AppTheme.typography.titleLarge,
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    if (isLandscape) {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
+        ) {
+            PaywallHeaderImage(
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 47.dp),
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
+            PaywallContent(
+                uiState = uiState,
+                onDismiss = onDismiss,
+                onUpgrade = onUpgrade,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
             )
         }
-
+    } else {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 24.dp, end = 18.dp, bottom = 30.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .navigationBarsPadding(),
         ) {
-            MegaText(
-                text = stringResource(id = R.string.over_disk_quota_paywall_title),
-                textColor = TextColor.Primary,
-                style = AppTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 27.dp),
+            PaywallHeaderImage(modifier = Modifier.fillMaxWidth())
+            PaywallContent(
+                uiState = uiState,
+                onDismiss = onDismiss,
+                onUpgrade = onUpgrade,
+                modifier = Modifier.fillMaxWidth(),
             )
+        }
+    }
+}
 
-            if (uiState.isLoading) {
-                LargeHUD(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .testTag(TEST_TAG_ODQ_LOADING)
-                )
-            } else {
-                MegaText(
-                    text = bodyText(uiState),
-                    textColor = TextColor.Primary,
-                    style = AppTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 22.dp)
-                        .testTag(TEST_TAG_ODQ_BODY),
-                )
+@Composable
+private fun PaywallHeaderImage(modifier: Modifier = Modifier) {
+    Box(modifier = modifier) {
+        Image(
+            painter = painterResource(id = R.drawable.storage_full_xl),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize(),
+        )
+        MegaText(
+            text = stringResource(id = R.string.over_disk_quota_paywall_header),
+            textColor = TextColor.Accent,
+            style = AppTheme.typography.titleLarge,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 47.dp),
+        )
+    }
+}
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 23.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_suspention_warning),
-                        contentDescription = null,
-                        modifier = Modifier.size(70.dp),
-                    )
-                    SpannedText(
-                        value = flattenNestedMarkup(deletionWarningText(uiState.deadlineTimestamp)),
-                        baseStyle = AppTheme.typography.bodyMedium,
-                        baseTextColor = TextColor.Primary,
-                        spanStyles = mapOf(
-                            SpanIndicator('B') to MegaSpanStyle.DefaultColorStyle(
-                                SpanStyle(fontWeight = FontWeight.Bold),
-                            ),
-                            SpanIndicator('M') to MegaSpanStyle.TextColorStyle(
-                                SpanStyle(fontWeight = FontWeight.Bold),
-                                TextColor.Error,
-                            ),
-                        ),
-                        modifier = Modifier
-                            .padding(start = 10.dp)
-                            .fillMaxWidth()
-                            .testTag(TEST_TAG_ODQ_DELETION_WARNING),
-                    )
-                }
-            }
+@Composable
+private fun PaywallContent(
+    uiState: OverDiskQuotaPaywallUiState,
+    onDismiss: () -> Unit,
+    onUpgrade: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .padding(start = 24.dp, end = 18.dp, bottom = 30.dp),
+    ) {
+        MegaText(
+            text = stringResource(id = R.string.over_disk_quota_paywall_title),
+            textColor = TextColor.Primary,
+            style = AppTheme.typography.titleMedium,
+            modifier = Modifier.padding(top = 27.dp),
+        )
+
+        if (uiState.isLoading) {
+            LargeHUD(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .testTag(TEST_TAG_ODQ_LOADING)
+            )
+        } else {
+            MegaText(
+                text = bodyText(uiState),
+                textColor = TextColor.Primary,
+                style = AppTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 22.dp)
+                    .testTag(TEST_TAG_ODQ_BODY),
+            )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 45.dp),
-                horizontalArrangement = Arrangement.End,
+                    .padding(top = 23.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                TextOnlyButton(
-                    text = stringResource(id = sharedR.string.general_dismiss_dialog),
-                    onClick = onDismiss,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .testTag(TEST_TAG_ODQ_DISMISS_BUTTON),
+                Image(
+                    painter = painterResource(id = R.drawable.ic_suspention_warning),
+                    contentDescription = null,
+                    modifier = Modifier.size(70.dp),
                 )
-                Spacer(modifier = Modifier.width(26.dp))
-                PrimaryFilledButton(
-                    text = stringResource(id = sharedR.string.general_upgrade_button),
-                    onClick = onUpgrade,
+                SpannedText(
+                    value = flattenNestedMarkup(deletionWarningText(uiState.deadlineTimestamp)),
+                    baseStyle = AppTheme.typography.bodyMedium,
+                    baseTextColor = TextColor.Primary,
+                    spanStyles = mapOf(
+                        SpanIndicator('B') to MegaSpanStyle.DefaultColorStyle(
+                            SpanStyle(fontWeight = FontWeight.Bold),
+                        ),
+                        SpanIndicator('M') to MegaSpanStyle.TextColorStyle(
+                            SpanStyle(fontWeight = FontWeight.Bold),
+                            TextColor.Error,
+                        ),
+                    ),
                     modifier = Modifier
-                        .wrapContentSize()
-                        .testTag(TEST_TAG_ODQ_UPGRADE_BUTTON),
+                        .padding(start = 10.dp)
+                        .fillMaxWidth()
+                        .testTag(TEST_TAG_ODQ_DELETION_WARNING),
                 )
             }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 45.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            TextOnlyButton(
+                text = stringResource(id = sharedR.string.general_dismiss_dialog),
+                onClick = onDismiss,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .testTag(TEST_TAG_ODQ_DISMISS_BUTTON),
+            )
+            Spacer(modifier = Modifier.width(26.dp))
+            PrimaryFilledButton(
+                text = stringResource(id = sharedR.string.general_upgrade_button),
+                onClick = onUpgrade,
+                modifier = Modifier
+                    .wrapContentSize()
+                    .testTag(TEST_TAG_ODQ_UPGRADE_BUTTON),
+            )
         }
     }
 }
@@ -285,6 +334,26 @@ private fun OverDiskQuotaPaywallScreenNoWarningsPreview() {
 @CombinedThemePreviews
 @Composable
 private fun OverDiskQuotaPaywallScreenWithDeadlinePreview() {
+    AndroidThemeForPreviews {
+        OverDiskQuotaPaywallScreen(
+            uiState = OverDiskQuotaPaywallUiState(
+                isLoading = false,
+                email = "user@mega.co.nz",
+                fileCount = 1280,
+                usedStorage = 53_687_091_200L,
+                warningTimestamps = listOf(1_700_000_000L, 1_700_086_400L),
+                deadlineTimestamp = 4_102_444_800L,
+            ),
+            onDismiss = {},
+            onUpgrade = {},
+        )
+    }
+}
+
+@CombinedThemePhoneLandscapePreviews
+@CombinedThemeTabletLandscapePreviews
+@Composable
+private fun OverDiskQuotaPaywallScreenLandscapePreview() {
     AndroidThemeForPreviews {
         OverDiskQuotaPaywallScreen(
             uiState = OverDiskQuotaPaywallUiState(
