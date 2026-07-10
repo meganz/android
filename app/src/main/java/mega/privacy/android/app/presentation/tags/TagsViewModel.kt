@@ -1,8 +1,10 @@
 package mega.privacy.android.app.presentation.tags
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -14,7 +16,6 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.MAX_TAGS_PER_NODE
-import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.NODE_ID
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.node.GetAllNodeTagsUseCase
@@ -28,14 +29,14 @@ import javax.inject.Inject
  *
  * @property manageNodeTagUseCase    Use case to update a node tag
  */
-@HiltViewModel
-class TagsViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = TagsViewModel.Factory::class)
+class TagsViewModel @AssistedInject constructor(
     private val manageNodeTagUseCase: ManageNodeTagUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val tagsValidationMessageMapper: TagsValidationMessageMapper,
     private val getAllNodeTagsUseCase: GetAllNodeTagsUseCase,
     monitorNodeUpdatesUseCase: MonitorNodeUpdatesUseCase,
-    stateHandle: SavedStateHandle,
+    @Assisted nodeHandle: Long,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TagsUiState())
@@ -44,7 +45,7 @@ class TagsViewModel @Inject constructor(
      * the state of the view
      */
     internal val uiState = _uiState.asStateFlow()
-    private val nodeId: NodeId = NodeId(stateHandle.get<Long>(NODE_ID) ?: -1L)
+    private val nodeId: NodeId = NodeId(nodeHandle)
 
     init {
         updateExistingTagsAndErrorState(nodeId)
@@ -178,5 +179,16 @@ class TagsViewModel @Inject constructor(
      */
     fun consumeTagsUpdatedEvent() {
         _uiState.update { it.copy(tagsUpdatedEvent = consumed()) }
+    }
+
+    /**
+     * Assisted factory to create a [TagsViewModel] with the target node handle.
+     */
+    @AssistedFactory
+    interface Factory {
+        /**
+         * Creates a [TagsViewModel] for the node identified by [nodeHandle].
+         */
+        fun create(nodeHandle: Long): TagsViewModel
     }
 }

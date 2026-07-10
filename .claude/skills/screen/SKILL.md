@@ -126,7 +126,7 @@ Create the destination file at `<module>/src/main/java/<package>/<Name>ScreenDes
 Key rules enforced during generation:
 - NavKey is `@Serializable` and defined at the top of the file (for feature-local keys) or imported from `navigation/destination/` (for shared keys).
 - The extension function receives `NavigationHandler` (and optionally `TransferHandler` or other dependencies).
-- ViewModel is created via `hiltViewModel<T>()` (standard) or `hiltViewModel<T, T.Factory>(creationCallback = { ... })` (assisted).
+- ViewModel is created via `hiltViewModel<T>()` (standard) or `hiltViewModel<T, T.Factory> { it.create(...) }` (assisted).
 - State is collected via `by viewmodel.uiState.collectAsStateWithLifecycle()` (or `viewmodel.state` — match the actual ViewModel property name).
 - Navigation callbacks are wired as method references: `onNavigateBack = navigationHandler::back`, `onNavigate = { navigationHandler.navigate(TargetNavKey(it)) }`.
 - ViewModel action callbacks are wired as method references: `onDeleteItem = viewmodel::deleteItem`.

@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.tags
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -14,7 +13,7 @@ import mega.privacy.android.app.components.session.SessionContainer
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -29,8 +28,6 @@ class TagsActivity : AppCompatActivity() {
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
 
-    private val viewModel: TagsViewModel by viewModels()
-
     /**
      * Create the Tags screen.
      *
@@ -39,10 +36,10 @@ class TagsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        val nodeHandle = intent?.getLongExtra(NODE_ID, -1L) ?: -1L
         setContent {
             val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val systemUiController = rememberSystemUiController()
             val useDarkIcons = themeMode.isDarkMode().not()
             systemUiController.setSystemBarsColor(
@@ -50,15 +47,10 @@ class TagsActivity : AppCompatActivity() {
                 darkIcons = useDarkIcons
             )
             SessionContainer {
-                OriginalTheme(themeMode.isDarkMode()) {
-                    TagsScreen(
-                        consumeInfoMessage = viewModel::consumeInfoMessage,
-                        validateTagName = viewModel::validateTagName,
+                AndroidTheme(isDark = themeMode.isDarkMode()) {
+                    TagsRoute(
+                        nodeHandle = nodeHandle,
                         onBackPressed = onBackPressedDispatcher::onBackPressed,
-                        addOrRemoveTag = viewModel::addOrRemoveTag,
-                        consumeMaxTagsError = viewModel::consumeMaxTagsError,
-                        consumeTagsUpdated = viewModel::consumeTagsUpdatedEvent,
-                        uiState = uiState
                     )
                 }
             }

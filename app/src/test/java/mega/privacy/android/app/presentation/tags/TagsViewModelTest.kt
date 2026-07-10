@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.tags
 
-import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.consumed
@@ -37,19 +36,17 @@ class TagsViewModelTest {
     private val monitorNodeUpdatesUseCase = mock<MonitorNodeUpdatesUseCase>()
     private val getAllNodeTagsUseCase = mock<GetAllNodeTagsUseCase>()
     private val tagsValidationMessageMapper = mock<TagsValidationMessageMapper>()
-    private lateinit var stateHandle: SavedStateHandle
     private lateinit var underTest: TagsViewModel
 
     @BeforeEach
     fun resetMock() {
-        stateHandle = SavedStateHandle(mapOf(TagsActivity.NODE_ID to 123L))
         whenever(tagsValidationMessageMapper.invoke("")).thenReturn(Pair("", false))
         whenever(monitorNodeUpdatesUseCase.invoke()).thenReturn(emptyFlow())
         underTest = TagsViewModel(
             manageNodeTagUseCase = manageNodeTagUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             tagsValidationMessageMapper = tagsValidationMessageMapper,
-            stateHandle = stateHandle,
+            nodeHandle = 123L,
             getAllNodeTagsUseCase = getAllNodeTagsUseCase,
             monitorNodeUpdatesUseCase = monitorNodeUpdatesUseCase
         )
