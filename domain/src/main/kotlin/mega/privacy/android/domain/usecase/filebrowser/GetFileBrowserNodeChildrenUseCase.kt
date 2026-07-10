@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase.filebrowser
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SensitivityFilterOption
@@ -27,13 +28,15 @@ class GetFileBrowserNodeChildrenUseCase @Inject constructor(
      * @param parentHandle
      * @param excludeSensitives When true, the SDK search filter excludes sensitive (hidden) nodes
      *   so the UI never sees them. Defaults to false.
+     * @param sortOrder The order to sort the children by. When null the global cloud sort order is used.
      * @return Children nodes of the parent handle, null if cannot be retrieved
      */
     suspend operator fun invoke(
         parentHandle: Long,
         excludeSensitives: Boolean = false,
+        sortOrder: SortOrder? = null,
     ): List<TypedNode> = coroutineScope {
-        val sortOrderDiffer = async { getCloudSortOrder() }
+        val sortOrderDiffer = async { sortOrder ?: getCloudSortOrder() }
         val folderTypeDataDiffer = async { getFolderTypeDataUseCase() }
         val nodeId = (if (parentHandle != nodeRepository.getInvalidHandle()) {
             NodeId(parentHandle)

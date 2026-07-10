@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.whenever
@@ -81,7 +82,7 @@ class VideoSelectedViewModelTest {
     @BeforeEach
     fun setUp() {
         wheneverBlocking { monitorViewType() }.thenReturn(fakeMonitorViewTypeFlow)
-        wheneverBlocking { getFileBrowserNodeChildrenUseCase(any(), any()) }.thenReturn(emptyList())
+        wheneverBlocking { getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull()) }.thenReturn(emptyList())
         wheneverBlocking { getCloudSortOrder() }.thenReturn(SortOrder.ORDER_NONE)
         initUnderTest()
     }
@@ -136,7 +137,7 @@ class VideoSelectedViewModelTest {
     fun `test that the nodes return correctly after init`() = runTest {
         val sortOrder = SortOrder.ORDER_DEFAULT_ASC
 
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testNode))
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
 
         initUnderTest()
@@ -155,7 +156,7 @@ class VideoSelectedViewModelTest {
 
     @Test
     fun `test that the state is updated correctly after a file is clicked`() = runTest {
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testNode))
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
 
         initUnderTest()
@@ -173,7 +174,7 @@ class VideoSelectedViewModelTest {
 
     @Test
     fun `test that the state is updated correctly after a folder is clicked`() = runTest {
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testFolderNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testFolderNode))
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
 
         initUnderTest()
@@ -194,7 +195,7 @@ class VideoSelectedViewModelTest {
 
     @Test
     fun `test that the state is updated correctly after back to parent folder`() = runTest {
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testNode))
         whenever(getParentNodeUseCase(NodeId(-1))).thenReturn(unTypedNode)
         whenever(getRootNodeUseCase()).thenReturn(null)
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
@@ -215,7 +216,7 @@ class VideoSelectedViewModelTest {
 
     @Test
     fun `test that the state is updated correctly after back to root folder`() = runTest {
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testNode))
         whenever(getParentNodeUseCase(NodeId(-1))).thenReturn(unTypedNode)
         whenever(getRootNodeUseCase()).thenReturn(unTypedNode)
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
@@ -236,7 +237,7 @@ class VideoSelectedViewModelTest {
 
     @Test
     fun `test that the state is updated correctly after select all`() = runTest {
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testNode))
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
 
         initUnderTest()
@@ -254,7 +255,7 @@ class VideoSelectedViewModelTest {
 
     @Test
     fun `test that the state is updated correctly after clear all`() = runTest {
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testNode))
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
 
         initUnderTest()
@@ -273,7 +274,7 @@ class VideoSelectedViewModelTest {
     @Test
     fun `test that the state is updated correctly after order changed`() = runTest {
         val newSortOrder = SortOrder.ORDER_FAV_ASC
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(listOf(testNode))
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(listOf(testNode))
         whenever(getCloudSortOrder()).thenReturn(newSortOrder)
 
         initUnderTest()
@@ -308,7 +309,7 @@ class VideoSelectedViewModelTest {
             on { name }.thenReturn("abc")
             on { type }.thenReturn(VideoFileTypeInfo("", "", 0.seconds))
         }
-        whenever(getFileBrowserNodeChildrenUseCase(any(), any())).thenReturn(
+        whenever(getFileBrowserNodeChildrenUseCase(any(), any(), anyOrNull())).thenReturn(
             listOf(testNode1, testNode2)
         )
         whenever(getCloudSortOrder()).thenReturn(sortOrder)
