@@ -15,6 +15,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -86,6 +87,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
@@ -163,6 +165,7 @@ class AudioPlayerServiceViewModel @Inject constructor(
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val playlistItemMapper: PlaylistItemMapper,
     private val megaApiFolderHttpServerIsRunningUseCase: MegaApiFolderHttpServerIsRunningUseCase,
@@ -962,11 +965,11 @@ class AudioPlayerServiceViewModel @Inject constructor(
                 runCatching { checkNodeAccessibilityUseCase(NodeId(playingHandle)) }
                     .onFailure { exception ->
                         if (exception is BlockedMegaException) {
-                            error.postValue(exception)
+                            withContext(mainDispatcher) { error.value = exception }
                             return@launch
                         }
                     }
-                retry.value = true
+                withContext(mainDispatcher) { retry.value = true }
             }
         } else {
             retry.value = playerRetry <= MAX_RETRY
