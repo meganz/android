@@ -196,6 +196,8 @@ id→name→email; Slack ids confirmed via the v16.8 notice.
 | 255 | Feng Lu | fl@mega.co.nz | `U096P7U0RHR` |
 | 256 | Junjie He | juh@mega.co.nz | `U097F8Q9ANB` |
 | 94 | Kevin Sun | ks@mega.co.nz | `U02ML8HT8E7` |
+| 141 | Atiqur Rahman | atr@mega.co.nz | `U0420372CLQ` |
+| 143 | Hai Luong | lh@mega.co.nz | `U03T1E2Q97V` |
 
 ### 6. Build the message
 

@@ -243,7 +243,7 @@ internal fun AlbumContentScreen(
     val isUserAlbum = remember(uiState.uiAlbum) {
         uiState.uiAlbum?.mediaAlbum is MediaAlbum.User
     }
-    var showDeletePhotosConfirmation by remember { mutableStateOf(false) }
+    var showDeletePhotosConfirmation by rememberSaveable { mutableStateOf(false) }
     var isMoreOptionsSheetVisible by rememberSaveable { mutableStateOf(false) }
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
 
