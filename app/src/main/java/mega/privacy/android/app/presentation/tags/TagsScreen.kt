@@ -49,6 +49,7 @@ import mega.privacy.android.shared.original.core.ui.controls.textfields.transfor
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.shared.original.core.ui.controls.chip.RoundedChipStyle
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
 import mega.privacy.mobile.analytics.event.NodeInfoTagsAddedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoTagsRemovedEvent
@@ -170,7 +171,7 @@ private fun TagsContent(
                 tag = it.removePrefix("#").lowercase()
                 validateTagName(tag)
             },
-            showUnderline = true,
+            showUnderline = true
         )
 
         if (
@@ -229,6 +230,7 @@ private fun TagsContent(
                     text = "#$tag",
                     modifier = Modifier.testTag(TAGS_SCREEN_TAG_CHIP),
                     leadingIcon = if (isSelected) CoreR.drawable.ic_filter_selected else null,
+                    style = RoundedChipStyle
                 ) {
                     addTag(tag)
                     Analytics.tracker.trackEvent(NodeInfoTagsRemovedEvent)

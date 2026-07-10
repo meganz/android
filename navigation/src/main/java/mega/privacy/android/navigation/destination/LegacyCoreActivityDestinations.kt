@@ -154,6 +154,14 @@ data class TestPasswordNavKey(
 @Serializable
 data class OfflineInfoNavKey(val handle: String) : NavKey
 
+/**
+ * Navigation key for the tags screen (TagsActivity) of the given node.
+ *
+ * @param nodeHandle The node handle whose tags are shown/edited.
+ */
+@Serializable
+data class TagsNavKey(val nodeHandle: Long) : NavKey
+
 @Serializable
 data class LegacyFileInfoNavKey(val handle: Long) : NavKey
 

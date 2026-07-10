@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.chip.DefaultChipStyle
+import mega.android.core.ui.components.chip.MegaChip
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
@@ -68,6 +72,7 @@ internal fun FileInfoScreen(
     onBack: () -> Unit,
     onLocationClick: () -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onTagsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -93,6 +98,7 @@ internal fun FileInfoScreen(
                     uiState = uiState,
                     onLocationClick = onLocationClick,
                     onDescriptionChange = onDescriptionChange,
+                    onTagsClick = onTagsClick,
                 )
             }
         }
@@ -104,6 +110,7 @@ private fun FileInfoContent(
     uiState: FileInfoUiState,
     onLocationClick: () -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onTagsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -216,6 +223,69 @@ private fun FileInfoContent(
                 onDescriptionChange = onDescriptionChange,
                 modifier = Modifier.testTag(FILE_INFO_DESCRIPTION_TAG),
             )
+        }
+
+        if (uiState.canShowTags) {
+            TagsSection(
+                tags = uiState.tags,
+                canEdit = uiState.canEditTags,
+                onClick = onTagsClick,
+                modifier = Modifier.testTag(FILE_INFO_TAGS_TAG),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun TagsSection(
+    tags: List<String>,
+    canEdit: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .then(if (canEdit) Modifier.clickable(onClick = onClick) else Modifier),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            MegaText(
+                modifier = Modifier.weight(1f),
+                // TODO extract to a localized string resource
+                text = "Tags",
+                textColor = TextColor.Primary,
+                style = AppTheme.typography.bodyLarge,
+            )
+            if (canEdit) {
+                MegaIcon(
+                    modifier = Modifier.size(24.dp),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
+                    tint = IconColor.Secondary,
+                    contentDescription = null,
+                )
+            }
+        }
+        if (tags.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                tags.forEach { tag ->
+                    MegaChip(
+                        selected = false,
+                        content = "#$tag",
+                        style = DefaultChipStyle,
+                        onClick = onClick,
+                    )
+                }
+            }
         }
     }
 }
@@ -337,11 +407,13 @@ private fun FileInfoScreenFilePreview() {
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 locationFolders = listOf("Documents", "Marketing"),
                 descriptionText = "This is test description",
+                tags = listOf("marketing", "2024", "confidential"),
                 accessPermission = AccessPermission.OWNER
             ),
             onBack = {},
             onLocationClick = {},
             onDescriptionChange = {},
+            onTagsClick = {},
         )
     }
 }
@@ -364,6 +436,7 @@ private fun FileInfoScreenFolderPreview() {
             onBack = {},
             onLocationClick = {},
             onDescriptionChange = {},
+            onTagsClick = {},
         )
     }
 }
@@ -378,6 +451,7 @@ private fun FileInfoScreenLoadingPreview() {
             onBack = {},
             onLocationClick = {},
             onDescriptionChange = {},
+            onTagsClick = {},
         )
     }
 }
@@ -392,3 +466,4 @@ internal const val FILE_INFO_LAST_MODIFIED_TAG = "file_info_screen:last_modified
 internal const val FILE_INFO_LOCATION_TAG = "file_info_screen:location"
 internal const val FILE_INFO_LOADING_TAG = "file_info_screen:loading"
 internal const val FILE_INFO_DESCRIPTION_TAG = "file_info_screen:description"
+internal const val FILE_INFO_TAGS_TAG = "file_info_screen:tags"
