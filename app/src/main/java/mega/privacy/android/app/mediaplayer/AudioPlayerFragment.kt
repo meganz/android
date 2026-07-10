@@ -84,7 +84,7 @@ class AudioPlayerFragment : Fragment() {
     @Inject
     lateinit var mediaPlayerGateway: MediaPlayerGateway
 
-    private val audioViewModel by viewModels<AudioPlayerViewModel>()
+    private val audioViewModel by viewModels<LegacyAudioPlayerViewModel>()
     private val mediaPlayerViewModel by activityViewModels<MediaPlayerViewModel>()
 
     private var playerViewHolder: AudioPlayerViewHolder? = null

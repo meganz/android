@@ -1,11 +1,53 @@
 package mega.privacy.android.app.presentation.videoplayer.view
 
 import android.app.Activity
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
+
+/**
+ * Native-API overload that requires no Accompanist dependency.
+ *
+ * Uses [WindowCompat.getInsetsController] and [android.view.Window.navigationBarColor] directly.
+ * Restores the original navigation bar appearance on dispose.
+ *
+ * The Accompanist overload below is kept for the video player until it is migrated separately.
+ */
+@Composable
+internal fun TransparentNavigationBarEffect() {
+    val view = LocalView.current
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val window = (context as? Activity)?.window ?: return@DisposableEffect onDispose {}
+        val insetsController = WindowCompat.getInsetsController(window, view)
+        val originalNavBarColor = window.navigationBarColor
+        val originalLightIcons = insetsController.isAppearanceLightNavigationBars
+        val originalContrastEnforced = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced
+        } else {
+            false
+        }
+
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        insetsController.isAppearanceLightNavigationBars = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
+
+        onDispose {
+            window.navigationBarColor = originalNavBarColor
+            insetsController.isAppearanceLightNavigationBars = originalLightIcons
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                window.isNavigationBarContrastEnforced = originalContrastEnforced
+            }
+        }
+    }
+}
 
 /**
  * Forces the system navigation bar fully transparent — with the contrast scrim disabled — for as

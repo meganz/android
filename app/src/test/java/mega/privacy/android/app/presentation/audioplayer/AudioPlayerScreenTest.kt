@@ -82,7 +82,8 @@ class AudioPlayerScreenTest {
     fun `test that player content is shown when uiState is Loading`() {
         setContent(uiState = AudioPlayerUiState.Loading)
 
-        composeTestRule.onNodeWithTag(AUDIO_PLAYER_CONTENT_TAG, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AUDIO_PLAYER_CONTENT_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -121,7 +122,8 @@ class AudioPlayerScreenTest {
     fun `test that player content is shown when uiState is Data`() {
         setContent(uiState = defaultData())
 
-        composeTestRule.onNodeWithTag(AUDIO_PLAYER_CONTENT_TAG, useUnmergedTree = true).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(AUDIO_PLAYER_CONTENT_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -142,7 +144,12 @@ class AudioPlayerScreenTest {
 
     @Test
     fun `test that item name is displayed as title when title is null`() {
-        setContent(uiState = defaultData(title = null, currentPlayingItemName = "podcast_episode_42.mp3"))
+        setContent(
+            uiState = defaultData(
+                title = null,
+                currentPlayingItemName = "podcast_episode_42.mp3"
+            )
+        )
 
         composeTestRule
             .onNodeWithText("podcast_episode_42.mp3", substring = true, useUnmergedTree = true)
@@ -265,6 +272,21 @@ class AudioPlayerScreenTest {
         composeTestRule.onNodeWithContentDescription("Playlist").performClick()
 
         verify(onPlaylistClicked).invoke()
+    }
+
+    @Test
+    fun `test that onScreenClicked is invoked when a non-interactive area of the screen is tapped`() {
+        val onScreenClicked = mock<() -> Unit>()
+        setContent(
+            uiState = defaultData(title = "Bohemian Rhapsody"),
+            onScreenClicked = onScreenClicked,
+        )
+
+        composeTestRule
+            .onNodeWithText("Bohemian Rhapsody", substring = true, useUnmergedTree = true)
+            .performClick()
+
+        verify(onScreenClicked).invoke()
     }
 
     // endregion

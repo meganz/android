@@ -15,7 +15,9 @@ import timber.log.Timber
 fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
     removeDestination: () -> Unit,
     navigateToVideoRoute: (NavKey) -> Unit,
+    navigateToAudioRoute: (NavKey) -> Unit,
     nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
+    nav3AudioPlayerRouteLauncher: Nav3AudioPlayerRouteLauncher,
     mediaPlayerIntentMapper: MediaPlayerIntentMapper,
     snackbarEventQueue: SnackbarEventQueue,
 ) {
@@ -47,9 +49,16 @@ fun EntryProviderScope<NavKey>.legacyMediaPlayerScreen(
 
             // Route to the Compose video player when the refactor flag is on; the transparent
             // launcher destination is replaced by the route (popUpTo inclusive) by the caller.
-            val composeRouteKey = nav3VideoPlayerRouteLauncher.routeOrNull(intent)
-            if (composeRouteKey != null) {
-                navigateToVideoRoute(composeRouteKey)
+            val composeVideoRouteKey = nav3VideoPlayerRouteLauncher.routeOrNull(intent)
+            if (composeVideoRouteKey != null) {
+                navigateToVideoRoute(composeVideoRouteKey)
+                return@LaunchedEffect
+            }
+
+            // Route to the Compose audio player when the revamp flag is on.
+            val composeAudioRouteKey = nav3AudioPlayerRouteLauncher.routeOrNull(intent)
+            if (composeAudioRouteKey != null) {
+                navigateToAudioRoute(composeAudioRouteKey)
                 return@LaunchedEffect
             }
 

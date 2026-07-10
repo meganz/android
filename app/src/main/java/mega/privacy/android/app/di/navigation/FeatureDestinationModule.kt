@@ -24,6 +24,9 @@ import mega.privacy.android.app.presentation.meeting.navigation.MeetingFeatureDe
 import mega.privacy.android.app.presentation.notification.navigation.NotificationsFeatureDestination
 import mega.privacy.android.app.presentation.psa.PsaFeatureDestinations
 import mega.privacy.android.app.presentation.settings.SettingsCameraUploadsFeatureDestination
+import mega.privacy.android.app.mediaplayer.AudioPlayerLaunchSourceHolder
+import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
+import mega.privacy.android.app.mediaplayer.navigation.AudioPlayerFeatureDestination
 import mega.privacy.android.app.presentation.videoplayer.VideoPlayerLaunchSourceHolder
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.presentation.videoplayer.navigation.VideoPlayerFeatureDestination
@@ -47,6 +50,7 @@ class FeatureDestinationModule {
         nodeContentUriIntentMapper: NodeContentUriIntentMapper,
         mediaPlayerIntentMapper: MediaPlayerIntentMapper,
         nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
+        nav3AudioPlayerRouteLauncher: Nav3AudioPlayerRouteLauncher,
         megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
         chatManagement: Lazy<ChatManagement>,
         setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
@@ -58,6 +62,7 @@ class FeatureDestinationModule {
             nodeContentUriIntentMapper,
             mediaPlayerIntentMapper,
             nav3VideoPlayerRouteLauncher,
+            nav3AudioPlayerRouteLauncher,
             megaChatRequestHandler,
             chatManagement,
             setChatVideoInDeviceUseCase,
@@ -75,6 +80,12 @@ class FeatureDestinationModule {
     fun provideVideoPlayerFeatureDestination(
         launchSourceHolder: VideoPlayerLaunchSourceHolder,
     ): FeatureDestination = VideoPlayerFeatureDestination(launchSourceHolder)
+
+    @Provides
+    @IntoSet
+    fun provideAudioPlayerFeatureDestination(
+        launchSourceHolder: AudioPlayerLaunchSourceHolder,
+    ): FeatureDestination = AudioPlayerFeatureDestination(launchSourceHolder)
 
     @Provides
     @IntoSet

@@ -24,7 +24,7 @@ sealed interface AudioPlayerUiState {
      * @property repeatMode Current repeat mode.
      * @property shuffleEnabled Whether shuffle mode is enabled.
      * @property isLoading Whether the player is buffering mid-playback.
-     * @property currentPlayingHandle Handle of the currently playing node.
+     * @property currentPlayingHandle Handle of the currently playing node, or `null` if no item is loaded.
      * @property currentPlayingItemName Name of the currently playing item.
      * @property hasPlaylist Whether there is more than one item in the queue.
      * @property currentAdapterType The adapter type from the launch intent.
@@ -40,7 +40,7 @@ sealed interface AudioPlayerUiState {
         val repeatMode: Int,
         val shuffleEnabled: Boolean,
         val isLoading: Boolean,
-        val currentPlayingHandle: Long,
+        val currentPlayingHandle: Long?,
         val currentPlayingItemName: String?,
         val hasPlaylist: Boolean,
         val currentAdapterType: Int,
