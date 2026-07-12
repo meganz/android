@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -40,8 +41,10 @@ class OfferPriceCardTest {
         composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_BADGE, useUnmergedTree = true)
             .assertExists()
         composeRule.onNodeWithText("Pro I").assertIsDisplayed()
-        composeRule.onNodeWithText("€9.99").assertIsDisplayed()
-        composeRule.onNodeWithText("€4.99/month").assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_PRICE)
+            .assertTextContains("€9.99", substring = true)
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_PRICE)
+            .assertTextContains("€4.99/month", substring = true)
         composeRule.onNodeWithText("Discount price for the first 12 months").assertIsDisplayed()
         composeRule.onNodeWithText("2 TB cloud storage").assertIsDisplayed()
         composeRule.onNodeWithText("2 TB transfer").assertIsDisplayed()
@@ -67,8 +70,10 @@ class OfferPriceCardTest {
         }
         composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_PRICE_PER_MONTH).assertExists()
         composeRule.onNodeWithText("€4.99/month").assertIsDisplayed()
-        composeRule.onNodeWithText("€59.88 charged yearly").assertIsDisplayed()
-        composeRule.onNodeWithText("€120").assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_PRICE)
+            .assertTextContains("€59.88 charged yearly", substring = true)
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_PRICE)
+            .assertTextContains("€120", substring = true)
     }
 
     @Test

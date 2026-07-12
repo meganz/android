@@ -19,10 +19,14 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.components.TEST_TAG_BILLING_PERIOD_MONTHLY
 import mega.privacy.android.feature.payment.components.TEST_TAG_BUY_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_CURRENT_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
+import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_COUNTDOWN
+import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_PRICE_CARD
+import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_PRICE_CARD_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_PLAN_PRICE_CARD_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_WHY_GO_PRO_CARD
@@ -34,6 +38,7 @@ import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_ADDITI
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FEATURE_ROW
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_COLUMN
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_MONTHLY_CHIP
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_OFFER_HEADER_BADGE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_PLAN_CARD
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_TITLE
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_REVAMP_UPGRADE_HINT
@@ -153,6 +158,48 @@ class UpgradeAccountScreenTest {
         subscriptionProI,
         subscriptionProII,
         subscriptionProIII
+    )
+
+    private val discount = CurrencyAmount(4.99F, Currency("EUR"))
+
+    private val subscriptionProIOffer = LocalisedSubscription(
+        monthlySubscription = subscriptionProIMonthly.copy(
+            discountedAmountMonthly = discount,
+            discountedPercentage = 50,
+            offerPeriod = OfferPeriod.Month(12),
+            discountName = "Black Friday",
+        ),
+        yearlySubscription = subscriptionProIYearly.copy(
+            discountedAmountMonthly = discount,
+            discountedPercentage = 50,
+            offerPeriod = OfferPeriod.Month(12),
+            discountName = "Black Friday",
+        ),
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val subscriptionProIIOffer = LocalisedSubscription(
+        monthlySubscription = subscriptionProIIMonthly.copy(
+            discountedAmountMonthly = discount,
+            discountedPercentage = 50,
+            offerPeriod = OfferPeriod.Month(12),
+            discountName = "Black Friday",
+        ),
+        yearlySubscription = subscriptionProIIYearly.copy(
+            discountedAmountMonthly = discount,
+            discountedPercentage = 50,
+            offerPeriod = OfferPeriod.Month(12),
+            discountName = "Black Friday",
+        ),
+        localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+        formattedSize = formattedSizeMapper,
+    )
+
+    private val singleOfferSubscriptionsList = listOf(
+        subscriptionProIOffer,
+        subscriptionProII,
+        subscriptionProIII,
     )
 
     @get:Rule
@@ -565,6 +612,106 @@ class UpgradeAccountScreenTest {
         composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}1").assertExists()
         composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}2").assertDoesNotExist()
     }
+
+    @Test
+    fun `test that single offer shows offer header and price card when flag enabled`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_HEADER_BADGE).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_OFFER_PRICE_CARD))
+            .assertExists()
+    }
+
+    @Test
+    fun `test that single offer content does not show the revamp title`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that offer countdown is not shown when offerValidUntil is null`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_COUNTDOWN).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that remaining plans are shown excluding the featured offer plan`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag("${TEST_TAG_REVAMP_PLAN_CARD}1"))
+            .assertExists()
+        composeRule.onNodeWithTag("${TEST_TAG_REVAMP_PLAN_CARD}2").assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that offer price card buy button calls onInAppCheckoutClick with the discounted plan`() {
+        var clickedSubscription: Subscription? = null
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            onBuyPlanClick = { clickedSubscription = it },
+            uiState = offerUiState(),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_OFFER_PRICE_CARD_BUTTON))
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD_BUTTON).performClick()
+
+        assert(clickedSubscription?.accountType == AccountType.PRO_I) {
+            "Offer buy button should purchase the discounted PRO_I plan"
+        }
+    }
+
+    @Test
+    fun `test that offer highlight falls back to revamp when there is no discount`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = null),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertExists()
+    }
+
+    @Test
+    fun `test that offer highlight falls back to revamp when there are multiple offers`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(
+                subscriptions = listOf(
+                    subscriptionProIOffer,
+                    subscriptionProIIOffer,
+                    subscriptionProIII,
+                ),
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertExists()
+    }
+
+    private fun offerUiState(
+        subscriptions: List<LocalisedSubscription> = singleOfferSubscriptionsList,
+    ) = UpgradeAccountState(
+        localisedSubscriptionsList = subscriptions,
+        isSubscriptionFeatureAvailable = true,
+        cheapestSubscriptionAvailable = subscriptionProII,
+    )
 
     private fun revampUiState(
         currentPlan: AccountType? = AccountType.PRO_I,

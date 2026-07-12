@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
+import mega.privacy.android.domain.entity.account.OfferPeriod
 import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
@@ -110,6 +111,42 @@ internal class UpgradeAccountPreviewProvider :
         val localisedSubscriptionsList: List<LocalisedSubscription> = listOf(
             subscriptionProLite,
             subscriptionProI,
+            subscriptionProII,
+            subscriptionProIII
+        )
+
+        val subscriptionProIOffer = LocalisedSubscription(
+            monthlySubscription = Subscription(
+                sku = "mega.android.pro1.onemonth",
+                accountType = AccountType.PRO_I,
+                handle = 1560943707714440503,
+                storage = 2048,
+                transfer = 2048,
+                amount = CurrencyAmount(9.99F, Currency("EUR")),
+                discountedAmountMonthly = CurrencyAmount(4.99F, Currency("EUR")),
+                discountedPercentage = 50,
+                offerPeriod = OfferPeriod.Month(12),
+                discountName = "Black Friday",
+            ),
+            yearlySubscription = Subscription(
+                sku = "mega.android.pro1.oneyear",
+                accountType = AccountType.PRO_I,
+                handle = 1560943707714440503,
+                storage = 2048,
+                transfer = 24576,
+                amount = CurrencyAmount(99.99F, Currency("EUR")),
+                discountedAmountMonthly = CurrencyAmount(4.99F, Currency("EUR")),
+                discountedPercentage = 50,
+                offerPeriod = OfferPeriod.Month(12),
+                discountName = "Black Friday",
+            ),
+            localisedPriceCurrencyCode = localisedPriceCurrencyCodeStringMapper,
+            formattedSize = formattedSizeMapper,
+        )
+
+        val singleOfferSubscriptionsList: List<LocalisedSubscription> = listOf(
+            subscriptionProLite,
+            subscriptionProIOffer,
             subscriptionProII,
             subscriptionProIII
         )

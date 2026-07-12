@@ -3151,6 +3151,37 @@
     <string name="settings_preference_option_per_folder">Per folder</string>
     <!-- Settings: preference option that uses the same sorting order or view mode for all folders -->
     <string name="settings_preference_option_all_folders">Same for all</string>
+    <!-- Badge shown above the featured plan on the subscription page when a single discount offer is active -->
+    <string name="subscription_offer_special_offer_badge">Special offer</string>
+    <!-- Buy button label on the featured offer card. %1$s is the plan name (e.g. "Pro I"), %2$s is the discounted price (e.g. "€4.99/month"). -->
+    <string name="subscription_offer_get_plan_button">Get %1$s for %2$s</string>
+    <!-- Discount description on the featured offer card when the offer lasts a number of months. %1$d is the number of months. -->
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="one">Discount price for the first month</item>
+        <item quantity="other">Discount price for the first %1$d months</item>
+    </plurals>
+    <!-- Discount description on the featured offer card when the offer lasts a number of years. %1$d is the number of years. -->
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="one">Discount price for the first year</item>
+        <item quantity="other">Discount price for the first %1$d years</item>
+    </plurals>
+    <!-- Caption above the offer countdown timer. %1$s is the expiry date, e.g. "July 11, 2026". -->
+    <string name="subscription_offer_countdown_valid_until">valid until %1$s</string>
+    <!-- Days unit label on the offer countdown timer. %1$d is the number of days shown above the label. -->
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="one">Day</item>
+        <item quantity="other">Days</item>
+    </plurals>
+    <!-- Hours unit label on the offer countdown timer. %1$d is the number of hours shown above the label. -->
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="one">Hour</item>
+        <item quantity="other">Hours</item>
+    </plurals>
+    <!-- Minutes unit label on the offer countdown timer. %1$d is the number of minutes shown above the label. -->
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="one">Minute</item>
+        <item quantity="other">Minutes</item>
+    </plurals>
     <!-- Title of the screen where the user reviews the pages they have scanned -->
     <string name="document_scanner_review_title">Review scan</string>
     <!-- Message shown on the scan review screen when no pages have been captured yet -->

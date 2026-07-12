@@ -63,6 +63,7 @@ import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.components.UpgradeAccountScreenTopBar
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
+import mega.privacy.android.feature.payment.model.OfferHighlight
 import mega.privacy.android.feature.payment.model.ProFeature
 import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
@@ -121,6 +122,13 @@ fun UpgradeAccountScreen(
     }
 
     val hasDiscount = remember(uiState) { uiState.hasDiscount() }
+
+    val offerHighlight = if (isSubscriptionRevampEnabled) {
+        uiState.offerHighlight(isMonthly, isUpgradeAccount)
+    } else {
+        OfferHighlight.None
+    }
+    val showOfferBanner = offerHighlight is OfferHighlight.Single
 
     // pre select discounted plan if user has discount and no plan is currently selected
     LaunchedEffect(uiState.localisedSubscriptionsList) {
@@ -249,23 +257,48 @@ fun UpgradeAccountScreen(
                         .fillMaxWidth()
                         .height(180.dp)
                         .testTag(TEST_TAG_IMAGE_HEADER),
-                    painter = painterResource(IconPackR.drawable.choose_account_type_header),
+                    painter = painterResource(
+                        if (showOfferBanner) {
+                            IconPackR.drawable.subscription_offer_banner
+                        } else {
+                            IconPackR.drawable.choose_account_type_header
+                        }
+                    ),
                     contentDescription = "Header Image",
                     contentScale = ContentScale.Crop
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
             if (isSubscriptionRevampEnabled) {
-                subscriptionRevampContent(
-                    uiState = uiState,
-                    isMonthly = isMonthly,
-                    onMonthlyChange = { isMonthly = it },
-                    locale = locale,
-                    isUpgradeAccount = isUpgradeAccount,
-                    onInAppCheckoutClick = onInAppCheckoutClick,
-                    onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
-                    onPricingPageClick = onPricingPageClick,
-                )
+                when (offerHighlight) {
+                    is OfferHighlight.Single -> subscriptionOfferContent(
+                        uiState = uiState,
+                        offerSubscription = offerHighlight.subscription,
+                        isMonthly = isMonthly,
+                        onMonthlyChange = { isMonthly = it },
+                        locale = locale,
+                        context = context,
+                        isUpgradeAccount = isUpgradeAccount,
+                        onInAppCheckoutClick = onInAppCheckoutClick,
+                        onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
+                        onPricingPageClick = onPricingPageClick,
+                    )
+
+                    // TODO: render a dedicated multiple-offer layout for OfferHighlight.Multiple.
+                    //  Until then multiple concurrent offers use the standard revamp layout.
+                    is OfferHighlight.Multiple,
+                    OfferHighlight.None,
+                        -> subscriptionRevampContent(
+                        uiState = uiState,
+                        isMonthly = isMonthly,
+                        onMonthlyChange = { isMonthly = it },
+                        locale = locale,
+                        isUpgradeAccount = isUpgradeAccount,
+                        onInAppCheckoutClick = onInAppCheckoutClick,
+                        onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
+                        onPricingPageClick = onPricingPageClick,
+                    )
+                }
             } else {
                 item("get_more_with_pro_plan") {
                     MegaText(
@@ -471,6 +504,31 @@ internal fun UpgradeAccountScreenRevampPreview(
             ),
             isNewCreationAccount = false,
             isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            onInAppCheckoutClick = { },
+            onFreePlanClicked = {},
+            maybeLaterClicked = {},
+            onBack = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+internal fun UpgradeAccountScreenSingleOfferPreview() {
+    AndroidTheme(isSystemInDarkTheme()) {
+        UpgradeAccountScreen(
+            uiState = UpgradeAccountState(
+                localisedSubscriptionsList = UpgradeAccountPreviewProvider.singleOfferSubscriptionsList,
+                isSubscriptionFeatureAvailable = true,
+                cheapestSubscriptionAvailable = UpgradeAccountPreviewProvider.subscriptionProLite,
+            ),
+            accountStorageUiState = AccountStorageUIState(
+                baseStorage = 15L * 1024 * 1024 * 1024,
+                totalStorage = 100L * 1024 * 1024 * 1024,
+            ),
+            isNewCreationAccount = false,
+            isUpgradeAccount = false,
             isSubscriptionRevampEnabled = true,
             onInAppCheckoutClick = { },
             onFreePlanClicked = {},

@@ -17,6 +17,8 @@ import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
  * @property subscriptionStatus current subscription status (VALID/INVALID/NONE), null if unknown
  * @property subscriptionRenewTime renewal timestamp of the current subscription in seconds, null if unknown
  * @property proExpirationTime expiration timestamp of the current Pro plan in seconds, null if unknown
+ * @property offerValidUntil expiry timestamp of the active discount offer in seconds, null when there is no
+ * time-limited offer. Drives the offer countdown; currently always null until surfaced from the SDK/backend.
  * @constructor Create default Upgrade Account state
  */
 data class UpgradeAccountState(
@@ -30,6 +32,7 @@ data class UpgradeAccountState(
     val proExpirationTime: Long? = null,
     val userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
     val isSubscriptionFeatureAvailable: Boolean? = null,
+    val offerValidUntil: Long? = null,
 ) {
     /**
      * Whether the current subscription is an active recurring subscription that renews
