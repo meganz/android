@@ -11,7 +11,6 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.search.SensitivityFilterOption
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFolderTypeDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
 import org.junit.jupiter.api.BeforeAll
@@ -33,15 +32,15 @@ class FetchNodesByIdInChunkUseCaseTest {
 
     private val nodeRepository = mock<NodeRepository>()
     private val getFolderTypeDataUseCase = mock<GetFolderTypeDataUseCase>()
-    private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
+
+    private val sortOrder = SortOrder.ORDER_DEFAULT_ASC
 
     @BeforeAll
     fun setUp() {
         underTest = FetchNodesByIdInChunkUseCase(
             nodeRepository = nodeRepository,
             getFolderTypeDataUseCase = getFolderTypeDataUseCase,
-            getCloudSortOrder = getCloudSortOrder,
             containsMediaItemUseCase = containsMediaItemUseCase,
         )
     }
@@ -51,7 +50,6 @@ class FetchNodesByIdInChunkUseCaseTest {
         reset(
             nodeRepository,
             getFolderTypeDataUseCase,
-            getCloudSortOrder,
             containsMediaItemUseCase,
         )
     }
@@ -60,7 +58,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     fun `test that invoke emits PartiallyLoaded state when repository emits hasMore true`() =
         runTest {
             val nodes = listOf(mock<TypedNode>())
-            whenever(getCloudSortOrder()).thenReturn(mock())
             whenever(getFolderTypeDataUseCase()).thenReturn(mock())
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             whenever(
@@ -73,7 +70,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 )
             ).thenReturn(flowOf(Pair(nodes, true)))
 
-            underTest(NodeId(1L)).test {
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
                 val result = awaitItem()
                 assertThat(result.loadingState).isEqualTo(NodesLoadingState.PartiallyLoaded)
                 awaitComplete()
@@ -84,7 +81,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     fun `test that invoke emits FullyLoaded state when repository emits hasMore false`() =
         runTest {
             val nodes = listOf(mock<TypedNode>())
-            whenever(getCloudSortOrder()).thenReturn(mock())
             whenever(getFolderTypeDataUseCase()).thenReturn(mock())
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             whenever(
@@ -97,7 +93,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 )
             ).thenReturn(flowOf(Pair(nodes, false)))
 
-            underTest(NodeId(1L)).test {
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
                 val result = awaitItem()
                 assertThat(result.loadingState).isEqualTo(NodesLoadingState.FullyLoaded)
                 awaitComplete()
@@ -108,7 +104,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     fun `test that invoke emits correct hasMediaItems from containsMediaItemUseCase`() =
         runTest {
             val nodes = listOf(mock<TypedNode>())
-            whenever(getCloudSortOrder()).thenReturn(mock())
             whenever(getFolderTypeDataUseCase()).thenReturn(mock())
             whenever(containsMediaItemUseCase(nodes)).thenReturn(true)
             whenever(
@@ -121,7 +116,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 )
             ).thenReturn(flowOf(Pair(nodes, false)))
 
-            underTest(NodeId(1L)).test {
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
                 val result = awaitItem()
                 assertThat(result.hasMediaItems).isTrue()
                 awaitComplete()
@@ -131,7 +126,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     @Test
     fun `test that invoke emits typed nodes from repository`() = runTest {
         val nodes = listOf(mock<TypedNode>(), mock<TypedNode>())
-        whenever(getCloudSortOrder()).thenReturn(mock())
         whenever(getFolderTypeDataUseCase()).thenReturn(mock())
         whenever(containsMediaItemUseCase(any())).thenReturn(false)
         whenever(
@@ -144,7 +138,7 @@ class FetchNodesByIdInChunkUseCaseTest {
             )
         ).thenReturn(flowOf(Pair(nodes, false)))
 
-        underTest(NodeId(1L)).test {
+        underTest(NodeId(1L), sortOrder = sortOrder).test {
             val result = awaitItem()
             assertThat(result.typedNodes).isEqualTo(nodes)
             awaitComplete()
@@ -154,7 +148,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     @Test
     fun `test that invoke passes initialBatchSize to repository`() = runTest {
         val batchSize = 200
-        whenever(getCloudSortOrder()).thenReturn(mock())
         whenever(getFolderTypeDataUseCase()).thenReturn(mock())
         whenever(containsMediaItemUseCase(any())).thenReturn(false)
         whenever(
@@ -167,7 +160,7 @@ class FetchNodesByIdInChunkUseCaseTest {
             )
         ).thenReturn(flowOf(Pair(emptyList(), false)))
 
-        underTest(nodeId = NodeId(1L), initialBatchSize = batchSize).test {
+        underTest(nodeId = NodeId(1L), initialBatchSize = batchSize, sortOrder = sortOrder).test {
             awaitItem()
             awaitComplete()
         }
@@ -182,9 +175,8 @@ class FetchNodesByIdInChunkUseCaseTest {
     }
 
     @Test
-    fun `test that invoke passes sort order from getCloudSortOrder to repository`() = runTest {
-        val sortOrder = SortOrder.ORDER_DEFAULT_ASC
-        whenever(getCloudSortOrder()).thenReturn(sortOrder)
+    fun `test that invoke passes the provided sort order to repository`() = runTest {
+        val expectedSortOrder = SortOrder.ORDER_SIZE_ASC
         whenever(getFolderTypeDataUseCase()).thenReturn(mock())
         whenever(containsMediaItemUseCase(any())).thenReturn(false)
         whenever(
@@ -197,14 +189,14 @@ class FetchNodesByIdInChunkUseCaseTest {
             )
         ).thenReturn(flowOf(Pair(emptyList(), false)))
 
-        underTest(NodeId(1L)).test {
+        underTest(NodeId(1L), sortOrder = expectedSortOrder).test {
             awaitItem()
             awaitComplete()
         }
 
         verify(nodeRepository).getTypedNodesByIdInChunks(
             nodeId = any(),
-            order = eq(sortOrder),
+            order = eq(expectedSortOrder),
             initialBatchSize = any(),
             folderTypeData = anyOrNull(),
             sensitivityFilter = anyOrNull(),
@@ -215,7 +207,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     fun `test that invoke passes folder type data from getFolderTypeDataUseCase to repository`() =
         runTest {
             val folderTypeData = mock<mega.privacy.android.domain.entity.FolderTypeData>()
-            whenever(getCloudSortOrder()).thenReturn(mock())
             whenever(getFolderTypeDataUseCase()).thenReturn(folderTypeData)
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             whenever(
@@ -228,7 +219,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 )
             ).thenReturn(flowOf(Pair(emptyList(), false)))
 
-            underTest(NodeId(1L)).test {
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
                 awaitItem()
                 awaitComplete()
             }
@@ -244,7 +235,6 @@ class FetchNodesByIdInChunkUseCaseTest {
 
     @Test
     fun `test that invoke emits Failed state when repository throws exception`() = runTest {
-        whenever(getCloudSortOrder()).thenReturn(mock())
         whenever(getFolderTypeDataUseCase()).thenReturn(mock())
         whenever(
             nodeRepository.getTypedNodesByIdInChunks(
@@ -256,7 +246,7 @@ class FetchNodesByIdInChunkUseCaseTest {
             )
         ).thenReturn(flow { throw RuntimeException("error") })
 
-        underTest(NodeId(1L)).test {
+        underTest(NodeId(1L), sortOrder = sortOrder).test {
             val result = awaitItem()
             assertThat(result.loadingState).isEqualTo(NodesLoadingState.Failed)
             assertThat(result.hasMediaItems).isFalse()
@@ -267,7 +257,6 @@ class FetchNodesByIdInChunkUseCaseTest {
 
     @Test
     fun `test that invoke uses default initialBatchSize of 500`() = runTest {
-        whenever(getCloudSortOrder()).thenReturn(mock())
         whenever(getFolderTypeDataUseCase()).thenReturn(mock())
         whenever(containsMediaItemUseCase(any())).thenReturn(false)
         whenever(
@@ -280,7 +269,7 @@ class FetchNodesByIdInChunkUseCaseTest {
             )
         ).thenReturn(flowOf(Pair(emptyList(), false)))
 
-        underTest(NodeId(1L)).test {
+        underTest(NodeId(1L), sortOrder = sortOrder).test {
             awaitItem()
             awaitComplete()
         }
@@ -297,7 +286,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     @Test
     fun `test that invoke forwards NonSensitiveOnly filter to repository when excludeSensitives is true`() =
         runTest {
-            whenever(getCloudSortOrder()).thenReturn(mock())
             whenever(getFolderTypeDataUseCase()).thenReturn(mock())
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             whenever(
@@ -313,6 +301,7 @@ class FetchNodesByIdInChunkUseCaseTest {
             underTest(
                 nodeId = NodeId(1L),
                 excludeSensitives = true,
+                sortOrder = sortOrder,
             ).test {
                 awaitItem()
                 awaitComplete()
@@ -330,7 +319,6 @@ class FetchNodesByIdInChunkUseCaseTest {
     @Test
     fun `test that invoke passes null filter to repository when excludeSensitives defaults to false`() =
         runTest {
-            whenever(getCloudSortOrder()).thenReturn(mock())
             whenever(getFolderTypeDataUseCase()).thenReturn(mock())
             whenever(containsMediaItemUseCase(any())).thenReturn(false)
             whenever(
@@ -343,7 +331,7 @@ class FetchNodesByIdInChunkUseCaseTest {
                 )
             ).thenReturn(flowOf(Pair(emptyList(), false)))
 
-            underTest(NodeId(1L)).test {
+            underTest(NodeId(1L), sortOrder = sortOrder).test {
                 awaitItem()
                 awaitComplete()
             }

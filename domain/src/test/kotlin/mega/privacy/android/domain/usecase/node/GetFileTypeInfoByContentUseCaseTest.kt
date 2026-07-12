@@ -5,9 +5,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeContentUri
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.GetLocalFileForNodeUseCase
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.file.GetPartialDataBytesFromUrlUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.streaming.GetStreamingUriStringForNode
@@ -38,6 +41,8 @@ class GetFileTypeInfoByContentUseCaseTest {
     private val getStreamingUriStringForNode = mock<GetStreamingUriStringForNode>()
     private val getPartialDataBytesFromUrlUseCase = mock<GetPartialDataBytesFromUrlUseCase>()
     private val fileSystemRepository = mock<FileSystemRepository>()
+    private val getNodeContentUriUseCase = mock<GetNodeContentUriUseCase>()
+    private val getLocalFolderLinkFromMegaApiUseCase = mock<GetLocalFolderLinkFromMegaApiUseCase>()
 
     private val headerSize = GetFileTypeInfoByContentUseCase.HEADER_SIZE_BYTES
 
@@ -51,6 +56,8 @@ class GetFileTypeInfoByContentUseCaseTest {
             getStreamingUriStringForNode = getStreamingUriStringForNode,
             getPartialDataBytesFromUrlUseCase = getPartialDataBytesFromUrlUseCase,
             fileSystemRepository = fileSystemRepository,
+            getNodeContentUriUseCase = getNodeContentUriUseCase,
+            getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
         )
     }
 
@@ -64,11 +71,15 @@ class GetFileTypeInfoByContentUseCaseTest {
             getStreamingUriStringForNode,
             getPartialDataBytesFromUrlUseCase,
             fileSystemRepository,
+            getNodeContentUriUseCase,
+            getLocalFolderLinkFromMegaApiUseCase,
         )
     }
 
-    private fun stubNode() = mock<TypedFileNode>().stub {
+    private fun stubNode(handle: Long = 1L, size: Long = 100L) = mock<TypedFileNode>().stub {
         on { type } doReturn UnMappedFileTypeInfo("")
+        on { id } doReturn NodeId(handle)
+        on { this.size } doReturn size
     }
 
     @Test
@@ -160,6 +171,21 @@ class GetFileTypeInfoByContentUseCaseTest {
     }
 
     @Test
+    fun `test that an empty file is reported as text so it stays previewable`() = runTest {
+        val node = stubNode(size = 0L)
+
+        val result = underTest(node)
+
+        assertThat(result).isEqualTo(TextFileTypeInfo("text/plain", ""))
+        verifyNoInteractions(
+            getLocalFileForNodeUseCase,
+            getStreamingUriStringForNode,
+            getPartialDataBytesFromUrlUseCase,
+            fileSystemRepository,
+        )
+    }
+
+    @Test
     fun `test that null is returned when the streaming url is blank`() = runTest {
         val node = stubNode()
         whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
@@ -167,5 +193,90 @@ class GetFileTypeInfoByContentUseCaseTest {
 
         assertThat(underTest(node)).isNull()
         verifyNoInteractions(getPartialDataBytesFromUrlUseCase)
+    }
+
+    @Test
+    fun `test that a folder link child reads the header from the authorized main api url`() =
+        runTest {
+            val node = stubNode(handle = 55L)
+            val url = "http://localhost/authorized"
+            val header = byteArrayOf(1, 2, 3)
+            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+            whenever(getLocalFolderLinkFromMegaApiUseCase(55L)).thenReturn(url)
+            whenever(getPartialDataBytesFromUrlUseCase(URL(url), headerSize)).thenReturn(header)
+            whenever(fileSystemRepository.getFileTypeInfoFromContent(header, 0))
+                .thenReturn(TextFileTypeInfo("text/plain", ""))
+
+            val result = underTest(node, isLinkNode = true)
+
+            assertThat(result).isEqualTo(TextFileTypeInfo("text/plain", ""))
+            verifyNoInteractions(getNodeContentUriUseCase, getStreamingUriStringForNode)
+        }
+
+    @Test
+    fun `test that a file link falls back to the node content uri when not in the folder api`() =
+        runTest {
+            val node = stubNode(handle = 77L)
+            val url = "http://localhost/filelink"
+            val header = byteArrayOf(4, 5, 6)
+            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+            whenever(getLocalFolderLinkFromMegaApiUseCase(77L)).thenReturn(null)
+            whenever(getNodeContentUriUseCase(node))
+                .thenReturn(NodeContentUri.RemoteContentUri(url, false))
+            whenever(getPartialDataBytesFromUrlUseCase(URL(url), headerSize)).thenReturn(header)
+            whenever(fileSystemRepository.getFileTypeInfoFromContent(header, 0))
+                .thenReturn(TextFileTypeInfo("text/plain", ""))
+
+            val result = underTest(node, isLinkNode = true)
+
+            assertThat(result).isEqualTo(TextFileTypeInfo("text/plain", ""))
+            verifyNoInteractions(getStreamingUriStringForNode)
+        }
+
+    @Test
+    fun `test that the main streaming server is started and stopped for a link header read`() =
+        runTest {
+            val node = stubNode(handle = 55L)
+            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+            whenever(httpServerIsRunning()).thenReturn(0)
+            whenever(getLocalFolderLinkFromMegaApiUseCase(55L)).thenReturn("http://localhost/a")
+            whenever(getPartialDataBytesFromUrlUseCase(any(), any())).thenReturn(byteArrayOf(1))
+            whenever(fileSystemRepository.getFileTypeInfoFromContent(any(), any()))
+                .thenReturn(TextFileTypeInfo("text/plain", ""))
+
+            underTest(node, isLinkNode = true)
+
+            verify(startStreamingServer).invoke()
+            verify(stopStreamingServer).invoke()
+        }
+
+    @Test
+    fun `test that the main streaming server is not stopped when it was already running`() =
+        runTest {
+            val node = stubNode(handle = 55L)
+            whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+            whenever(httpServerIsRunning()).thenReturn(8080)
+            whenever(getLocalFolderLinkFromMegaApiUseCase(55L)).thenReturn("http://localhost/a")
+            whenever(getPartialDataBytesFromUrlUseCase(any(), any())).thenReturn(byteArrayOf(1))
+            whenever(fileSystemRepository.getFileTypeInfoFromContent(any(), any()))
+                .thenReturn(TextFileTypeInfo("text/plain", ""))
+
+            underTest(node, isLinkNode = true)
+
+            verifyNoInteractions(startStreamingServer, stopStreamingServer)
+        }
+
+    @Test
+    fun `test that a link node does not use the generic streaming path`() = runTest {
+        val node = stubNode(handle = 55L)
+        whenever(getLocalFileForNodeUseCase(node)).thenReturn(null)
+        whenever(getLocalFolderLinkFromMegaApiUseCase(55L)).thenReturn("http://localhost/a")
+        whenever(getPartialDataBytesFromUrlUseCase(any(), any())).thenReturn(byteArrayOf(1))
+        whenever(fileSystemRepository.getFileTypeInfoFromContent(any(), any()))
+            .thenReturn(TextFileTypeInfo("text/plain", ""))
+
+        underTest(node, isLinkNode = true)
+
+        verifyNoInteractions(getStreamingUriStringForNode)
     }
 }

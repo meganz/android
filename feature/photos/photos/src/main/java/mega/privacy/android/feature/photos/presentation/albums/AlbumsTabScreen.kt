@@ -155,11 +155,13 @@ internal fun AlbumsTabScreen(
                         userAlbum?.let { uiState.selectedUserAlbums.contains(it) } ?: false
                     val isSensitive =
                         uiState.showHiddenItems && (album.cover?.isSensitive == true || album.cover?.isSensitiveInherited == true)
+                    val isEnabled = !uiState.isInSelectionMode || userAlbum != null
 
                     AlbumGridItem(
                         modifier = Modifier
                             .testTag("$ALBUMS_SCREEN_ALBUM_GRID_ITEM:${index}")
                             .combinedClickable(
+                                enabled = isEnabled,
                                 onClick = {
                                     if (uiState.isInSelectionMode) {
                                         userAlbum?.let(onAlbumSelectionToggle)
@@ -186,7 +188,8 @@ internal fun AlbumsTabScreen(
                         errorPlaceholder = placeholder,
                         isExported = album.isExported,
                         isSelected = isSelected,
-                        isSensitive = isSensitive
+                        isSensitive = isSensitive,
+                        enabled = isEnabled
                     )
                 }
             }

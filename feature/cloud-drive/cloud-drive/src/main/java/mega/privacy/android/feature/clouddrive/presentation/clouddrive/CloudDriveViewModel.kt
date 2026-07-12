@@ -57,6 +57,11 @@ import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.node.HandleToBase64UseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.clouddrive.FetchNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -126,6 +131,11 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val monitorAccountInactivityUseCase: MonitorAccountInactivityUseCase,
     private val acknowledgeLastPurgeUseCase: AcknowledgeLastPurgeUseCase,
     private val suppressPurgeTimestampUseCase: SuppressPurgeTimestampUseCase,
+    private val handleToBase64UseCase: HandleToBase64UseCase,
+    private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase,
+    private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase,
+    private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase,
+    private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase,
     @Assisted private val args: Args,
 ) : ViewModel() {
 
@@ -170,55 +180,82 @@ class CloudDriveViewModel @AssistedInject constructor(
             }
             .distinctUntilChanged()
             .flatMapLatest { (isHiddenNodesEnabled, excludeSensitives) ->
-                combine(
-                    monitorNodeUpdatesFlow.filterNot { it == NodeChanges.Remove }
-                        .map { getLatestTitle() to hasWritePermission(folderId) }
-                        .onStart { emit(getLatestTitle() to hasWritePermission(folderId)) },
-                    fetchNodesByIdInChunkUseCase(folderId, excludeSensitives = excludeSensitives)
-                        .catch { Timber.e(it) }
-                        .takeWhileInclusive { it.loadingState == NodesLoadingState.PartiallyLoaded }
-                        .onCompletion {
-                            emitAll(getMonitoredNodesFlow(folderId, excludeSensitives))
-                        },
-                    flowOf(runCatching { getContactVerificationWarningUseCase() }.getOrDefault(false))
-                ) { (title, hasWritePermission), fetchResult, contactVerificationEnabled ->
-                    val nodeUiItems = nodeViewItemMapper(
-                        nodeList = fetchResult.typedNodes,
-                        nodeSourceType = args.nodeSourceType,
-                        highlightedNodeId = args.highlightedNodeId,
-                        highlightedNames = args.highlightedNodeNames,
-                        isHiddenNodesEnabled = isHiddenNodesEnabled,
-                        isContactVerificationOn = contactVerificationEnabled,
-                    )
+                monitorSortOrderFlow.flatMapLatest { sortOrder ->
+                    combine(
+                        monitorNodeUpdatesFlow.filterNot { it == NodeChanges.Remove }
+                            .map { getLatestTitle() to hasWritePermission(folderId) }
+                            .onStart { emit(getLatestTitle() to hasWritePermission(folderId)) },
+                        fetchNodesByIdInChunkUseCase(
+                            folderId,
+                            excludeSensitives = excludeSensitives,
+                            sortOrder = sortOrder,
+                        )
+                            .catch { Timber.e(it) }
+                            .takeWhileInclusive { it.loadingState == NodesLoadingState.PartiallyLoaded }
+                            .onCompletion {
+                                emitAll(getMonitoredNodesFlow(folderId, excludeSensitives, sortOrder))
+                            },
+                        flowOf(runCatching { getContactVerificationWarningUseCase() }.getOrDefault(false))
+                    ) { (title, hasWritePermission), fetchResult, contactVerificationEnabled ->
+                        val nodeUiItems = nodeViewItemMapper(
+                            nodeList = fetchResult.typedNodes,
+                            nodeSourceType = args.nodeSourceType,
+                            highlightedNodeId = args.highlightedNodeId,
+                            highlightedNames = args.highlightedNodeNames,
+                            isHiddenNodesEnabled = isHiddenNodesEnabled,
+                            isContactVerificationOn = contactVerificationEnabled,
+                        )
 
-                    StateData(
-                        currentFolderId = folderId,
-                        title = title,
-                        hasWritePermission = hasWritePermission,
-                        loadingState = fetchResult.loadingState,
-                        hasMediaItems = fetchResult.hasMediaItems,
-                        nodeUiItems = nodeUiItems
-                    )
+                        StateData(
+                            currentFolderId = folderId,
+                            title = title,
+                            hasWritePermission = hasWritePermission,
+                            loadingState = fetchResult.loadingState,
+                            hasMediaItems = fetchResult.hasMediaItems,
+                            nodeUiItems = nodeUiItems
+                        )
+                    }
                 }
             }
     }
 
     private val currentFolderIdFlow: Flow<NodeId> by lazy(LazyThreadSafetyMode.NONE) {
-        flow {
-            emit(
-                if (args.isRootNode()) {
-                    getRootNodeIdUseCase() ?: args.currentFolderId
-                } else {
-                    args.currentFolderId
-                }
-            )
-        }.shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+        flow { emit(currentFolderId()) }
+            .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
+    }
+
+    private suspend fun currentFolderId(): NodeId =
+        if (args.isRootNode()) getRootNodeIdUseCase() ?: args.currentFolderId else args.currentFolderId
+
+    /**
+     * The view type to apply to the current folder: the per-folder value when the feature is on,
+     * otherwise the global view type.
+     */
+    private fun effectiveViewTypeFlow(folderKey: String): Flow<ViewType> =
+        monitorFolderViewTypeUseCase(folderKey, orElse = monitorViewTypeUseCase())
+
+    /**
+     * The effective sort order for this (fixed) folder as state: the per-folder value when the
+     * feature is on, otherwise the global cloud sort order. Exposes [StateFlow.value] for the fetch.
+     */
+    private val monitorSortOrderFlow: StateFlow<SortOrder> by lazy(LazyThreadSafetyMode.NONE) {
+        currentFolderIdFlow
+            .flatMapLatest { folderId ->
+                monitorFolderSortOrderUseCase(
+                    folderKey = handleToBase64UseCase(folderId.longValue),
+                    orElse = monitorSortCloudOrderUseCase().filterNotNull(),
+                )
+            }
+            .distinctUntilChanged()
+            .catch { Timber.e(it) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, SortOrder.ORDER_DEFAULT_ASC)
     }
 
     private fun stateUpdatesFlow(): Flow<StateUpdates> =
         currentFolderIdFlow.flatMapLatest { folderId ->
+            val folderKey = handleToBase64UseCase(folderId.longValue)
             combine(
-                monitorViewTypeUseCase()
+                effectiveViewTypeFlow(folderKey)
                     .catch { Timber.e(it) },
                 monitorFolderUpdatesFlow.mapLatest {
                     shouldShowContactNotVerifiedBanner(folderId)
@@ -260,20 +297,11 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val accountInactivityFlow: Flow<AccountInactivity?> =
         monitorAccountInactivityUseCase().catch { Timber.e(it) }
 
-    private val monitorSortOrderFlow: SharedFlow<SortOrder> by lazy(LazyThreadSafetyMode.NONE) {
-        monitorSortCloudOrderUseCase()
-            .filterNotNull()
-            .catch { Timber.e(it) }
-            .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
-    }
-
     private val monitorFolderUpdatesFlow by lazy(LazyThreadSafetyMode.NONE) {
-        merge(
-            monitorNodeUpdatesFlow
-                .filterNot { it == NodeChanges.Remove }
-                .map { Unit },
-            monitorSortOrderFlow.map { Unit }
-        ).onStart { emit(Unit) }
+        monitorNodeUpdatesFlow
+            .filterNot { it == NodeChanges.Remove }
+            .map { Unit }
+            .onStart { emit(Unit) }
             .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
     }
 
@@ -317,11 +345,13 @@ class CloudDriveViewModel @AssistedInject constructor(
     private fun getMonitoredNodesFlow(
         folderId: NodeId,
         excludeSensitives: Boolean,
+        sortOrder: SortOrder,
     ) = monitorFolderUpdatesFlow
         .mapLatest {
             val nodes = getFileBrowserNodeChildrenUseCase(
                 parentHandle = folderId.longValue,
                 excludeSensitives = excludeSensitives,
+                sortOrder = sortOrder,
             )
             val hasMediaItems = containsMediaItemUseCase(nodes)
 
@@ -348,12 +378,20 @@ class CloudDriveViewModel @AssistedInject constructor(
         viewModelScope.launch {
             runCatching {
                 val order = nodeSortConfigurationUiMapper(sortConfiguration)
-                setCloudSortOrderUseCase(order)
+                setFolderSortOrderUseCase(
+                    folderKey = handleToBase64UseCase(currentFolderId().longValue),
+                    sortOrder = order,
+                    currentViewType = currentViewType(),
+                    orElse = { setCloudSortOrderUseCase(it) },
+                )
             }.onFailure {
                 Timber.e(it, "Failed to set cloud sort order")
             }
         }
     }
+
+    private fun currentViewType(): ViewType =
+        (uiState.value as? CloudDriveUiState.Data)?.currentViewType ?: ViewType.LIST
 
     /**
      * Process CloudDriveAction and call relevant methods
@@ -386,7 +424,12 @@ class CloudDriveViewModel @AssistedInject constructor(
     private fun onChangeViewTypeClicked(newViewType: ViewType) {
         viewModelScope.launch {
             runCatching {
-                setViewTypeUseCase(newViewType)
+                setFolderViewTypeUseCase(
+                    folderKey = handleToBase64UseCase(currentFolderId().longValue),
+                    viewType = newViewType,
+                    currentSortOrder = monitorSortOrderFlow.value,
+                    orElse = { setViewTypeUseCase(it) },
+                )
             }.onFailure {
                 Timber.e(it, "Failed to change view type")
             }.onSuccess {

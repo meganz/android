@@ -85,11 +85,13 @@ interface CacheFolderGateway {
     suspend fun getPreviewDownloadPathForNode(): String
 
     /**
-     * Get the file preview download
+     * Get the file preview download, only if the cached copy still matches the current node.
      *
      * @param fileName Name of the file
+     * @param fileSize Size of the node, used to discard an outdated cached copy
+     * @param lastModifiedDate Modification time (in seconds) of the node, used to discard an outdated cached copy
      */
-    suspend fun getPreviewFile(fileName: String): File?
+    suspend fun getPreviewFile(fileName: String, fileSize: Long, lastModifiedDate: Long): File?
 
     /**
      * @return true if the path represents a file or folder in the device cache directory, false otherwise

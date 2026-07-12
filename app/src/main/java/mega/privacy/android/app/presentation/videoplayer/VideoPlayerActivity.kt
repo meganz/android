@@ -20,7 +20,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +28,6 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.withCreationCallback
-import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -44,7 +42,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.appstate.content.navigation.LegacyActivityScaffold
 import mega.privacy.android.app.appstate.content.navigation.NavigationResultManager
-import mega.privacy.android.app.appstate.global.snackbar.SnackbarEventsViewModel
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.MediaSessionHelper
@@ -200,9 +197,6 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
         Analytics.tracker.trackEvent(VideoPlayerScreenEvent)
         window.clearFlags(FLAG_TRANSLUCENT_STATUS or FLAG_TRANSLUCENT_NAVIGATION)
         enableEdgeToEdge()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            window.isNavigationBarContrastEnforced = false
-        }
         pipManager.initialize()
         setupImmersiveMode()
         exoPlayer = createPlayer()
@@ -211,9 +205,6 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
             val mode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by videoPlayerViewModelV2.uiState.collectAsStateWithLifecycle()
-            val snackbarEventsViewModel = hiltViewModel<SnackbarEventsViewModel>()
-            val snackbarEventsState by snackbarEventsViewModel.snackbarEventState
-                .collectAsStateWithLifecycle()
 
             val isFromLinkWithoutLogin = uiState.isFromLink && !uiState.isLoggedIn
             LegacyActivityScaffold(
@@ -240,15 +231,6 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
                             videoPlayerViewModelV2.updateSnackBarMessage(null)
                         }
                     }
-                    EventEffect(
-                        event = snackbarEventsState,
-                        onConsumed = snackbarEventsViewModel::consumeEvent,
-                        action = { event ->
-                            snackbarHostState.showAutoDurationSnackbar(
-                                event.attributes.message.orEmpty()
-                            )
-                        }
-                    )
                 },
             ) { navigationHandler, transferHandler ->
                 videoPlayerEntryProvider(

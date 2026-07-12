@@ -132,10 +132,10 @@ class LinkSettingsViewModel @AssistedInject constructor(
     }
 
     private fun update(transform: (LinkSettingsUiState) -> LinkSettingsUiState) =
-        _uiState.update { transform(it).withSaveEnabled() }
+        _uiState.update { transform(it).withComputedFlags() }
 
-    private fun LinkSettingsUiState.withSaveEnabled() =
-        copy(isSaveEnabled = isDirty && isValid && !isSaving)
+    private fun LinkSettingsUiState.withComputedFlags() =
+        copy(hasUnsavedChanges = isDirty, isSaveEnabled = isDirty && isValid && !isSaving)
 
     private val LinkSettingsUiState.isDirty: Boolean
         get() = isSeparateKeyEnabled || isExpiryEnabled || isPasswordEnabled ||

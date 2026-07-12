@@ -401,6 +401,33 @@ internal class FileFacadeTest {
         }
 
     @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "file:///data/user/0/mega.privacy.android.%61pp/databases/megapreferences.db",
+            "file:///data/data/mega.privacy.android.%61pp/files",
+            "file:///storage/emulated/0/..%2f..%2fdata/data/mega.privacy.android.app",
+            "file:///data//user/0/mega.privacy.android.app/databases/megapreferences.db",
+            "file:///data/user/0/./mega.privacy.android.app/files",
+        ]
+    )
+    fun `test that isMalformedPathFromExternalApp returns true when an encoded or non-canonical path resolves into the app private dir`(
+        path: String,
+    ) = runTest {
+        val result = underTest.isMalformedPathFromExternalApp(Intent.ACTION_SEND, path)
+
+        assertThat(result).isTrue()
+    }
+
+    @Test
+    fun `test that isMalformedPathFromExternalApp returns false when an encoded filename does not resolve into the app private dir`() =
+        runTest {
+            val path = "file:///storage/emulated/0/Download/my%20holiday%20photo.jpg"
+            val result = underTest.isMalformedPathFromExternalApp(Intent.ACTION_SEND, path)
+
+            assertThat(result).isFalse()
+        }
+
+    @ParameterizedTest
     @ValueSource(booleans = [true, false])
     fun `test that getFileDescriptor returns correct result from content resolver with correct permissions`(
         writePermission: Boolean,
@@ -442,6 +469,35 @@ internal class FileFacadeTest {
 
             assertThat(actual).containsExactly(expected)
         }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "/data/user/0/mega.privacy.android.app/databases/megapreferences",
+            "/data/data/mega.privacy.android.app/files",
+            "/data//user/0/mega.privacy.android.app/databases/megapreferences",
+            "/data/user/0/./mega.privacy.android.app/files",
+        ]
+    )
+    fun `test that getDocumentEntities filters out a file uri resolving into the app private dir`(
+        privatePath: String,
+    ) = runTest {
+        val privateUri = mock<Uri> {
+            on { scheme } doReturn "file"
+            on { path } doReturn privatePath
+        }
+        val safeUri = mock<Uri> {
+            on { scheme } doReturn "content"
+        }
+        val doc = mock<DocumentFile>()
+        val expected = mock<DocumentEntity>()
+        whenever(documentFileWrapper.fromUri(safeUri)) doReturn doc
+        whenever(documentFileMapper(doc, 0, 0)) doReturn expected
+
+        val actual = underTest.getDocumentEntities(listOf(privateUri, safeUri))
+
+        assertThat(actual).containsExactly(expected)
+    }
 
     @Test
     fun `test that getDocumentEntities returns the mapped entities from a list of MIUI gallery raw uris`() =

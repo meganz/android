@@ -1,62 +1,102 @@
 package mega.privacy.android.app.presentation.tags
 
-import mega.privacy.android.core.R as CoreR
-import mega.privacy.android.shared.resources.R as sharedR
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import kotlinx.collections.immutable.persistentListOf
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.chip.DefaultChipStyle
+import mega.android.core.ui.components.chip.MegaChip
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.components.inputfields.HelpTextInfo
+import mega.android.core.ui.components.inputfields.TextInputField
+import mega.android.core.ui.components.toolbar.AppBarNavigationType
+import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.meeting.chat.extension.getInfo
 import mega.privacy.android.app.presentation.tags.TagsActivity.Companion.MAX_TAGS_PER_NODE
-import mega.privacy.android.shared.original.core.ui.controls.appbar.AppBarType
-import mega.privacy.android.shared.original.core.ui.controls.appbar.MegaAppBar
-import mega.privacy.android.shared.original.core.ui.controls.banners.WarningBanner
-import mega.privacy.android.shared.original.core.ui.controls.chip.MegaChip
-import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
-import mega.privacy.android.shared.original.core.ui.controls.lists.MenuActionListTile
-import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
-import mega.privacy.android.shared.original.core.ui.controls.textfields.GenericDescriptionTextField
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.textfields.transformations.PrefixTransformation
-import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
-import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
-import mega.android.core.ui.theme.values.TextColor
-import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.NodeInfoTagsAddedEvent
 import mega.privacy.mobile.analytics.event.NodeInfoTagsRemovedEvent
 
 /**
+ * Stateful entry point for the tags screen: creates the [TagsViewModel] for [nodeHandle] and hosts
+ * the [TagsScreen]. Shared by both the legacy [TagsActivity] and the Navigation3 tags destination.
+ *
+ * @param nodeHandle the node handle whose tags are shown/edited
+ * @param onBackPressed invoked when the back navigation is triggered
+ */
+@Composable
+fun TagsRoute(
+    nodeHandle: Long,
+    onBackPressed: () -> Unit,
+) {
+    val viewModel = hiltViewModel<TagsViewModel, TagsViewModel.Factory> {
+        it.create(nodeHandle)
+    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    TagsScreen(
+        consumeInfoMessage = viewModel::consumeInfoMessage,
+        validateTagName = viewModel::validateTagName,
+        addOrRemoveTag = viewModel::addOrRemoveTag,
+        onBackPressed = onBackPressed,
+        consumeMaxTagsError = viewModel::consumeMaxTagsError,
+        uiState = uiState,
+        consumeTagsUpdated = viewModel::consumeTagsUpdatedEvent,
+    )
+}
+
+/**
  * Tags screen composable.
  */
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TagsScreen(
     consumeInfoMessage: () -> Unit,
@@ -67,47 +107,46 @@ fun TagsScreen(
     uiState: TagsUiState,
     consumeTagsUpdated: () -> Unit,
 ) {
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = LocalSnackBarHostState.current ?: remember { SnackbarHostState() }
     val context = LocalContext.current
-    MegaScaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-            .imePadding()
-            .semantics {
-                testTagsAsResourceId = true
-            },
-        scaffoldState = scaffoldState,
-        topBar = {
-            MegaAppBar(
-                modifier = Modifier.testTag(tag = TAGS_SCREEN_APP_BAR),
-                appBarType = AppBarType.BACK_NAVIGATION,
-                title = stringResource(id = sharedR.string.add_tags_page_title_label),
-                elevation = 0.dp,
-                onNavigationPressed = { onBackPressed() },
-            )
-        },
-    ) { paddingValues ->
-        EventEffect(event = uiState.informationMessage, onConsumed = consumeInfoMessage) { info ->
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(info.getInfo(context))
-        }
-        EventEffect(event = uiState.showMaxTagsError, onConsumed = { consumeMaxTagsError() }) {
-            scaffoldState.snackbarHostState.showAutoDurationSnackbar(
-                message = context.getString(
-                    sharedR.string.add_tags_error_max_tags,
-                    MAX_TAGS_PER_NODE
-                )
-            )
-        }
-        TagsContent(
+    val maxTagsError =
+        stringResource(id = sharedR.string.add_tags_error_max_tags, MAX_TAGS_PER_NODE)
+    val coroutineScope = rememberCoroutineScope()
+
+    // Provide to support legacy activity wrapper
+    CompositionLocalProvider(LocalSnackBarHostState provides snackbarHostState) {
+        MegaScaffoldWithTopAppBarScrollBehavior(
             modifier = Modifier
-                .padding(paddingValues)
-                .testTag(TAGS_SCREEN_CONTENTS_LABEL),
-            validateTagName = validateTagName,
-            addOrRemoveTag = addOrRemoveTag,
-            consumeTagsUpdated = consumeTagsUpdated,
-            uiState = uiState,
-        )
+                .fillMaxSize()
+                .imePadding()
+                .semantics { testTagsAsResourceId = true },
+            topBar = {
+                MegaTopAppBar(
+                    modifier = Modifier.testTag(TAGS_SCREEN_APP_BAR),
+                    title = stringResource(id = sharedR.string.add_tags_page_title_label),
+                    navigationType = AppBarNavigationType.Back(onBackPressed),
+                )
+            },
+        ) { paddingValues ->
+            EventEffect(
+                event = uiState.informationMessage,
+                onConsumed = consumeInfoMessage
+            ) { info ->
+                snackbarHostState.showAutoDurationSnackbar(info.getInfo(context))
+            }
+            EventEffect(event = uiState.showMaxTagsError, onConsumed = consumeMaxTagsError) {
+                snackbarHostState.showAutoDurationSnackbar(maxTagsError)
+            }
+            TagsContent(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .testTag(TAGS_SCREEN_CONTENTS_LABEL),
+                validateTagName = validateTagName,
+                addOrRemoveTag = addOrRemoveTag,
+                consumeTagsUpdated = consumeTagsUpdated,
+                uiState = uiState,
+            )
+        }
     }
 }
 
@@ -120,119 +159,115 @@ private fun TagsContent(
     modifier: Modifier = Modifier,
     consumeTagsUpdated: () -> Unit,
 ) {
-
     var tag by rememberSaveable { mutableStateOf("") }
+    var isFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
-    /**
-     * Define a function addTag that takes selectedTag and an optional newTag parameter.
-     * Check if selectedTag is not blank.
-     * If newTag is true, ensure uiState.isError is false.
-     * Call addOrRemoveTag with selectedTag.
-     */
     fun addTag(selectedTag: String, newTag: Boolean = false) {
         if (selectedTag.isNotBlank() && (!newTag || !uiState.isError)) {
             addOrRemoveTag(selectedTag)
         }
     }
 
-    /**
-     * Use EventEffect to handle uiState.tagsUpdated.
-     * Reset tag to an empty string.
-     * Track the event using Analytics.tracker
-     */
-    EventEffect(event = uiState.tagsUpdatedEvent, onConsumed = { consumeTagsUpdated() }) {
+    EventEffect(event = uiState.tagsUpdatedEvent, onConsumed = consumeTagsUpdated) {
         tag = ""
         val event = if (it == TagUpdate.ADD) NodeInfoTagsAddedEvent else NodeInfoTagsRemovedEvent
+        if (it == TagUpdate.ADD) focusManager.clearFocus()
         Analytics.tracker.trackEvent(event)
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        MegaText(
-            modifier = Modifier.testTag(TAGS_SCREEN_ADD_TAGS_LABEL),
-            text = stringResource(id = sharedR.string.add_tags_text_label_tag),
-            textColor = if (uiState.isError) TextColor.Error else TextColor.Accent,
-            style = MaterialTheme.typography.caption,
-        )
-        // Tags content
-        GenericDescriptionTextField(
+        TextInputField(
             modifier = Modifier
-                .padding(bottom = 4.dp),
-            visualTransformation = PrefixTransformation("#"),
-            value = tag,
+                .fillMaxWidth()
+                .testTag(TAGS_SCREEN_ADD_TAGS_TEXT_FIELD),
+            placeholder = stringResource(id = sharedR.string.add_tags_placeholder_label),
+            text = tag,
+            // Only show the placeholder ("#Add tags") while the field is empty AND unfocused. Once
+            // focused or typing, fix the "#" prefix (which puts the cursor right after it); applying
+            // the prefix while empty+unfocused would make the field look non-empty and hide the placeholder.
+            visualTransformation = if (tag.isEmpty() && !isFocused) {
+                VisualTransformation.None
+            } else {
+                PrefixTransformation("#")
+            },
+            keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Done,
-            supportingText = uiState.message,
-            showError = uiState.isError,
-            onValueChange = {
+            onValueChanged = {
                 tag = it.removePrefix("#").lowercase()
                 validateTagName(tag)
             },
-            showUnderline = true,
+            onFocusChanged = { isFocused = it },
+            errorText = uiState.message?.takeIf { uiState.isError },
         )
 
-        if (
-            tag.isNotBlank() &&
-            uiState.isError.not() &&
-            uiState.tags.contains(tag).not()
-        ) {
-            MenuActionListTile(
-                modifier = Modifier
-                    .testTag(TAGS_SCREEN_ADD_TAGS_BUTTON)
-                    .padding(vertical = 8.dp)
-                    .clickable {
-                        addTag(selectedTag = tag, newTag = true)
-                    },
-                text = stringResource(
-                    id = sharedR.string.add_tags_button_label_add,
-                    tag
-                ),
-                icon = painterResource(id = CoreR.drawable.ic_plus),
-                dividerType = null,
+        if (!uiState.isError) {
+            HelpTextInfo(
+                modifier = Modifier.testTag(TAGS_SCREEN_ADD_TAGS_LABEL),
+                text = stringResource(id = sharedR.string.add_tags_label_tag_description),
             )
+        }
+
+        if (tag.isNotBlank() && !uiState.isError && !uiState.tags.contains(tag)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TAGS_SCREEN_ADD_TAGS_BUTTON)
+                    .clickable { addTag(selectedTag = tag, newTag = true) }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                MegaIcon(
+                    modifier = Modifier.size(24.dp),
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Plus),
+                    tint = IconColor.Primary,
+                    contentDescription = null,
+                )
+                MegaText(
+                    text = stringResource(id = sharedR.string.add_tags_button_label_add, tag),
+                    textColor = TextColor.Primary,
+                    style = AppTheme.typography.bodyLarge,
+                )
+            }
         }
 
         if (uiState.tags.isNotEmpty()) {
             MegaText(
                 modifier = Modifier
-                    .padding(vertical = 12.dp)
+                    .padding(top = 4.dp)
                     .testTag(TAGS_SCREEN_EXISTING_TAGS_LABEL),
                 text = stringResource(id = sharedR.string.add_tags_label_existing_tags),
                 textColor = TextColor.Secondary,
-                style = MaterialTheme.typography.subtitle2,
-            )
-        }
-
-        if (uiState.nodeTags.size >= MAX_TAGS_PER_NODE) {
-            WarningBanner(
-                modifier = Modifier.padding(vertical = 8.dp),
-                textString = stringResource(
-                    id = sharedR.string.add_tags_error_max_tags,
-                    MAX_TAGS_PER_NODE
-                ),
-                onCloseClick = null
+                style = AppTheme.typography.titleSmall,
             )
         }
 
         FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             uiState.tags.forEach { tag ->
                 val isSelected = uiState.nodeTags.contains(tag)
                 MegaChip(
-                    selected = isSelected,
-                    text = "#$tag",
                     modifier = Modifier.testTag(TAGS_SCREEN_TAG_CHIP),
-                    leadingIcon = if (isSelected) CoreR.drawable.ic_filter_selected else null,
-                ) {
-                    addTag(tag)
-                    Analytics.tracker.trackEvent(NodeInfoTagsRemovedEvent)
-                }
+                    selected = isSelected,
+                    content = "#$tag",
+                    style = DefaultChipStyle,
+                    leadingPainter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Check)
+                        .takeIf { isSelected },
+                    onClick = {
+                        addTag(tag)
+                        Analytics.tracker.trackEvent(NodeInfoTagsRemovedEvent)
+                    },
+                )
             }
         }
     }
@@ -241,16 +276,16 @@ private fun TagsContent(
 @CombinedThemePreviews
 @Composable
 private fun TagsScreenPreview() {
-    OriginalTheme(isDark = isSystemInDarkTheme()) {
+    AndroidThemeForPreviews {
         TagsScreen(
             consumeInfoMessage = {},
-            validateTagName = { it.isNotEmpty() },
+            validateTagName = {},
             addOrRemoveTag = {},
             onBackPressed = {},
             consumeMaxTagsError = {},
             uiState = TagsUiState(
-                tags = persistentListOf("tag1", "tag2"),
-                nodeTags = persistentListOf("tag1")
+                tags = persistentListOf("marketing", "2026", "documentation", "promo", "mega"),
+                nodeTags = persistentListOf("marketing"),
             ),
             consumeTagsUpdated = {},
         )
@@ -260,6 +295,7 @@ private fun TagsScreenPreview() {
 internal const val TAGS_SCREEN_APP_BAR = "tags_screen:tags_app_bar"
 internal const val TAGS_SCREEN_CONTENTS_LABEL = "tags_screen:contents_label_tag"
 internal const val TAGS_SCREEN_ADD_TAGS_LABEL = "tags_screen:add_tags_text_label_tag"
+internal const val TAGS_SCREEN_ADD_TAGS_TEXT_FIELD = "tags_screen:add_tags_text_field"
 internal const val TAGS_SCREEN_ADD_TAGS_BUTTON = "tags_screen:add_tags_button"
 internal const val TAGS_SCREEN_EXISTING_TAGS_LABEL = "tags_screen:existing_tags_label"
 internal const val TAGS_SCREEN_TAG_CHIP = "tags_screen:tag_chip"

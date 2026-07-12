@@ -1,11 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
 import androidx.annotation.OptIn
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,7 +28,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -57,6 +51,7 @@ import mega.android.core.ui.components.image.MegaIconWithIndicator
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
+import mega.privacy.android.app.presentation.videoplayer.view.TransparentNavigationBarEffect
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
@@ -98,6 +93,7 @@ fun AudioPlayerScreen(
     onScreenClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    TransparentNavigationBarEffect()
     OriginalTheme(isDark = true) {
         Box(
             modifier = modifier
@@ -377,15 +373,6 @@ private fun PlaybackControlsRow(
     onRepeatClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val infiniteTransition = rememberInfiniteTransition(label = "loader")
-    val loaderRotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = LinearEasing)
-        ),
-        label = "loaderRotation",
-    )
     val repeatIcon = if (repeatMode == Player.REPEAT_MODE_ONE)
         IconPack.Medium.Regular.Solid.RepeatOne
     else
@@ -423,22 +410,18 @@ private fun PlaybackControlsRow(
             enabled = !isLoading,
             modifier = Modifier.size(64.dp),
         ) {
-            MegaIcon(
-                imageVector = when {
-                    isLoading -> IconPack.Medium.Thin.Outline.LoaderThrobber
-                    isPlaying -> IconPack.Medium.Regular.Solid.Pause
-                    else -> IconPack.Medium.Regular.Solid.Play
-                },
-                tint = IconColor.Primary,
-                contentDescription = when {
-                    isLoading -> "Loading"
-                    isPlaying -> "Pause"
-                    else -> "Play"
-                },
-                modifier = Modifier
-                    .size(64.dp)
-                    .then(if (isLoading) Modifier.rotate(loaderRotation) else Modifier),
-            )
+            if (isLoading) {
+                MediaPlayerLoadingIndicator(modifier = Modifier.size(64.dp))
+            } else {
+                MegaIcon(
+                    imageVector =
+                        if (isPlaying) IconPack.Medium.Regular.Solid.Pause
+                        else IconPack.Medium.Regular.Solid.Play,
+                    tint = IconColor.Primary,
+                    contentDescription = if (isPlaying) "Pause" else "Play",
+                    modifier = Modifier.size(64.dp),
+                )
+            }
         }
 
         IconButton(
@@ -551,7 +534,7 @@ private fun PreviewAudioPlayerScreenPlaying() {
             hasPlaylist = true,
             repeatMode = Player.REPEAT_MODE_ONE,
             isLoading = false,
-            currentPlayingHandle = -1L,
+            currentPlayingHandle = null,
             currentPlayingItemName = null,
             currentAdapterType = -1,
             thumbnailData = null,
@@ -581,7 +564,7 @@ private fun PreviewAudioPlayerScreenPaused() {
             repeatMode = Player.REPEAT_MODE_OFF,
             shuffleEnabled = false,
             isLoading = false,
-            currentPlayingHandle = -1L,
+            currentPlayingHandle = null,
             currentPlayingItemName = "podcast_episode_42.mp3",
             hasPlaylist = false,
             currentAdapterType = -1,

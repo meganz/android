@@ -20,9 +20,13 @@ sealed interface ShareFilesToMegaUiState {
      *
      * @property rootNodeId Root node id.
      * @property shareUris Uris to share.
+     * @property hasNoFilesToUpload True when the shared uris resolve to nothing that can be
+     * uploaded (e.g. all rejected by the private-dir guard); the screen then shows an error
+     * and closes.
      */
     data class Data(
         val rootNodeId: NodeId,
         val shareUris: List<UriPath>,
+        val hasNoFilesToUpload: Boolean = false,
     ) : ShareFilesToMegaUiState
 }

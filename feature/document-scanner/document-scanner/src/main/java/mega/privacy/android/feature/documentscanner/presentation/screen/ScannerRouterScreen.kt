@@ -14,6 +14,7 @@ import mega.privacy.android.feature.documentscanner.presentation.model.ScannerRo
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
 import mega.privacy.android.navigation.contract.navkey.LegacyScanDocumentNavKey
+import mega.privacy.android.navigation.contract.navkey.ScanReviewNavKey
 import timber.log.Timber
 
 /**
@@ -40,6 +41,7 @@ internal fun ScannerRouterScreen(
                     navigationHandler.navigate(LegacyScanDocumentNavKey)
                     navigationHandler.remove(ContinuousScanNavKey)
                 },
+                onReviewPages = { navigationHandler.navigate(ScanReviewNavKey) },
             )
 
         is ScannerRoute.UseLegacy -> LaunchedEffect(current) {

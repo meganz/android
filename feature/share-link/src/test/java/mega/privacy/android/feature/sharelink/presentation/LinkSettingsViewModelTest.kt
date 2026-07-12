@@ -171,6 +171,23 @@ class LinkSettingsViewModelTest {
         }
 
     @Test
+    fun `test that hasUnsavedChanges is true once an option changes even if not yet saveable`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                val state = awaitItem()
+                assertThat(state.hasUnsavedChanges).isTrue()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that uiState carries the account type from monitorAccountDetailUseCase`() =
         runTest(extension.testDispatcher) {
             stubNode()

@@ -60,12 +60,8 @@ fun PlanPriceCard(
         modifier = modifier
             .fillMaxWidth()
             .border(
-                width = if (isRecommended) 2.dp else 1.dp,
-                color = if (isRecommended) {
-                    DSTokens.colors.border.strongSelected
-                } else {
-                    DSTokens.colors.border.strong
-                },
+                width = 1.dp,
+                color = DSTokens.colors.border.strong,
                 shape = cardShape,
             )
             .clip(cardShape)

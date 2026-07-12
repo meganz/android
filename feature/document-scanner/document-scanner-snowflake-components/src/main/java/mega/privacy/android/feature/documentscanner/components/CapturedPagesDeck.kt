@@ -2,6 +2,7 @@ package mega.privacy.android.feature.documentscanner.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,18 +31,25 @@ import mega.android.core.ui.tokens.theme.DSTokens
  *
  * @param thumbnailUris URIs of the most recent captured page thumbnails, oldest first.
  * @param count Total number of pages captured so far.
+ * @param onClick Called when the deck is tapped (opens the page-review screen).
  * @param modifier Modifier for the deck.
  */
 @Composable
 fun CapturedPagesDeck(
     thumbnailUris: List<String>,
     count: Int,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     if (thumbnailUris.isEmpty()) return
 
     val fanned = thumbnailUris.takeLast(MAX_FANNED)
-    Box(modifier = modifier.size(96.dp), contentAlignment = Alignment.BottomStart) {
+    Box(
+        modifier = modifier
+            .size(96.dp)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.BottomStart,
+    ) {
         fanned.forEachIndexed { index, uri ->
             // Oldest fanned card leans most; the top (newest) card sits upright.
             val depth = fanned.lastIndex - index

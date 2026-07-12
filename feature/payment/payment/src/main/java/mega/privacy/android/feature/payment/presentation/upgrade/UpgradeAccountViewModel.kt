@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -57,23 +59,6 @@ class UpgradeAccountViewModel @AssistedInject constructor(
     init {
         loadSubscriptions()
         viewModelScope.launch {
-            val cheapestSubscriptionAvailable =
-                runCatching { getRecommendedSubscriptionUseCase() }.getOrElse {
-                    Timber.e(it)
-                    null
-                }
-            _state.update {
-                it.copy(
-                    cheapestSubscriptionAvailable = cheapestSubscriptionAvailable?.let { cheapest ->
-                        localisedSubscriptionMapper(
-                            monthlySubscription = cheapest,
-                            yearlySubscription = cheapest
-                        )
-                    }
-                )
-            }
-        }
-        viewModelScope.launch {
             val isSubscriptionFeatureAvailable =
                 runCatching { isSubscriptionFeatureAvailableUseCase() }.getOrElse { false }
             _state.update {
@@ -100,6 +85,8 @@ class UpgradeAccountViewModel @AssistedInject constructor(
         }
         if (isUpgradeAccount) {
             loadCurrentSubscriptionPlan()
+        } else {
+            viewModelScope.launch { refreshRecommendedSubscription() }
         }
         refreshPricing()
     }
@@ -147,7 +134,7 @@ class UpgradeAccountViewModel @AssistedInject constructor(
                 .collectLatest { levelDetail ->
                     _state.update {
                         it.copy(
-                            subscriptionCycle = levelDetail.accountSubscriptionCycle,
+                            subscriptionCycle = resolveCurrentPlanCycle(levelDetail),
                             currentSubscriptionPlan = levelDetail.accountType,
                             subscriptionStatus = levelDetail.subscriptionStatus,
                             subscriptionRenewTime = levelDetail.subscriptionRenewTime
@@ -156,8 +143,49 @@ class UpgradeAccountViewModel @AssistedInject constructor(
                                 .takeIf { time -> time > 0 },
                         )
                     }
+                    refreshRecommendedSubscription()
                 }
         }
+    }
+
+    /**
+     * Recomputes the recommended plan (the tier above the current plan). Driven by
+     * [monitorAccountDetailUseCase] for upgrade accounts so it is resolved against the known current
+     * plan; otherwise the recommendation would fall back to the cheapest plan and stay stale.
+     */
+    private suspend fun refreshRecommendedSubscription() {
+        val recommended = runCatching { getRecommendedSubscriptionUseCase() }.getOrElse {
+            Timber.e(it)
+            null
+        }
+        _state.update {
+            it.copy(
+                cheapestSubscriptionAvailable = recommended?.let { plan ->
+                    localisedSubscriptionMapper(
+                        monthlySubscription = plan,
+                        yearlySubscription = plan,
+                    )
+                }
+            )
+        }
+    }
+
+    /**
+     * Resolves the billing cycle of the current plan from its own subscription, since the
+     * account-level cycle can be wrong when the account holds more than one subscription.
+     *
+     * @return the cycle of the subscription matching the current plan (by id, then by level), or the
+     * account-level cycle when no subscription matches or the match reports an unknown cycle.
+     */
+    private fun resolveCurrentPlanCycle(levelDetail: AccountLevelDetail): AccountSubscriptionCycle {
+        val subscriptions = levelDetail.accountSubscriptionDetailList
+        val planSubscriptionId = levelDetail.accountPlanDetail?.subscriptionId
+        val matchingSubscription = planSubscriptionId?.let { id ->
+            subscriptions.firstOrNull { it.subscriptionId == id }
+        } ?: subscriptions.firstOrNull { it.subscriptionLevel == levelDetail.accountType }
+        return matchingSubscription?.subscriptionCycle
+            ?.takeIf { it != AccountSubscriptionCycle.UNKNOWN }
+            ?: levelDetail.accountSubscriptionCycle
     }
 
     /**

@@ -2,18 +2,22 @@ package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.file
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalResources
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import mega.android.core.ui.components.LocalSnackBarHostState
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -23,6 +27,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.ExplorerScreen
 import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.ShareToMegaUpload
 import mega.privacy.android.navigation.destination.ExplorerNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,6 +51,18 @@ internal fun ShareFilesToMegaScreen(
         var isProcessingAction by rememberSaveable { mutableStateOf(false) }
         var prepareChatsEvent: StateEvent by remember { mutableStateOf(consumed) }
         var chatUploadIds by rememberSaveable { mutableStateOf<List<Long>?>(null) }
+        val snackbarHostState = LocalSnackBarHostState.current
+        val resources = LocalResources.current
+
+        LaunchedEffect(dataUiState.hasNoFilesToUpload) {
+            if (dataUiState.hasNoFilesToUpload) {
+                isProcessingAction = true
+                snackbarHostState?.showAutoDurationSnackbar(
+                    resources.getString(sharedR.string.unable_to_open_selected_file_message)
+                )
+                onNavigateBack()
+            }
+        }
 
         ExplorerScreen(
             explorerMode = ExplorerMode.ShareFilesToMega,

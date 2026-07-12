@@ -117,6 +117,11 @@ fun UpgradeAccountRoute(
                     megaNavigator.launchUrl(it, SUBSCRIPTION_UNAVAILABLE_LEARN_MORE_URL)
                 }
             },
+            onPricingPageClick = {
+                activity?.let {
+                    megaNavigator.launchUrl(it, PRICING_PAGE_URL)
+                }
+            },
             onBack = {
                 Analytics.tracker.trackEvent(BackButtonPressedEvent)
                 onBack()
@@ -133,6 +138,8 @@ fun UpgradeAccountRoute(
 
 private const val SUBSCRIPTION_UNAVAILABLE_LEARN_MORE_URL =
     "https://help.mega.io/plans-storage"
+
+private const val PRICING_PAGE_URL = "https://mega.io/pro"
 
 
 private fun sendAccountTypeAnalytics(

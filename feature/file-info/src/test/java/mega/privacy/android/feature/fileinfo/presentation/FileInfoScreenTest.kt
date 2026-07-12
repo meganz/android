@@ -2,7 +2,7 @@ package mega.privacy.android.feature.fileinfo.presentation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.icon.pack.R as iconPackR
 import org.junit.Rule
@@ -97,10 +98,90 @@ class FileInfoScreenTest {
         assertThat(clicked).isTrue()
     }
 
+    @Test
+    fun `test that the editable description field shows the current description`() {
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.OWNER,
+                descriptionText = "My description",
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_DESCRIPTION_TAG).assertExists()
+        composeRule.onNodeWithText("My description").assertExists()
+    }
+
+    @Test
+    fun `test that the description field is hidden when not editable and the description is blank`() {
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.READ,
+                descriptionText = "",
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_DESCRIPTION_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the description is displayed as read-only text when not editable`() {
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.READ,
+                descriptionText = "My description",
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_DESCRIPTION_TAG).assertExists()
+        composeRule.onNodeWithText("My description").assertExists()
+    }
+
+    @Test
+    fun `test that tags are displayed for a node with tags`() {
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.OWNER,
+                tags = listOf("marketing", "2024"),
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).assertExists()
+        composeRule.onNodeWithText("#marketing", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithText("#2024", useUnmergedTree = true).assertExists()
+    }
+
+    @Test
+    fun `test that the tags section is hidden when the node is in the rubbish bin`() {
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.OWNER,
+                isNodeInRubbish = true,
+                tags = listOf("marketing"),
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that clicking the tags section invokes onTagsClick when editable`() {
+        var clicked = false
+        setContent(
+            uiState = fileState.copy(accessPermission = AccessPermission.OWNER),
+            onTagsClick = { clicked = true },
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).performScrollTo().performClick()
+
+        assertThat(clicked).isTrue()
+    }
+
     private fun setContent(
         uiState: FileInfoUiState,
         onBack: () -> Unit = {},
         onLocationClick: () -> Unit = {},
+        onDescriptionChange: (String) -> Unit = {},
+        onTagsClick: () -> Unit = {},
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
@@ -108,6 +189,8 @@ class FileInfoScreenTest {
                     uiState = uiState,
                     onBack = onBack,
                     onLocationClick = onLocationClick,
+                    onDescriptionChange = onDescriptionChange,
+                    onTagsClick = onTagsClick,
                 )
             }
         }

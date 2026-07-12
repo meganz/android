@@ -16,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
@@ -45,10 +46,26 @@ class GetNodePreviewFileUseCaseTest {
         else {
             whenever(fileSystemRepository.getLocalFile(node)).thenReturn(null)
         }
-        whenever(cacheRepository.getPreviewFile(node.name)).thenReturn(expected)
+        whenever(cacheRepository.getPreviewFile(node.name, node.size, node.modificationTime))
+            .thenReturn(expected)
         val actual = underTest(node)
         assertThat(actual).isEqualTo(expected)
     }
+
+    @Test
+    fun `test that cache preview file is requested with the node size and modification time`() =
+        runTest {
+            val node = mock<DefaultTypedFileNode> {
+                whenever(it.name).thenReturn(NODE_NAME)
+                whenever(it.size).thenReturn(NODE_SIZE)
+                whenever(it.modificationTime).thenReturn(NODE_MODIFICATION_TIME)
+            }
+            whenever(fileSystemRepository.getLocalFile(node)).thenReturn(null)
+
+            underTest(node)
+
+            verify(cacheRepository).getPreviewFile(NODE_NAME, NODE_SIZE, NODE_MODIFICATION_TIME)
+        }
 
     @Test
     fun `test that offline local file is returned when node is available offline`() = runTest {
@@ -62,6 +79,12 @@ class GetNodePreviewFileUseCaseTest {
         whenever(getOfflineFileUseCase(offlineNode)).thenReturn(file)
         val actual = underTest(node)
         assertThat(actual).isEqualTo(file)
+    }
+
+    companion object {
+        private const val NODE_NAME = "some name"
+        private const val NODE_SIZE = 1024L
+        private const val NODE_MODIFICATION_TIME = 1_700_000_000L
     }
 
     private fun provideParams() = Stream.of(

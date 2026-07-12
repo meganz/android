@@ -9,6 +9,7 @@ import mega.privacy.android.app.businessExpiredAlertLegacyDestination
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
 import mega.privacy.android.app.mediaplayer.legacyMediaPlayerScreen
 import mega.privacy.android.app.meeting.activity.legacyMeetingScreen
 import mega.privacy.android.app.meeting.activity.legacyWaitingRoomScreen
@@ -38,6 +39,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.me
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
 import mega.privacy.android.app.presentation.settings.startscreen.startScreenPreferenceScreen
+import mega.privacy.android.app.presentation.tags.tagsScreen
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.presentation.videosection.legacyVideoToPlaylistDestination
@@ -57,6 +59,7 @@ class LegacyCoreActivityFeatureGraph(
     nodeContentUriIntentMapper: NodeContentUriIntentMapper,
     mediaPlayerIntentMapper: MediaPlayerIntentMapper,
     nav3VideoPlayerRouteLauncher: Nav3VideoPlayerRouteLauncher,
+    nav3AudioPlayerRouteLauncher: Nav3AudioPlayerRouteLauncher,
     megaChatRequestHandler: Lazy<MegaChatRequestHandler>,
     chatManagement: Lazy<ChatManagement>,
     setChatVideoInDeviceUseCase: Lazy<SetChatVideoInDeviceUseCase>,
@@ -108,7 +111,18 @@ class LegacyCoreActivityFeatureGraph(
                         },
                     )
                 },
+                navigateToAudioRoute = { key ->
+                    navigationHandler.navigate(
+                        destination = key,
+                        navOptions = navOptions {
+                            popUpTo<LegacyMediaPlayerNavKey> {
+                                inclusive = true
+                            }
+                        },
+                    )
+                },
                 nav3VideoPlayerRouteLauncher = nav3VideoPlayerRouteLauncher,
+                nav3AudioPlayerRouteLauncher = nav3AudioPlayerRouteLauncher,
                 mediaPlayerIntentMapper = mediaPlayerIntentMapper,
                 snackbarEventQueue = snackbarEventQueue,
             )
@@ -127,6 +141,7 @@ class LegacyCoreActivityFeatureGraph(
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             fileInfoScreen(navigationHandler::back)
+            tagsScreen(navigationHandler::back)
             mediaDiscoveryLegacyDestination(navigationHandler::back)
             legacyVideoToPlaylistDestination(
                 navigationHandler::back,

@@ -17,6 +17,8 @@ import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountPlanDetail
+import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
 import mega.privacy.android.domain.entity.billing.Pricing
@@ -44,6 +46,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
@@ -224,7 +227,7 @@ class UpgradeAccountViewModelTest {
         )
         wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
         whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
-        initViewModel()
+        initViewModel(isUpgradeAccount = false)
         underTest.state.map { it.cheapestSubscriptionAvailable }.test {
             Truth.assertThat(awaitItem()).isEqualTo(expectedResult)
         }
@@ -260,6 +263,154 @@ class UpgradeAccountViewModelTest {
                 val initialState = awaitItem()
                 Truth.assertThat(initialState.currentSubscriptionPlan).isEqualTo(expectedPlan)
                 Truth.assertThat(initialState.subscriptionCycle).isEqualTo(expectedCycle)
+            }
+        }
+
+    @Test
+    fun `test that subscriptionCycle uses the matching subscription cycle when the account level cycle disagrees`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val matchingSubscription = AccountSubscriptionDetail(
+                subscriptionId = "sub-123",
+                subscriptionStatus = SubscriptionStatus.VALID,
+                subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+                paymentMethodType = null,
+                renewalTime = 0L,
+                subscriptionLevel = expectedPlan,
+                featuresList = emptyList(),
+                isFreeTrial = false,
+            )
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { accountSubscriptionDetailList }.thenReturn(listOf(matchingSubscription))
+                on { accountPlanDetail }.thenReturn(null)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.MONTHLY)
+            }
+        }
+
+    @Test
+    fun `test that recommended subscription is recomputed once the current plan loads`() =
+        runTest {
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.MONTHLY)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+            advanceUntilIdle()
+
+            verify(getRecommendedSubscriptionUseCase).invoke()
+        }
+
+    @Test
+    fun `test that subscriptionCycle uses subscriptionId match when accountPlanDetail is available`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val matchingSubscription = AccountSubscriptionDetail(
+                subscriptionId = "sub-123",
+                subscriptionStatus = SubscriptionStatus.VALID,
+                subscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+                paymentMethodType = null,
+                renewalTime = 0L,
+                subscriptionLevel = AccountType.PRO_II,
+                featuresList = emptyList(),
+                isFreeTrial = false,
+            )
+            val planDetail = mock<AccountPlanDetail> {
+                on { subscriptionId }.thenReturn("sub-123")
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { accountSubscriptionDetailList }.thenReturn(listOf(matchingSubscription))
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.MONTHLY)
+            }
+        }
+
+    @Test
+    fun `test that subscriptionCycle falls back to the account level cycle when the matching subscription cycle is unknown`() =
+        runTest {
+            val expectedPlan = AccountType.PRO_I
+            val matchingSubscription = AccountSubscriptionDetail(
+                subscriptionId = "sub-123",
+                subscriptionStatus = SubscriptionStatus.VALID,
+                subscriptionCycle = AccountSubscriptionCycle.UNKNOWN,
+                paymentMethodType = null,
+                renewalTime = 0L,
+                subscriptionLevel = expectedPlan,
+                featuresList = emptyList(),
+                isFreeTrial = false,
+            )
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(expectedPlan)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { accountSubscriptionDetailList }.thenReturn(listOf(matchingSubscription))
+                on { accountPlanDetail }.thenReturn(null)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(
+                    expectedMonthlySubscriptionsList,
+                    expectedYearlySubscriptionsList
+                )
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.YEARLY)
             }
         }
 

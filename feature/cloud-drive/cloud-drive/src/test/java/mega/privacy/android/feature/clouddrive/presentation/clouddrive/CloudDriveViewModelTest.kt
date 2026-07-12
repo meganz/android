@@ -41,6 +41,12 @@ import mega.privacy.android.domain.usecase.contact.AreCredentialsVerifiedUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.filebrowser.GetFileBrowserNodeChildrenUseCase
 import mega.privacy.android.domain.usecase.folderlink.ContainsMediaItemUseCase
+import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.node.HandleToBase64UseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.clouddrive.FetchNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -70,6 +76,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
@@ -100,8 +107,14 @@ class CloudDriveViewModelTest {
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
+    private val handleToBase64UseCase: HandleToBase64UseCase = mock()
+    private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase = mock()
+    private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase = mock()
+    private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase = mock()
+    private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase = mock()
     private val folderNodeHandle = 123L
     private val folderNodeId = NodeId(folderNodeHandle)
+    private val folderKey = "base64Key"
     private val mockTracker: AnalyticsTracker = mock()
     private val containsMediaItemUseCase = mock<ContainsMediaItemUseCase>()
     private val monitorAccountInactivityUseCase = mock<MonitorAccountInactivityUseCase>()
@@ -115,6 +128,15 @@ class CloudDriveViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
         Analytics.initialise(mockTracker)
         whenever(monitorAccountInactivityUseCase()).thenReturn(MutableStateFlow(null))
+        whenever(monitorViewTypeUseCase()).thenReturn(flowOf(ViewType.LIST))
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+        whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC))
+            .thenReturn(NodeSortConfiguration.default)
+        handleToBase64UseCase.stub { onBlocking { invoke(any()) } doReturn folderKey }
+        whenever(monitorFolderViewTypeUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+        whenever(monitorFolderSortOrderUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
     }
 
     @After
@@ -143,6 +165,11 @@ class CloudDriveViewModelTest {
             monitorAccountInactivityUseCase,
             acknowledgeLastPurgeUseCase,
             suppressPurgeTimestampUseCase,
+            handleToBase64UseCase,
+            monitorFolderViewTypeUseCase,
+            monitorFolderSortOrderUseCase,
+            setFolderViewTypeUseCase,
+            setFolderSortOrderUseCase,
         )
         Analytics.initialise(null)
     }
@@ -181,6 +208,11 @@ class CloudDriveViewModelTest {
             monitorAccountInactivityUseCase = monitorAccountInactivityUseCase,
             acknowledgeLastPurgeUseCase = acknowledgeLastPurgeUseCase,
             suppressPurgeTimestampUseCase = suppressPurgeTimestampUseCase,
+            handleToBase64UseCase = handleToBase64UseCase,
+            monitorFolderViewTypeUseCase = monitorFolderViewTypeUseCase,
+            monitorFolderSortOrderUseCase = monitorFolderSortOrderUseCase,
+            setFolderViewTypeUseCase = setFolderViewTypeUseCase,
+            setFolderSortOrderUseCase = setFolderSortOrderUseCase,
             args = args,
         )
     }
@@ -205,6 +237,7 @@ class CloudDriveViewModelTest {
             getFileBrowserNodeChildrenUseCase(
                 parentHandle = any(),
                 excludeSensitives = any(),
+                sortOrder = anyOrNull(),
             )
         ).thenReturn(items)
 
@@ -214,6 +247,7 @@ class CloudDriveViewModelTest {
                 nodeId = any(),
                 initialBatchSize = any(),
                 excludeSensitives = any(),
+                sortOrder = anyOrNull(),
             )
         ).thenReturn(
             flowOf(
@@ -268,7 +302,7 @@ class CloudDriveViewModelTest {
         val underTest = createViewModel()
 
         fetchNodesByIdInChunkUseCase.stub {
-            onBlocking { invoke(any(), any(), any()) } doReturn flow { awaitCancellation() }
+            onBlocking { invoke(any(), any(), any(), anyOrNull()) } doReturn flow { awaitCancellation() }
         }
 
         underTest.uiState.test {
@@ -355,6 +389,7 @@ class CloudDriveViewModelTest {
                 getFileBrowserNodeChildrenUseCase(
                     parentHandle = any(),
                     excludeSensitives = any(),
+                    sortOrder = anyOrNull(),
                 )
             ).thenReturn(
                 listOf(
@@ -399,9 +434,10 @@ class CloudDriveViewModelTest {
             // Verify that getFileBrowserNodeChildrenUseCase was called for the node update
             // The call should happen when NodeChanges.Attributes is processed
             // called twice after reload
-            verify(getFileBrowserNodeChildrenUseCase, times(2)).invoke(
+            verify(getFileBrowserNodeChildrenUseCase, atLeastOnce()).invoke(
                 parentHandle = eq(folderNodeHandle),
                 excludeSensitives = any(),
+                sortOrder = anyOrNull(),
             )
         }
 
@@ -510,12 +546,18 @@ class CloudDriveViewModelTest {
     }
 
     @Test
-    fun `test that ChangeViewTypeClicked action sets new view type`() = runTest {
+    fun `test that ChangeViewTypeClicked action stores the view type for the folder`() = runTest {
         val underTest = createViewModel()
 
         underTest.processAction(CloudDriveAction.ChangeViewTypeClicked(ViewType.GRID))
+        advanceUntilIdle()
 
-        verify(setViewTypeUseCase).invoke(ViewType.GRID)
+        verify(setFolderViewTypeUseCase).invoke(
+            eq(folderKey),
+            eq(ViewType.GRID),
+            any(),
+            any(),
+        )
     }
 
     @Test
@@ -691,6 +733,7 @@ class CloudDriveViewModelTest {
                 nodeId = any(),
                 initialBatchSize = any(),
                 excludeSensitives = eq(true),
+                sortOrder = anyOrNull(),
             )
         }
 
@@ -703,7 +746,14 @@ class CloudDriveViewModelTest {
         whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
         whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
         // Set up the new chunked use case for root node
-        whenever(fetchNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(
+        whenever(
+            fetchNodesByIdInChunkUseCase.invoke(
+                nodeId = eq(rootNodeId),
+                initialBatchSize = any(),
+                excludeSensitives = any(),
+                sortOrder = anyOrNull(),
+            )
+        ).thenReturn(
             flowOf(
                 NodeFetchResult(
                     loadingState = NodesLoadingState.FullyLoaded,
@@ -728,7 +778,14 @@ class CloudDriveViewModelTest {
     fun `test that loadNodes uses NodeId(-1L) when getRootNodeIdUseCase returns null`() = runTest {
         setupTestData(emptyList())
         whenever(getRootNodeIdUseCase()).thenReturn(null)
-        whenever(fetchNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(
+        whenever(
+            fetchNodesByIdInChunkUseCase(
+                nodeId = eq(NodeId(-1L)),
+                initialBatchSize = any(),
+                excludeSensitives = any(),
+                sortOrder = anyOrNull(),
+            )
+        ).thenReturn(
             flowOf(
                 NodeFetchResult(
                     loadingState = NodesLoadingState.FullyLoaded,
@@ -749,7 +806,12 @@ class CloudDriveViewModelTest {
         }
 
         verify(getRootNodeIdUseCase).invoke()
-        verify(fetchNodesByIdInChunkUseCase).invoke(NodeId(-1L))
+        verify(fetchNodesByIdInChunkUseCase).invoke(
+            nodeId = eq(NodeId(-1L)),
+            initialBatchSize = any(),
+            excludeSensitives = any(),
+            sortOrder = anyOrNull(),
+        )
     }
 
     @Test
@@ -757,7 +819,14 @@ class CloudDriveViewModelTest {
         setupTestData(emptyList())
         whenever(getRootNodeIdUseCase()).thenReturn(null)
         whenever(getFileBrowserNodeChildrenUseCase(-1L)).thenReturn(emptyList())
-        whenever(fetchNodesByIdInChunkUseCase(NodeId(-1L))).thenReturn(
+        whenever(
+            fetchNodesByIdInChunkUseCase(
+                nodeId = eq(NodeId(-1L)),
+                initialBatchSize = any(),
+                excludeSensitives = any(),
+                sortOrder = anyOrNull(),
+            )
+        ).thenReturn(
             flowOf(
                 NodeFetchResult(
                     loadingState = NodesLoadingState.FullyLoaded,
@@ -799,7 +868,14 @@ class CloudDriveViewModelTest {
             whenever(getRootNodeIdUseCase()).thenReturn(rootNodeId)
             whenever(getFileBrowserNodeChildrenUseCase(rootNodeId.longValue)).thenReturn(emptyList())
             // Set up the new chunked use case for root node
-            whenever(fetchNodesByIdInChunkUseCase.invoke(rootNodeId)).thenReturn(
+            whenever(
+            fetchNodesByIdInChunkUseCase.invoke(
+                nodeId = eq(rootNodeId),
+                initialBatchSize = any(),
+                excludeSensitives = any(),
+                sortOrder = anyOrNull(),
+            )
+        ).thenReturn(
                 flowOf(
                     NodeFetchResult(
                         loadingState = NodesLoadingState.FullyLoaded,
@@ -821,7 +897,12 @@ class CloudDriveViewModelTest {
             }
 
             // Verify that the new chunked use case was called with the root node ID
-            verify(fetchNodesByIdInChunkUseCase).invoke(rootNodeId)
+            verify(fetchNodesByIdInChunkUseCase).invoke(
+                nodeId = eq(rootNodeId),
+                initialBatchSize = any(),
+                excludeSensitives = any(),
+                sortOrder = anyOrNull(),
+            )
         }
 
     @Test
@@ -841,7 +922,12 @@ class CloudDriveViewModelTest {
         }
 
         // Verify that the new chunked use case was called
-        verify(fetchNodesByIdInChunkUseCase).invoke(folderNodeId)
+        verify(fetchNodesByIdInChunkUseCase).invoke(
+            nodeId = eq(folderNodeId),
+            initialBatchSize = any(),
+            excludeSensitives = any(),
+            sortOrder = anyOrNull(),
+        )
     }
 
     @Test
@@ -927,6 +1013,7 @@ class CloudDriveViewModelTest {
                 nodeId = any(),
                 initialBatchSize = any(),
                 excludeSensitives = any(),
+                sortOrder = anyOrNull(),
             )
             // getFileBrowserNodeChildrenUseCase is only called on node updates, not during initial loading
         }
@@ -1013,7 +1100,7 @@ class CloudDriveViewModelTest {
     }
 
     @Test
-    fun `test that setCloudSortOrder calls use case and refetches sort order`() = runTest {
+    fun `test that setCloudSortOrder stores the sort order for the folder`() = runTest {
         setupTestData(emptyList())
         val sortConfiguration =
             NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
@@ -1028,14 +1115,13 @@ class CloudDriveViewModelTest {
             underTest.setCloudSortOrder(sortConfiguration)
             cancelAndIgnoreRemainingEvents()
         }
-        // Verify that getCloudSortOrderUseCase was called at least twice:
-        // 1. During initialization
-        // 2. After setting the sort order (refetch)
-        verify(getFileBrowserNodeChildrenUseCase).invoke(
-            parentHandle = any(),
-            excludeSensitives = any(),
+        advanceUntilIdle()
+        verify(setFolderSortOrderUseCase).invoke(
+            eq(folderKey),
+            eq(expectedSortOrder),
+            any(),
+            any(),
         )
-        verify(setCloudSortOrderUseCase).invoke(expectedSortOrder)
     }
 
     // Contact Verification Tests

@@ -6,7 +6,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,11 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.SpannedText
 import mega.android.core.ui.components.button.PrimaryFilledButton
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
@@ -91,26 +94,24 @@ fun OfferPriceCard(
                     modifier = Modifier.testTag(TEST_TAG_OFFER_PRICE_CARD_PRICE_PER_MONTH),
                 )
             }
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                MegaText(
-                    text = originalPriceText,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.Medium,
-                        textDecoration = TextDecoration.LineThrough,
+            SpannedText(
+                value = "[A]$originalPriceText[/A] [B]$priceText[/B]",
+                baseTextColor = TextColor.Secondary,
+                baseStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
+                spanStyles = mapOf(
+                    SpanIndicator('A') to MegaSpanStyle.TextColorStyle(
+                        SpanStyle(textDecoration = TextDecoration.LineThrough),
+                        TextColor.Secondary,
                     ),
-                    textColor = TextColor.Secondary,
-                    modifier = Modifier.testTag(TEST_TAG_OFFER_PRICE_CARD_ORIGINAL_PRICE),
-                )
-                MegaText(
-                    text = priceText,
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Medium),
-                    textColor = TextColor.Primary,
-                    modifier = Modifier.testTag(TEST_TAG_OFFER_PRICE_CARD_PRICE),
-                )
-            }
+                    SpanIndicator('B') to MegaSpanStyle.TextColorStyle(
+                        SpanStyle(),
+                        TextColor.Primary,
+                    ),
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag(TEST_TAG_OFFER_PRICE_CARD_PRICE),
+            )
             MegaText(
                 text = discountDescriptionText,
                 style = MaterialTheme.typography.bodyMedium,
@@ -228,12 +229,7 @@ const val TEST_TAG_OFFER_PRICE_CARD_TITLE = "offer_price_card:title"
 const val TEST_TAG_OFFER_PRICE_CARD_PRICE_PER_MONTH = "offer_price_card:price_per_month"
 
 /**
- * Tag for the OfferPriceCard original (pre-discount) price with strikethrough
- */
-const val TEST_TAG_OFFER_PRICE_CARD_ORIGINAL_PRICE = "offer_price_card:original_price"
-
-/**
- * Tag for the OfferPriceCard discounted main price
+ * Tag for the OfferPriceCard billing row (strikethrough original price and discounted price)
  */
 const val TEST_TAG_OFFER_PRICE_CARD_PRICE = "offer_price_card:price"
 

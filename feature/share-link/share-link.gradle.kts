@@ -44,6 +44,7 @@ dependencies {
     implementation(androidx.lifecycle.runtime.compose)
     implementation(androidx.lifecycle.viewmodel)
     implementation(androidx.compose.viewmodel)
+    implementation(androidx.compose.activity)
     implementation(androidx.bundles.compose.bom)
     implementation(androidx.material3)
     implementation(androidx.hilt.navigation)

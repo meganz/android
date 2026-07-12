@@ -127,9 +127,14 @@ internal class CacheFolderFacade @Inject constructor(
     override suspend fun getPreviewDownloadPathForNode(): String =
         (context.externalCacheDir ?: context.cacheDir).path + File.separator
 
-    override suspend fun getPreviewFile(fileName: String) = File(
-        getPreviewDownloadPathForNode() + fileName
-    ).takeIf { it.exists() }
+    override suspend fun getPreviewFile(
+        fileName: String,
+        fileSize: Long,
+        lastModifiedDate: Long,
+    ) = File(getPreviewDownloadPathForNode() + fileName).takeIf {
+        // node modificationTime is in seconds; File.lastModified() is in milliseconds
+        it.exists() && it.length() == fileSize && it.lastModified() / 1000L == lastModifiedDate
+    }
 
     override fun isFileInCacheDirectory(file: File): Boolean {
         val cachePaths = context.externalCacheDirs.asSequence()

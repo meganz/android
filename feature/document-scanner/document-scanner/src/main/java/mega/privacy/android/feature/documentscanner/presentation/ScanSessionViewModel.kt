@@ -21,6 +21,7 @@ import mega.privacy.android.feature.documentscanner.domain.model.ScannerModelPro
 import mega.privacy.android.feature.documentscanner.domain.smoother.BoundarySmoother
 import mega.privacy.android.feature.documentscanner.domain.usecase.AddScannedPageUseCase
 import mega.privacy.android.feature.documentscanner.domain.usecase.MonitorScanSessionUseCase
+import mega.privacy.android.feature.documentscanner.domain.usecase.ReplaceScannedPageUseCase
 import mega.privacy.android.feature.documentscanner.presentation.model.BoundaryOverlayState
 import mega.privacy.android.feature.documentscanner.presentation.model.ScanSessionUiState
 import timber.log.Timber
@@ -48,6 +49,7 @@ internal class ScanSessionViewModel @Inject constructor(
     private val documentPageCapturer: DocumentPageCapturer,
     private val addScannedPageUseCase: AddScannedPageUseCase,
     private val monitorScanSessionUseCase: MonitorScanSessionUseCase,
+    private val replaceScannedPageUseCase: ReplaceScannedPageUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ScanSessionUiState())
@@ -55,6 +57,9 @@ internal class ScanSessionViewModel @Inject constructor(
 
     private var lastFrameTimestampMs: Long = 0L
     private var lastCaptureTimestampMs: Long? = null
+
+    /** When set, the next capture replaces this page in place instead of adding one. */
+    private var retakePageId: String? = null
 
     init {
         viewModelScope.launch {
@@ -171,12 +176,29 @@ internal class ScanSessionViewModel @Inject constructor(
         // this matches the captured frame; a manual capture of a moving document may
         // rectify to a slightly stale quad, which is acceptable.
         val boundary = _uiState.value.boundaryOverlayState.boundary
+        val retakeId = retakePageId
         viewModelScope.launch {
             runCatching {
                 val page = documentPageCapturer.capture(jpegBytes, rotationDegrees, boundary)
-                addScannedPageUseCase(page)
+                if (retakeId != null) {
+                    replaceScannedPageUseCase(retakeId, page)
+                    retakePageId = null
+                    _uiState.update { it.copy(retakeCompleteEvent = triggered) }
+                } else {
+                    addScannedPageUseCase(page)
+                }
             }.onFailure { Timber.e(it, "[DocScanner] Capture pipeline failed") }
         }
+    }
+
+    /** Enter retake mode: the next capture replaces [pageId] in place, then returns. */
+    fun enterRetakeMode(pageId: String) {
+        retakePageId = pageId
+    }
+
+    /** The screen has navigated back after a completed retake. */
+    fun onRetakeCompleteHandled() {
+        _uiState.update { it.copy(retakeCompleteEvent = consumed) }
     }
 
     private fun cooldownElapsed(now: Long): Boolean =

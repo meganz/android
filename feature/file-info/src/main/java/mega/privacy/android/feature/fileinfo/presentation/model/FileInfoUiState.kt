@@ -59,4 +59,28 @@ internal data class FileInfoUiState(
      */
     val mapCoordinates: Coordinates?
         get() = coordinates?.takeIf { accessPermission == AccessPermission.OWNER }
+
+    /**
+     * The description is editable only outside the rubbish bin / Backups and with write access.
+     */
+    val canEditDescription: Boolean
+        get() = !isNodeInRubbish && !isNodeInBackups &&
+                (accessPermission == AccessPermission.FULL ||
+                        accessPermission == AccessPermission.OWNER)
+
+    /**
+     * Tags can be edited only outside the rubbish bin / Backups and with write access.
+     */
+    val canEditTags: Boolean
+        get() = !isNodeInRubbish && !isNodeInBackups &&
+                (accessPermission == AccessPermission.FULL ||
+                        accessPermission == AccessPermission.OWNER)
+
+    /**
+     * The tags section is shown for any accessible node outside the rubbish bin / Backups; whether it
+     * is also editable is [canEditTags].
+     */
+    val canShowTags: Boolean
+        get() = !isNodeInRubbish && !isNodeInBackups &&
+                accessPermission != AccessPermission.UNKNOWN
 }

@@ -789,6 +789,17 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                     )
                 }
 
+                EventEffect(
+                    event = state.noFilesToUploadEvent,
+                    onConsumed = viewModel::onConsumeNoFilesToUploadEvent
+                ) {
+                    dismissAlertDialogIfExists(statusDialog)
+                    finishShareAndBack(
+                        INVALID_HANDLE,
+                        getString(sharedR.string.unable_to_open_selected_file_message)
+                    )
+                }
+
                 if (state.isUploadingScans && state.isScanUploadingAborted) {
                     DiscardScanWarningDialog(
                         hasMultipleScans = state.hasMultipleScans,

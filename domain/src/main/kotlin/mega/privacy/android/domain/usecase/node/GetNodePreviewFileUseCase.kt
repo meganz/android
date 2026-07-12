@@ -34,6 +34,6 @@ class GetNodePreviewFileUseCase @Inject constructor(
             }
         }
         return file ?: fileSystemRepository.getLocalFile(node)
-        ?: cacheRepository.getPreviewFile(node.name)
+        ?: cacheRepository.getPreviewFile(node.name, node.size, node.modificationTime)
     }
 }

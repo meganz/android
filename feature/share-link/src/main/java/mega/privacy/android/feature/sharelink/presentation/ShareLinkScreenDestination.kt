@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import de.palm.composestateevents.EventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
@@ -78,9 +79,31 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
     navigationHandler: NavigationHandler,
 ) {
     entry<LinkSettingsNavKey> { key ->
+        val viewModel = hiltViewModel<LinkSettingsViewModel, LinkSettingsViewModel.Factory> { factory ->
+            factory.create(LinkSettingsViewModel.Args(handles = key.handles))
+        }
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val resources = LocalResources.current
+        val snackbarQueue = rememberSnackBarQueue()
+        val coroutineScope = rememberCoroutineScope()
+
+        EventEffect(event = uiState.savedEvent, onConsumed = viewModel::onSavedEventConsumed) {
+            navigationHandler.back()
+        }
+        EventEffect(event = uiState.errorEvent, onConsumed = viewModel::onErrorEventConsumed) {
+            coroutineScope.launch {
+                snackbarQueue.queueMessage(
+                    resources.getString(sharedR.string.general_request_failed_message)
+                )
+            }
+        }
+
         LinkSettingsScreen(
-            handles = key.handles,
+            uiState = uiState,
             onBack = navigationHandler::back,
+            onExpiryEnabled = viewModel::onExpiryEnabled,
+            onPasswordEnabled = viewModel::onPasswordEnabled,
+            onSave = viewModel::onSave,
         )
     }
 }
