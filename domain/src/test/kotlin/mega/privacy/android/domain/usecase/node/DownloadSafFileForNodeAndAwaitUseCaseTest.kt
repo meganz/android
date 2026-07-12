@@ -175,4 +175,30 @@ class DownloadSafFileForNodeAndAwaitUseCaseTest {
                 tempDir.deleteRecursively()
             }
         }
+
+    @Test
+    fun `test that invoke throws FileNotFoundException and neither returns nor deletes a file outside the download directory when node name contains path traversal`() =
+        runTest {
+            val root = Files.createTempDirectory("saf_traversal").toFile()
+            try {
+                val downloadDir = File(root, "cache/preview").apply { mkdirs() }
+                val secretFile = File(root, "databases/session.db").apply {
+                    parentFile?.mkdirs()
+                    createNewFile()
+                    writeText("session-secret")
+                }
+                val node: TypedFileNode = mock()
+                whenever(node.name).thenReturn("../../databases/session.db")
+                whenever(getFilePreviewDownloadPathUseCase())
+                    .thenReturn(downloadDir.absolutePath)
+
+                assertThrows<FileNotFoundException> { underTest(node) }
+
+                assertThat(secretFile.exists()).isTrue()
+                assertThat(secretFile.readText()).isEqualTo("session-secret")
+                verify(downloadNodeUseCase, never()).invoke(any(), any(), any(), any())
+            } finally {
+                root.deleteRecursively()
+            }
+        }
 }
