@@ -81,7 +81,7 @@ class GlobalOnNodesUpdateHandler @Inject constructor(
                 ContactUtil.getMegaUserNameDB(user) ?: ""
             } ?: ""
 
-            val folderName = if (n.isNodeKeyDecrypted) n.name else notificationTitle
+            val folderName = (if (n.isNodeKeyDecrypted) n.name else notificationTitle).toCDATA()
 
             val source =
                 "<b>$folderName</b> " +

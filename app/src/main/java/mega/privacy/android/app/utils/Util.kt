@@ -193,15 +193,16 @@ object Util {
     }
 
     @JvmStatic
-    fun String?.toCDATAOrNull() = this?.toCDATA() ?: this
+    fun String?.toCDATAOrNull(): String? = this?.toCDATA()
 
-    fun String.toCDATA() = this.apply {
-        replace("&", "&amp;")
+    fun String.toCDATA(): String {
+        val escaped = replace("&", "&amp;")
             .replace("\"", "&quot;")
             .replace("'", "&#39;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
-    }.let { ChatUtil.converterShortCodes(it) } ?: this
+        return ChatUtil.converterShortCodes(escaped) ?: escaped
+    }
 
     @JvmStatic
     fun getNumberItemChildren(file: File, context: Context): String {
