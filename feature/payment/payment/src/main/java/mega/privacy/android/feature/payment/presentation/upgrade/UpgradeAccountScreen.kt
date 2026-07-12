@@ -62,6 +62,7 @@ import mega.privacy.android.feature.payment.components.FreePlanCard
 import mega.privacy.android.feature.payment.components.NewFeatureRow
 import mega.privacy.android.feature.payment.components.TEST_TAG_FREE_PLAN_CARD
 import mega.privacy.android.feature.payment.components.UpgradeAccountScreenTopBar
+import mega.privacy.android.feature.payment.components.upgradeAccountRevampSkeleton
 import mega.privacy.android.feature.payment.model.AccountStorageUIState
 import mega.privacy.android.feature.payment.model.OfferHighlight
 import mega.privacy.android.feature.payment.model.ProFeature
@@ -102,7 +103,10 @@ fun UpgradeAccountScreen(
     val position by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
     val itemOffset by remember { derivedStateOf { lazyListState.firstVisibleItemScrollOffset } }
     val currentHeaderHeightPx = headerHeightPx - itemOffset
-    val transparent = position == 0 && currentHeaderHeightPx > topBarHeightPx
+    val showFullSkeleton = isSubscriptionRevampEnabled &&
+            uiState.localisedSubscriptionsList.isEmpty() &&
+            uiState.isSubscriptionFeatureAvailable != false
+    val transparent = !showFullSkeleton && position == 0 && currentHeaderHeightPx > topBarHeightPx
     val alpha by animateFloatAsState(targetValue = if (transparent) 0f else 1f)
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -247,143 +251,147 @@ fun UpgradeAccountScreen(
         LazyColumn(
             modifier = Modifier
                 .testTag(TEST_TAG_LAZY_COLUMN)
+                .padding(top = if (showFullSkeleton) innerPadding.calculateTopPadding() else 0.dp)
                 .padding(bottom = innerPadding.calculateBottomPadding())
                 .fillMaxSize(),
             state = lazyListState,
         ) {
-            item("image_header") {
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .testTag(TEST_TAG_IMAGE_HEADER),
-                    painter = painterResource(
-                        if (showOfferBanner) {
-                            IconPackR.drawable.subscription_offer_banner
-                        } else {
-                            IconPackR.drawable.choose_account_type_header
-                        }
-                    ),
-                    contentDescription = "Header Image",
-                    contentScale = ContentScale.Crop
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            if (isSubscriptionRevampEnabled) {
-                when (offerHighlight) {
-                    is OfferHighlight.Single -> subscriptionOfferContent(
-                        uiState = uiState,
-                        offerSubscription = offerHighlight.subscription,
-                        isMonthly = isMonthly,
-                        onMonthlyChange = { isMonthly = it },
-                        locale = locale,
-                        context = context,
-                        isUpgradeAccount = isUpgradeAccount,
-                        onInAppCheckoutClick = onInAppCheckoutClick,
-                        onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
-                        onPricingPageClick = onPricingPageClick,
-                    )
-
-                    // TODO: render a dedicated multiple-offer layout for OfferHighlight.Multiple.
-                    //  Until then multiple concurrent offers use the standard revamp layout.
-                    is OfferHighlight.Multiple,
-                    OfferHighlight.None,
-                        -> subscriptionRevampContent(
-                        uiState = uiState,
-                        isMonthly = isMonthly,
-                        onMonthlyChange = { isMonthly = it },
-                        locale = locale,
-                        isUpgradeAccount = isUpgradeAccount,
-                        onInAppCheckoutClick = onInAppCheckoutClick,
-                        onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
-                        onPricingPageClick = onPricingPageClick,
-                    )
-                }
+            if (showFullSkeleton) {
+                upgradeAccountRevampSkeleton()
             } else {
-                item("get_more_with_pro_plan") {
-                    MegaText(
-                        text = stringResource(sharedR.string.choose_account_screen_get_more_with_pro_plan_title),
-                        style = MaterialTheme.typography.headlineSmall,
-                        textColor = TextColor.Primary,
+                item("image_header") {
+                    Image(
                         modifier = Modifier
-                            .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
-                            .testTag(TEST_TAG_TITLE)
-                    )
-                    MegaText(
-                        text = stringResource(id = sharedR.string.pro_plan_features_section_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        textColor = TextColor.Primary,
-                        modifier = Modifier
-                            .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
-                            .testTag(TEST_TAG_FEATURES_SECTION_TITLE)
-                    )
-                }
-                items(proFeatures, key = { it.title }) { feature ->
-                    val index = proFeatures.indexOf(feature)
-                    NewFeatureRow(
-                        painter = rememberVectorPainter(feature.icon),
-                        title = feature.title,
-                        description = feature.description,
-                        testTag = feature.testTag,
-                        modifier = Modifier.testTag("$TEST_TAG_FEATURE_ROW$index")
-                    )
-                }
-
-                if (uiState.isSubscriptionFeatureAvailable == false) {
-                    subscriptionUnavailableContent(onLearnMoreClick = onSubscriptionUnavailableLearnMoreClick)
-                } else {
-                    subscriptionAvailableContent(
-                        uiState = uiState,
-                        isMonthly = isMonthly,
-                        onMonthlyChange = { isMonthly = it },
-                        chosenPlan = chosenPlan,
-                        onPlanSelected = { chosenPlan = it },
-                        hasDiscount = hasDiscount,
-                        context = context,
-                        locale = locale,
-                        isUpgradeAccount = isUpgradeAccount,
-                    )
-                }
-            }
-
-            item("additional_benefits") {
-                AdditionalBenefitProPlanView(
-                    title = stringResource(id = sharedR.string.pro_plan_additional_benefits_section_title),
-                    benefits = listOf(
-                        stringResource(id = sharedR.string.pro_plan_benefit_password_protected_links),
-                        stringResource(id = sharedR.string.pro_plan_benefit_links_with_expiry_dates),
-                        stringResource(id = sharedR.string.pro_plan_benefit_auto_sync_mobile),
-                        stringResource(
-                            id = sharedR.string.pro_plan_benefit_rewind_days,
-                            if (isSubscriptionRevampEnabled) 180 else 60
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .testTag(TEST_TAG_IMAGE_HEADER),
+                        painter = painterResource(
+                            if (showOfferBanner) {
+                                IconPackR.drawable.subscription_offer_banner
+                            } else {
+                                IconPackR.drawable.choose_account_type_header
+                            }
                         ),
-                        stringResource(id = sharedR.string.pro_plan_benefit_host_calls_unlimited),
-                        stringResource(id = sharedR.string.pro_plan_benefit_schedule_rubbish_bin_clearing),
-                        stringResource(id = sharedR.string.pro_plan_benefit_priority_support),
-                    ),
-                    modifier = Modifier.testTag(TEST_TAG_ADDITIONAL_BENEFITS)
-                )
-            }
+                        contentDescription = "Header Image",
+                        contentScale = ContentScale.Crop
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                if (isSubscriptionRevampEnabled) {
+                    when (offerHighlight) {
+                        is OfferHighlight.Single -> subscriptionOfferContent(
+                            uiState = uiState,
+                            offerSubscription = offerHighlight.subscription,
+                            isMonthly = isMonthly,
+                            onMonthlyChange = { isMonthly = it },
+                            locale = locale,
+                            context = context,
+                            isUpgradeAccount = isUpgradeAccount,
+                            onInAppCheckoutClick = onInAppCheckoutClick,
+                            onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
+                            onPricingPageClick = onPricingPageClick,
+                        )
 
-            item("free_plan_card") {
-                if (!isUpgradeAccount) {
-                    FreePlanCard(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .testTag(TEST_TAG_FREE_PLAN_CARD),
-                        onContinue = onFreePlanClicked,
-                        isNewCreationAccount = isNewCreationAccount,
-                        storageFormatted = baseStorageFormatted,
+                        // TODO: render a dedicated multiple-offer layout for OfferHighlight.Multiple.
+                        //  Until then multiple concurrent offers use the standard revamp layout.
+                        is OfferHighlight.Multiple,
+                        OfferHighlight.None,
+                            -> subscriptionRevampContent(
+                            uiState = uiState,
+                            isMonthly = isMonthly,
+                            onMonthlyChange = { isMonthly = it },
+                            locale = locale,
+                            isUpgradeAccount = isUpgradeAccount,
+                            onInAppCheckoutClick = onInAppCheckoutClick,
+                            onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
+                            onPricingPageClick = onPricingPageClick,
+                        )
+                    }
+                } else {
+                    item("get_more_with_pro_plan") {
+                        MegaText(
+                            text = stringResource(sharedR.string.choose_account_screen_get_more_with_pro_plan_title),
+                            style = MaterialTheme.typography.headlineSmall,
+                            textColor = TextColor.Primary,
+                            modifier = Modifier
+                                .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                                .testTag(TEST_TAG_TITLE)
+                        )
+                        MegaText(
+                            text = stringResource(id = sharedR.string.pro_plan_features_section_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            textColor = TextColor.Primary,
+                            modifier = Modifier
+                                .padding(bottom = 8.dp, start = 16.dp, end = 16.dp)
+                                .testTag(TEST_TAG_FEATURES_SECTION_TITLE)
+                        )
+                    }
+                    items(proFeatures, key = { it.title }) { feature ->
+                        val index = proFeatures.indexOf(feature)
+                        NewFeatureRow(
+                            painter = rememberVectorPainter(feature.icon),
+                            title = feature.title,
+                            description = feature.description,
+                            testTag = feature.testTag,
+                            modifier = Modifier.testTag("$TEST_TAG_FEATURE_ROW$index")
+                        )
+                    }
+
+                    if (uiState.isSubscriptionFeatureAvailable == false) {
+                        subscriptionUnavailableContent(onLearnMoreClick = onSubscriptionUnavailableLearnMoreClick)
+                    } else {
+                        subscriptionAvailableContent(
+                            uiState = uiState,
+                            isMonthly = isMonthly,
+                            onMonthlyChange = { isMonthly = it },
+                            chosenPlan = chosenPlan,
+                            onPlanSelected = { chosenPlan = it },
+                            hasDiscount = hasDiscount,
+                            context = context,
+                            locale = locale,
+                            isUpgradeAccount = isUpgradeAccount,
+                        )
+                    }
+                }
+
+                item("additional_benefits") {
+                    AdditionalBenefitProPlanView(
+                        title = stringResource(id = sharedR.string.pro_plan_additional_benefits_section_title),
+                        benefits = listOf(
+                            stringResource(id = sharedR.string.pro_plan_benefit_password_protected_links),
+                            stringResource(id = sharedR.string.pro_plan_benefit_links_with_expiry_dates),
+                            stringResource(id = sharedR.string.pro_plan_benefit_auto_sync_mobile),
+                            stringResource(
+                                id = sharedR.string.pro_plan_benefit_rewind_days,
+                                if (isSubscriptionRevampEnabled) 180 else 60
+                            ),
+                            stringResource(id = sharedR.string.pro_plan_benefit_host_calls_unlimited),
+                            stringResource(id = sharedR.string.pro_plan_benefit_schedule_rubbish_bin_clearing),
+                            stringResource(id = sharedR.string.pro_plan_benefit_priority_support),
+                        ),
+                        modifier = Modifier.testTag(TEST_TAG_ADDITIONAL_BENEFITS)
                     )
                 }
-            }
 
-            item("subscription_info") {
-                SubscriptionInformation(context)
+                item("free_plan_card") {
+                    if (!isUpgradeAccount) {
+                        FreePlanCard(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .testTag(TEST_TAG_FREE_PLAN_CARD),
+                            onContinue = onFreePlanClicked,
+                            isNewCreationAccount = isNewCreationAccount,
+                            storageFormatted = baseStorageFormatted,
+                        )
+                    }
+                }
+
+                item("subscription_info") {
+                    SubscriptionInformation(context)
+                }
             }
         }
     }
-
 }
 
 fun isCurrentPlan(

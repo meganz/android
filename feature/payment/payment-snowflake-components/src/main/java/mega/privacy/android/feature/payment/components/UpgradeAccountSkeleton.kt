@@ -132,9 +132,108 @@ fun ProPlanCardSkeleton(
 }
 
 /**
+ * Full-page skeleton for the redesigned subscription page. Replaces the whole screen content while
+ * subscriptions are loading: a title line, a shorter subtitle line, then placeholder plan cards.
+ */
+fun LazyListScope.upgradeAccountRevampSkeleton(itemCount: Int = 3) {
+    item(TEST_TAG_REVAMP_SKELETON_HEADER) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(all = 16.dp)
+                .testTag(TEST_TAG_REVAMP_SKELETON_HEADER),
+        ) {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(16.dp)
+                    .shimmerEffect(RoundedCornerShape(12.dp))
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(
+                modifier = Modifier
+                    .width(112.dp)
+                    .height(16.dp)
+                    .shimmerEffect(RoundedCornerShape(12.dp))
+            )
+        }
+    }
+    items(itemCount) { index ->
+        PlanPriceCardSkeleton(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .testTag("$TEST_TAG_PLAN_PRICE_CARD_SKELETON$index")
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+/**
+ * Skeleton item matching [PlanPriceCard] layout: name line, price line, two benefit lines, and a
+ * full-width buy-button placeholder.
+ */
+@Composable
+fun PlanPriceCardSkeleton(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = DSTokens.colors.border.strong,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Spacer(
+            modifier = Modifier
+                .width(48.dp)
+                .height(16.dp)
+                .shimmerEffect(RoundedCornerShape(12.dp))
+        )
+        Spacer(
+            modifier = Modifier
+                .width(90.dp)
+                .height(16.dp)
+                .shimmerEffect(RoundedCornerShape(12.dp))
+        )
+        Spacer(
+            modifier = Modifier
+                .width(230.dp)
+                .height(16.dp)
+                .shimmerEffect(RoundedCornerShape(12.dp))
+        )
+        Spacer(
+            modifier = Modifier
+                .width(230.dp)
+                .height(16.dp)
+                .shimmerEffect(RoundedCornerShape(12.dp))
+        )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(32.dp)
+                .shimmerEffect(RoundedCornerShape(8.dp))
+        )
+    }
+}
+
+/**
  * Test tag for the ProPlanCard skeleton
  */
 internal const val TEST_TAG_PRO_PLAN_CARD_SKELETON = "upgrade_account:pro_plan_card_skeleton"
+
+/**
+ * Test tag for the redesigned subscription page skeleton header (title + subtitle lines)
+ */
+const val TEST_TAG_REVAMP_SKELETON_HEADER = "upgrade_account:revamp_skeleton_header"
+
+/**
+ * Test tag prefix for each PlanPriceCard skeleton (append index)
+ */
+const val TEST_TAG_PLAN_PRICE_CARD_SKELETON = "upgrade_account:plan_price_card_skeleton"
 
 @CombinedThemePreviews
 @Composable
@@ -151,6 +250,26 @@ private fun UpgradeAccountSkeletonPreview() {
 private fun ProPlanCardSkeletonPreview() {
     AndroidThemeForPreviews {
         ProPlanCardSkeleton(
+            modifier = Modifier.padding(16.dp)
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun UpgradeAccountRevampSkeletonPreview() {
+    AndroidThemeForPreviews {
+        LazyColumn {
+            upgradeAccountRevampSkeleton(itemCount = 3)
+        }
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PlanPriceCardSkeletonPreview() {
+    AndroidThemeForPreviews {
+        PlanPriceCardSkeleton(
             modifier = Modifier.padding(16.dp)
         )
     }

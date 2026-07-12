@@ -28,7 +28,9 @@ import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_COUNTDOWN
 import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_PRICE_CARD
 import mega.privacy.android.feature.payment.components.TEST_TAG_OFFER_PRICE_CARD_BUTTON
 import mega.privacy.android.feature.payment.components.TEST_TAG_PLAN_PRICE_CARD_BUTTON
+import mega.privacy.android.feature.payment.components.TEST_TAG_PLAN_PRICE_CARD_SKELETON
 import mega.privacy.android.feature.payment.components.TEST_TAG_PRO_PLAN_CARD
+import mega.privacy.android.feature.payment.components.TEST_TAG_REVAMP_SKELETON_HEADER
 import mega.privacy.android.feature.payment.components.TEST_TAG_WHY_GO_PRO_CARD
 import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
@@ -712,6 +714,64 @@ class UpgradeAccountScreenTest {
         isSubscriptionFeatureAvailable = true,
         cheapestSubscriptionAvailable = subscriptionProII,
     )
+
+    @Test
+    fun `test that full skeleton is shown when revamp enabled and subscriptions are loading`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = UpgradeAccountState(
+                localisedSubscriptionsList = emptyList(),
+                isSubscriptionFeatureAvailable = null,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_SKELETON_HEADER).assertExists()
+        composeRule.onNodeWithTag("${TEST_TAG_PLAN_PRICE_CARD_SKELETON}0").assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that full skeleton is not shown when revamp enabled and subscriptions are loaded`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = null),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_SKELETON_HEADER).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertExists()
+    }
+
+    @Test
+    fun `test that full skeleton is not shown when revamp disabled and subscriptions are loading`() {
+        setContent(
+            isSubscriptionRevampEnabled = false,
+            uiState = UpgradeAccountState(
+                localisedSubscriptionsList = emptyList(),
+                isSubscriptionFeatureAvailable = null,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_SKELETON_HEADER).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that full skeleton is not shown when subscription feature is unavailable`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = UpgradeAccountState(
+                localisedSubscriptionsList = emptyList(),
+                isSubscriptionFeatureAvailable = false,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_SKELETON_HEADER).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_UNAVAILABLE_BANNER))
+            .assertExists()
+    }
 
     private fun revampUiState(
         currentPlan: AccountType? = AccountType.PRO_I,
