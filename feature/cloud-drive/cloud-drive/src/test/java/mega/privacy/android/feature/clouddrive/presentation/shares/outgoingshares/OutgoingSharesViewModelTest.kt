@@ -7,6 +7,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -29,11 +30,16 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
+import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.SetCloudSortOrder
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorSortCloudOrderUseCase
 import mega.privacy.android.domain.usecase.shares.GetOutgoingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -42,10 +48,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -57,9 +65,13 @@ class OutgoingSharesViewModelTest {
     private val getOutgoingSharesChildrenNodeUseCase: GetOutgoingSharesChildrenNodeUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
+    private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase = mock()
+    private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase = mock()
+    private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase = mock()
+    private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase = mock()
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
-    private val getCloudSortOrder: GetCloudSortOrder = mock()
+    private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val setCloudSortOrder: SetCloudSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
@@ -81,9 +93,13 @@ class OutgoingSharesViewModelTest {
             getOutgoingSharesChildrenNodeUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
+            monitorFolderViewTypeUseCase,
+            setFolderViewTypeUseCase,
+            monitorFolderSortOrderUseCase,
+            setFolderSortOrderUseCase,
             monitorNodeUpdatesByIdUseCase,
             nodeUiItemMapper,
-            getCloudSortOrder,
+            monitorSortCloudOrderUseCase,
             setCloudSortOrder,
             nodeSortConfigurationUiMapper,
             getContactVerificationWarningUseCase
@@ -94,23 +110,31 @@ class OutgoingSharesViewModelTest {
         getOutgoingSharesChildrenNodeUseCase = getOutgoingSharesChildrenNodeUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
+        monitorFolderViewTypeUseCase = monitorFolderViewTypeUseCase,
+        setFolderViewTypeUseCase = setFolderViewTypeUseCase,
+        monitorFolderSortOrderUseCase = monitorFolderSortOrderUseCase,
+        setFolderSortOrderUseCase = setFolderSortOrderUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
-        getCloudSortOrderUseCase = getCloudSortOrder,
+        monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
         setCloudSortOrderUseCase = setCloudSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     )
 
     private suspend fun setupTestData(items: List<ShareNode>, nodeName: String = "Test Folder") {
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(
             nodeSortConfigurationUiMapper(
                 SortOrder.ORDER_DEFAULT_ASC,
                 NodeSourceType.OUTGOING_SHARES
             )
         ).thenReturn(NodeSortConfiguration.Companion.default)
-        whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(items)
+        whenever(monitorFolderViewTypeUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+        whenever(monitorFolderSortOrderUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
+        whenever(getOutgoingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(items)
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -522,7 +546,12 @@ class OutgoingSharesViewModelTest {
         underTest.processAction(OutgoingSharesAction.ChangeViewTypeClicked)
         advanceUntilIdle()
 
-        verify(setViewTypeUseCase).invoke(ViewType.GRID)
+        verify(setFolderViewTypeUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.OUTGOING_SHARES),
+            viewType = eq(ViewType.GRID),
+            currentSortOrder = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -541,7 +570,12 @@ class OutgoingSharesViewModelTest {
         underTest.processAction(OutgoingSharesAction.ChangeViewTypeClicked)
         advanceUntilIdle()
 
-        verify(setViewTypeUseCase).invoke(ViewType.LIST)
+        verify(setFolderViewTypeUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.OUTGOING_SHARES),
+            viewType = eq(ViewType.LIST),
+            currentSortOrder = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -572,15 +606,15 @@ class OutgoingSharesViewModelTest {
     }
 
     @Test
-    fun `test that getCloudSortOrder updates selectedSort in UI state on success`() = runTest {
+    fun `test that monitorSortOrder updates selectedSort in UI state`() = runTest {
         setupTestData(emptyList())
-        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
+        val expectedSortOrder = SortOrder.ORDER_SIZE_DESC
         val expectedSortConfiguration = NodeSortConfiguration.Companion.default
 
-        whenever(getCloudSortOrder()).thenReturn(expectedSortOrder)
-        whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(
-            expectedSortConfiguration
-        )
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(expectedSortOrder))
+        whenever(
+            nodeSortConfigurationUiMapper(expectedSortOrder, NodeSourceType.OUTGOING_SHARES)
+        ).thenReturn(expectedSortConfiguration)
 
         val underTest = createViewModel()
         advanceUntilIdle()
@@ -593,14 +627,13 @@ class OutgoingSharesViewModelTest {
     }
 
     @Test
-    fun `test that setSortOrder calls use case and refetches sort order`() = runTest {
+    fun `test that setSortOrder writes via setFolderSortOrderUseCase`() = runTest {
         setupTestData(emptyList())
         val sortConfiguration =
             NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
         val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
 
         whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
-        whenever(getCloudSortOrder()).thenReturn(expectedSortOrder)
 
         val underTest = createViewModel()
         advanceUntilIdle()
@@ -608,8 +641,12 @@ class OutgoingSharesViewModelTest {
         underTest.setSortOrder(sortConfiguration)
         advanceUntilIdle()
 
-        verify(getCloudSortOrder, times(2)).invoke()
-        verify(setCloudSortOrder).invoke(expectedSortOrder)
+        verify(setFolderSortOrderUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.OUTGOING_SHARES),
+            sortOrder = eq(expectedSortOrder),
+            currentViewType = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -715,7 +752,11 @@ class OutgoingSharesViewModelTest {
             }
 
             whenever(getContactVerificationWarningUseCase()).thenReturn(true)
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+            whenever(monitorFolderViewTypeUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+            whenever(monitorFolderSortOrderUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
             whenever(
                 nodeSortConfigurationUiMapper(
                     SortOrder.ORDER_DEFAULT_ASC,
@@ -724,7 +765,7 @@ class OutgoingSharesViewModelTest {
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+            whenever(getOutgoingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -762,7 +803,11 @@ class OutgoingSharesViewModelTest {
             }
 
             whenever(getContactVerificationWarningUseCase()).thenReturn(false)
-            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+            whenever(monitorFolderViewTypeUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+            whenever(monitorFolderSortOrderUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
             whenever(
                 nodeSortConfigurationUiMapper(
                     SortOrder.ORDER_DEFAULT_ASC,
@@ -771,7 +816,7 @@ class OutgoingSharesViewModelTest {
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+            whenever(getOutgoingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -808,14 +853,18 @@ class OutgoingSharesViewModelTest {
         }
 
         whenever(getContactVerificationWarningUseCase()).thenThrow(RuntimeException("Test exception"))
-        whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+        whenever(monitorFolderViewTypeUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+        whenever(monitorFolderSortOrderUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
         whenever(
             nodeSortConfigurationUiMapper(
                 SortOrder.ORDER_DEFAULT_ASC,
                 NodeSourceType.OUTGOING_SHARES
             )
         ).thenReturn(NodeSortConfiguration.default)
-        whenever(getOutgoingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+        whenever(getOutgoingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
         val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
         whenever(

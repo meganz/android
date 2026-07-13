@@ -14,7 +14,6 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkNode
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
-import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import javax.inject.Inject
 
@@ -29,7 +28,6 @@ import javax.inject.Inject
  */
 class MonitorLinksUseCase @Inject constructor(
     private val shareRepository: ShareRepository,
-    private val getLinksSortOrderUseCase: GetLinksSortOrderUseCase,
     private val mapNodeToPublicLinkUseCase: MapNodeToPublicLinkUseCase,
     private val nodeRepository: NodeRepository,
     private val monitorOfflineNodeUpdatesUseCase: MonitorOfflineNodeUpdatesUseCase,
@@ -39,10 +37,10 @@ class MonitorLinksUseCase @Inject constructor(
     /**
      * Invoke
      *
-     * @param sortOrder the order to sort the links by; when null the global links sort order is used.
+     * @param sortOrder the order to sort the links by.
      * @return
      */
-    operator fun invoke(sortOrder: SortOrder? = null) =
+    operator fun invoke(sortOrder: SortOrder) =
         merge(
             monitorOnlineNodeUpdates(),
             monitorOfflineNodeUpdates()
@@ -87,9 +85,9 @@ class MonitorLinksUseCase @Inject constructor(
             it.contains(NodeChanges.Public_link)
         }
 
-    private suspend fun getPublicLinks(sortOrder: SortOrder? = null): List<PublicLinkNode> {
+    private suspend fun getPublicLinks(sortOrder: SortOrder): List<PublicLinkNode> {
         val publicLinks =
-            shareRepository.getPublicLinks(sortOrder ?: getLinksSortOrderUseCase(true))
+            shareRepository.getPublicLinks(sortOrder)
         nodeIds = publicLinks.mapTo(mutableSetOf()) { it.id }
         return publicLinks
             .mapNotNull {

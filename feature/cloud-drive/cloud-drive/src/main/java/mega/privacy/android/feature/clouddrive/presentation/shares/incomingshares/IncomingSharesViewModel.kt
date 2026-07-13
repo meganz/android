@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.node.NodeChanges
@@ -16,11 +18,17 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetOthersSortOrder
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorOthersSortOrderUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -38,9 +46,13 @@ class IncomingSharesViewModel @Inject constructor(
     private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase,
     private val setViewTypeUseCase: SetViewType,
     private val monitorViewTypeUseCase: MonitorViewType,
+    private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase,
+    private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase,
+    private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase,
+    private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase,
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase,
     private val nodeUiItemMapper: NodeUiItemMapper,
-    private val getOthersSortOrder: GetOthersSortOrder,
+    private val monitorOthersSortOrderUseCase: MonitorOthersSortOrderUseCase,
     private val setOthersSortOrder: SetOthersSortOrder,
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
@@ -51,8 +63,7 @@ class IncomingSharesViewModel @Inject constructor(
 
     init {
         monitorViewType()
-        getSortOrder()
-        viewModelScope.launch { loadNodes() }
+        monitorSortOrder()
         monitorNodeUpdates()
     }
 
@@ -71,13 +82,16 @@ class IncomingSharesViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadNodes() {
+    private suspend fun loadNodes(sortOrder: SortOrder) {
         val folderId = uiState.value.currentFolderId
         runCatching {
             val isContactVerificationOn = runCatching {
                 getContactVerificationWarningUseCase()
             }.getOrDefault(false)
-            val nodes = getIncomingSharesChildrenNodeUseCase(folderId.longValue)
+            val nodes = getIncomingSharesChildrenNodeUseCase(
+                parentHandle = folderId.longValue,
+                sortOrder = sortOrder,
+            )
             val nodeUiItems = nodeUiItemMapper(
                 nodeList = nodes,
                 existingItems = uiState.value.items,
@@ -107,7 +121,7 @@ class IncomingSharesViewModel @Inject constructor(
                         it.copy(navigateBack = triggered)
                     }
                 } else {
-                    loadNodes()
+                    loadNodes(uiState.value.selectedSortOrder)
                 }
             }
         }
@@ -202,7 +216,12 @@ class IncomingSharesViewModel @Inject constructor(
                     ViewType.LIST -> ViewType.GRID
                     ViewType.GRID -> ViewType.LIST
                 }
-                setViewTypeUseCase(toggledViewType)
+                setFolderViewTypeUseCase(
+                    folderKey = FolderPreferenceKeys.INCOMING_SHARES,
+                    viewType = toggledViewType,
+                    currentSortOrder = uiState.value.selectedSortOrder,
+                    orElse = { setViewTypeUseCase(it) },
+                )
             }.onFailure {
                 Timber.e(it, "Failed to change view type")
             }
@@ -211,7 +230,10 @@ class IncomingSharesViewModel @Inject constructor(
 
     private fun monitorViewType() {
         viewModelScope.launch {
-            monitorViewTypeUseCase()
+            monitorFolderViewTypeUseCase(
+                folderKey = FolderPreferenceKeys.INCOMING_SHARES,
+                orElse = monitorViewTypeUseCase(),
+            )
                 .catch { Timber.e(it) }
                 .collect { viewType ->
                     _uiState.update { it.copy(currentViewType = viewType) }
@@ -219,26 +241,23 @@ class IncomingSharesViewModel @Inject constructor(
         }
     }
 
-    private fun getSortOrder(
-        refresh: Boolean = false,
-    ) {
+    private fun monitorSortOrder() {
         viewModelScope.launch {
-            runCatching {
-                getOthersSortOrder()
-            }.onSuccess { sortOrder ->
-                val sortOrderPair = nodeSortConfigurationUiMapper(sortOrder)
-                _uiState.update {
-                    it.copy(
-                        selectedSortConfiguration = sortOrderPair,
-                        selectedSortOrder = sortOrder
-                    )
+            monitorFolderSortOrderUseCase(
+                folderKey = FolderPreferenceKeys.INCOMING_SHARES,
+                orElse = monitorOthersSortOrderUseCase().filterNotNull(),
+            )
+                .distinctUntilChanged()
+                .catch { Timber.e(it) }
+                .collectLatest { sortOrder ->
+                    _uiState.update {
+                        it.copy(
+                            selectedSortConfiguration = nodeSortConfigurationUiMapper(sortOrder),
+                            selectedSortOrder = sortOrder,
+                        )
+                    }
+                    loadNodes(sortOrder)
                 }
-                if (refresh) {
-                    loadNodes()
-                }
-            }.onFailure {
-                Timber.e(it, "Failed to get sort order")
-            }
         }
     }
 
@@ -249,9 +268,12 @@ class IncomingSharesViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val order = nodeSortConfigurationUiMapper(sortConfiguration)
-                setOthersSortOrder(order)
-            }.onSuccess {
-                getSortOrder(refresh = true)
+                setFolderSortOrderUseCase(
+                    folderKey = FolderPreferenceKeys.INCOMING_SHARES,
+                    sortOrder = order,
+                    currentViewType = uiState.value.currentViewType,
+                    orElse = { setOthersSortOrder(it) },
+                )
             }.onFailure {
                 Timber.e(it, "Failed to set sort order")
             }

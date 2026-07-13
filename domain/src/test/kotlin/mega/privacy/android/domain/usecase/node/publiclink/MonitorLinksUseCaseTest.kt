@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFolder
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.repository.filemanagement.ShareRepository
-import mega.privacy.android.domain.usecase.GetLinksSortOrderUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -42,16 +41,12 @@ internal class MonitorLinksUseCaseTest {
     private val nodeRepository = mock<NodeRepository> {
         on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
     }
-    private val getLinksSortOrderUseCase = mock<GetLinksSortOrderUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
-    }
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
 
     @BeforeAll
     internal fun setUp() {
         underTest = MonitorLinksUseCase(
             shareRepository = shareRepository,
-            getLinksSortOrderUseCase = getLinksSortOrderUseCase,
             mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
             nodeRepository = nodeRepository,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase
@@ -64,7 +59,6 @@ internal class MonitorLinksUseCaseTest {
             shareRepository,
             mapNodeToPublicLinkUseCase,
             nodeRepository,
-            getLinksSortOrderUseCase,
             monitorOfflineNodeUpdatesUseCase
         )
         nodeRepository.stub {
@@ -72,9 +66,6 @@ internal class MonitorLinksUseCaseTest {
         }
         mapNodeToPublicLinkUseCase.stub {
             onBlocking { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
-        }
-        getLinksSortOrderUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
         }
     }
 
@@ -86,7 +77,7 @@ internal class MonitorLinksUseCaseTest {
         }
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
-        underTest().test {
+        underTest(SortOrder.ORDER_DEFAULT_ASC).test {
             assertThat(awaitItem()).hasSize(untypedNodes.size)
             cancelAndConsumeRemainingEvents()
         }
@@ -108,7 +99,7 @@ internal class MonitorLinksUseCaseTest {
             }
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
-            underTest().test {
+            underTest(SortOrder.ORDER_DEFAULT_ASC).test {
                 assertThat(awaitItem()).isEmpty()
                 nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))
                 assertThat(awaitItem()).hasSize(untypedNodes.size)
@@ -132,7 +123,7 @@ internal class MonitorLinksUseCaseTest {
             }
             whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
-            underTest().test {
+            underTest(SortOrder.ORDER_DEFAULT_ASC).test {
                 assertThat(awaitItem()).isEmpty()
                 nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Favourite))))
                 assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
@@ -164,7 +155,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest().test {
+            underTest(SortOrder.ORDER_DEFAULT_ASC).test {
                 assertThat(awaitItem()).hasSize(untypedNodes.size)
                 nodeUpdateChannel.send(update)
                 assertThat(awaitItem()).isEmpty()
@@ -201,7 +192,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest().test {
+            underTest(SortOrder.ORDER_DEFAULT_ASC).test {
                 assertThat(awaitItem()).hasSize(1)
                 assertThat(awaitItem()).hasSize(1)
                 cancelAndConsumeRemainingEvents()
@@ -238,7 +229,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest().test {
+            underTest(SortOrder.ORDER_DEFAULT_ASC).test {
                 assertThat(awaitItem()).hasSize(1)
                 assertThat(awaitItem()).hasSize(1) // After offline node added
                 assertThat(awaitItem()).hasSize(1) // After offline node removed
@@ -272,7 +263,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest().test {
+            underTest(SortOrder.ORDER_DEFAULT_ASC).test {
                 assertThat(awaitItem()).hasSize(1)
                 // Should not emit again because offline node doesn't match
                 assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
@@ -303,7 +294,7 @@ internal class MonitorLinksUseCaseTest {
                 )
             )
 
-            underTest().test {
+            underTest(SortOrder.ORDER_DEFAULT_ASC).test {
                 assertThat(awaitItem()).isEmpty()
                 // Should not emit again because nodeIds is empty
                 assertThat(cancelAndConsumeRemainingEvents()).isEmpty()
@@ -335,7 +326,7 @@ internal class MonitorLinksUseCaseTest {
             )
         )
 
-        underTest().test {
+        underTest(SortOrder.ORDER_DEFAULT_ASC).test {
             assertThat(awaitItem()).hasSize(1)
             assertThat(awaitItem()).hasSize(1)
             cancelAndConsumeRemainingEvents()
@@ -368,7 +359,7 @@ internal class MonitorLinksUseCaseTest {
             )
         )
 
-        underTest().test {
+        underTest(SortOrder.ORDER_DEFAULT_ASC).test {
             assertThat(awaitItem()).hasSize(1)
             assertThat(awaitItem()).hasSize(1)
             // Should not emit again because the set hasn't changed
@@ -409,7 +400,7 @@ internal class MonitorLinksUseCaseTest {
             )
         )
 
-        underTest().test {
+        underTest(SortOrder.ORDER_DEFAULT_ASC).test {
             assertThat(awaitItem()).hasSize(1)
             // Send online update
             nodeUpdateChannel.send(NodeUpdate(mapOf(mock<Node>() to listOf(NodeChanges.Public_link))))

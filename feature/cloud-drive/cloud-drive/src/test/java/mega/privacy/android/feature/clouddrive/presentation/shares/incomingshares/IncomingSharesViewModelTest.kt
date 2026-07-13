@@ -7,6 +7,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
@@ -24,11 +25,16 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.shares.ShareFileNode
 import mega.privacy.android.domain.entity.node.shares.ShareFolderNode
 import mega.privacy.android.domain.entity.node.shares.ShareNode
+import mega.privacy.android.domain.entity.preference.FolderPreferenceKeys
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.SetOthersSortOrder
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTypeUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
+import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
+import mega.privacy.android.domain.usecase.node.sort.MonitorOthersSortOrderUseCase
 import mega.privacy.android.domain.usecase.shares.GetIncomingSharesChildrenNodeUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -42,10 +48,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -57,9 +65,13 @@ class IncomingSharesViewModelTest {
     private val getIncomingSharesChildrenNodeUseCase: GetIncomingSharesChildrenNodeUseCase = mock()
     private val setViewTypeUseCase: SetViewType = mock()
     private val monitorViewTypeUseCase: MonitorViewType = mock()
+    private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase = mock()
+    private val setFolderViewTypeUseCase: SetFolderViewTypeUseCase = mock()
+    private val monitorFolderSortOrderUseCase: MonitorFolderSortOrderUseCase = mock()
+    private val setFolderSortOrderUseCase: SetFolderSortOrderUseCase = mock()
     private val monitorNodeUpdatesByIdUseCase: MonitorNodeUpdatesByIdUseCase = mock()
     private val nodeUiItemMapper: NodeUiItemMapper = mock()
-    private val getOthersSortOrder: GetOthersSortOrder = mock()
+    private val monitorOthersSortOrderUseCase: MonitorOthersSortOrderUseCase = mock()
     private val setOthersSortOrder: SetOthersSortOrder = mock()
     private val nodeSortConfigurationUiMapper: NodeSortConfigurationUiMapper = mock()
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase = mock()
@@ -81,9 +93,13 @@ class IncomingSharesViewModelTest {
             getIncomingSharesChildrenNodeUseCase,
             setViewTypeUseCase,
             monitorViewTypeUseCase,
+            monitorFolderViewTypeUseCase,
+            setFolderViewTypeUseCase,
+            monitorFolderSortOrderUseCase,
+            setFolderSortOrderUseCase,
             monitorNodeUpdatesByIdUseCase,
             nodeUiItemMapper,
-            getOthersSortOrder,
+            monitorOthersSortOrderUseCase,
             setOthersSortOrder,
             nodeSortConfigurationUiMapper,
             getContactVerificationWarningUseCase,
@@ -94,20 +110,28 @@ class IncomingSharesViewModelTest {
         getIncomingSharesChildrenNodeUseCase = getIncomingSharesChildrenNodeUseCase,
         setViewTypeUseCase = setViewTypeUseCase,
         monitorViewTypeUseCase = monitorViewTypeUseCase,
+        monitorFolderViewTypeUseCase = monitorFolderViewTypeUseCase,
+        setFolderViewTypeUseCase = setFolderViewTypeUseCase,
+        monitorFolderSortOrderUseCase = monitorFolderSortOrderUseCase,
+        setFolderSortOrderUseCase = setFolderSortOrderUseCase,
         monitorNodeUpdatesByIdUseCase = monitorNodeUpdatesByIdUseCase,
         nodeUiItemMapper = nodeUiItemMapper,
-        getOthersSortOrder = getOthersSortOrder,
+        monitorOthersSortOrderUseCase = monitorOthersSortOrderUseCase,
         setOthersSortOrder = setOthersSortOrder,
         nodeSortConfigurationUiMapper = nodeSortConfigurationUiMapper,
         getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
     )
 
     private suspend fun setupTestData(items: List<ShareNode>) {
-        whenever(getOthersSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(monitorOthersSortOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
             NodeSortConfiguration.default
         )
-        whenever(getIncomingSharesChildrenNodeUseCase(-1L)).thenReturn(items)
+        whenever(monitorFolderViewTypeUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+        whenever(monitorFolderSortOrderUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
+        whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(items)
 
         val nodeUiItems = items.map { node ->
             NodeUiItem<TypedNode>(
@@ -545,7 +569,12 @@ class IncomingSharesViewModelTest {
         underTest.processAction(IncomingSharesAction.ChangeViewTypeClicked)
         advanceUntilIdle()
 
-        verify(setViewTypeUseCase).invoke(ViewType.GRID)
+        verify(setFolderViewTypeUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.INCOMING_SHARES),
+            viewType = eq(ViewType.GRID),
+            currentSortOrder = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -564,7 +593,12 @@ class IncomingSharesViewModelTest {
         underTest.processAction(IncomingSharesAction.ChangeViewTypeClicked)
         advanceUntilIdle()
 
-        verify(setViewTypeUseCase).invoke(ViewType.LIST)
+        verify(setFolderViewTypeUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.INCOMING_SHARES),
+            viewType = eq(ViewType.LIST),
+            currentSortOrder = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -596,12 +630,12 @@ class IncomingSharesViewModelTest {
 
 
     @Test
-    fun `test that getOthersSortOrder updates selectedSort in UI state on success`() = runTest {
+    fun `test that monitorSortOrder updates selectedSort in UI state`() = runTest {
         setupTestData(emptyList())
-        val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
+        val expectedSortOrder = SortOrder.ORDER_SIZE_DESC
         val expectedSortConfiguration = NodeSortConfiguration.default
 
-        whenever(getOthersSortOrder()).thenReturn(expectedSortOrder)
+        whenever(monitorOthersSortOrderUseCase()).thenReturn(flowOf(expectedSortOrder))
         whenever(nodeSortConfigurationUiMapper(expectedSortOrder)).thenReturn(
             expectedSortConfiguration
         )
@@ -617,14 +651,13 @@ class IncomingSharesViewModelTest {
     }
 
     @Test
-    fun `test that setSortOrder calls use case and refetches sort order`() = runTest {
+    fun `test that setSortOrder writes via setFolderSortOrderUseCase`() = runTest {
         setupTestData(emptyList())
         val sortConfiguration =
             NodeSortConfiguration(NodeSortOption.Name, SortDirection.Ascending)
         val expectedSortOrder = SortOrder.ORDER_DEFAULT_ASC
 
         whenever(nodeSortConfigurationUiMapper(sortConfiguration)).thenReturn(expectedSortOrder)
-        whenever(getOthersSortOrder()).thenReturn(expectedSortOrder)
 
         val underTest = createViewModel()
         advanceUntilIdle()
@@ -632,11 +665,12 @@ class IncomingSharesViewModelTest {
         underTest.setSortOrder(sortConfiguration)
         advanceUntilIdle()
 
-        // Verify that getOthersSortOrder was called at least twice:
-        // 1. During initialization
-        // 2. After setting the sort order (refetch)
-        verify(getOthersSortOrder, times(2)).invoke()
-        verify(setOthersSortOrder).invoke(expectedSortOrder)
+        verify(setFolderSortOrderUseCase).invoke(
+            folderKey = eq(FolderPreferenceKeys.INCOMING_SHARES),
+            sortOrder = eq(expectedSortOrder),
+            currentViewType = any(),
+            orElse = any(),
+        )
     }
 
     @Test
@@ -744,7 +778,11 @@ class IncomingSharesViewModelTest {
             }
 
             whenever(getContactVerificationWarningUseCase()).thenReturn(true)
-            whenever(getOthersSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(monitorOthersSortOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+            whenever(monitorFolderViewTypeUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+            whenever(monitorFolderSortOrderUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
             whenever(
                 nodeSortConfigurationUiMapper(
                     SortOrder.ORDER_DEFAULT_ASC,
@@ -752,7 +790,7 @@ class IncomingSharesViewModelTest {
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getIncomingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+            whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -790,7 +828,11 @@ class IncomingSharesViewModelTest {
             }
 
             whenever(getContactVerificationWarningUseCase()).thenReturn(false)
-            whenever(getOthersSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+            whenever(monitorOthersSortOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+            whenever(monitorFolderViewTypeUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+            whenever(monitorFolderSortOrderUseCase(any(), any()))
+                .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
             whenever(
                 nodeSortConfigurationUiMapper(
                     SortOrder.ORDER_DEFAULT_ASC
@@ -798,7 +840,7 @@ class IncomingSharesViewModelTest {
             ).thenReturn(
                 NodeSortConfiguration.default
             )
-            whenever(getIncomingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+            whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
             val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
             whenever(
@@ -835,13 +877,17 @@ class IncomingSharesViewModelTest {
         }
 
         whenever(getContactVerificationWarningUseCase()).thenThrow(RuntimeException("Test exception"))
-        whenever(getOthersSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
+        whenever(monitorOthersSortOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
+        whenever(monitorFolderViewTypeUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
+        whenever(monitorFolderSortOrderUseCase(any(), any()))
+            .thenAnswer { it.getArgument<Flow<SortOrder>>(1) }
         whenever(
             nodeSortConfigurationUiMapper(
                 SortOrder.ORDER_DEFAULT_ASC
             )
         ).thenReturn(NodeSortConfiguration.default)
-        whenever(getIncomingSharesChildrenNodeUseCase(-1L)).thenReturn(listOf(node1))
+        whenever(getIncomingSharesChildrenNodeUseCase(eq(-1L), anyOrNull())).thenReturn(listOf(node1))
 
         val nodeUiItems = listOf(NodeUiItem<TypedNode>(node = node1, isSelected = false))
         whenever(
