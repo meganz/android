@@ -26,7 +26,6 @@ import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensiti
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -74,7 +73,7 @@ class ShareRecipientsViewModelTest {
 
     private fun initUnderTest() {
         underTest = ShareRecipientsViewModel(
-            navKey = FileContactInfoNavKey(
+            args = ShareRecipientsViewModel.Args(
                 folderName = TestValues.FOLDER_NAME,
                 folderHandle = TestValues.NODE_HANDLE,
             ),

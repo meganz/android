@@ -29,7 +29,12 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
     entry<FileContactInfoNavKey> { key ->
         val viewModel = hiltViewModel<ShareRecipientsViewModel, ShareRecipientsViewModel.Factory>(
             creationCallback = { factory ->
-                factory.create(key)
+                factory.create(
+                    ShareRecipientsViewModel.Args(
+                        folderHandle = key.folderHandle,
+                        folderName = key.folderName,
+                    )
+                )
             }
         )
         LaunchedEffect(Unit) {

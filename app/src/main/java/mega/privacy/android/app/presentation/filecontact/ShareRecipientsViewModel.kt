@@ -35,12 +35,11 @@ import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUs
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.feature_flags.AppFeatures
-import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = ShareRecipientsViewModel.Factory::class)
 internal class ShareRecipientsViewModel @AssistedInject constructor(
-    @Assisted private val navKey: FileContactInfoNavKey,
+    @Assisted private val args: Args,
     private val monitorShareRecipientsUseCase: MonitorShareRecipientsUseCase,
     private val shareFolderUseCase: ShareFolderUseCase,
     private val removeShareResultMapper: RemoveShareResultMapper,
@@ -50,14 +49,13 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
 ) : ViewModel() {
-    private val folderInfo = navKey
 
     val state: StateFlow<FileContactListState> by lazy {
         combine(
             flow {
-                emit(getAllowedSharingPermissionsUseCase(folderInfo.folderId))
+                emit(getAllowedSharingPermissionsUseCase(args.folderId))
             },
-            monitorShareRecipientsUseCase(folderInfo.folderId),
+            monitorShareRecipientsUseCase(args.folderId),
             flow {
                 emit(false)
                 emit(getContactVerificationWarningUseCase())
@@ -66,8 +64,8 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
             addContactFlow,
         ) { allowedPermissions: Set<AccessPermission>, recipients: List<ShareRecipient>, isContactVerificationWarningEnabled: Boolean, events: ShareEvents, addContact: AddContactState ->
             FileContactListState.Data(
-                folderName = folderInfo.folderName,
-                folderId = folderInfo.folderId,
+                folderName = args.folderName,
+                folderId = args.folderId,
                 recipients = recipients.toImmutableList(),
                 shareRemovedEvent = events.removeEvent,
                 sharingInProgress = events.shareInProgress,
@@ -82,8 +80,8 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
         }.asUiStateFlow(
             viewModelScope,
             FileContactListState.Loading(
-                folderName = folderInfo.folderName,
-                folderId = folderInfo.folderId,
+                folderName = args.folderName,
+                folderId = args.folderId,
             )
         )
     }
@@ -110,13 +108,13 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
                 getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
             }.getOrDefault(false)
             val warning = if (isComposeContactsPicker) {
-                getShareFolderSensitiveWarningUseCase(listOf(folderInfo.folderId))
+                getShareFolderSensitiveWarningUseCase(listOf(args.folderId))
             } else {
                 SensitiveNodeShareWarning.None
             }
             if (warning == SensitiveNodeShareWarning.None) {
                 addContactFlow.value = AddContactState(
-                    navigateEvent = triggered(folderInfo.folderHandle),
+                    navigateEvent = triggered(args.folderHandle),
                 )
             } else {
                 addContactFlow.value = AddContactState(warning = warning)
@@ -129,7 +127,7 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
      */
     fun onShareHiddenNodeWarningConfirmed() {
         addContactFlow.value = AddContactState(
-            navigateEvent = triggered(folderInfo.folderHandle),
+            navigateEvent = triggered(args.folderHandle),
         )
     }
 
@@ -183,7 +181,7 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             runCatching {
                 val result: MoveRequestResult.ShareMovement = shareFolderUseCase(
-                    nodeIds = listOf(folderInfo.folderId),
+                    nodeIds = listOf(args.folderId),
                     contactData = list.map { it.email },
                     accessPermission = AccessPermission.UNKNOWN,
                 )
@@ -214,7 +212,7 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
             runCatching {
                 eventsFlow.emit(ShareEvents.ShareStarted)
                 shareFolderUseCase(
-                    nodeIds = listOf(folderInfo.folderId),
+                    nodeIds = listOf(args.folderId),
                     contactData = emailList,
                     accessPermission = permission,
                 )
@@ -223,7 +221,7 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
                 MoveRequestResult.ShareMovement(
                     count = 0,
                     errorCount = emailList.size,
-                    nodes = listOf(folderInfo.folderHandle),
+                    nodes = listOf(args.folderHandle),
                 )
             }.onSuccess { result ->
                 eventsFlow.emit(ShareEvents.ShareTriggered(nodeMoveRequestMessageMapper(result)))
@@ -241,7 +239,7 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             runCatching {
                 shareFolderUseCase(
-                    nodeIds = listOf(folderInfo.folderId),
+                    nodeIds = listOf(args.folderId),
                     contactData = list.map { it.email },
                     accessPermission = permission,
                 )
@@ -254,13 +252,17 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(navKey: FileContactInfoNavKey): ShareRecipientsViewModel
+        fun create(args: Args): ShareRecipientsViewModel
+    }
+
+    data class Args(
+        val folderHandle: Long,
+        val folderName: String,
+    ) {
+        val folderId: NodeId get() = NodeId(folderHandle)
     }
 
 }
-
-internal val FileContactInfoNavKey.folderId: NodeId
-    get() = NodeId(folderHandle)
 
 private fun interface StateTransform {
     operator fun invoke(
