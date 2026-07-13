@@ -69,6 +69,13 @@ class LinkSettingsViewModelTest {
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
     }
 
+    private suspend fun stubNodeWithoutLink() {
+        val node = mock<TypedFileNode> {
+            on { exportedData } doReturn null
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+    }
+
     private fun stubExistingPassword(password: String = OLD_PASSWORD) {
         whenever(passwordCache.get(NODE_HANDLE)).thenReturn(LinkPassword(password, PUBLIC_LINK))
     }
@@ -352,6 +359,114 @@ class LinkSettingsViewModelTest {
 
             verify(encryptLinkWithPasswordUseCase).invoke(PUBLIC_LINK, PASSWORD)
             verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+        }
+
+    @Test
+    fun `test that toggling password off clears the entered password and strength`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                awaitUntil { it.passwordStrength == PasswordStrength.STRONG }
+
+                underTest.onPasswordEnabled(false)
+                val state = awaitUntil { !it.isPasswordEnabled }
+                assertThat(state.password).isNull()
+                assertThat(state.passwordStrength).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that clearing the password resets the strength`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                awaitUntil { it.passwordStrength == PasswordStrength.STRONG }
+
+                underTest.onPasswordChanged("")
+                val state = awaitUntil { it.password == "" && it.passwordStrength == null }
+                assertThat(state.password).isEmpty()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that setting a new password onSave stores the encrypted link in the cache`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+        }
+
+    @Test
+    fun `test that setting a password onSave stores a null encrypted link when the node has no public link`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithoutLink()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, null))
+            verifyNoInteractions(encryptLinkWithPasswordUseCase)
+        }
+
+    @Test
+    fun `test that changing an existing password back to the original keeps Save disabled`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubExistingPassword()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(getPasswordStrengthUseCase(OLD_PASSWORD)).thenReturn(PasswordStrength.MEDIUM)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordChanged(PASSWORD)
+                awaitUntil { it.isSaveEnabled }
+
+                underTest.onPasswordChanged(OLD_PASSWORD)
+                val state = awaitUntil { it.password == OLD_PASSWORD }
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     private companion object {
