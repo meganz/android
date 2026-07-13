@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.node.NodesLoadingState
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.node.isSharedSource
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
@@ -435,7 +436,7 @@ internal fun CloudDriveContent(
                 if (showSortBottomSheet) {
                     SortBottomSheet(
                         title = stringResource(sharedR.string.action_sort_by_header),
-                        options = NodeSortOption.getOptionsForSourceType(uiState.nodeSourceType),
+                        options = NodeSortOption.getOptionsForSourceType(uiState.nodeSourceType.sortOptionsSourceType()),
                         sheetState = sortBottomSheetState,
                         selectedSort = SortBottomSheetResult(
                             sortOptionItem = uiState.selectedSortConfiguration.sortOption,
@@ -463,6 +464,13 @@ internal fun CloudDriveContent(
 
     }
 }
+
+/**
+ * Folders browsed from a share are ordinary folders, so their sort bottom sheet must offer the
+ * Cloud Drive options rather than the reduced shares-root options.
+ */
+internal fun NodeSourceType.sortOptionsSourceType(): NodeSourceType =
+    if (isSharedSource()) NodeSourceType.CLOUD_DRIVE else this
 
 internal fun NodeSortOption.trackAnalyticsEvent() {
     val event = when (this) {
