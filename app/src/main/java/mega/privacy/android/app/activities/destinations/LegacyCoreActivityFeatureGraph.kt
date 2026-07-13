@@ -11,6 +11,7 @@ import mega.privacy.android.app.getLink.navigation.getLinkLegacyDestination
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
 import mega.privacy.android.app.mediaplayer.legacyMediaPlayerScreen
+import mega.privacy.android.app.meeting.activity.createScheduledMeetingScreen
 import mega.privacy.android.app.meeting.activity.legacyMeetingScreen
 import mega.privacy.android.app.meeting.activity.legacyWaitingRoomScreen
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -139,6 +140,7 @@ class LegacyCoreActivityFeatureGraph(
                 rtcAudioManagerGateway
             )
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
+            createScheduledMeetingScreen(navigationHandler::back)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             fileInfoScreen(navigationHandler::back)
             tagsScreen(navigationHandler::back)

@@ -11,10 +11,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
+import mega.privacy.android.app.presentation.meeting.CreateScheduledMeetingActivity
 import mega.privacy.android.app.presentation.meeting.WaitingRoomActivity
 import mega.privacy.android.app.usecase.chat.SetChatVideoInDeviceUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
+import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyWaitingRoomNavKey
 import mega.privacy.android.navigation.destination.MeetingNavKeyInfo
@@ -147,6 +149,20 @@ fun EntryProviderScope<NavKey>.legacyWaitingRoomScreen(
                 }
             }
             context.startActivity(intent)
+
+            // Immediately pop this destination from the back stack
+            removeDestination()
+        }
+    }
+}
+
+fun EntryProviderScope<NavKey>.createScheduledMeetingScreen(removeDestination: () -> Unit) {
+    entry<CreateScheduledMeetingNavKey>(
+        metadata = transparentMetadata()
+    ) {
+        val context = LocalContext.current
+        LaunchedEffect(Unit) {
+            context.startActivity(Intent(context, CreateScheduledMeetingActivity::class.java))
 
             // Immediately pop this destination from the back stack
             removeDestination()

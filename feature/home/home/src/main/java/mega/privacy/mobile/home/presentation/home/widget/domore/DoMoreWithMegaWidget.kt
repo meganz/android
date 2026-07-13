@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.model.LocalizedText
@@ -37,6 +37,7 @@ import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
+import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
@@ -111,9 +112,8 @@ private fun NavigationHandler.navigateForItem(
         DoMoreWithMegaItem.Identifier.AddContact ->
             navigate(InviteContactNavKey())
 
-        DoMoreWithMegaItem.Identifier.ScheduleMeeting -> {
-            // TODO wire navigation for Do More with MEGA
-        }
+        DoMoreWithMegaItem.Identifier.ScheduleMeeting ->
+            navigate(CreateScheduledMeetingNavKey)
     }
 }
 

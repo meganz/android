@@ -198,6 +198,7 @@ id→name→email; Slack ids confirmed via the v16.8 notice.
 | 94 | Kevin Sun | ks@mega.co.nz | `U02ML8HT8E7` |
 | 141 | Atiqur Rahman | atr@mega.co.nz | `U0420372CLQ` |
 | 143 | Hai Luong | lh@mega.co.nz | `U03T1E2Q97V` |
+| 228 | HM Tamim | ht@mega.co.nz | `U06BLKAJVT2` |
 
 ### 6. Build the message
 

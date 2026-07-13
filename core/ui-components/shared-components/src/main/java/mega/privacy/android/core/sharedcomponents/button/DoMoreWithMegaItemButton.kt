@@ -73,7 +73,8 @@ fun DoMoreWithMegaItemButton(
             style = AppTheme.typography.labelSmall.copy(
                 fontWeight = FontWeight.Medium
             ),
-            maxLines = 1,
+            maxLines = 2,
+            minLines = 2,
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth(),

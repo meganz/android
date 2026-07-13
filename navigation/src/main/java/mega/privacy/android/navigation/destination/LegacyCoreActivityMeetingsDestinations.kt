@@ -1,7 +1,11 @@
 package mega.privacy.android.navigation.destination
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+
+@Serializable
+data object CreateScheduledMeetingNavKey : NavKey
 
 @Serializable
 data class LegacyMeetingNavKey(
