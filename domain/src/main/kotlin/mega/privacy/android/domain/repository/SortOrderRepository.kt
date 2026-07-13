@@ -21,6 +21,18 @@ interface SortOrderRepository {
     fun monitorCloudSortOrder(): Flow<SortOrder?>
 
     /**
+     * Monitor others sort order
+     * @return Flow of others sort order
+     */
+    fun monitorOthersSortOrder(): Flow<SortOrder?>
+
+    /**
+     * Monitor links sort order
+     * @return Flow of links sort order
+     */
+    fun monitorLinksSortOrder(): Flow<SortOrder?>
+
+    /**
      * Get cloud sort order
      * @return cloud sort order
      */

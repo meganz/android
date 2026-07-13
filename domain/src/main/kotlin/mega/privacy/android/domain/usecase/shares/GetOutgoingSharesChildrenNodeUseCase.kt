@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.shares
 
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.repository.NodeRepository
@@ -27,13 +28,15 @@ class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
     /**
      * Get children nodes of the outgoing shares parent handle or root list of outgoing shares node
      * @param parentHandle
+     * @param sortOrder the order to sort by; when null the global sort order is used.
      */
     suspend operator fun invoke(
         parentHandle: Long,
+        sortOrder: SortOrder? = null,
     ): List<ShareNode> {
         return if (parentHandle == -1L) {
             nodeRepository.getAllOutgoingShares(
-                order = getCloudSortOrder(),
+                order = sortOrder ?: getCloudSortOrder(),
             ).mapNotNull { shareData ->
                 getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
                     runCatching {
@@ -43,7 +46,7 @@ class GetOutgoingSharesChildrenNodeUseCase @Inject constructor(
             }
         } else {
             getNodeByHandle(NodeId(parentHandle))?.let {
-                getChildrenNode(it.id, getCloudSortOrder()).map { node ->
+                getChildrenNode(it.id, sortOrder ?: getCloudSortOrder()).map { node ->
                     mapNodeToShareUseCase(node)
                 }
             } ?: emptyList()

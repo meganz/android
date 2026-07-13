@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -32,6 +33,7 @@ internal class DefaultSortOrderRepository @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
 ) : SortOrderRepository {
     private val sortOrderFlow = MutableStateFlow<SortOrder?>(null)
+    private val othersSortOrderFlow = MutableStateFlow<SortOrder?>(null)
 
     override suspend fun getCameraSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getCameraSortOrder())
@@ -47,6 +49,21 @@ internal class DefaultSortOrderRepository @Inject constructor(
             }
             .flowOn(ioDispatcher)
 
+    override fun monitorOthersSortOrder(): Flow<SortOrder?> =
+        othersSortOrderFlow
+            .asStateFlow()
+            .onStart {
+                if (othersSortOrderFlow.value == null) {
+                    emit(getOthersSortOrder())
+                }
+            }
+            .flowOn(ioDispatcher)
+
+    // Links sort order has no independent storage or setter: it is derived from the cloud sort order
+    // (and persisted via setCloudSortOrder), so it changes exactly when the cloud sort order changes.
+    override fun monitorLinksSortOrder(): Flow<SortOrder?> =
+        monitorCloudSortOrder().map { getLinksSortOrder() }
+
     override suspend fun getCloudSortOrder(): SortOrder? = withContext(ioDispatcher) {
         sortOrderMapper(megaLocalStorageGateway.getCloudSortOrder()).also {
             sortOrderFlow.emit(it)
@@ -59,7 +76,9 @@ internal class DefaultSortOrderRepository @Inject constructor(
         }
 
     override suspend fun getOthersSortOrder(): SortOrder? = withContext(ioDispatcher) {
-        sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder())
+        sortOrderMapper(megaLocalStorageGateway.getOthersSortOrder()).also {
+            othersSortOrderFlow.emit(it)
+        }
     }
 
     override suspend fun getOfflineSortOrder(): SortOrder? = withContext(ioDispatcher) {
@@ -81,5 +100,6 @@ internal class DefaultSortOrderRepository @Inject constructor(
 
     override suspend fun setOthersSortOrder(order: SortOrder) = withContext(ioDispatcher) {
         megaLocalStorageGateway.setOthersSortOrder(sortOrderIntMapper(order))
+        othersSortOrderFlow.emit(order)
     }
 }

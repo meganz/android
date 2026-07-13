@@ -42,7 +42,7 @@ internal class MonitorLinksUseCaseTest {
     private val nodeRepository = mock<NodeRepository> {
         on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
     }
-    private val getLinksSortOrderUseCase = mock<GetLinksSortOrderUseCase>() {
+    private val getLinksSortOrderUseCase = mock<GetLinksSortOrderUseCase> {
         onBlocking { invoke(any()) }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
     private val monitorOfflineNodeUpdatesUseCase = mock<MonitorOfflineNodeUpdatesUseCase>()
@@ -51,9 +51,9 @@ internal class MonitorLinksUseCaseTest {
     internal fun setUp() {
         underTest = MonitorLinksUseCase(
             shareRepository = shareRepository,
+            getLinksSortOrderUseCase = getLinksSortOrderUseCase,
             mapNodeToPublicLinkUseCase = mapNodeToPublicLinkUseCase,
             nodeRepository = nodeRepository,
-            getLinksSortOrderUseCase = getLinksSortOrderUseCase,
             monitorOfflineNodeUpdatesUseCase = monitorOfflineNodeUpdatesUseCase
         )
     }

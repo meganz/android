@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -38,18 +39,19 @@ class MonitorLinksUseCase @Inject constructor(
     /**
      * Invoke
      *
+     * @param sortOrder the order to sort the links by; when null the global links sort order is used.
      * @return
      */
-    operator fun invoke() =
+    operator fun invoke(sortOrder: SortOrder? = null) =
         merge(
             monitorOnlineNodeUpdates(),
             monitorOfflineNodeUpdates()
         )
             .map {
-                getPublicLinks()
+                getPublicLinks(sortOrder)
             }
             .onStart {
-                emit(getPublicLinks())
+                emit(getPublicLinks(sortOrder))
             }
 
     private fun monitorOnlineNodeUpdates() =
@@ -85,9 +87,9 @@ class MonitorLinksUseCase @Inject constructor(
             it.contains(NodeChanges.Public_link)
         }
 
-    private suspend fun getPublicLinks(): List<PublicLinkNode> {
+    private suspend fun getPublicLinks(sortOrder: SortOrder? = null): List<PublicLinkNode> {
         val publicLinks =
-            shareRepository.getPublicLinks(getLinksSortOrderUseCase(true))
+            shareRepository.getPublicLinks(sortOrder ?: getLinksSortOrderUseCase(true))
         nodeIds = publicLinks.mapTo(mutableSetOf()) { it.id }
         return publicLinks
             .mapNotNull {

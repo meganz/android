@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.shares
 
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.shares.ShareNode
 import mega.privacy.android.domain.repository.NodeRepository
@@ -36,26 +37,34 @@ class GetIncomingSharesChildrenNodeUseCase @Inject constructor(
 
     /**
      * Get children nodes of the incoming shares parent handle or root list of incoming shares node
+     *
+     * @param sortOrder the order to sort by; when null the global sort order is used.
      */
-    suspend operator fun invoke(parentHandle: Long): List<ShareNode> {
+    suspend operator fun invoke(
+        parentHandle: Long,
+        sortOrder: SortOrder? = null,
+    ): List<ShareNode> {
         return if (parentHandle == -1L) {
             val isContactVerificationOn = getContactVerificationWarningUseCase()
-            nodeRepository.getAllIncomingShares(getOthersSortOrder()).mapNotNull { shareData ->
-                getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
-                    runCatching {
-                        mapNodeToShareUseCase(node, shareData.let {
-                            if (isContactVerificationOn && it.user != null)
-                                it.copy(
-                                    isContactCredentialsVerified = areCredentialsVerifiedUseCase(it.user)
-                                )
-                            else it
-                        })
-                    }.getOrNull()
+            nodeRepository.getAllIncomingShares(sortOrder ?: getOthersSortOrder())
+                .mapNotNull { shareData ->
+                    getNodeByHandle(NodeId(shareData.nodeHandle))?.let { node ->
+                        runCatching {
+                            mapNodeToShareUseCase(node, shareData.let {
+                                if (isContactVerificationOn && it.user != null)
+                                    it.copy(
+                                        isContactCredentialsVerified = areCredentialsVerifiedUseCase(
+                                            it.user
+                                        )
+                                    )
+                                else it
+                            })
+                        }.getOrNull()
+                    }
                 }
-            }
         } else {
             getNodeByHandle(NodeId(parentHandle))?.let {
-                getChildrenNode(it.id, getCloudSortOrder()).map { node ->
+                getChildrenNode(it.id, sortOrder ?: getCloudSortOrder()).map { node ->
                     mapNodeToShareUseCase(node)
                 }
             } ?: emptyList()

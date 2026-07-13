@@ -69,7 +69,7 @@ class IncomingSharesExplorerViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn emptyFlow()
         whenever(monitorShowHiddenItemsUseCase()) doReturn emptyFlow()
         whenever(monitorNodeUpdatesByIdUseCase(any(), any())) doReturn emptyFlow()
-        whenever { getIncomingSharesChildrenNodeUseCase(any()) } doReturn emptyList()
+        whenever { getIncomingSharesChildrenNodeUseCase(any(), anyOrNull()) } doReturn emptyList()
         whenever {
             nodeViewItemMapper(any(), any(), anyOrNull(), any(), anyOrNull(), any())
         } doReturn emptyList()
