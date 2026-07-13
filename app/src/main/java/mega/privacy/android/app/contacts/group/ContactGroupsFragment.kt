@@ -145,6 +145,7 @@ class ContactGroupsFragment : Fragment() {
             navigator.openCreateGroupChatForResult(
                 context = requireContext(),
                 launcher = createGroupChatLauncher,
+                allowEmptyGroup = false,
             )
         }
 

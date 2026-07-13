@@ -64,7 +64,11 @@ class CreateGroupChatComposeActivity : AppCompatActivity() {
         setContent {
             val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
-            val startKey = remember { CreateGroupChatNavKey }
+            val startKey = remember {
+                CreateGroupChatNavKey(
+                    allowEmptyGroup = intent.getBooleanExtra(EXTRA_ALLOW_EMPTY_GROUP, false),
+                )
+            }
             LegacyActivityScaffold(
                 container = { content ->
                     MegaAppContainer(
@@ -112,10 +116,15 @@ class CreateGroupChatComposeActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val EXTRA_ALLOW_EMPTY_GROUP = "extra_allow_empty_group"
+
         /**
          * Builds an [Intent] to open the create-group-chat flow.
+         *
+         * @param allowEmptyGroup when true the group may be created with no other participants.
          */
-        fun getIntent(context: Context): Intent =
+        fun getIntent(context: Context, allowEmptyGroup: Boolean = false): Intent =
             Intent(context, CreateGroupChatComposeActivity::class.java)
+                .putExtra(EXTRA_ALLOW_EMPTY_GROUP, allowEmptyGroup)
     }
 }

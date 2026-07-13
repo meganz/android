@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.contact.group.create.navigation
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -18,16 +19,21 @@ import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
  * Hosted by the app module's gated `CreateGroupChatNavKey` destination (behind `ContactsComposeUI`).
  *
  * @param navigationHandler
+ * @param allowEmptyGroup When true the group may be confirmed with no other participants.
  * @param viewModel
  */
+@SuppressLint("ComposeViewModelInjection")
 @Composable
 fun CreateGroupChatEntry(
     navigationHandler: NavigationHandler,
-    viewModel: CreateGroupChatViewModel = hiltViewModel(),
+    allowEmptyGroup: Boolean,
 ) {
+    val viewModel: CreateGroupChatViewModel =
+        hiltViewModel<CreateGroupChatViewModel>()
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     CreateGroupChatScreen(
         state = state,
+        allowEmptyGroup = allowEmptyGroup,
         onSearchQueryChange = viewModel::setQuery,
         onConfirm = { handles, title, isEkr, isChatLink, allowAddParticipants ->
             navigationHandler.returnResult(
@@ -41,6 +47,6 @@ fun CreateGroupChatEntry(
                 ),
             )
         },
-        onBack = { navigationHandler.remove(CreateGroupChatNavKey) },
+        onBack = { navigationHandler.remove(CreateGroupChatNavKey(allowEmptyGroup = allowEmptyGroup)) },
     )
 }

@@ -653,10 +653,14 @@ interface AppNavigator {
      * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
      * result is delivered to [activity]'s onActivityResult under [requestCode], mirroring the legacy
      * AddContactActivity contract (RESULT_OK + EXTRA_CONTACTS plus the group-chat extras).
+     *
+     * @param allowEmptyGroup when true the group may be created with no other participants (the
+     * StartConversation flow); the legacy path additionally sets `EXTRA_IS_START_CONVERSATION`.
      */
     fun openCreateGroupChatForResult(
         activity: Activity,
         requestCode: Int,
+        allowEmptyGroup: Boolean,
     )
 
     /**
@@ -664,10 +668,14 @@ interface AppNavigator {
      * legacy AddContactActivity ("only create group" mode) based on the ContactsComposeUI flag. The
      * result is delivered to [launcher], mirroring the legacy AddContactActivity contract (RESULT_OK
      * + EXTRA_CONTACTS plus the group-chat extras).
+     *
+     * @param allowEmptyGroup when true the group may be created with no other participants (the
+     * StartConversation flow); the legacy path additionally sets `EXTRA_IS_START_CONVERSATION`.
      */
     fun openCreateGroupChatForResult(
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
+        allowEmptyGroup: Boolean,
     )
 
     /**

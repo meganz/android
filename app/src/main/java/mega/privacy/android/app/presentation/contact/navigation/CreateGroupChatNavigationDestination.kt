@@ -27,18 +27,22 @@ import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
  * TODO: Move this entry to the feature module once the feature flag is removed
  */
 fun EntryProviderScope<NavKey>.createGroupChatLegacyDestination(navigationHandler: NavigationHandler) {
-    entry<CreateGroupChatNavKey> {
+    entry<CreateGroupChatNavKey> { key ->
         FeatureFlagGate(
             feature = AppFeatures.ContactsComposeUI,
             disabled = {
                 LegacyCreateGroupChatEntry(
+                    allowEmptyGroup = key.allowEmptyGroup,
                     onResult = { result ->
                         navigationHandler.returnResult(CreateGroupChatNavKey.KEY, result)
                     },
                 )
             },
             enabled = {
-                CreateGroupChatEntry(navigationHandler = navigationHandler)
+                CreateGroupChatEntry(
+                    navigationHandler = navigationHandler,
+                    allowEmptyGroup = key.allowEmptyGroup,
+                )
             },
         )
     }
@@ -50,10 +54,11 @@ fun EntryProviderScope<NavKey>.createGroupChatLegacyDestination(navigationHandle
  */
 @Composable
 private fun LegacyCreateGroupChatEntry(
+    allowEmptyGroup: Boolean,
     onResult: (CreateGroupChatNavKey.NewGroupChatResult?) -> Unit,
 ) {
     val launcher = rememberLauncherForActivityResult(
-        contract = CreateGroupChatContract(),
+        contract = CreateGroupChatContract(allowEmptyGroup = allowEmptyGroup),
     ) { result ->
         onResult(result)
     }
@@ -62,13 +67,19 @@ private fun LegacyCreateGroupChatEntry(
     }
 }
 
-private class CreateGroupChatContract :
-    ActivityResultContract<Unit, CreateGroupChatNavKey.NewGroupChatResult?>() {
+private class CreateGroupChatContract(
+    private val allowEmptyGroup: Boolean,
+) : ActivityResultContract<Unit, CreateGroupChatNavKey.NewGroupChatResult?>() {
 
     override fun createIntent(context: Context, input: Unit): Intent =
         Intent(context, AddContactActivity::class.java)
             .putExtra(AddContactActivity.EXTRA_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
             .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
+            .apply {
+                if (allowEmptyGroup) {
+                    putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true)
+                }
+            }
 
     override fun parseResult(
         resultCode: Int,
@@ -77,16 +88,13 @@ private class CreateGroupChatContract :
         if (resultCode != Activity.RESULT_OK || intent == null) return null
         val emails = intent.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)?.toList()
             ?: return null
-        if (emails.isEmpty()) return null
+        if (emails.isEmpty() && !allowEmptyGroup) return null
         return CreateGroupChatNavKey.NewGroupChatResult(
             emails = emails,
             title = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE),
             isEkr = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false),
             isChatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false),
-            allowAddParticipants = intent.getBooleanExtra(
-                AddContactActivity.ALLOW_ADD_PARTICIPANTS,
-                false,
-            ),
+            allowAddParticipants = allowEmptyGroup,
         )
     }
 }

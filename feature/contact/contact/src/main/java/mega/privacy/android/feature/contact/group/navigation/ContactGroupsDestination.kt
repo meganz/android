@@ -56,7 +56,9 @@ internal fun EntryProviderScope<NavKey>.contactGroups(navigationHandler: Navigat
             state = state,
             onSearchQueryChange = viewModel::setQuery,
             onGroupClick = { chatId -> navigationHandler.navigate(ShowChatMessagesNavKey(chatId)) },
-            onCreateGroupClick = { navigationHandler.navigate(CreateGroupChatNavKey) },
+            onCreateGroupClick = {
+                navigationHandler.navigate(CreateGroupChatNavKey(allowEmptyGroup = false))
+            },
             onGroupChatCreatedConsumed = viewModel::onGroupChatCreatedConsumed,
             onNavigateToChat = { chatId ->
                 navigationHandler.navigate(ShowChatMessagesNavKey(chatId))

@@ -81,6 +81,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 @Composable
 internal fun CreateGroupChatScreen(
     state: CreateGroupChatUiState,
+    allowEmptyGroup: Boolean,
     onSearchQueryChange: (String?) -> Unit,
     onConfirm: (
         selectedHandles: Set<Long>,
@@ -98,6 +99,7 @@ internal fun CreateGroupChatScreen(
 
     CreateGroupChatScreenContent(
         state = state,
+        allowEmptyGroup = allowEmptyGroup,
         onSearchQueryChange = onSearchQueryChange,
         onConfirm = onConfirm,
         onBack = onBack,
@@ -111,6 +113,7 @@ internal fun CreateGroupChatScreen(
 @Composable
 internal fun CreateGroupChatScreenContent(
     state: CreateGroupChatUiState,
+    allowEmptyGroup: Boolean,
     onSearchQueryChange: (String?) -> Unit,
     onConfirm: (
         selectedHandles: Set<Long>,
@@ -130,6 +133,7 @@ internal fun CreateGroupChatScreenContent(
             state = state,
             selectedHandles = selectionState.selectedHandles,
             selectedCount = selectionState.selectedItemsCount,
+            allowEmptyGroup = allowEmptyGroup,
             onSearchQueryChange = onSearchQueryChange,
             onToggle = selectionState::toggleSelection,
             onNext = { stepChange(CreateGroupChatStep.Settings) },
@@ -162,6 +166,7 @@ private fun SelectionStep(
     state: CreateGroupChatUiState,
     selectedHandles: Set<Long>,
     selectedCount: Int,
+    allowEmptyGroup: Boolean,
     onSearchQueryChange: (String?) -> Unit,
     onToggle: (Long) -> Unit,
     onNext: () -> Unit,
@@ -205,7 +210,7 @@ private fun SelectionStep(
             )
         },
         floatingActionButton = {
-            if (state is CreateGroupChatUiState.Data && selectedCount > 0) {
+            if (state is CreateGroupChatUiState.Data && (selectedCount > 0 || allowEmptyGroup)) {
                 MegaFab(
                     modifier = Modifier
                         .testTag(CREATE_GROUP_CHAT_NEXT_FAB_TAG)
@@ -468,6 +473,7 @@ private fun CreateGroupChatScreenSelectionStepPreview(
     AndroidThemeForPreviews {
         CreateGroupChatScreenContent(
             state = state,
+            allowEmptyGroup = false,
             onSearchQueryChange = {},
             onConfirm = { _, _, _, _, _ -> },
             onBack = {},
@@ -509,6 +515,7 @@ private fun CreateGroupChatScreenSettingsStepPreview(
     AndroidThemeForPreviews {
         CreateGroupChatScreenContent(
             state = state,
+            allowEmptyGroup = false,
             onSearchQueryChange = {},
             onConfirm = { _, _, _, _, _ -> },
             onBack = {},

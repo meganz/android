@@ -1119,9 +1119,10 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openCreateGroupChatForResult(
         activity: Activity,
         requestCode: Int,
+        allowEmptyGroup: Boolean,
     ) {
         applicationScope.launch {
-            val intent = createGroupChatIntent(activity)
+            val intent = createGroupChatIntent(activity, allowEmptyGroup)
             withContext(mainDispatcher) {
                 if (!activity.isFinishing && !activity.isDestroyed) {
                     activity.startActivityForResult(intent, requestCode)
@@ -1133,25 +1134,32 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openCreateGroupChatForResult(
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
+        allowEmptyGroup: Boolean,
     ) {
         applicationScope.launch {
-            val intent = createGroupChatIntent(context)
+            val intent = createGroupChatIntent(context, allowEmptyGroup)
             withContext(mainDispatcher) {
                 launcher.launch(intent)
             }
         }
     }
 
-    private suspend fun createGroupChatIntent(context: Context): Intent {
+    private suspend fun createGroupChatIntent(
+        context: Context,
+        allowEmptyGroup: Boolean,
+    ): Intent {
         val isContactsComposeUIEnabled = runCatching {
             getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
         }.getOrDefault(false)
         return if (isContactsComposeUIEnabled) {
-            CreateGroupChatComposeActivity.getIntent(context)
+            CreateGroupChatComposeActivity.getIntent(context, allowEmptyGroup = allowEmptyGroup)
         } else {
             Intent(context, AddContactActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
                 putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
+                if (allowEmptyGroup) {
+                    putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true)
+                }
             }
         }
     }

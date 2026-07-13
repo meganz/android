@@ -54,10 +54,18 @@ data class AddMeetingParticipantsNavKey(val chatId: Long) : NavKey {
     }
 }
 
-/** Launches the legacy "Add contacts" activity in "only create group" mode; result published under [KEY]. */
+/**
+ * Launches the "create group chat" flow; result published under [KEY].
+ *
+ * @property allowEmptyGroup When true the group may be created with no other participants (the
+ * StartConversation flow); when false at least one participant is required, matching every other
+ * create-group caller.
+ */
 @Serializable
-data object CreateGroupChatNavKey : NavKey {
-    const val KEY: String = "create_group_chat"
+data class CreateGroupChatNavKey(val allowEmptyGroup: Boolean) : NavKey {
+    companion object {
+        const val KEY: String = "create_group_chat"
+    }
 
     /**
      * @property emails Selected contact emails.

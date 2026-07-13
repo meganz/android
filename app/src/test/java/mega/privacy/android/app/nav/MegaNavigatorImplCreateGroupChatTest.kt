@@ -73,6 +73,7 @@ class MegaNavigatorImplCreateGroupChatTest {
             navigator.openCreateGroupChatForResult(
                 activity = activity,
                 requestCode = REQUEST_CODE,
+                allowEmptyGroup = false,
             )
             advanceUntilIdle()
 
@@ -97,6 +98,7 @@ class MegaNavigatorImplCreateGroupChatTest {
             navigator.openCreateGroupChatForResult(
                 activity = activity,
                 requestCode = REQUEST_CODE,
+                allowEmptyGroup = false,
             )
             advanceUntilIdle()
 
@@ -115,6 +117,12 @@ class MegaNavigatorImplCreateGroupChatTest {
             assertThat(
                 started.intent.getBooleanExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, false)
             ).isTrue()
+            assertThat(
+                started.intent.getBooleanExtra(
+                    AddContactActivity.EXTRA_IS_START_CONVERSATION,
+                    false,
+                )
+            ).isFalse()
         }
 
     @Test
@@ -127,6 +135,7 @@ class MegaNavigatorImplCreateGroupChatTest {
             navigator.openCreateGroupChatForResult(
                 context = ApplicationProvider.getApplicationContext(),
                 launcher = launcher,
+                allowEmptyGroup = false,
             )
             advanceUntilIdle()
 
@@ -151,6 +160,7 @@ class MegaNavigatorImplCreateGroupChatTest {
             navigator.openCreateGroupChatForResult(
                 context = ApplicationProvider.getApplicationContext(),
                 launcher = launcher,
+                allowEmptyGroup = false,
             )
             advanceUntilIdle()
 
@@ -169,6 +179,65 @@ class MegaNavigatorImplCreateGroupChatTest {
             assertThat(
                 captor.firstValue.getBooleanExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, false)
             ).isTrue()
+        }
+
+    @Test
+    fun `test that openCreateGroupChatForResult with allowEmptyGroup sets EXTRA_IS_START_CONVERSATION on the legacy intent when the ContactsComposeUI flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+            val launcher = mock<ActivityResultLauncher<Intent>>()
+            val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
+
+            navigator.openCreateGroupChatForResult(
+                context = ApplicationProvider.getApplicationContext(),
+                launcher = launcher,
+                allowEmptyGroup = true,
+            )
+            advanceUntilIdle()
+
+            val captor = argumentCaptor<Intent>()
+            verify(launcher).launch(captor.capture())
+            assertThat(captor.firstValue.component)
+                .isEqualTo(
+                    ComponentName(
+                        ApplicationProvider.getApplicationContext(),
+                        AddContactActivity::class.java,
+                    )
+                )
+            assertThat(
+                captor.firstValue.getBooleanExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, false)
+            ).isTrue()
+            assertThat(
+                captor.firstValue.getBooleanExtra(
+                    AddContactActivity.EXTRA_IS_START_CONVERSATION,
+                    false,
+                )
+            ).isTrue()
+        }
+
+    @Test
+    fun `test that openCreateGroupChatForResult with allowEmptyGroup launches the Compose host when the ContactsComposeUI flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            val launcher = mock<ActivityResultLauncher<Intent>>()
+            val navigator = createNavigator(UnconfinedTestDispatcher(testScheduler))
+
+            navigator.openCreateGroupChatForResult(
+                context = ApplicationProvider.getApplicationContext(),
+                launcher = launcher,
+                allowEmptyGroup = true,
+            )
+            advanceUntilIdle()
+
+            val captor = argumentCaptor<Intent>()
+            verify(launcher).launch(captor.capture())
+            assertThat(captor.firstValue.component)
+                .isEqualTo(
+                    ComponentName(
+                        ApplicationProvider.getApplicationContext(),
+                        CreateGroupChatComposeActivity::class.java,
+                    )
+                )
         }
 
     private companion object {

@@ -2742,6 +2742,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                             megaNavigator.openCreateGroupChatForResult(
                                 context = this,
                                 launcher = createChatLauncher,
+                                allowEmptyGroup = false,
                             )
                         }
                     }

@@ -29,6 +29,7 @@ import mega.privacy.android.app.presentation.startconversation.view.StartConvers
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.mobile.analytics.event.CreateNoteToSelfButtonPressedEvent
 import mega.privacy.mobile.analytics.event.GroupChatPressedEvent
 import mega.privacy.mobile.analytics.event.InviteContactsPressedEvent
@@ -45,6 +46,9 @@ class StartConversationActivity : ComponentActivity() {
 
     @Inject
     lateinit var monitorThemeModeUseCase: MonitorThemeModeUseCase
+
+    @Inject
+    lateinit var navigator: MegaNavigator
 
     private val viewModel by viewModels<StartConversationViewModel>()
     private val noteToSelfChatViewModel by viewModels<NoteToSelfChatViewModel>()
@@ -148,11 +152,10 @@ class StartConversationActivity : ComponentActivity() {
 
     private fun onNewGroup() {
         Analytics.tracker.trackEvent(GroupChatPressedEvent)
-        addContactActivityLauncher.launch(
-            Intent(this, AddContactActivity::class.java)
-                .putExtra(Constants.INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
-                .putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true)
+        navigator.openCreateGroupChatForResult(
+            context = this,
+            launcher = addContactActivityLauncher,
+            allowEmptyGroup = true,
         )
     }
 

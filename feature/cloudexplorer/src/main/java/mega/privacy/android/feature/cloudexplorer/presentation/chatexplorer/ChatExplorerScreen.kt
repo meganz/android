@@ -391,7 +391,9 @@ internal fun TabsScope.ChatExplorerTab(
                 uiState = uiState,
                 isProcessingAction = isProcessingAction,
                 selectedChatIds = selectionState.selectedChatIds,
-                onNewGroupChatClick = { onNavigate(CreateGroupChatNavKey) },
+                onNewGroupChatClick = {
+                    onNavigate(CreateGroupChatNavKey(allowEmptyGroup = false))
+                },
                 onChatToggled = selectionState::toggleSelection,
                 modifier = modifier,
                 listState = listState,

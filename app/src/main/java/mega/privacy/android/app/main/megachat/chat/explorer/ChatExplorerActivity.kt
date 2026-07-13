@@ -418,6 +418,7 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
                 megaNavigator.openCreateGroupChatForResult(
                     activity = this,
                     requestCode = Constants.REQUEST_CREATE_CHAT,
+                    allowEmptyGroup = false,
                 )
             } else {
                 Timber.w("Online but not megaApi")

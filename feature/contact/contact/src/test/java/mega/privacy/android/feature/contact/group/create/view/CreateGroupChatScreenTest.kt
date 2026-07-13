@@ -63,6 +63,22 @@ class CreateGroupChatScreenTest {
     }
 
     @Test
+    fun `test that the next fab is shown with no selection when empty group is allowed`() {
+        setScreen(dataState(contact(1L, "Alice")), allowEmptyGroup = true)
+
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_NEXT_FAB_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that tapping next with no selection advances to settings when empty group is allowed`() {
+        setScreen(dataState(contact(1L, "Alice")), allowEmptyGroup = true)
+
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_NEXT_FAB_TAG).performClick()
+
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_SETTINGS_TAG).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that tapping next advances to the settings step`() {
         setScreen(dataState(contact(1L, "Alice")))
 
@@ -195,6 +211,7 @@ class CreateGroupChatScreenTest {
 
     private fun setScreen(
         state: CreateGroupChatUiState,
+        allowEmptyGroup: Boolean = false,
         onSearchQueryChange: (String?) -> Unit = {},
         onConfirm: (Set<Long>, String?, Boolean, Boolean, Boolean) -> Unit = { _, _, _, _, _ -> },
         onBack: () -> Unit = {},
@@ -202,6 +219,7 @@ class CreateGroupChatScreenTest {
         composeTestRule.setContent {
             CreateGroupChatScreen(
                 state = state,
+                allowEmptyGroup = allowEmptyGroup,
                 onSearchQueryChange = onSearchQueryChange,
                 onConfirm = onConfirm,
                 onBack = onBack,
