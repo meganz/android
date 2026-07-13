@@ -71,18 +71,21 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.node.NodeExistsInCurrentLocationUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
+import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
 import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackbar
@@ -133,6 +136,9 @@ class FileInfoActivity : BaseActivity() {
 
     @Inject
     lateinit var isOutShareUseCase: IsOutShareUseCase
+
+    @Inject
+    lateinit var getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase
 
     @Inject
     lateinit var renameNodeUseCase: RenameNodeUseCase
@@ -254,6 +260,13 @@ class FileInfoActivity : BaseActivity() {
                         onDismiss = viewModel::extraActionFinished,
                     )
                 }
+                if (uiState.shareHiddenNodeWarning != SensitiveNodeShareWarning.None) {
+                    ShareHiddenNodeWarningDialog(
+                        sharingMultipleFolders = uiState.shareHiddenNodeWarning == SensitiveNodeShareWarning.Folders,
+                        onConfirm = viewModel::shareHiddenNodeWarningConfirmed,
+                        onCancel = viewModel::shareHiddenNodeWarningDismissed,
+                    )
+                }
                 StartTransferComponent(
                     uiState.downloadEvent,
                     { viewModel.consumeDownloadEvent() },
@@ -328,6 +341,7 @@ class FileInfoActivity : BaseActivity() {
             megaNavigator = megaNavigator,
             getNodeByIdUseCase = getNodeByIdUseCase,
             isOutShareUseCase = isOutShareUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -522,7 +536,7 @@ class FileInfoActivity : BaseActivity() {
                     )
                 }
             } else {
-                navigateToShare()
+                viewModel.shareFolderWithContactsClicked()
             }
         }
     }
@@ -616,6 +630,8 @@ class FileInfoActivity : BaseActivity() {
             }
 
             is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
+
+            FileInfoOneOffViewEvent.LaunchShareContactPicker -> navigateToShare()
         }
     }
 

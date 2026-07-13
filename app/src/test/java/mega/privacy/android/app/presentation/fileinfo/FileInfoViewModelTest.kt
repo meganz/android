@@ -24,6 +24,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -39,6 +40,7 @@ import mega.privacy.android.domain.entity.node.NodeNameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -66,6 +68,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUs
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -77,6 +80,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -167,6 +171,9 @@ internal class FileInfoViewModelTest {
     private val nodeDestinationMapper = mock<NodeDestinationMapper>()
     private val contactItemStatusMapper = mock<ContactItemStatusMapper>()
     private val contactPermissionUiStateMapper = mock<ContactPermissionUiStateMapper>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getShareFolderSensitiveWarningUseCase =
+        mock<GetShareFolderSensitiveWarningUseCase>()
 
     @BeforeEach
     fun cleanUp() = runTest {
@@ -221,6 +228,8 @@ internal class FileInfoViewModelTest {
             monitorAccountDetailsUseCase,
             getNodeLocationByIdUseCase,
             nodeDestinationMapper,
+            getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -272,6 +281,8 @@ internal class FileInfoViewModelTest {
             nodeDestinationMapper = nodeDestinationMapper,
             contactItemStatusMapper = contactItemStatusMapper,
             contactPermissionUiStateMapper = contactPermissionUiStateMapper,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -577,6 +588,83 @@ internal class FileInfoViewModelTest {
                 StateEventWithContentConsumed::class.java
             )
             assertThat(underTest.uiState.value.descriptionText).isEqualTo("")
+        }
+
+    @Test
+    fun `test that LaunchShareContactPicker is triggered when shareFolderWithContactsClicked and compose picker disabled`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+
+            underTest.shareFolderWithContactsClicked()
+
+            testEventIsOfType(FileInfoOneOffViewEvent.LaunchShareContactPicker::class.java)
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+        }
+
+    @Test
+    fun `test that LaunchShareContactPicker is triggered when shareFolderWithContactsClicked and no sensitive warning`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.None)
+
+            underTest.shareFolderWithContactsClicked()
+
+            testEventIsOfType(FileInfoOneOffViewEvent.LaunchShareContactPicker::class.java)
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+        }
+
+    @Test
+    fun `test that warning is set when shareFolderWithContactsClicked and folder is sensitive`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.Folder)
+
+            underTest.shareFolderWithContactsClicked()
+
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.Folder)
+            assertThat(underTest.uiState.value.oneOffViewEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+
+    @Test
+    fun `test that confirming the warning triggers LaunchShareContactPicker and clears the warning`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.Folder)
+            underTest.shareFolderWithContactsClicked()
+
+            underTest.shareHiddenNodeWarningConfirmed()
+
+            testEventIsOfType(FileInfoOneOffViewEvent.LaunchShareContactPicker::class.java)
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+        }
+
+    @Test
+    fun `test that dismissing the warning clears it without launching the picker`() =
+        runTest {
+            underTest.setNode(node.handle, true)
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(any()))
+                .thenReturn(SensitiveNodeShareWarning.Folders)
+            underTest.shareFolderWithContactsClicked()
+
+            underTest.shareHiddenNodeWarningDismissed()
+
+            assertThat(underTest.uiState.value.shareHiddenNodeWarning)
+                .isEqualTo(SensitiveNodeShareWarning.None)
+            assertThat(underTest.uiState.value.oneOffViewEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
 
     @Test

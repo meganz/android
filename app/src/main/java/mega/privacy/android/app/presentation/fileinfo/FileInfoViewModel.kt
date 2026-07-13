@@ -52,6 +52,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges.Tags
 import mega.privacy.android.domain.entity.node.NodeChanges.Timestamp
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -78,6 +79,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsMediaUploadsEnabledUs
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorChatOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCase
@@ -89,6 +91,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.offline.RemoveOfflineNodeUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
@@ -96,6 +99,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactPermissionUiStateMapper
 import mega.privacy.android.shared.contact.model.ContactPermissionUiState
@@ -206,6 +210,8 @@ class FileInfoViewModel @Inject constructor(
     @IoDispatcher private val iODispatcher: CoroutineDispatcher,
     private val contactItemStatusMapper: ContactItemStatusMapper,
     private val contactPermissionUiStateMapper: ContactPermissionUiStateMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -1191,5 +1197,49 @@ class FileInfoViewModel @Inject constructor(
      */
     fun clearLeaveFolderNodeIds() {
         _uiState.update { it.copy(leaveFolderNodeIds = null) }
+    }
+
+    /**
+     * Called when the user chooses to share the folder with contacts. On the Compose picker path
+     * ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when needed;
+     * the legacy picker warns itself, so no warning is surfaced here for it.
+     */
+    fun shareFolderWithContactsClicked() {
+        viewModelScope.launch {
+            val isComposeContactsPicker = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val warning = if (isComposeContactsPicker) {
+                getShareFolderSensitiveWarningUseCase(listOf(nodeId))
+            } else {
+                SensitiveNodeShareWarning.None
+            }
+            if (warning == SensitiveNodeShareWarning.None) {
+                _uiState.update {
+                    it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.LaunchShareContactPicker))
+                }
+            } else {
+                _uiState.update { it.copy(shareHiddenNodeWarning = warning) }
+            }
+        }
+    }
+
+    /**
+     * Called when the user confirms the hidden/sensitive-node warning; proceeds to the picker.
+     */
+    fun shareHiddenNodeWarningConfirmed() {
+        _uiState.update {
+            it.copy(
+                shareHiddenNodeWarning = SensitiveNodeShareWarning.None,
+                oneOffViewEvent = triggered(FileInfoOneOffViewEvent.LaunchShareContactPicker),
+            )
+        }
+    }
+
+    /**
+     * Called when the user dismisses the hidden/sensitive-node warning; aborts the share.
+     */
+    fun shareHiddenNodeWarningDismissed() {
+        _uiState.update { it.copy(shareHiddenNodeWarning = SensitiveNodeShareWarning.None) }
     }
 }

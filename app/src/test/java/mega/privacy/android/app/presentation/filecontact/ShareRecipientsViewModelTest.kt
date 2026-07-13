@@ -16,12 +16,16 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMe
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,6 +51,9 @@ class ShareRecipientsViewModelTest {
     private val shareFolderRequestMapper = mock<NodeMoveRequestMessageMapper>()
     private val getAllowedSharingPermissionsUseCase = mock<GetAllowedSharingPermissionsUseCase>()
     private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getShareFolderSensitiveWarningUseCase =
+        mock<GetShareFolderSensitiveWarningUseCase>()
 
     private val shareResultMapper = RemoveShareResultMapper(
         successString = { TestValues.SUCCESS_STRING },
@@ -60,6 +67,8 @@ class ShareRecipientsViewModelTest {
             shareFolderUseCase,
             getAllowedSharingPermissionsUseCase,
             getContactVerificationWarningUseCase,
+            getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -75,6 +84,8 @@ class ShareRecipientsViewModelTest {
             nodeMoveRequestMessageMapper = shareFolderRequestMapper,
             getAllowedSharingPermissionsUseCase = getAllowedSharingPermissionsUseCase,
             getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -461,6 +472,123 @@ class ShareRecipientsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    @Test
+    fun `test that navigateToAddContactEvent is triggered when onAddContactClicked and compose picker disabled`() =
+        runTest {
+            stubForData()
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn false
+            }
+            initUnderTest()
+
+            underTest.state.test {
+                awaitItem()
+                underTest.onAddContactClicked()
+                val actual = awaitItem() as FileContactListState.Data
+                assertThat(actual.navigateToAddContactEvent.triggeredContent())
+                    .isEqualTo(TestValues.NODE_HANDLE)
+                assertThat(actual.sensitiveNodeShareWarning)
+                    .isEqualTo(SensitiveNodeShareWarning.None)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that navigateToAddContactEvent is triggered when onAddContactClicked and no sensitive warning`() =
+        runTest {
+            stubForData()
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            }
+            getShareFolderSensitiveWarningUseCase.stub {
+                onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.None
+            }
+            initUnderTest()
+
+            underTest.state.test {
+                awaitItem()
+                underTest.onAddContactClicked()
+                val actual = awaitItem() as FileContactListState.Data
+                assertThat(actual.navigateToAddContactEvent.triggeredContent())
+                    .isEqualTo(TestValues.NODE_HANDLE)
+                assertThat(actual.sensitiveNodeShareWarning)
+                    .isEqualTo(SensitiveNodeShareWarning.None)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that warning is shown when onAddContactClicked and folder is sensitive`() = runTest {
+        stubForData()
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+        }
+        getShareFolderSensitiveWarningUseCase.stub {
+            onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
+        }
+        initUnderTest()
+
+        underTest.state.test {
+            awaitItem()
+            underTest.onAddContactClicked()
+            val actual = awaitItem() as FileContactListState.Data
+            assertThat(actual.sensitiveNodeShareWarning).isEqualTo(SensitiveNodeShareWarning.Folder)
+            assertThat(actual.navigateToAddContactEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that confirming the warning triggers navigateToAddContactEvent and clears the warning`() =
+        runTest {
+            stubForData()
+            getFeatureFlagValueUseCase.stub {
+                onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            }
+            getShareFolderSensitiveWarningUseCase.stub {
+                onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
+            }
+            initUnderTest()
+
+            underTest.state.test {
+                awaitItem()
+                underTest.onAddContactClicked()
+                awaitItem()
+                underTest.onShareHiddenNodeWarningConfirmed()
+                val actual = awaitItem() as FileContactListState.Data
+                assertThat(actual.sensitiveNodeShareWarning)
+                    .isEqualTo(SensitiveNodeShareWarning.None)
+                assertThat(actual.navigateToAddContactEvent.triggeredContent())
+                    .isEqualTo(TestValues.NODE_HANDLE)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that dismissing the warning clears it without navigating`() = runTest {
+        stubForData()
+        getFeatureFlagValueUseCase.stub {
+            onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+        }
+        getShareFolderSensitiveWarningUseCase.stub {
+            onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.Folders
+        }
+        initUnderTest()
+
+        underTest.state.test {
+            awaitItem()
+            underTest.onAddContactClicked()
+            awaitItem()
+            underTest.onShareHiddenNodeWarningDismissed()
+            val actual = awaitItem() as FileContactListState.Data
+            assertThat(actual.sensitiveNodeShareWarning).isEqualTo(SensitiveNodeShareWarning.None)
+            assertThat(actual.navigateToAddContactEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     private fun stubForData() {
         getAllowedSharingPermissionsUseCase.stub {

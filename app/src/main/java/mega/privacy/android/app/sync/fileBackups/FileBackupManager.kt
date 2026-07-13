@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.interfaces.ActionBackupListener
@@ -22,10 +23,14 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.createBackupsWarningDialog
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.resources.R as sharedR
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 
@@ -40,6 +45,7 @@ class FileBackupManager(
     val megaNavigator: MegaNavigator,
     val getNodeByIdUseCase: GetNodeByIdUseCase,
     val isOutShareUseCase: IsOutShareUseCase,
+    val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
 ) {
 
     object BackupDialogState {
@@ -130,17 +136,62 @@ class FileBackupManager(
                             nodeName = megaNode.name
                         )
                     } else if (megaNode != null) {
-                        nodeController?.selectContactToShareFolder(
-                            megaNode,
-                            selectContactToShareLauncher
-                        )
+                        warnBeforeSharingHiddenFolders(listOf(NodeId(megaNode.handle))) {
+                            nodeController?.selectContactToShareFolder(
+                                megaNode,
+                                selectContactToShareLauncher
+                            )
+                        }
                     }
                 }
 
-                ACTION_MENU_BACKUP_SHARE_FOLDER -> handleList?.let {
-                    nodeController?.selectContactToShareFolders(it, selectContactToShareLauncher)
+                ACTION_MENU_BACKUP_SHARE_FOLDER -> handleList?.let { handles ->
+                    activity.lifecycleScope.launch {
+                        warnBeforeSharingHiddenFolders(handles.map { NodeId(it) }) {
+                            nodeController?.selectContactToShareFolders(
+                                handles,
+                                selectContactToShareLauncher
+                            )
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    /**
+     * Warns before sharing hidden/sensitive [nodeIds] with contacts, then invokes [onProceed]. On
+     * the Compose picker path ([AppFeatures.ContactsComposeUI]) the warning is shown when needed;
+     * the legacy picker warns itself, so it is skipped there to avoid double-warning.
+     */
+    private suspend fun warnBeforeSharingHiddenFolders(
+        nodeIds: List<NodeId>,
+        onProceed: () -> Unit,
+    ) {
+        val warning = runCatching {
+            if (getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)) {
+                getShareFolderSensitiveWarningUseCase(nodeIds)
+            } else {
+                SensitiveNodeShareWarning.None
+            }
+        }.getOrDefault(SensitiveNodeShareWarning.None)
+
+        if (warning == SensitiveNodeShareWarning.None) {
+            onProceed()
+        } else {
+            val sharingMultipleFolders = warning == SensitiveNodeShareWarning.Folders
+            MaterialAlertDialogBuilder(activity)
+                .setTitle(
+                    if (sharingMultipleFolders) sharedR.string.hidden_items
+                    else sharedR.string.hidden_item
+                )
+                .setMessage(
+                    if (sharingMultipleFolders) sharedR.string.share_hidden_folders_description
+                    else sharedR.string.share_hidden_folder_description
+                )
+                .setPositiveButton(sharedR.string.button_continue) { _, _ -> onProceed() }
+                .setNegativeButton(sharedR.string.general_dialog_cancel_button, null)
+                .show()
         }
     }
 

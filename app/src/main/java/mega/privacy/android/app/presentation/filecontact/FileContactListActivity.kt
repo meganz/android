@@ -52,6 +52,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.IsOutShareUseCase
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
@@ -88,6 +89,9 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
 
     @Inject
     lateinit var isOutShareUseCase: IsOutShareUseCase
+
+    @Inject
+    lateinit var getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase
 
     internal val viewModel by viewModels<FileContactListViewModel>()
 
@@ -423,6 +427,7 @@ internal class FileContactListActivity : PasscodeActivity(), View.OnClickListene
             megaNavigator = megaNavigator,
             getNodeByIdUseCase = getNodeByIdUseCase,
             isOutShareUseCase = isOutShareUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 

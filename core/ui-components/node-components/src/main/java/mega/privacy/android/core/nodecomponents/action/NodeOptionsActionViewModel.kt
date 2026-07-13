@@ -99,8 +99,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
-import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningTypeUseCase
-import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
@@ -168,8 +167,7 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val getFileTypeInfoByNameUseCase: GetFileTypeInfoByNameUseCase,
     private val createShareKeyUseCase: CreateShareKeyUseCase,
-    private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
-    private val getShareFolderSensitiveWarningTypeUseCase: GetShareFolderSensitiveWarningTypeUseCase,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val nodeMenuProviderRegistry: NodeMenuProviderRegistry,
@@ -613,14 +611,8 @@ class NodeOptionsActionViewModel @AssistedInject constructor(
         }.getOrDefault(false)
         if (!contactsComposeUIEnabled) return SensitiveNodeShareWarning.None
 
-        val hiddenNodesEnabled = runCatching {
-            monitorHiddenNodesEnabledUseCase().first()
-        }.getOrDefault(false)
         return runCatching {
-            getShareFolderSensitiveWarningTypeUseCase(
-                folderNodes.map { it.id },
-                hiddenNodesEnabled,
-            )
+            getShareFolderSensitiveWarningUseCase(folderNodes.map { it.id })
         }.getOrDefault(SensitiveNodeShareWarning.None)
     }
 

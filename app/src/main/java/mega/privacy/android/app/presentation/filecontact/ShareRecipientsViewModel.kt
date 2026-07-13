@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,13 +24,17 @@ import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMe
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import timber.log.Timber
 
@@ -42,6 +47,8 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
     private val nodeMoveRequestMessageMapper: NodeMoveRequestMessageMapper,
     private val getAllowedSharingPermissionsUseCase: GetAllowedSharingPermissionsUseCase,
     private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
 ) : ViewModel() {
     private val folderInfo = navKey
 
@@ -55,8 +62,9 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
                 emit(false)
                 emit(getContactVerificationWarningUseCase())
             },
-            eventsFlow
-        ) { allowedPermissions: Set<AccessPermission>, recipients: List<ShareRecipient>, isContactVerificationWarningEnabled: Boolean, events: ShareEvents ->
+            eventsFlow,
+            addContactFlow,
+        ) { allowedPermissions: Set<AccessPermission>, recipients: List<ShareRecipient>, isContactVerificationWarningEnabled: Boolean, events: ShareEvents, addContact: AddContactState ->
             FileContactListState.Data(
                 folderName = folderInfo.folderName,
                 folderId = folderInfo.folderId,
@@ -66,6 +74,8 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
                 sharingCompletedEvent = events.addEvent,
                 accessPermissions = allowedPermissions.toImmutableSet(),
                 isContactVerificationWarningEnabled = isContactVerificationWarningEnabled,
+                sensitiveNodeShareWarning = addContact.warning,
+                navigateToAddContactEvent = addContact.navigateEvent,
             )
         }.catch { error ->
             Timber.e(error)
@@ -81,6 +91,61 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
     private val eventsFlow = MutableStateFlow<ShareEvents>(
         ShareEvents.Default
     )
+
+    private val addContactFlow = MutableStateFlow(AddContactState())
+
+    private data class AddContactState(
+        val warning: SensitiveNodeShareWarning = SensitiveNodeShareWarning.None,
+        val navigateEvent: StateEventWithContent<Long> = consumed(),
+    )
+
+    /**
+     * Called when the user chooses to add contacts to the shared folder. On the Compose picker path
+     * ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when needed;
+     * the legacy picker warns itself, so no warning is surfaced here for it.
+     */
+    fun onAddContactClicked() {
+        viewModelScope.launch {
+            val isComposeContactsPicker = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val warning = if (isComposeContactsPicker) {
+                getShareFolderSensitiveWarningUseCase(listOf(folderInfo.folderId))
+            } else {
+                SensitiveNodeShareWarning.None
+            }
+            if (warning == SensitiveNodeShareWarning.None) {
+                addContactFlow.value = AddContactState(
+                    navigateEvent = triggered(folderInfo.folderHandle),
+                )
+            } else {
+                addContactFlow.value = AddContactState(warning = warning)
+            }
+        }
+    }
+
+    /**
+     * Called when the user confirms the hidden/sensitive-node warning; proceeds to the picker.
+     */
+    fun onShareHiddenNodeWarningConfirmed() {
+        addContactFlow.value = AddContactState(
+            navigateEvent = triggered(folderInfo.folderHandle),
+        )
+    }
+
+    /**
+     * Called when the user dismisses the hidden/sensitive-node warning; aborts adding contacts.
+     */
+    fun onShareHiddenNodeWarningDismissed() {
+        addContactFlow.value = AddContactState()
+    }
+
+    /**
+     * Called once the navigate-to-picker event has been consumed by the UI.
+     */
+    fun onNavigateToAddContactEventConsumed() {
+        addContactFlow.value = AddContactState()
+    }
 
     sealed interface ShareEvents {
         val addEvent: StateEventWithContent<String>

@@ -32,6 +32,7 @@ import mega.privacy.android.app.presentation.filecontact.model.SelectionState
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.entity.user.UserVisibility
@@ -43,7 +44,7 @@ internal fun FileContactScreen(
     state: FileContactListState.Data,
     onBackPressed: () -> Unit,
     removeContacts: (List<ShareRecipient>) -> Unit,
-    addContact: (Long) -> Unit,
+    addContact: () -> Unit,
     updatePermissions: (List<ShareRecipient>, AccessPermission) -> Unit,
     shareRemovedEventHandled: () -> Unit,
     shareCompletedEventHandled: () -> Unit,
@@ -117,7 +118,7 @@ internal fun FileContactScreen(
                 selectAll = selectAll,
                 deselectAll = deselectAll,
                 changePermissions = changePermissions,
-                shareFolder = { addContact(state.folderId.longValue) },
+                shareFolder = addContact,
                 removeShare = removeShare,
             )
         },
@@ -129,7 +130,7 @@ internal fun FileContactScreen(
         floatingActionButton = {
             PrimaryLargeIconButton(
                 icon = painterResource(id = R.drawable.ic_add_white),
-                onClick = { addContact(state.folderId.longValue) },
+                onClick = addContact,
             )
         }
     ) { paddingValues ->
@@ -258,6 +259,8 @@ private fun FileContactScreenPreview() {
                 shareRemovedEvent = StateEventWithContentConsumed,
                 sharingCompletedEvent = StateEventWithContentConsumed,
                 isContactVerificationWarningEnabled = true,
+                sensitiveNodeShareWarning = SensitiveNodeShareWarning.None,
+                navigateToAddContactEvent = StateEventWithContentConsumed,
             ),
             onBackPressed = {},
             removeContacts = {},

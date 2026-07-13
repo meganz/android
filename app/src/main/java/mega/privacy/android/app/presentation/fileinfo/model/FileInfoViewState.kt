@@ -8,6 +8,7 @@ import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -61,6 +62,8 @@ import mega.privacy.android.shared.contact.model.ContactPermissionUiState
  * @property leaveFolderNodeIds the list of node ids to be left
  * @property isDecrypted
  * @property nodeDestination the node location type for navigation
+ * @property shareHiddenNodeWarning the hidden/sensitive-node warning to show before sharing the
+ * folder with contacts, or [SensitiveNodeShareWarning.None] when no warning is required
  */
 internal data class FileInfoViewState(
     val title: String = "",
@@ -106,6 +109,7 @@ internal data class FileInfoViewState(
     val leaveFolderNodeIds: List<Long>? = null,
     val isDecrypted: Boolean = true,
     val nodeDestination: List<NavKey>? = null,
+    val shareHiddenNodeWarning: SensitiveNodeShareWarning = SensitiveNodeShareWarning.None,
 ) {
 
     /**

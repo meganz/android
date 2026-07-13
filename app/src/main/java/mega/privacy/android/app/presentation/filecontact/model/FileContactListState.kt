@@ -5,6 +5,7 @@ import de.palm.composestateevents.StateEventWithContent
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 
@@ -35,5 +36,7 @@ internal sealed interface FileContactListState {
         val sharingCompletedEvent: StateEventWithContent<String>,
         val accessPermissions: ImmutableSet<AccessPermission>,
         val isContactVerificationWarningEnabled: Boolean,
+        val sensitiveNodeShareWarning: SensitiveNodeShareWarning,
+        val navigateToAddContactEvent: StateEventWithContent<Long>,
     ) : FileContactListState
 }

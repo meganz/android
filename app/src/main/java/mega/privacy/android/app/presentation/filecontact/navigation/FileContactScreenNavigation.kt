@@ -9,9 +9,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.filecontact.ShareRecipientsViewModel
+import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
 import mega.privacy.android.app.presentation.filecontact.view.FileContactHomeScreen
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
@@ -43,16 +45,22 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
             newShareRecipients = result
         }
 
-        val onShareFolder = { handle: Long ->
-            onNavigate(
-                AddContactToShareNavKey(
-                    contactType = AddContactToShareNavKey.ContactType.All,
-                    nodeHandle = listOf(handle),
+        val state by viewModel.state.collectAsStateWithLifecycle()
+
+        (state as? FileContactListState.Data)?.let { data ->
+            EventEffect(
+                event = data.navigateToAddContactEvent,
+                onConsumed = viewModel::onNavigateToAddContactEventConsumed,
+            ) { handle ->
+                onNavigate(
+                    AddContactToShareNavKey(
+                        contactType = AddContactToShareNavKey.ContactType.All,
+                        nodeHandle = listOf(handle),
+                    )
                 )
-            )
+            }
         }
 
-        val state by viewModel.state.collectAsStateWithLifecycle()
         FileContactHomeScreen(
             state = state,
             newShareRecipients = newShareRecipients,
@@ -67,7 +75,9 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
             shareRemovedEventHandled = viewModel::onShareRemovedEventHandled,
             shareCompletedEventHandled = viewModel::onSharingCompletedEventHandled,
             navigateToInfo = { onNavigate(ContactInfoNavKey(it.email)) },
-            addContact = onShareFolder,
+            addContact = { viewModel.onAddContactClicked() },
+            onShareHiddenNodeWarningConfirmed = viewModel::onShareHiddenNodeWarningConfirmed,
+            onShareHiddenNodeWarningDismissed = viewModel::onShareHiddenNodeWarningDismissed,
         )
     }
 }

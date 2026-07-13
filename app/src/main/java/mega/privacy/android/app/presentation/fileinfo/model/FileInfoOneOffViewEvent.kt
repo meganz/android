@@ -94,5 +94,11 @@ sealed interface FileInfoOneOffViewEvent {
      * @param collision the name collision detected
      */
     data class CollisionDetected(val collision: NameCollision) : FileInfoOneOffViewEvent
+
+    /**
+     * The add-contacts-to-share picker should be opened for the current folder, no
+     * hidden/sensitive-node warning is required.
+     */
+    object LaunchShareContactPicker : FileInfoOneOffViewEvent
 }
 

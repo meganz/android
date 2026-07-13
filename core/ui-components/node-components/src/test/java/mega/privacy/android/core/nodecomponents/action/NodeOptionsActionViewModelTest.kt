@@ -101,8 +101,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.RestoreNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
-import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningTypeUseCase
-import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CheckPublicNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.CopyPublicNodeUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
@@ -180,9 +179,8 @@ class NodeOptionsActionViewModelTest {
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getFileTypeInfoByNameUseCase = mock<GetFileTypeInfoByNameUseCase>()
     private val createShareKeyUseCase = mock<CreateShareKeyUseCase>()
-    private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
-    private val getShareFolderSensitiveWarningTypeUseCase =
-        mock<GetShareFolderSensitiveWarningTypeUseCase>()
+    private val getShareFolderSensitiveWarningUseCase =
+        mock<GetShareFolderSensitiveWarningUseCase>()
 
     // Mock action handlers for testing
     private val mockSingleNodeActionHandler = mock<SingleNodeAction>()
@@ -267,8 +265,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -316,9 +313,8 @@ class NodeOptionsActionViewModelTest {
         isNodeInBackupsUseCase.stub { onBlocking { invoke(any()) } doReturn false }
         getNodeAccessPermission.stub { onBlocking { invoke(any()) } doReturn AccessPermission.FULL }
         checkNodeCanBeMovedToTargetNode.stub { onBlocking { invoke(any(), any()) } doReturn true }
-        monitorHiddenNodesEnabledUseCase.stub { on { invoke() } doReturn flowOf(false) }
-        getShareFolderSensitiveWarningTypeUseCase.stub {
-            onBlocking { invoke(any(), any()) } doReturn SensitiveNodeShareWarning.None
+        getShareFolderSensitiveWarningUseCase.stub {
+            onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.None
         }
         getFeatureFlagValueUseCase.stub {
             onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
@@ -355,8 +351,7 @@ class NodeOptionsActionViewModelTest {
             getBusinessStatusUseCase,
             getFileTypeInfoByNameUseCase,
             createShareKeyUseCase,
-            monitorHiddenNodesEnabledUseCase,
-            getShareFolderSensitiveWarningTypeUseCase,
+            getShareFolderSensitiveWarningUseCase,
             getFeatureFlagValueUseCase,
             mockSingleNodeActionHandler,
             mockMultiNodeActionHandler,
@@ -1315,8 +1310,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = multipleHandlers,
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1391,8 +1385,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = multipleHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1461,8 +1454,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = emptySet(),
             multipleNodesActionHandlers = multipleNodesActionHandlers,
             createShareKeyUseCase = createShareKeyUseCase,
-            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1523,8 +1515,7 @@ class NodeOptionsActionViewModelTest {
             singleNodeActionHandlers = singleNodeActionHandlers,
             multipleNodesActionHandlers = emptySet(),
             createShareKeyUseCase = createShareKeyUseCase,
-            monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
-            getShareFolderSensitiveWarningTypeUseCase = getShareFolderSensitiveWarningTypeUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
             snackbarEventQueue = snackbarEventQueue,
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
@@ -1723,9 +1714,8 @@ class NodeOptionsActionViewModelTest {
                 on { id } doReturn NodeId(123L)
             }
 
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(
-                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
             ).thenReturn(SensitiveNodeShareWarning.Folder)
 
             initViewModel()
@@ -1763,12 +1753,8 @@ class NodeOptionsActionViewModelTest {
                 on { id } doReturn NodeId(456L)
             }
 
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(
-                getShareFolderSensitiveWarningTypeUseCase(
-                    listOf(NodeId(123L), NodeId(456L)),
-                    true
-                )
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L), NodeId(456L)))
             ).thenReturn(SensitiveNodeShareWarning.Folders)
 
             initViewModel()
@@ -1791,9 +1777,8 @@ class NodeOptionsActionViewModelTest {
                 on { id } doReturn NodeId(123L)
             }
 
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(
-                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
             ).thenReturn(SensitiveNodeShareWarning.None)
             whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
             whenever(checkBackupNodeTypeUseCase(mockFolderNode))
@@ -1843,7 +1828,7 @@ class NodeOptionsActionViewModelTest {
                 )
             }
 
-            verify(getShareFolderSensitiveWarningTypeUseCase, never()).invoke(any(), any())
+            verify(getShareFolderSensitiveWarningUseCase, never()).invoke(any())
             verify(createShareKeyUseCase).invoke(mockFolderNode)
         }
 
@@ -1854,9 +1839,8 @@ class NodeOptionsActionViewModelTest {
                 on { id } doReturn NodeId(123L)
             }
 
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(
-                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
             ).thenReturn(SensitiveNodeShareWarning.Folder)
             whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
             whenever(checkBackupNodeTypeUseCase(mockFolderNode))
@@ -1888,9 +1872,8 @@ class NodeOptionsActionViewModelTest {
                 on { id } doReturn NodeId(123L)
             }
 
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(
-                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
             ).thenReturn(SensitiveNodeShareWarning.Folder)
             whenever(createShareKeyUseCase(mockFolderNode)).thenReturn(Unit)
             whenever(checkBackupNodeTypeUseCase(mockFolderNode))
@@ -1916,9 +1899,8 @@ class NodeOptionsActionViewModelTest {
                 on { id } doReturn NodeId(123L)
             }
 
-            whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(true))
             whenever(
-                getShareFolderSensitiveWarningTypeUseCase(listOf(NodeId(123L)), true)
+                getShareFolderSensitiveWarningUseCase(listOf(NodeId(123L)))
             ).thenReturn(SensitiveNodeShareWarning.Folder)
 
             initViewModel()
