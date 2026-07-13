@@ -580,7 +580,7 @@ class ShareRecipientsViewModelTest {
             awaitItem()
             underTest.onAddContactClicked()
             awaitItem()
-            underTest.onShareHiddenNodeWarningDismissed()
+            underTest.clearAddContactState()
             val actual = awaitItem() as FileContactListState.Data
             assertThat(actual.sensitiveNodeShareWarning).isEqualTo(SensitiveNodeShareWarning.None)
             assertThat(actual.navigateToAddContactEvent)

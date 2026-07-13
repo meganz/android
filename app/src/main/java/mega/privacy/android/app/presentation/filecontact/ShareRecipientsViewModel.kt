@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.filecontact.model.FileContactListState
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.nodecomponents.mapper.RemoveShareResultMapper
 import mega.privacy.android.core.nodecomponents.mapper.message.NodeMoveRequestMessageMapper
 import mega.privacy.android.domain.entity.node.MoveRequestResult
@@ -33,7 +34,6 @@ import mega.privacy.android.domain.usecase.foldernode.ShareFolderUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.domain.usecase.shares.GetAllowedSharingPermissionsUseCase
 import mega.privacy.android.domain.usecase.shares.MonitorShareRecipientsUseCase
-import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 
@@ -108,7 +108,9 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
                 getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
             }.getOrDefault(false)
             val warning = if (isComposeContactsPicker) {
-                getShareFolderSensitiveWarningUseCase(listOf(args.folderId))
+                runCatching {
+                    getShareFolderSensitiveWarningUseCase(listOf(args.folderId))
+                }.getOrDefault(SensitiveNodeShareWarning.None)
             } else {
                 SensitiveNodeShareWarning.None
             }
@@ -134,14 +136,7 @@ internal class ShareRecipientsViewModel @AssistedInject constructor(
     /**
      * Called when the user dismisses the hidden/sensitive-node warning; aborts adding contacts.
      */
-    fun onShareHiddenNodeWarningDismissed() {
-        addContactFlow.value = AddContactState()
-    }
-
-    /**
-     * Called once the navigate-to-picker event has been consumed by the UI.
-     */
-    fun onNavigateToAddContactEventConsumed() {
+    fun clearAddContactState() {
         addContactFlow.value = AddContactState()
     }
 

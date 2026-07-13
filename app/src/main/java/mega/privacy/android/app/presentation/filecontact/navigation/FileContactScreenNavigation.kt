@@ -55,7 +55,7 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
         (state as? FileContactListState.Data)?.let { data ->
             EventEffect(
                 event = data.navigateToAddContactEvent,
-                onConsumed = viewModel::onNavigateToAddContactEventConsumed,
+                onConsumed = viewModel::clearAddContactState,
             ) { handle ->
                 onNavigate(
                     AddContactToShareNavKey(
@@ -82,7 +82,7 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
             navigateToInfo = { onNavigate(ContactInfoNavKey(it.email)) },
             addContact = { viewModel.onAddContactClicked() },
             onShareHiddenNodeWarningConfirmed = viewModel::onShareHiddenNodeWarningConfirmed,
-            onShareHiddenNodeWarningDismissed = viewModel::onShareHiddenNodeWarningDismissed,
+            onShareHiddenNodeWarningDismissed = viewModel::clearAddContactState,
         )
     }
 }
