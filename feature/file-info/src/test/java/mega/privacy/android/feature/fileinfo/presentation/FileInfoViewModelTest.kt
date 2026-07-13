@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
@@ -63,6 +64,7 @@ internal class FileInfoViewModelTest {
     private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase = mock()
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase = mock()
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase = mock()
+    private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
     private val nodeDestinationMapper: NodeDestinationMapper = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
@@ -82,6 +84,7 @@ internal class FileInfoViewModelTest {
             getImageNodeByIdUseCase = getImageNodeByIdUseCase,
             getAddressFromCoordinatesUseCase = getAddressFromCoordinatesUseCase,
             setNodeDescriptionUseCase = setNodeDescriptionUseCase,
+            getNodeOutSharesUseCase = getNodeOutSharesUseCase,
             nodeDestinationMapper = nodeDestinationMapper,
             nodeHandle = nodeHandle,
         )
@@ -101,6 +104,7 @@ internal class FileInfoViewModelTest {
             getImageNodeByIdUseCase,
             getAddressFromCoordinatesUseCase,
             setNodeDescriptionUseCase,
+            getNodeOutSharesUseCase,
             nodeDestinationMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
@@ -509,6 +513,38 @@ internal class FileInfoViewModelTest {
         advanceUntilIdle()
 
         assertThat(underTest.uiState.value.canEditDescription).isFalse()
+    }
+
+    @Test
+    fun `test that init loads the shared contact count for an outgoing share folder`() = runTest {
+        val node = mockFolderNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getNodeOutSharesUseCase(NodeId(NODE_HANDLE))).thenReturn(List(3) { mock() })
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(sharedContactCount).isEqualTo(3)
+            assertThat(isOutgoingShare).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that a folder with no out shares is not an outgoing share`() = runTest {
+        val node = mockFolderNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getNodeOutSharesUseCase(NodeId(NODE_HANDLE))).thenReturn(emptyList())
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(sharedContactCount).isEqualTo(0)
+            assertThat(isOutgoingShare).isFalse()
+        }
     }
 
     private companion object {

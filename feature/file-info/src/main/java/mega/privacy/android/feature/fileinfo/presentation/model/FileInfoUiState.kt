@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @property locationDestinations the navigation back stack that opens the node's containing folder
  * @property coordinates the media GPS coordinates, or null when the node has no valid location
  * @property locationCaption the reverse-geocoded place name for [coordinates], or null when unresolved
+ * @property sharedContactCount the number of contacts this node is shared with (0 when not an outgoing share)
  * @property descriptionText the node description, empty when none
  * @property tags the tags associated with the node
  * @property isTakenDown whether the node has been taken down
@@ -52,7 +53,15 @@ internal data class FileInfoUiState(
     val isNodeInBackups: Boolean = false,
     val coordinates: Coordinates? = null,
     val locationCaption: String? = null,
+    val sharedContactCount: Int = 0,
 ) {
+    /**
+     * Whether the node is an outgoing share (an owned folder shared with at least one contact);
+     * drives the "Shared with" section. Outgoing shares only apply to folders, never files.
+     */
+    val isOutgoingShare: Boolean
+        get() = !isFile && sharedContactCount > 0
+
     /**
      * The coordinates whose location map should be shown, or null when there is nothing to show:
      * the node has no valid location, or the current user is not the owner.

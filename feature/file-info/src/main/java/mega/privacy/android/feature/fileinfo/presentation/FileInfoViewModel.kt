@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.shared.nodes.extension.getIcon
@@ -52,6 +53,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase,
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase,
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase,
+    private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val nodeDestinationMapper: NodeDestinationMapper,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
@@ -65,6 +67,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
         loadNodeInfo()
         loadLocation()
         loadMapLocation()
+        loadSharedContacts()
         monitorNodeUpdates()
     }
 
@@ -199,6 +202,16 @@ internal class FileInfoViewModel @AssistedInject constructor(
         }
     }
 
+    private fun loadSharedContacts() {
+        viewModelScope.launch {
+            val count = runCatching { getNodeOutSharesUseCase(nodeId) }
+                .onFailure { Timber.e(it, "Failed to load out-shares for $nodeHandle") }
+                .getOrNull()
+                ?.size ?: 0
+            _uiState.update { it.copy(sharedContactCount = count) }
+        }
+    }
+
     private fun monitorNodeUpdates() {
         monitorNodeUpdatesById(nodeId)
             .catch { Timber.e(it, "Error monitoring node updates for $nodeHandle") }
@@ -206,6 +219,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                 loadNodeInfo()
                 loadLocation()
                 loadMapLocation()
+                loadSharedContacts()
             }
             .launchIn(viewModelScope)
     }

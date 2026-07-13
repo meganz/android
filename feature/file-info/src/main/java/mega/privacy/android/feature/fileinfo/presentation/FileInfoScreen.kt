@@ -1,18 +1,13 @@
 package mega.privacy.android.feature.fileinfo.presentation
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
@@ -30,11 +24,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
-import mega.android.core.ui.components.chip.DefaultChipStyle
-import mega.android.core.ui.components.chip.MegaChip
-import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -43,16 +35,19 @@ import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
+import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoDetailRow
 import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoMapView
+import mega.privacy.android.feature.fileinfo.presentation.view.TagsSection
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.TagsNavKey
 import mega.privacy.android.shared.nodes.components.NodeDescriptionField
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
@@ -62,17 +57,22 @@ import mega.privacy.android.shared.resources.R as sharedR
  * File Info screen showing the node thumbnail, name, type and size.
  *
  * @param uiState the current [FileInfoUiState]
+ * @param nodeHandle the handle of the node being shown, used to build navigation keys
  * @param onBack invoked when the Close action is tapped
+ * @param onLocationClick invoked when the location row is tapped (opens the containing folder)
+ * @param onNavigate invoked with the destination [NavKey] for a forward navigation (tags, shares)
+ * @param onDescriptionChange invoked with the new description when the description edit is committed
  * @param modifier modifier for the scaffold
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun FileInfoScreen(
     uiState: FileInfoUiState,
+    nodeHandle: Long,
     onBack: () -> Unit,
     onLocationClick: () -> Unit,
+    onNavigate: (NavKey) -> Unit,
     onDescriptionChange: (String) -> Unit,
-    onTagsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -96,9 +96,10 @@ internal fun FileInfoScreen(
             } else {
                 FileInfoContent(
                     uiState = uiState,
+                    nodeHandle = nodeHandle,
                     onLocationClick = onLocationClick,
+                    onNavigate = onNavigate,
                     onDescriptionChange = onDescriptionChange,
-                    onTagsClick = onTagsClick,
                 )
             }
         }
@@ -108,9 +109,10 @@ internal fun FileInfoScreen(
 @Composable
 private fun FileInfoContent(
     uiState: FileInfoUiState,
+    nodeHandle: Long,
     onLocationClick: () -> Unit,
+    onNavigate: (NavKey) -> Unit,
     onDescriptionChange: (String) -> Unit,
-    onTagsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -122,6 +124,10 @@ private fun FileInfoContent(
         "Folder"
     }
     val subtitle = buildList {
+        if (uiState.isOutgoingShare) {
+            // TODO extract to a localized string resource
+            add("Outgoing share")
+        }
         typeLabel?.let { add(it) }
         if (uiState.isFile && uiState.sizeInBytes > 0) {
             add(formatFileSize(uiState.sizeInBytes, context))
@@ -175,6 +181,24 @@ private fun FileInfoContent(
             }
         }
 
+        if (uiState.isOutgoingShare) {
+            FileInfoDetailRow(
+                // TODO extract to localized string resources
+                label = "Shared with",
+                value = "${uiState.sharedContactCount} contacts",
+                trailingIcon = IconPack.Medium.Thin.Outline.ChevronRight,
+                onClick = {
+                    onNavigate(
+                        FileContactInfoNavKey(
+                            folderHandle = nodeHandle,
+                            folderName = uiState.title,
+                        )
+                    )
+                },
+                modifier = Modifier.testTag(FILE_INFO_SHARED_WITH_TAG),
+            )
+        }
+
         uiState.creationTime?.let { added ->
             FileInfoDetailRow(
                 // TODO extract to a localized string resource
@@ -199,8 +223,11 @@ private fun FileInfoContent(
             } else {
                 uiState.locationFolders.joinToString(separator = " > ", prefix = "$rootLabel > ")
             }
-            LocationRow(
-                location = location,
+            FileInfoDetailRow(
+                // TODO extract to a localized string resource
+                label = "Location",
+                value = location,
+                trailingIcon = IconPack.Medium.Thin.Outline.FolderSearch,
                 onClick = onLocationClick,
                 modifier = Modifier.testTag(FILE_INFO_LOCATION_TAG),
             )
@@ -229,63 +256,9 @@ private fun FileInfoContent(
             TagsSection(
                 tags = uiState.tags,
                 canEdit = uiState.canEditTags,
-                onClick = onTagsClick,
+                onClick = { onNavigate(TagsNavKey(nodeHandle)) },
                 modifier = Modifier.testTag(FILE_INFO_TAGS_TAG),
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun TagsSection(
-    tags: List<String>,
-    canEdit: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .then(if (canEdit) Modifier.clickable(onClick = onClick) else Modifier),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            MegaText(
-                modifier = Modifier.weight(1f),
-                // TODO extract to a localized string resource
-                text = "Tags",
-                textColor = TextColor.Primary,
-                style = AppTheme.typography.bodyLarge,
-            )
-            if (canEdit) {
-                MegaIcon(
-                    modifier = Modifier.size(24.dp),
-                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.ChevronRight),
-                    tint = IconColor.Secondary,
-                    contentDescription = null,
-                )
-            }
-        }
-        if (tags.isNotEmpty()) {
-            FlowRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                tags.forEach { tag ->
-                    MegaChip(
-                        selected = false,
-                        content = "#$tag",
-                        style = DefaultChipStyle,
-                        onClick = onClick,
-                    )
-                }
-            }
         }
     }
 }
@@ -300,69 +273,6 @@ private fun locationRootLabel(sourceType: NodeSourceType?): String? = when (sour
     NodeSourceType.RUBBISH_BIN -> stringResource(sharedR.string.general_section_rubbish_bin)
     NodeSourceType.INCOMING_SHARES -> stringResource(sharedR.string.general_title_incoming_shares)
     else -> null
-}
-
-@Composable
-private fun LocationRow(
-    location: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-        ) {
-            MegaText(
-                // TODO extract to a localized string resource
-                text = "Location",
-                textColor = TextColor.Primary,
-                style = AppTheme.typography.bodyLarge,
-            )
-            MegaText(
-                text = location,
-                textColor = TextColor.Secondary,
-                style = AppTheme.typography.bodyMedium,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
-            )
-        }
-        MegaIcon(
-            modifier = Modifier.size(24.dp),
-            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderSearch),
-            tint = IconColor.Secondary,
-            contentDescription = null,
-        )
-    }
-}
-
-@Composable
-private fun FileInfoDetailRow(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-    ) {
-        MegaText(
-            text = label,
-            textColor = TextColor.Primary,
-            style = AppTheme.typography.bodyLarge,
-        )
-        MegaText(
-            text = value,
-            textColor = TextColor.Secondary,
-            style = AppTheme.typography.bodyMedium,
-        )
-    }
 }
 
 @Composable
@@ -410,10 +320,11 @@ private fun FileInfoScreenFilePreview() {
                 tags = listOf("marketing", "2024", "confidential"),
                 accessPermission = AccessPermission.OWNER
             ),
+            nodeHandle = 0L,
             onBack = {},
             onLocationClick = {},
+            onNavigate = {},
             onDescriptionChange = {},
-            onTagsClick = {},
         )
     }
 }
@@ -432,11 +343,13 @@ private fun FileInfoScreenFolderPreview() {
                 creationTime = 1_749_000_000L,
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 locationFolders = listOf("Documents"),
+                sharedContactCount = 3,
             ),
+            nodeHandle = 0L,
             onBack = {},
             onLocationClick = {},
+            onNavigate = {},
             onDescriptionChange = {},
-            onTagsClick = {},
         )
     }
 }
@@ -448,10 +361,11 @@ private fun FileInfoScreenLoadingPreview() {
     AndroidThemeForPreviews {
         FileInfoScreen(
             uiState = FileInfoUiState(isLoading = true),
+            nodeHandle = 0L,
             onBack = {},
             onLocationClick = {},
+            onNavigate = {},
             onDescriptionChange = {},
-            onTagsClick = {},
         )
     }
 }
@@ -464,6 +378,7 @@ internal const val FILE_INFO_SUBTITLE_TAG = "file_info_screen:subtitle"
 internal const val FILE_INFO_ADDED_TAG = "file_info_screen:added"
 internal const val FILE_INFO_LAST_MODIFIED_TAG = "file_info_screen:last_modified"
 internal const val FILE_INFO_LOCATION_TAG = "file_info_screen:location"
+internal const val FILE_INFO_SHARED_WITH_TAG = "file_info_screen:shared_with"
 internal const val FILE_INFO_LOADING_TAG = "file_info_screen:loading"
 internal const val FILE_INFO_DESCRIPTION_TAG = "file_info_screen:description"
 internal const val FILE_INFO_TAGS_TAG = "file_info_screen:tags"

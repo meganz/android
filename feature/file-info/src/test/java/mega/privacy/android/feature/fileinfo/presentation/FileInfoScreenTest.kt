@@ -12,8 +12,11 @@ import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.FileContactInfoNavKey
+import mega.privacy.android.navigation.destination.TagsNavKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -164,35 +167,81 @@ class FileInfoScreenTest {
     }
 
     @Test
-    fun `test that clicking the tags section invokes onTagsClick when editable`() {
-        var clicked = false
+    fun `test that clicking the tags section navigates to TagsNavKey when editable`() {
+        var navKey: NavKey? = null
         setContent(
             uiState = fileState.copy(accessPermission = AccessPermission.OWNER),
-            onTagsClick = { clicked = true },
+            onNavigate = { navKey = it },
         )
 
         composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).performScrollTo().performClick()
 
-        assertThat(clicked).isTrue()
+        assertThat(navKey).isEqualTo(TagsNavKey(NODE_HANDLE))
+    }
+
+    @Test
+    fun `test that the subtitle shows Outgoing share for a shared folder`() {
+        setContent(uiState = folderState.copy(sharedContactCount = 3))
+
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextContains("Outgoing share", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextContains("Folder", substring = true)
+    }
+
+    @Test
+    fun `test that the shared with row is displayed for a shared folder`() {
+        setContent(uiState = folderState.copy(sharedContactCount = 3))
+
+        composeRule.onNodeWithTag(FILE_INFO_SHARED_WITH_TAG).assertExists()
+        composeRule.onNodeWithText("3 contacts", useUnmergedTree = true).assertExists()
+    }
+
+    @Test
+    fun `test that the shared with row is hidden for a file even with shared contacts`() {
+        setContent(uiState = fileState.copy(sharedContactCount = 3))
+
+        composeRule.onNodeWithTag(FILE_INFO_SHARED_WITH_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that clicking the shared with row navigates to FileContactInfoNavKey`() {
+        var navKey: NavKey? = null
+        setContent(
+            uiState = folderState.copy(sharedContactCount = 3),
+            onNavigate = { navKey = it },
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_SHARED_WITH_TAG).performScrollTo().performClick()
+
+        assertThat(navKey).isEqualTo(
+            FileContactInfoNavKey(folderHandle = NODE_HANDLE, folderName = folderState.title)
+        )
     }
 
     private fun setContent(
         uiState: FileInfoUiState,
+        nodeHandle: Long = NODE_HANDLE,
         onBack: () -> Unit = {},
         onLocationClick: () -> Unit = {},
+        onNavigate: (NavKey) -> Unit = {},
         onDescriptionChange: (String) -> Unit = {},
-        onTagsClick: () -> Unit = {},
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
                 FileInfoScreen(
                     uiState = uiState,
+                    nodeHandle = nodeHandle,
                     onBack = onBack,
                     onLocationClick = onLocationClick,
+                    onNavigate = onNavigate,
                     onDescriptionChange = onDescriptionChange,
-                    onTagsClick = onTagsClick,
                 )
             }
         }
+    }
+
+    private companion object {
+        const val NODE_HANDLE = 123L
     }
 }

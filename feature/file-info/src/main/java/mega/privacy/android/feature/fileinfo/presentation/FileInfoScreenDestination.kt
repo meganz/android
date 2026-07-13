@@ -13,7 +13,6 @@ import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.LegacyFileInfoNavKey
-import mega.privacy.android.navigation.destination.TagsNavKey
 
 fun EntryProviderScope<NavKey>.fileInfoScreen(
     navigationHandler: NavigationHandler,
@@ -36,6 +35,7 @@ fun EntryProviderScope<NavKey>.fileInfoScreen(
 
             FileInfoScreen(
                 uiState = uiState,
+                nodeHandle = key.nodeHandle,
                 onBack = navigationHandler::back,
                 onLocationClick = {
                     uiState.locationDestinations?.let { destinations ->
@@ -48,8 +48,8 @@ fun EntryProviderScope<NavKey>.fileInfoScreen(
                         )
                     }
                 },
+                onNavigate = { navigationHandler.navigate(it) },
                 onDescriptionChange = viewModel::updateDescription,
-                onTagsClick = { navigationHandler.navigate(TagsNavKey(key.nodeHandle)) },
             )
         }
     }
