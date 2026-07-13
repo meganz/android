@@ -43,9 +43,11 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoDetailRow
 import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoMapView
+import mega.privacy.android.feature.fileinfo.presentation.view.PermissionsRow
 import mega.privacy.android.feature.fileinfo.presentation.view.TagsSection
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.TagsNavKey
 import mega.privacy.android.shared.nodes.components.NodeDescriptionField
@@ -128,6 +130,10 @@ private fun FileInfoContent(
             // TODO extract to a localized string resource
             add("Outgoing share")
         }
+        if (uiState.isIncomingShare) {
+            // TODO extract to a localized string resource
+            add("Incoming share")
+        }
         typeLabel?.let { add(it) }
         if (uiState.isFile && uiState.sizeInBytes > 0) {
             add(formatFileSize(uiState.sizeInBytes, context))
@@ -196,6 +202,28 @@ private fun FileInfoContent(
                     )
                 },
                 modifier = Modifier.testTag(FILE_INFO_SHARED_WITH_TAG),
+            )
+        }
+
+        if (uiState.isIncomingShare) {
+            uiState.ownerEmail?.let { ownerEmail ->
+                val ownerName = uiState.ownerName.orEmpty()
+                FileInfoDetailRow(
+                    // TODO extract to a localized string resource
+                    label = "Owner",
+                    value = if (ownerName.isNotBlank() && ownerName != ownerEmail) {
+                        "$ownerName ($ownerEmail)"
+                    } else {
+                        ownerEmail
+                    },
+                    trailingIcon = IconPack.Medium.Thin.Outline.ChevronRight,
+                    onClick = { onNavigate(ContactInfoNavKey(ownerEmail)) },
+                    modifier = Modifier.testTag(FILE_INFO_OWNER_TAG),
+                )
+            }
+            PermissionsRow(
+                accessPermission = uiState.accessPermission,
+                modifier = Modifier.testTag(FILE_INFO_PERMISSIONS_TAG),
             )
         }
 
@@ -357,6 +385,32 @@ private fun FileInfoScreenFolderPreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
+private fun FileInfoScreenIncomingShareFolderPreview() {
+    AndroidThemeForPreviews {
+        FileInfoScreen(
+            uiState = FileInfoUiState(
+                isLoading = false,
+                title = "Company Assets",
+                isFile = false,
+                iconRes = iconPackR.drawable.ic_folder_medium_solid,
+                creationTime = 1_749_000_000L,
+                nodeSourceType = NodeSourceType.INCOMING_SHARES,
+                accessPermission = AccessPermission.FULL,
+                ownerName = "John Doe",
+                ownerEmail = "johndoe@mail.com",
+            ),
+            nodeHandle = 0L,
+            onBack = {},
+            onLocationClick = {},
+            onNavigate = {},
+            onDescriptionChange = {},
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@CombinedThemePreviews
+@Composable
 private fun FileInfoScreenLoadingPreview() {
     AndroidThemeForPreviews {
         FileInfoScreen(
@@ -379,6 +433,8 @@ internal const val FILE_INFO_ADDED_TAG = "file_info_screen:added"
 internal const val FILE_INFO_LAST_MODIFIED_TAG = "file_info_screen:last_modified"
 internal const val FILE_INFO_LOCATION_TAG = "file_info_screen:location"
 internal const val FILE_INFO_SHARED_WITH_TAG = "file_info_screen:shared_with"
+internal const val FILE_INFO_OWNER_TAG = "file_info_screen:owner"
+internal const val FILE_INFO_PERMISSIONS_TAG = "file_info_screen:permissions"
 internal const val FILE_INFO_LOADING_TAG = "file_info_screen:loading"
 internal const val FILE_INFO_DESCRIPTION_TAG = "file_info_screen:description"
 internal const val FILE_INFO_TAGS_TAG = "file_info_screen:tags"

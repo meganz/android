@@ -109,4 +109,16 @@ class FileInfoUiStateTest {
             FileInfoUiState(isFile = false, sharedContactCount = 0).isOutgoingShare
         ).isFalse()
     }
+
+    @Test
+    fun `test that a node with an owner email is an incoming share`() {
+        assertThat(
+            FileInfoUiState(ownerEmail = "owner@mail.com").isIncomingShare
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that a node without an owner email is not an incoming share`() {
+        assertThat(FileInfoUiState(ownerEmail = null).isIncomingShare).isFalse()
+    }
 }

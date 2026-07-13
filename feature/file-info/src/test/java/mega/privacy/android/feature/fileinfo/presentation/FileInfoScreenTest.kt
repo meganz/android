@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.TagsNavKey
 import org.junit.Rule
@@ -217,6 +218,46 @@ class FileInfoScreenTest {
         assertThat(navKey).isEqualTo(
             FileContactInfoNavKey(folderHandle = NODE_HANDLE, folderName = folderState.title)
         )
+    }
+
+    @Test
+    fun `test that the owner and permissions rows are displayed for an incoming share`() {
+        setContent(
+            uiState = folderState.copy(
+                ownerName = "John Doe",
+                ownerEmail = "johndoe@mail.com",
+                accessPermission = AccessPermission.FULL,
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_OWNER_TAG).assertExists()
+        composeRule.onNodeWithText("John Doe (johndoe@mail.com)", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(FILE_INFO_PERMISSIONS_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that the owner row is hidden when not an incoming share`() {
+        setContent(uiState = folderState)
+
+        composeRule.onNodeWithTag(FILE_INFO_OWNER_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(FILE_INFO_PERMISSIONS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that clicking the owner row navigates to ContactInfoNavKey`() {
+        var navKey: NavKey? = null
+        setContent(
+            uiState = folderState.copy(
+                ownerName = "John Doe",
+                ownerEmail = "johndoe@mail.com",
+                accessPermission = AccessPermission.FULL,
+            ),
+            onNavigate = { navKey = it },
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_OWNER_TAG).performScrollTo().performClick()
+
+        assertThat(navKey).isEqualTo(ContactInfoNavKey("johndoe@mail.com"))
     }
 
     private fun setContent(

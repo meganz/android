@@ -20,6 +20,7 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
@@ -54,6 +56,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase,
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase,
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
+    private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder,
     private val nodeDestinationMapper: NodeDestinationMapper,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
@@ -93,10 +96,18 @@ internal class FileInfoViewModel @AssistedInject constructor(
             val isInBackupsDeferred = async {
                 runCatching { isNodeInBackupsUseCase(nodeHandle) }.getOrDefault(false)
             }
+            val ownerDeferred = async {
+                (node as? TypedFolderNode)?.let { folder ->
+                    runCatching { getContactItemFromInShareFolder(folder, skipCache = false) }
+                        .onFailure { Timber.e(it, "Failed to load in-share owner for $nodeHandle") }
+                        .getOrNull()
+                }
+            }
 
             val accessPermission = accessPermissionDeferred.await()
             val isInRubbish = isInRubbishDeferred.await()
             val isInBackups = isInBackupsDeferred.await()
+            val owner = ownerDeferred.await()
 
             val isFile: Boolean
             val sizeInBytes: Long
@@ -138,6 +149,10 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     accessPermission = accessPermission,
                     isNodeInRubbish = isInRubbish,
                     isNodeInBackups = isInBackups,
+                    ownerName = owner?.let {
+                        it.contactData.alias ?: it.contactData.fullName ?: it.email
+                    },
+                    ownerEmail = owner?.email,
                 )
             }
         }

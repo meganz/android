@@ -10,6 +10,8 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.usecase.node.GetNodeLocationByIdUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
+import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
@@ -65,6 +68,7 @@ internal class FileInfoViewModelTest {
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase = mock()
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase = mock()
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
+    private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder = mock()
     private val nodeDestinationMapper: NodeDestinationMapper = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
@@ -85,6 +89,7 @@ internal class FileInfoViewModelTest {
             getAddressFromCoordinatesUseCase = getAddressFromCoordinatesUseCase,
             setNodeDescriptionUseCase = setNodeDescriptionUseCase,
             getNodeOutSharesUseCase = getNodeOutSharesUseCase,
+            getContactItemFromInShareFolder = getContactItemFromInShareFolder,
             nodeDestinationMapper = nodeDestinationMapper,
             nodeHandle = nodeHandle,
         )
@@ -105,6 +110,7 @@ internal class FileInfoViewModelTest {
             getAddressFromCoordinatesUseCase,
             setNodeDescriptionUseCase,
             getNodeOutSharesUseCase,
+            getContactItemFromInShareFolder,
             nodeDestinationMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
@@ -544,6 +550,47 @@ internal class FileInfoViewModelTest {
         with(underTest.uiState.value) {
             assertThat(sharedContactCount).isEqualTo(0)
             assertThat(isOutgoingShare).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that init loads the owner for an incoming share folder`() = runTest {
+        val node = mockFolderNode()
+        val contactData = mock<ContactData> {
+            on { alias } doReturn null
+            on { fullName } doReturn "John Doe"
+        }
+        val owner = mock<ContactItem> {
+            on { email } doReturn "owner@mail.com"
+            on { this.contactData } doReturn contactData
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.FULL)
+        whenever(getContactItemFromInShareFolder(any(), any())).thenReturn(owner)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(ownerName).isEqualTo("John Doe")
+            assertThat(ownerEmail).isEqualTo("owner@mail.com")
+            assertThat(isIncomingShare).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that a folder that is not an incoming share has no owner`() = runTest {
+        val node = mockFolderNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getContactItemFromInShareFolder(any(), any())).thenReturn(null)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(ownerEmail).isNull()
+            assertThat(isIncomingShare).isFalse()
         }
     }
 

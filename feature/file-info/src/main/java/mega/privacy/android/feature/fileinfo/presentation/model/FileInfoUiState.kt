@@ -25,6 +25,8 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @property coordinates the media GPS coordinates, or null when the node has no valid location
  * @property locationCaption the reverse-geocoded place name for [coordinates], or null when unresolved
  * @property sharedContactCount the number of contacts this node is shared with (0 when not an outgoing share)
+ * @property ownerName the display name (or email) of the incoming-share owner, or null when not an incoming share
+ * @property ownerEmail the email of the incoming-share owner, or null when not an incoming share
  * @property descriptionText the node description, empty when none
  * @property tags the tags associated with the node
  * @property isTakenDown whether the node has been taken down
@@ -54,6 +56,8 @@ internal data class FileInfoUiState(
     val coordinates: Coordinates? = null,
     val locationCaption: String? = null,
     val sharedContactCount: Int = 0,
+    val ownerName: String? = null,
+    val ownerEmail: String? = null,
 ) {
     /**
      * Whether the node is an outgoing share (an owned folder shared with at least one contact);
@@ -61,6 +65,13 @@ internal data class FileInfoUiState(
      */
     val isOutgoingShare: Boolean
         get() = !isFile && sharedContactCount > 0
+
+    /**
+     * Whether the node is an incoming share (a folder shared with the current user by its owner);
+     * drives the "Owner" and "Permissions" sections. Determined by the presence of the owner.
+     */
+    val isIncomingShare: Boolean
+        get() = ownerEmail != null
 
     /**
      * The coordinates whose location map should be shown, or null when there is nothing to show:
