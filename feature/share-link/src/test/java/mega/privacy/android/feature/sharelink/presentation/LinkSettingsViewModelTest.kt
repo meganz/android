@@ -21,6 +21,8 @@ import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.feature.sharelink.session.LinkPassword
+import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -41,6 +43,7 @@ class LinkSettingsViewModelTest {
     private val encryptLinkWithPasswordUseCase = mock<EncryptLinkWithPasswordUseCase>()
     private val getPasswordStrengthUseCase = mock<GetPasswordStrengthUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
+    private val passwordCache = mock<ShareLinkPasswordCache>()
 
     @BeforeEach
     fun setUp() {
@@ -55,6 +58,7 @@ class LinkSettingsViewModelTest {
             encryptLinkWithPasswordUseCase,
             getPasswordStrengthUseCase,
             monitorAccountDetailUseCase,
+            passwordCache,
         )
     }
 
@@ -65,6 +69,10 @@ class LinkSettingsViewModelTest {
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
     }
 
+    private fun stubExistingPassword(password: String = OLD_PASSWORD) {
+        whenever(passwordCache.get(NODE_HANDLE)).thenReturn(LinkPassword(password, PUBLIC_LINK))
+    }
+
     private fun createUnderTest() = LinkSettingsViewModel(
         args = LinkSettingsViewModel.Args(handles = listOf(NODE_HANDLE)),
         getNodeByIdUseCase = getNodeByIdUseCase,
@@ -72,6 +80,7 @@ class LinkSettingsViewModelTest {
         encryptLinkWithPasswordUseCase = encryptLinkWithPasswordUseCase,
         getPasswordStrengthUseCase = getPasswordStrengthUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+        passwordCache = passwordCache,
     )
 
     private suspend fun ReceiveTurbine<LinkSettingsUiState>.awaitUntil(
@@ -279,10 +288,78 @@ class LinkSettingsViewModelTest {
             verifyNoInteractions(exportNodeUseCase, encryptLinkWithPasswordUseCase)
         }
 
+    @Test
+    fun `test that opening with an existing password pre-fills it without marking it dirty`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubExistingPassword()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isPasswordEnabled).isTrue()
+                assertThat(state.isPasswordAlreadySet).isTrue()
+                assertThat(state.password).isEqualTo(OLD_PASSWORD)
+                assertThat(state.initialPassword).isEqualTo(OLD_PASSWORD)
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removing an existing password enables Save and clears the cached password`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubExistingPassword()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(false)
+                val dirty = awaitUntil { !it.isPasswordEnabled }
+                assertThat(dirty.hasUnsavedChanges).isTrue()
+                assertThat(dirty.isSaveEnabled).isTrue()
+
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(passwordCache).set(NODE_HANDLE, null)
+            verifyNoInteractions(encryptLinkWithPasswordUseCase)
+        }
+
+    @Test
+    fun `test that changing an existing password onSave stores the new encrypted link in the cache`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubExistingPassword()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(encryptLinkWithPasswordUseCase).invoke(PUBLIC_LINK, PASSWORD)
+            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+        }
+
     private companion object {
         const val NODE_HANDLE = 123L
         const val PUBLIC_LINK = "https://mega.nz/file/abc"
+        const val ENCRYPTED_LINK = "https://mega.nz/#P!encrypted"
         const val PASSWORD = "Str0ngP@ss"
+        const val OLD_PASSWORD = "0ldP@ssw0rd"
         const val EXPIRY_TIME = 1_800_000_000L
         const val CALLER_NAME = "LinkSettingsViewModel"
 

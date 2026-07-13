@@ -184,6 +184,7 @@ private fun LinkSettingsContent(
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .testTag(LINK_SETTINGS_PASSWORD_FIELD_TAG),
                 label = null,
+                placeholder = stringResource(sharedR.string.password_placeholder),
                 text = uiState.password.orEmpty(),
                 showClearIcon = true,
                 successText = strengthLabel.takeIf { uiState.passwordStrength.isAcceptable() },

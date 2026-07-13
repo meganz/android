@@ -36,6 +36,10 @@ sealed interface ShareLinkUiState {
      * @property linkWithoutKey The public link with the decryption key stripped, or null.
      * @property key The decryption key split from the link, or null.
      * @property accountType The current account type, used for Pro gating of link settings.
+     * @property isPasswordSet Whether the link is currently password-protected (session state).
+     * @property password The current plaintext password, kept in-session so Link settings can
+     * pre-fill it for change/remove; null when not protected. Not rendered.
+     * @property linkWithPassword The password-encrypted link to share, or null when not protected.
      */
     data class Data(
         val handles: List<Long>,
@@ -48,5 +52,8 @@ sealed interface ShareLinkUiState {
         val linkWithoutKey: String?,
         val key: String?,
         val accountType: AccountType?,
+        val isPasswordSet: Boolean = false,
+        val password: String? = null,
+        val linkWithPassword: String? = null,
     ) : ShareLinkUiState
 }

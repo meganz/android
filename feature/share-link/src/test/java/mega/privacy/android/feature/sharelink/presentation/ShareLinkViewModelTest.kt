@@ -20,6 +20,8 @@ import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.feature.sharelink.session.LinkPassword
+import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.AfterEach
@@ -43,12 +45,14 @@ class ShareLinkViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val splitLinkAndKeyUseCase = mock<SplitLinkAndKeyUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
+    private val passwordCache = mock<ShareLinkPasswordCache>()
 
     @BeforeEach
     fun setUp() {
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(AccountDetail()))
         whenever(splitLinkAndKeyUseCase(any())).thenReturn(LinkAndKey(null, null))
         whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
+        whenever(passwordCache.monitor(any())).thenReturn(flowOf(null))
         underTest = ShareLinkViewModel(
             args = ShareLinkViewModel.Args(handles = listOf(NODE_HANDLE)),
             getNodeByIdUseCase = getNodeByIdUseCase,
@@ -56,6 +60,7 @@ class ShareLinkViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
+            passwordCache = passwordCache,
         )
     }
 
@@ -67,6 +72,7 @@ class ShareLinkViewModelTest {
             monitorAccountDetailUseCase,
             splitLinkAndKeyUseCase,
             fileTypeIconMapper,
+            passwordCache,
         )
     }
 
@@ -182,6 +188,26 @@ class ShareLinkViewModelTest {
         verifyNoInteractions(exportNodeUseCase)
     }
 
+    @Test
+    fun `test that a cached password marks the link as password protected`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { name } doReturn "report.pdf"
+                on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+                on { type } doReturn PdfFileTypeInfo
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(passwordCache.monitor(NODE_HANDLE))
+                .thenReturn(flowOf(LinkPassword("Str0ngP@ss", ENCRYPTED_LINK)))
+
+            underTest.uiState.test {
+                val data = awaitData { it.isPasswordSet }
+                assertThat(data.linkWithPassword).isEqualTo(ENCRYPTED_LINK)
+                assertThat(data.password).isEqualTo("Str0ngP@ss")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
     private suspend fun ReceiveTurbine<ShareLinkUiState>.awaitData(
         predicate: (ShareLinkUiState.Data) -> Boolean = { true },
     ): ShareLinkUiState.Data {
@@ -194,6 +220,7 @@ class ShareLinkViewModelTest {
     private companion object {
         const val NODE_HANDLE = 123L
         const val CALLER_NAME = "ShareLinkViewModel"
+        const val ENCRYPTED_LINK = "https://mega.nz/#P!enc"
         val FILE_ICON_RES = iconPackR.drawable.ic_pdf_medium_solid
     }
 }

@@ -3137,16 +3137,18 @@
     <string name="share_link_set_password">Set password</string>
     <!-- Share link revamp: subtitle explaining the "Set password" row -->
     <string name="share_link_password_subtitle">Limit access with a password</string>
+    <!-- Placeholder shown inside an empty password input field, prompting the user to type a password -->
+    <string name="password_placeholder">Enter password</string>
     <!-- Password strength label shown below a password field when the password is very weak -->
-    <string name="password_strength_very_weak">Very weak</string>
+    <string name="password_strength_very_weak">Very weak password</string>
     <!-- Password strength label shown below a password field when the password is weak -->
-    <string name="password_strength_weak">Weak</string>
+    <string name="password_strength_weak">Weak password</string>
     <!-- Password strength label shown below a password field when the password is of medium strength -->
-    <string name="password_strength_medium">Medium</string>
+    <string name="password_strength_medium">Medium password</string>
     <!-- Password strength label shown below a password field when the password is good -->
-    <string name="password_strength_good">Good</string>
+    <string name="password_strength_good">Good password</string>
     <!-- Password strength label shown below a password field when the password is strong -->
-    <string name="password_strength_strong">Strong</string>
+    <string name="password_strength_strong">Strong password</string>
     <!-- Settings: title of the Sorting and view mode screen -->
     <string name="settings_sorting_and_view_mode_title">Sorting and view mode</string>
     <!-- Settings: title of the sorting preference option -->

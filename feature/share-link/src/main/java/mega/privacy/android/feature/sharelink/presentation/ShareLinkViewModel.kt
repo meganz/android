@@ -10,9 +10,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -42,6 +44,7 @@ class ShareLinkViewModel @AssistedInject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val splitLinkAndKeyUseCase: SplitLinkAndKeyUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
+    private val passwordCache: ShareLinkPasswordCache,
 ) : ViewModel() {
 
     /**
@@ -53,8 +56,15 @@ class ShareLinkViewModel @AssistedInject constructor(
         val accountTypeFlow = monitorAccountDetailUseCase()
             .map { it.levelDetail?.accountType }
             .onStart { emit(null) }
-        combine(linkFlow, accountTypeFlow) { state, accountType ->
-            if (state is ShareLinkUiState.Data) state.copy(accountType = accountType) else state
+        val passwordFlow = args.handles.firstOrNull()?.let(passwordCache::monitor) ?: flowOf(null)
+        combine(linkFlow, accountTypeFlow, passwordFlow) { state, accountType, password ->
+            if (state !is ShareLinkUiState.Data) return@combine state
+            state.copy(
+                accountType = accountType,
+                isPasswordSet = password != null,
+                password = password?.password,
+                linkWithPassword = password?.linkWithPassword,
+            )
         }.asUiStateFlow(
             scope = viewModelScope,
             initialValue = ShareLinkUiState.Loading,

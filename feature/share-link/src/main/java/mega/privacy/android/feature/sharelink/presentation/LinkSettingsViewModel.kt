@@ -20,6 +20,8 @@ import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.feature.sharelink.session.LinkPassword
+import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
 import timber.log.Timber
 
 /**
@@ -38,9 +40,20 @@ class LinkSettingsViewModel @AssistedInject constructor(
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val getPasswordStrengthUseCase: GetPasswordStrengthUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
+    private val passwordCache: ShareLinkPasswordCache,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LinkSettingsUiState())
+    private val handle: Long? = args.handles.firstOrNull()
+    private val cachedPassword: LinkPassword? = handle?.let(passwordCache::get)
+
+    private val _uiState = MutableStateFlow(
+        LinkSettingsUiState(
+            isPasswordEnabled = cachedPassword != null,
+            isPasswordAlreadySet = cachedPassword != null,
+            initialPassword = cachedPassword?.password,
+            password = cachedPassword?.password,
+        )
+    )
     val uiState: StateFlow<LinkSettingsUiState> = _uiState.asStateFlow()
 
     private var publicLink: String? = null
@@ -48,6 +61,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
     init {
         loadNode()
         monitorAccountDetail()
+        cachedPassword?.password?.let(::computeStrength)
     }
 
     fun onSeparateKeyEnabled(enabled: Boolean) =
@@ -69,6 +83,10 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     fun onPasswordChanged(password: String) {
         update { it.copy(password = password) }
+        computeStrength(password)
+    }
+
+    private fun computeStrength(password: String) {
         viewModelScope.launch {
             val strength = password.takeIf(String::isNotEmpty)
                 ?.let { runCatching { getPasswordStrengthUseCase(it) }.getOrNull() }
@@ -77,13 +95,13 @@ class LinkSettingsViewModel @AssistedInject constructor(
     }
 
     fun onSave() {
-        val handle = args.handles.firstOrNull()
+        val handle = handle ?: return
         val current = _uiState.value
-        if (current.isSaving || handle == null || !current.isDirty || !current.isValid) return
+        if (current.isSaving || !current.isDirty || !current.isValid) return
 
         update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            runCatching { applyChanges(NodeId(handle), current) }
+            runCatching { applyChanges(handle, NodeId(handle), current) }
                 .onSuccess { update { it.copy(isSaving = false, savedEvent = triggered) } }
                 .onFailure { throwable ->
                     Timber.e(throwable, "Failed to save link settings")
@@ -96,7 +114,15 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     fun onErrorEventConsumed() = update { it.copy(errorEvent = consumed) }
 
-    private suspend fun applyChanges(nodeId: NodeId, state: LinkSettingsUiState) {
+    /**
+     * Applies the pending changes, writing any password change/removal to the shared
+     * [ShareLinkPasswordCache] so the Share link screen reflects it.
+     */
+    private suspend fun applyChanges(
+        handle: Long,
+        nodeId: NodeId,
+        state: LinkSettingsUiState,
+    ) {
         if (state.isExpiryEnabled) {
             exportNodeUseCase(
                 nodeToExport = nodeId,
@@ -105,15 +131,20 @@ class LinkSettingsViewModel @AssistedInject constructor(
             )
         }
         val password = state.password
-        if (state.isPasswordEnabled && !password.isNullOrBlank()) {
-            publicLink?.takeIf(String::isNotEmpty)?.let { link ->
-                encryptLinkWithPasswordUseCase(link, password)
+        when {
+            state.isPasswordEnabled && !password.isNullOrBlank() -> {
+                val encrypted = publicLink?.takeIf(String::isNotEmpty)
+                    ?.let { encryptLinkWithPasswordUseCase(it, password) }
+                passwordCache.set(handle, LinkPassword(password = password, linkWithPassword = encrypted))
             }
+
+            state.isPasswordAlreadySet && !state.isPasswordEnabled ->
+                passwordCache.set(handle, null)
         }
     }
 
     private fun loadNode() {
-        val handle = args.handles.firstOrNull() ?: return
+        val handle = handle ?: return
         viewModelScope.launch {
             publicLink = runCatching { getNodeByIdUseCase(NodeId(handle))?.exportedData?.publicLink }
                 .onFailure { Timber.e(it, "Failed to load node for link settings") }
@@ -138,8 +169,14 @@ class LinkSettingsViewModel @AssistedInject constructor(
         copy(hasUnsavedChanges = isDirty, isSaveEnabled = isDirty && isValid && !isSaving)
 
     private val LinkSettingsUiState.isDirty: Boolean
-        get() = isSeparateKeyEnabled || isExpiryEnabled || isPasswordEnabled ||
-                expiryDate != null || !password.isNullOrEmpty()
+        get() = isSeparateKeyEnabled || isExpiryEnabled || expiryDate != null || isPasswordDirty
+
+    private val LinkSettingsUiState.isPasswordDirty: Boolean
+        get() = if (isPasswordAlreadySet) {
+            !isPasswordEnabled || password != initialPassword
+        } else {
+            isPasswordEnabled || !password.isNullOrEmpty()
+        }
 
     private val LinkSettingsUiState.isValid: Boolean
         get() = when {
