@@ -7,9 +7,11 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -125,11 +127,51 @@ class LinkSettingsScreenTest {
         assertThat(backed).isFalse()
     }
 
+    @Test
+    fun `test that the password field is hidden when the password toggle is off`() {
+        setContent(uiState = loaded.copy(isPasswordEnabled = false))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_FIELD_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the password field is revealed when the password toggle is on`() {
+        setContent(uiState = loaded.copy(isPasswordEnabled = true))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_FIELD_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that typing in the password field invokes onPasswordChanged`() {
+        var typed: String? = null
+        setContent(uiState = loaded.copy(isPasswordEnabled = true), onPasswordChanged = { typed = it })
+
+        composeRule.onNodeWithTag(CORE_UI_TEXT_FIELD_TAG).performTextInput("a")
+
+        assertThat(typed).isEqualTo("a")
+    }
+
+    @Test
+    fun `test that the strength helper text is displayed for a strong password`() {
+        setContent(
+            uiState = loaded.copy(
+                isPasswordEnabled = true,
+                password = "Str0ngP@ss",
+                passwordStrength = PasswordStrength.STRONG,
+            )
+        )
+
+        composeRule.onNodeWithText(
+            context.getString(sharedR.string.password_strength_strong)
+        ).assertIsDisplayed()
+    }
+
     private fun setContent(
         uiState: LinkSettingsUiState,
         onBack: () -> Unit = {},
         onExpiryEnabled: (Boolean) -> Unit = {},
         onPasswordEnabled: (Boolean) -> Unit = {},
+        onPasswordChanged: (String) -> Unit = {},
         onSave: () -> Unit = {},
     ) {
         composeRule.setContent {
@@ -138,6 +180,7 @@ class LinkSettingsScreenTest {
                 onBack = onBack,
                 onExpiryEnabled = onExpiryEnabled,
                 onPasswordEnabled = onPasswordEnabled,
+                onPasswordChanged = onPasswordChanged,
                 onSave = onSave,
             )
         }
@@ -145,5 +188,9 @@ class LinkSettingsScreenTest {
 
     private companion object {
         const val NAVIGATION_ICON = "Navigation Icon"
+
+        // core-ui BaseTextField's editable OutlinedTextField tag; the input field's public
+        // testTag is only on the wrapper, so text input must target the inner node.
+        const val CORE_UI_TEXT_FIELD_TAG = "base_text_field:outlined_text_field"
     }
 }

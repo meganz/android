@@ -103,6 +103,7 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
             onBack = navigationHandler::back,
             onExpiryEnabled = viewModel::onExpiryEnabled,
             onPasswordEnabled = viewModel::onPasswordEnabled,
+            onPasswordChanged = viewModel::onPasswordChanged,
             onSave = viewModel::onSave,
         )
     }

@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,10 +23,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.inputfields.PasswordTextInputField
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -33,6 +38,7 @@ import mega.android.core.ui.model.Button
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -42,6 +48,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onBack Invoked when the Close action is tapped.
  * @param onExpiryEnabled Invoked when the "Set expiry date" toggle changes.
  * @param onPasswordEnabled Invoked when the "Set password" toggle changes.
+ * @param onPasswordChanged Invoked when the revealed password field text changes.
  * @param onSave Invoked when the bottom "Save" button is tapped.
  * @param modifier Modifier for the scaffold.
  */
@@ -52,6 +59,7 @@ fun LinkSettingsScreen(
     onBack: () -> Unit,
     onExpiryEnabled: (Boolean) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
+    onPasswordChanged: (String) -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -102,6 +110,7 @@ fun LinkSettingsScreen(
                     uiState = uiState,
                     onExpiryEnabled = onExpiryEnabled,
                     onPasswordEnabled = onPasswordEnabled,
+                    onPasswordChanged = onPasswordChanged,
                 )
             }
         }
@@ -129,6 +138,7 @@ private fun LinkSettingsContent(
     uiState: LinkSettingsUiState,
     onExpiryEnabled: (Boolean) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
+    onPasswordChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -164,8 +174,39 @@ private fun LinkSettingsContent(
                 )
             },
         )
+        AnimatedVisibility(visible = uiState.isPasswordEnabled) {
+            val strengthLabel = uiState.passwordStrength
+                ?.strengthLabelRes()
+                ?.let { stringResource(it) }
+            PasswordTextInputField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .testTag(LINK_SETTINGS_PASSWORD_FIELD_TAG),
+                label = null,
+                text = uiState.password.orEmpty(),
+                showClearIcon = true,
+                successText = strengthLabel.takeIf { uiState.passwordStrength.isAcceptable() },
+                warningText = strengthLabel.takeIf { uiState.passwordStrength == PasswordStrength.WEAK },
+                errorText = strengthLabel.takeIf { uiState.passwordStrength == PasswordStrength.VERY_WEAK },
+                onValueChanged = onPasswordChanged,
+            )
+        }
     }
 }
+
+@StringRes
+private fun PasswordStrength.strengthLabelRes(): Int? = when (this) {
+    PasswordStrength.VERY_WEAK -> sharedR.string.password_strength_very_weak
+    PasswordStrength.WEAK -> sharedR.string.password_strength_weak
+    PasswordStrength.MEDIUM -> sharedR.string.password_strength_medium
+    PasswordStrength.GOOD -> sharedR.string.password_strength_good
+    PasswordStrength.STRONG -> sharedR.string.password_strength_strong
+    PasswordStrength.INVALID -> null
+}
+
+private fun PasswordStrength?.isAcceptable() =
+    this == PasswordStrength.MEDIUM || this == PasswordStrength.GOOD || this == PasswordStrength.STRONG
 
 @Composable
 private fun LinkSettingsLoading(modifier: Modifier = Modifier) {
@@ -206,6 +247,7 @@ private fun LinkSettingsScreenPreview() {
             onBack = {},
             onExpiryEnabled = {},
             onPasswordEnabled = {},
+            onPasswordChanged = {},
             onSave = {},
         )
     }
@@ -220,9 +262,42 @@ private fun LinkSettingsScreenDirtyPreview() {
             onBack = {},
             onExpiryEnabled = {},
             onPasswordEnabled = {},
+            onPasswordChanged = {},
             onSave = {},
         )
     }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun LinkSettingsScreenPasswordPreview(
+    @PreviewParameter(PasswordStrengthPreviewProvider::class) strength: PasswordStrength,
+) {
+    AndroidThemeForPreviews {
+        LinkSettingsScreen(
+            uiState = previewData.copy(
+                isPasswordEnabled = true,
+                password = "Str0ngP@ss",
+                passwordStrength = strength,
+                isSaveEnabled = true,
+            ),
+            onBack = {},
+            onExpiryEnabled = {},
+            onPasswordEnabled = {},
+            onPasswordChanged = {},
+            onSave = {},
+        )
+    }
+}
+
+private class PasswordStrengthPreviewProvider : PreviewParameterProvider<PasswordStrength> {
+    override val values = sequenceOf(
+        PasswordStrength.VERY_WEAK,
+        PasswordStrength.WEAK,
+        PasswordStrength.MEDIUM,
+        PasswordStrength.GOOD,
+        PasswordStrength.STRONG,
+    )
 }
 
 @CombinedThemePreviews
@@ -234,6 +309,7 @@ private fun LinkSettingsScreenLoadingPreview() {
             onBack = {},
             onExpiryEnabled = {},
             onPasswordEnabled = {},
+            onPasswordChanged = {},
             onSave = {},
         )
     }
@@ -245,5 +321,6 @@ internal const val LINK_SETTINGS_EXPIRY_ROW_TAG = "link_settings_screen:row_expi
 internal const val LINK_SETTINGS_EXPIRY_TOGGLE_TAG = "link_settings_screen:toggle_expiry"
 internal const val LINK_SETTINGS_PASSWORD_ROW_TAG = "link_settings_screen:row_password"
 internal const val LINK_SETTINGS_PASSWORD_TOGGLE_TAG = "link_settings_screen:toggle_password"
+internal const val LINK_SETTINGS_PASSWORD_FIELD_TAG = "link_settings_screen:field_password"
 internal const val LINK_SETTINGS_LOADING_TAG = "link_settings_screen:loading"
 internal const val LINK_SETTINGS_DISCARD_DIALOG_TAG = "link_settings_screen:discard_dialog"
