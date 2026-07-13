@@ -488,18 +488,6 @@ interface AppNavigator {
     )
 
     /**
-     * Open File Contact List Activity
-     *
-     * @param context Context
-     * @param handle Node handle
-     */
-    @Deprecated("Use the new openFileContactListActivity with nodeName parameter")
-    fun openFileContactListActivity(
-        context: Context,
-        handle: Long,
-    )
-
-    /**
      * Open Authenticity Credentials Activity
      *
      * @param context Context

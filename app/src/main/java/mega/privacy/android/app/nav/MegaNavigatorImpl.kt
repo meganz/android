@@ -30,7 +30,6 @@ import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActiv
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.contact.navigation.intValue
-import mega.privacy.android.app.presentation.filecontact.FileContactListActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -864,19 +863,6 @@ internal class MegaNavigatorImpl @Inject constructor(
             singleActivityDestination = FileContactInfoNavKey(
                 folderHandle = handle,
                 folderName = nodeName
-            )
-        )
-    }
-
-    @Deprecated("Use the new openFileContactListActivity with nodeName parameter")
-    override fun openFileContactListActivity(
-        context: Context,
-        handle: Long,
-    ) {
-        context.startActivity(
-            FileContactListActivity.launchIntent(
-                context = context,
-                handle = handle
             )
         )
     }
