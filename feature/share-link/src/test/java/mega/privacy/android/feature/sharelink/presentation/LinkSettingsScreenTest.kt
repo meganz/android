@@ -12,6 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
+import mega.privacy.android.feature.sharelink.presentation.component.MEGA_DATE_PICKER_DIALOG_TAG
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -128,6 +129,29 @@ class LinkSettingsScreenTest {
     }
 
     @Test
+    fun `test that the expiry date field is hidden when the expiry toggle is off`() {
+        setContent(uiState = loaded.copy(isExpiryEnabled = false))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_FIELD_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the expiry date field is revealed when the expiry toggle is on`() {
+        setContent(uiState = loaded.copy(isExpiryEnabled = true))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_FIELD_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that tapping the expiry date field opens the date picker`() {
+        setContent(uiState = loaded.copy(isExpiryEnabled = true))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_FIELD_TAG).performClick()
+
+        composeRule.onNodeWithTag(MEGA_DATE_PICKER_DIALOG_TAG).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that the password field is hidden when the password toggle is off`() {
         setContent(uiState = loaded.copy(isPasswordEnabled = false))
 
@@ -170,6 +194,7 @@ class LinkSettingsScreenTest {
         uiState: LinkSettingsUiState,
         onBack: () -> Unit = {},
         onExpiryEnabled: (Boolean) -> Unit = {},
+        onExpiryDateChanged: (Long) -> Unit = {},
         onPasswordEnabled: (Boolean) -> Unit = {},
         onPasswordChanged: (String) -> Unit = {},
         onSave: () -> Unit = {},
@@ -179,6 +204,7 @@ class LinkSettingsScreenTest {
                 uiState = uiState,
                 onBack = onBack,
                 onExpiryEnabled = onExpiryEnabled,
+                onExpiryDateChanged = onExpiryDateChanged,
                 onPasswordEnabled = onPasswordEnabled,
                 onPasswordChanged = onPasswordChanged,
                 onSave = onSave,

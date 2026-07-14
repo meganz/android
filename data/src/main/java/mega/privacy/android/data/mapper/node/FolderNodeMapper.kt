@@ -67,7 +67,7 @@ internal class FolderNodeMapper @Inject constructor(
         isMarkedSensitive = megaNode.isMarkedSensitive,
         isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),
         exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-            ExportedData(it.publicLink, it.publicLinkCreationTime)
+            ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTime.takeIf { time -> time > 0 })
         },
         isTakenDown = megaNode.isTakenDown,
         isInRubbishBin = megaApiGateway.isInRubbish(megaNode),

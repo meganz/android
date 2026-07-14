@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sharelink.presentation
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -29,7 +31,9 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.inputfields.PasswordTextInputField
+import mega.android.core.ui.components.inputfields.ReadOnlyTextInputField
 import mega.android.core.ui.components.list.FlexibleLineListItem
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
@@ -38,8 +42,14 @@ import mega.android.core.ui.model.Button
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
+import mega.privacy.android.feature.sharelink.presentation.component.MegaDatePickerDialog
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
+import java.text.DateFormat
+import java.util.Date
+import java.util.TimeZone
 
 /**
  * Revamped Link settings editor screen.
@@ -47,6 +57,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param uiState The current [LinkSettingsUiState].
  * @param onBack Invoked when the Close action is tapped.
  * @param onExpiryEnabled Invoked when the "Set expiry date" toggle changes.
+ * @param onExpiryDateChanged Invoked with the chosen expiry date, in UTC milliseconds.
  * @param onPasswordEnabled Invoked when the "Set password" toggle changes.
  * @param onPasswordChanged Invoked when the revealed password field text changes.
  * @param onSave Invoked when the bottom "Save" button is tapped.
@@ -58,6 +69,7 @@ fun LinkSettingsScreen(
     uiState: LinkSettingsUiState,
     onBack: () -> Unit,
     onExpiryEnabled: (Boolean) -> Unit,
+    onExpiryDateChanged: (Long) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onSave: () -> Unit,
@@ -109,6 +121,7 @@ fun LinkSettingsScreen(
                 LinkSettingsContent(
                     uiState = uiState,
                     onExpiryEnabled = onExpiryEnabled,
+                    onExpiryDateChanged = onExpiryDateChanged,
                     onPasswordEnabled = onPasswordEnabled,
                     onPasswordChanged = onPasswordChanged,
                 )
@@ -137,10 +150,13 @@ fun LinkSettingsScreen(
 private fun LinkSettingsContent(
     uiState: LinkSettingsUiState,
     onExpiryEnabled: (Boolean) -> Unit,
+    onExpiryDateChanged: (Long) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
     onPasswordChanged: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -160,6 +176,15 @@ private fun LinkSettingsContent(
                 )
             },
         )
+        AnimatedVisibility(visible = uiState.isExpiryEnabled) {
+            ExpiryDateField(
+                expiryDate = uiState.expiryDate,
+                onClick = { showDatePicker = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            )
+        }
         FlexibleLineListItem(
             modifier = Modifier.testTag(LINK_SETTINGS_PASSWORD_ROW_TAG),
             title = stringResource(sharedR.string.share_link_set_password),
@@ -194,7 +219,51 @@ private fun LinkSettingsContent(
             )
         }
     }
+
+    if (showDatePicker) {
+        MegaDatePickerDialog(
+            initialSelectedTimeMillis = uiState.expiryDate,
+            onDateSelected = {
+                onExpiryDateChanged(it)
+                showDatePicker = false
+            },
+            onDismiss = { showDatePicker = false },
+        )
+    }
 }
+
+@Composable
+private fun ExpiryDateField(
+    expiryDate: Long?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier = modifier) {
+        ReadOnlyTextInputField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(LINK_SETTINGS_EXPIRY_FIELD_TAG),
+            text = expiryDate?.let(::formatExpiryDate).orEmpty(),
+            trailingIcon = {
+                MegaIcon(
+                    painter = painterResource(iconPackR.drawable.ic_calendar_01_medium_thin_outline),
+                    tint = IconColor.Secondary,
+                    contentDescription = null,
+                )
+            },
+        )
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .clickable(onClick = onClick),
+        )
+    }
+}
+
+private fun formatExpiryDate(millis: Long): String =
+    DateFormat.getDateInstance(DateFormat.MEDIUM)
+        .apply { timeZone = TimeZone.getTimeZone("UTC") }
+        .format(Date(millis))
 
 @StringRes
 private fun PasswordStrength.strengthLabelRes(): Int? = when (this) {
@@ -247,6 +316,7 @@ private fun LinkSettingsScreenPreview() {
             uiState = previewData,
             onBack = {},
             onExpiryEnabled = {},
+            onExpiryDateChanged = {},
             onPasswordEnabled = {},
             onPasswordChanged = {},
             onSave = {},
@@ -262,6 +332,7 @@ private fun LinkSettingsScreenDirtyPreview() {
             uiState = previewData.copy(isExpiryEnabled = true, isSaveEnabled = true),
             onBack = {},
             onExpiryEnabled = {},
+            onExpiryDateChanged = {},
             onPasswordEnabled = {},
             onPasswordChanged = {},
             onSave = {},
@@ -284,6 +355,7 @@ private fun LinkSettingsScreenPasswordPreview(
             ),
             onBack = {},
             onExpiryEnabled = {},
+            onExpiryDateChanged = {},
             onPasswordEnabled = {},
             onPasswordChanged = {},
             onSave = {},
@@ -309,6 +381,7 @@ private fun LinkSettingsScreenLoadingPreview() {
             uiState = LinkSettingsUiState(isLoading = true),
             onBack = {},
             onExpiryEnabled = {},
+            onExpiryDateChanged = {},
             onPasswordEnabled = {},
             onPasswordChanged = {},
             onSave = {},
@@ -320,6 +393,7 @@ internal const val LINK_SETTINGS_APP_BAR_TAG = "link_settings_screen:app_bar"
 internal const val LINK_SETTINGS_SAVE_BUTTON_TAG = "link_settings_screen:button_save"
 internal const val LINK_SETTINGS_EXPIRY_ROW_TAG = "link_settings_screen:row_expiry"
 internal const val LINK_SETTINGS_EXPIRY_TOGGLE_TAG = "link_settings_screen:toggle_expiry"
+internal const val LINK_SETTINGS_EXPIRY_FIELD_TAG = "link_settings_screen:field_expiry"
 internal const val LINK_SETTINGS_PASSWORD_ROW_TAG = "link_settings_screen:row_password"
 internal const val LINK_SETTINGS_PASSWORD_TOGGLE_TAG = "link_settings_screen:toggle_password"
 internal const val LINK_SETTINGS_PASSWORD_FIELD_TAG = "link_settings_screen:field_password"

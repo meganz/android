@@ -88,7 +88,7 @@ internal class PhotoMapper @Inject constructor(
                         label = node.label,
                         nodeLabel = nodeLabelMapper(node.label),
                         exportedData = node.takeIf { node.isExported }?.let {
-                            ExportedData(it.publicLink, it.publicLinkCreationTime)
+                            ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTime.takeIf { time -> time > 0 })
                         },
                         isIncomingShare = node.isInShare,
                         isNodeKeyDecrypted = node.isNodeKeyDecrypted,
@@ -125,7 +125,7 @@ internal class PhotoMapper @Inject constructor(
                         label = node.label,
                         nodeLabel = nodeLabelMapper(node.label),
                         exportedData = node.takeIf { node.isExported }?.let {
-                            ExportedData(it.publicLink, it.publicLinkCreationTime)
+                            ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTime.takeIf { time -> time > 0 })
                         },
                         isIncomingShare = node.isInShare,
                         isNodeKeyDecrypted = node.isNodeKeyDecrypted,

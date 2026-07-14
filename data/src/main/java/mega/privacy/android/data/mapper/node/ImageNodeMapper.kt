@@ -60,7 +60,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val isMarkedSensitive = megaNode.isMarkedSensitive
             override val isSensitiveInherited = isSensitiveInherited
             override val exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-                ExportedData(it.publicLink, it.publicLinkCreationTime)
+                ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTime.takeIf { time -> time > 0 })
             }
             override val isTakenDown = megaNode.isTakenDown
             override val isIncomingShare = megaNode.isInShare

@@ -76,6 +76,13 @@ class LinkSettingsViewModelTest {
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
     }
 
+    private suspend fun stubNodeWithExpiry(expirationSeconds: Long) {
+        val node = mock<TypedFileNode> {
+            on { exportedData } doReturn ExportedData(PUBLIC_LINK, 0L, expirationSeconds)
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+    }
+
     private fun stubExistingPassword(password: String = OLD_PASSWORD) {
         whenever(passwordCache.get(NODE_HANDLE)).thenReturn(LinkPassword(password, PUBLIC_LINK))
     }
@@ -238,7 +245,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), EXPIRY_TIME, CALLER_NAME)
+            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), EXPIRY_TIME_SECONDS, CALLER_NAME)
         }
 
     @Test
@@ -469,13 +476,77 @@ class LinkSettingsViewModelTest {
             }
         }
 
+    @Test
+    fun `test that opening with an existing expiry pre-fills it without marking it dirty`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitUntil { it.isExpiryAlreadySet }
+                assertThat(state.isExpiryEnabled).isTrue()
+                assertThat(state.expiryDate).isEqualTo(EXPIRY_TIME)
+                assertThat(state.initialExpiryDate).isEqualTo(EXPIRY_TIME)
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removing an existing expiry enables Save and re-exports without an expiry`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitUntil { it.isExpiryAlreadySet }
+                underTest.onExpiryEnabled(false)
+                val dirty = awaitUntil { !it.isExpiryEnabled }
+                assertThat(dirty.isSaveEnabled).isTrue()
+
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), null, CALLER_NAME)
+        }
+
+    @Test
+    fun `test that changing an existing expiry re-exports with the new date in seconds`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+            val newMillis = EXPIRY_TIME + MILLIS_PER_DAY
+
+            underTest.uiState.test {
+                awaitUntil { it.isExpiryAlreadySet }
+                underTest.onExpiryDateChanged(newMillis)
+                awaitUntil { it.expiryDate == newMillis && it.isSaveEnabled }
+
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), newMillis / 1_000L, CALLER_NAME)
+        }
+
     private companion object {
         const val NODE_HANDLE = 123L
         const val PUBLIC_LINK = "https://mega.nz/file/abc"
         const val ENCRYPTED_LINK = "https://mega.nz/#P!encrypted"
         const val PASSWORD = "Str0ngP@ss"
         const val OLD_PASSWORD = "0ldP@ssw0rd"
-        const val EXPIRY_TIME = 1_800_000_000L
+        const val EXPIRY_TIME = 1_800_000_000_000L
+        const val EXPIRY_TIME_SECONDS = EXPIRY_TIME / 1_000L
+        const val MILLIS_PER_DAY = 86_400_000L
         const val CALLER_NAME = "LinkSettingsViewModel"
 
         @JvmField

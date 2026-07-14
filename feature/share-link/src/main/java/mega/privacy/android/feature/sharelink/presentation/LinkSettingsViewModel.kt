@@ -123,10 +123,13 @@ class LinkSettingsViewModel @AssistedInject constructor(
         nodeId: NodeId,
         state: LinkSettingsUiState,
     ) {
-        if (state.isExpiryEnabled) {
+        if (state.isExpiryDirty) {
+            val expireTimeSeconds = state.expiryDate
+                ?.takeIf { state.isExpiryEnabled }
+                ?.let { it / MILLIS_PER_SECOND }
             exportNodeUseCase(
                 nodeToExport = nodeId,
-                expireTime = state.expiryDate,
+                expireTime = expireTimeSeconds,
                 callerName = CALLER_NAME,
             )
         }
@@ -146,9 +149,21 @@ class LinkSettingsViewModel @AssistedInject constructor(
     private fun loadNode() {
         val handle = handle ?: return
         viewModelScope.launch {
-            publicLink = runCatching { getNodeByIdUseCase(NodeId(handle))?.exportedData?.publicLink }
+            val exportedData = runCatching { getNodeByIdUseCase(NodeId(handle))?.exportedData }
                 .onFailure { Timber.e(it, "Failed to load node for link settings") }
                 .getOrNull()
+            publicLink = exportedData?.publicLink
+            val expiryMillis = exportedData?.expirationTime?.let { it * MILLIS_PER_SECOND }
+            if (expiryMillis != null) {
+                update {
+                    it.copy(
+                        isExpiryEnabled = true,
+                        isExpiryAlreadySet = true,
+                        initialExpiryDate = expiryMillis,
+                        expiryDate = expiryMillis,
+                    )
+                }
+            }
         }
     }
 
@@ -169,7 +184,14 @@ class LinkSettingsViewModel @AssistedInject constructor(
         copy(hasUnsavedChanges = isDirty, isSaveEnabled = isDirty && isValid && !isSaving)
 
     private val LinkSettingsUiState.isDirty: Boolean
-        get() = isSeparateKeyEnabled || isExpiryEnabled || expiryDate != null || isPasswordDirty
+        get() = isSeparateKeyEnabled || isExpiryDirty || isPasswordDirty
+
+    private val LinkSettingsUiState.isExpiryDirty: Boolean
+        get() = if (isExpiryAlreadySet) {
+            !isExpiryEnabled || expiryDate != initialExpiryDate
+        } else {
+            isExpiryEnabled || expiryDate != null
+        }
 
     private val LinkSettingsUiState.isPasswordDirty: Boolean
         get() = if (isPasswordAlreadySet) {
@@ -199,5 +221,6 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     private companion object {
         const val CALLER_NAME = "LinkSettingsViewModel"
+        const val MILLIS_PER_SECOND = 1_000L
     }
 }

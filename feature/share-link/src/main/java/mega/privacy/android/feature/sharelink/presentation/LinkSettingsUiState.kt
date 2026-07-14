@@ -9,6 +9,10 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 /**
  * UI state for the Link settings editor screen.
  *
+ * @property isExpiryAlreadySet Whether the link already had an expiry date when the screen opened,
+ * so the expiry toggle starts on and Save only enables on an actual change or removal.
+ * @property initialExpiryDate The existing expiry date, in UTC milliseconds, used as the baseline
+ * for detecting an actual change; null when no expiry was set.
  * @property isPasswordAlreadySet Whether the link already had a password when the screen opened,
  * so the password toggle starts on and Save only enables on an actual change or removal.
  * @property initialPassword The existing plaintext password pre-filled for change/remove, used as
@@ -20,6 +24,8 @@ data class LinkSettingsUiState(
     val isSeparateKeyEnabled: Boolean = false,
     val isExpiryEnabled: Boolean = false,
     val expiryDate: Long? = null,
+    val isExpiryAlreadySet: Boolean = false,
+    val initialExpiryDate: Long? = null,
     val isPasswordEnabled: Boolean = false,
     val isPasswordAlreadySet: Boolean = false,
     val initialPassword: String? = null,
