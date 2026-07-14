@@ -4,10 +4,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
@@ -47,11 +45,13 @@ import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
 import mega.privacy.android.navigation.destination.CameraBackupPermissionsNavKey
 import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey
+import mega.privacy.android.navigation.destination.DriveSyncNavKey.Companion.SYNC_TAB_INDEX
+import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
-import mega.privacy.android.navigation.destination.SyncPromotionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
@@ -169,7 +169,13 @@ private fun NavigationHandler.navigateForItem(
             }
 
         DoMoreWithMegaItem.Identifier.AddSync ->
-            navigate(SyncPromotionNavKey)
+            navigate(
+                HomeScreensNavKey(
+                    root = DriveSyncNavKey(initialTabIndex = SYNC_TAB_INDEX),
+                    destinations = null,
+                    timestamp = System.currentTimeMillis(),
+                )
+            )
 
         DoMoreWithMegaItem.Identifier.ScanDocument ->
             navigate(ContinuousScanNavKey)
@@ -208,9 +214,8 @@ private fun DoMoreWithMegaSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Spacer(modifier = Modifier.width(4.dp))
             items.forEach { item ->
                 DoMoreWithMegaItemButton(
                     icon = item.icon,
@@ -218,7 +223,6 @@ private fun DoMoreWithMegaSection(
                     onClick = { onItemClick(item) },
                 )
             }
-            Spacer(modifier = Modifier.width(4.dp))
         }
     }
 }

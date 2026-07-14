@@ -49,9 +49,15 @@ data class OfflineNavKey(
 
 @Serializable
 data class DriveSyncNavKey(
-    val initialTabIndex: Int = 0,
+    val initialTabIndex: Int = DRIVE_TAB_INDEX,
     val highlightedNodeHandle: Long? = null,
-) : MainNavItemNavKey
+) : MainNavItemNavKey {
+
+    companion object {
+        const val DRIVE_TAB_INDEX = 0
+        const val SYNC_TAB_INDEX = 1
+    }
+}
 
 /**
  * Cloud drive media discovery route args
