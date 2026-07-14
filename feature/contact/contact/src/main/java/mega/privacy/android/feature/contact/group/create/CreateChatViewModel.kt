@@ -15,24 +15,24 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
-import mega.privacy.android.feature.contact.group.create.model.CreateGroupChatUiState
+import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Create group chat view model. Backs the distinct "create group chat" screen: exposes the searchable
- * MEGA-contacts list for the selection step and resolves the selected handles to emails on confirm.
- * Selection and the group-settings form (name, EKR, chat link, allow-add-participants) are owned by the
- * Compose layer, not this ViewModel. The screen builds a `NewGroupChatResult` from the selection plus the
- * settings and returns it to the caller, which performs the actual group creation.
+ * Create chat view model. Backs the searchable MEGA-contacts multi-select picker shared by the
+ * "create group chat" and "new chat" flows: exposes the contact list for the selection step and
+ * resolves the selected handles to emails on confirm. Selection and any settings form are owned by
+ * the Compose layer, not this ViewModel. The screen builds its result from the selection plus the
+ * settings and returns it to the caller, which performs the actual chat creation.
  *
  * @property getContactsUseCase
  * @property contactItemUiStateMapper
  */
 @HiltViewModel
-class CreateGroupChatViewModel @Inject constructor(
+class CreateChatViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val contactItemUiStateMapper: ContactItemUiStateMapper,
 ) : ViewModel() {
@@ -49,7 +49,7 @@ class CreateGroupChatViewModel @Inject constructor(
     /**
      * Ui state
      */
-    val uiState: StateFlow<CreateGroupChatUiState> by lazy {
+    val uiState: StateFlow<CreateChatUiState> by lazy {
         combine(
             queryChannel.receiveAsFlow().onStart { emit(null) },
             getContactsUseCase().map { domainList ->
@@ -66,12 +66,12 @@ class CreateGroupChatViewModel @Inject constructor(
         ) { query, indexed: List<IndexedContact> ->
             val visible =
                 if (query.isNullOrBlank()) indexed else indexed.filter { it.matches(query) }
-            CreateGroupChatUiState.Data(
+            CreateChatUiState.Data(
                 contacts = visible.map { it.ui }.toImmutableList(),
                 query = query,
             )
         }.catch { Timber.e(it) }
-            .asUiStateFlow(viewModelScope, CreateGroupChatUiState.Loading)
+            .asUiStateFlow(viewModelScope, CreateChatUiState.Loading)
     }
 
     /**

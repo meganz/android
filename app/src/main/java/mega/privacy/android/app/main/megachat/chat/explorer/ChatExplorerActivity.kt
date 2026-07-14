@@ -40,7 +40,6 @@ import javax.inject.Inject
 private const val CHAT_EXPLORER_FRAGMENT = "chatExplorerFragment"
 private const val QUERY_SEARCH = "querySearch"
 private const val IS_SEARCH_EXPANDED = "isSearchExpanded"
-private const val CONTACT_TYPE = "contactType"
 
 @AndroidEntryPoint
 internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
@@ -239,14 +238,10 @@ internal class ChatExplorerActivity : PasscodeActivity(), View.OnClickListener,
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            Intent(
-                                this,
-                                AddContactActivity::class.java
-                            ).apply {
-                                putExtra(CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
-                            }.let {
-                                startActivityForResult(it, Constants.REQUEST_CREATE_CHAT)
-                            }
+                            megaNavigator.openNewChatForResult(
+                                activity = this,
+                                requestCode = Constants.REQUEST_CREATE_CHAT,
+                            )
                         }
                     }
                 } else {

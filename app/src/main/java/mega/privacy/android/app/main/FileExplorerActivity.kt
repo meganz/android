@@ -84,12 +84,10 @@ import mega.privacy.android.app.main.FileExplorerActivity.Companion.SHARE_LINK
 import mega.privacy.android.app.main.FileExplorerActivity.Companion.UPLOAD
 import mega.privacy.android.app.main.adapters.FileExplorerPagerAdapter
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.ALLOW_ADD_PARTICIPANTS
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CHAT_LINK
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CHAT_TITLE
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CONTACTS
-import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_CONTACT_TYPE
 import mega.privacy.android.app.main.legacycontact.AddContactActivity.Companion.EXTRA_EKR
 import mega.privacy.android.app.main.listeners.CreateGroupChatWithPublicLink
 import mega.privacy.android.app.main.megachat.chat.explorer.ChatExplorerFragment
@@ -106,7 +104,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.tintIcon
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IMPORT_TO
 import mega.privacy.android.app.utils.FileUtil
@@ -2628,9 +2625,9 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
                         if (contacts.isEmpty()) {
                             showSnackbar(getString(R.string.no_contacts_invite))
                         } else {
-                            createChatLauncher.launch(
-                                Intent(this, AddContactActivity::class.java)
-                                    .putExtra(EXTRA_CONTACT_TYPE, CONTACT_TYPE_MEGA)
+                            megaNavigator.openNewChatForResult(
+                                context = this,
+                                launcher = createChatLauncher,
                             )
                         }
                     }

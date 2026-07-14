@@ -13,18 +13,18 @@ import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 
-class CreateGroupChatScreenScreenshotTest {
+class NewChatScreenScreenshotTest {
 
     @PreviewTest
     @CombinedThemePreviews
     @Composable
-    fun CreateGroupChatScreenLoading() {
+    fun NewChatScreenLoading() {
         AndroidThemeForPreviews {
-            CreateGroupChatScreen(
+            NewChatScreen(
                 state = CreateChatUiState.Loading,
-                allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirmOneToOne = {},
+                onConfirmGroup = { _, _, _, _, _ -> },
                 onBack = {},
             )
         }
@@ -33,13 +33,13 @@ class CreateGroupChatScreenScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
-    fun CreateGroupChatScreenEmpty() {
+    fun NewChatScreenEmpty() {
         AndroidThemeForPreviews {
-            CreateGroupChatScreen(
+            NewChatScreen(
                 state = CreateChatUiState.Data(contacts = persistentListOf(), query = null),
-                allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirmOneToOne = {},
+                onConfirmGroup = { _, _, _, _, _ -> },
                 onBack = {},
             )
         }
@@ -48,14 +48,17 @@ class CreateGroupChatScreenScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
-    fun CreateGroupChatScreenWithContacts() {
+    fun NewChatScreenNoneSelected() {
         AndroidThemeForPreviews {
-            CreateGroupChatScreen(
+            NewChatScreenContent(
                 state = sampleData(),
-                allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirmOneToOne = {},
+                onConfirmGroup = { _, _, _, _, _ -> },
                 onBack = {},
+                step = NewChatStep.Selection,
+                selectionState = rememberContactSelectionState(),
+                stepChange = {},
             )
         }
     }
@@ -63,15 +66,35 @@ class CreateGroupChatScreenScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
-    fun CreateGroupChatScreenSettings() {
+    fun NewChatScreenOneSelected() {
         AndroidThemeForPreviews {
-            CreateGroupChatScreenContent(
+            NewChatScreenContent(
                 state = sampleData(),
-                allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirmOneToOne = {},
+                onConfirmGroup = { _, _, _, _, _ -> },
                 onBack = {},
-                step = CreateGroupChatStep.Settings,
+                step = NewChatStep.Selection,
+                selectionState = rememberContactSelectionState(
+                    initialSelectedHandles = setOf(1L),
+                ),
+                stepChange = {},
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun NewChatScreenMultipleSelected() {
+        AndroidThemeForPreviews {
+            NewChatScreenContent(
+                state = sampleData(),
+                onSearchQueryChange = {},
+                onConfirmOneToOne = {},
+                onConfirmGroup = { _, _, _, _, _ -> },
+                onBack = {},
+                step = NewChatStep.Selection,
                 selectionState = rememberContactSelectionState(
                     initialSelectedHandles = setOf(1L, 2L),
                 ),
@@ -83,17 +106,19 @@ class CreateGroupChatScreenScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
-    fun CreateGroupChatScreenChatLinkNameError() {
+    fun NewChatScreenSettings() {
         AndroidThemeForPreviews {
-            SettingsStep(
-                contacts = sampleData().contacts,
-                selectedHandles = setOf(1L, 2L),
-                selectedCount = 2,
-                tagPrefix = CREATE_GROUP_CHAT_TAG_PREFIX,
-                onConfirm = { _, _, _, _ -> },
+            NewChatScreenContent(
+                state = sampleData(),
+                onSearchQueryChange = {},
+                onConfirmOneToOne = {},
+                onConfirmGroup = { _, _, _, _, _ -> },
                 onBack = {},
-                initialChatLink = true,
-                initialConfirmAttempted = true,
+                step = NewChatStep.Settings,
+                selectionState = rememberContactSelectionState(
+                    initialSelectedHandles = setOf(1L, 2L),
+                ),
+                stepChange = {},
             )
         }
     }

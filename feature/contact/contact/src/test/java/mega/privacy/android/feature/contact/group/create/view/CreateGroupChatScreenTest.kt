@@ -22,7 +22,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import mega.android.core.ui.components.contact.state.ContactItemStatus
-import mega.privacy.android.feature.contact.group.create.model.CreateGroupChatUiState
+import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.contact.model.ContactItemUiState
@@ -38,7 +38,7 @@ class CreateGroupChatScreenTest {
 
     @Test
     fun `test that the shimmer loading view is displayed when state is Loading`() {
-        setScreen(CreateGroupChatUiState.Loading)
+        setScreen(CreateChatUiState.Loading)
 
         composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_LOADING_TAG).assertIsDisplayed()
         composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_LIST_TAG).assertIsNotDisplayed()
@@ -46,7 +46,7 @@ class CreateGroupChatScreenTest {
 
     @Test
     fun `test that the empty view is displayed when there are no contacts`() {
-        setScreen(CreateGroupChatUiState.Data(contacts = persistentListOf(), query = null))
+        setScreen(CreateChatUiState.Data(contacts = persistentListOf(), query = null))
 
         composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_EMPTY_TAG).assertIsDisplayed()
     }
@@ -201,6 +201,52 @@ class CreateGroupChatScreenTest {
         assertThat(result?.title).isNull()
     }
 
+    @Test
+    fun `test that enabling get chat link with a blank name blocks confirm and shows an inline error`() {
+        var result: Result? = null
+        setScreen(
+            dataState(contact(1L, "Alice")),
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd ->
+                result = Result(handles, title, isEkr, isChatLink, allowAdd)
+            },
+        )
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_NEXT_FAB_TAG).performClick()
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_CHAT_LINK_TAG).performClick()
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_CONFIRM_FAB_TAG).performClick()
+
+        assertThat(result).isNull()
+        val error = composeTestRule.activity
+            .getString(sharedR.string.create_group_chat_link_requires_name_error)
+        composeTestRule.onNodeWithText(error).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that entering a name clears the chat link error and allows confirm`() {
+        var result: Result? = null
+        setScreen(
+            dataState(contact(1L, "Alice")),
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd ->
+                result = Result(handles, title, isEkr, isChatLink, allowAdd)
+            },
+        )
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_NEXT_FAB_TAG).performClick()
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_CHAT_LINK_TAG).performClick()
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_CONFIRM_FAB_TAG).performClick()
+
+        assertThat(result).isNull()
+
+        composeTestRule.onNode(hasImeAction(ImeAction.Done)).performTextInput("My group")
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_CONFIRM_FAB_TAG).performClick()
+
+        assertThat(result).isNotNull()
+        assertThat(result?.isChatLink).isTrue()
+        assertThat(result?.title).isEqualTo("My group")
+    }
+
     private fun goToSettings(vararg contacts: ContactItemUiState) {
         setScreen(dataState(*contacts))
         contacts.indices.forEach { index ->
@@ -210,7 +256,7 @@ class CreateGroupChatScreenTest {
     }
 
     private fun setScreen(
-        state: CreateGroupChatUiState,
+        state: CreateChatUiState,
         allowEmptyGroup: Boolean = false,
         onSearchQueryChange: (String?) -> Unit = {},
         onConfirm: (Set<Long>, String?, Boolean, Boolean, Boolean) -> Unit = { _, _, _, _, _ -> },
@@ -228,7 +274,7 @@ class CreateGroupChatScreenTest {
     }
 
     private fun dataState(vararg contacts: ContactItemUiState) =
-        CreateGroupChatUiState.Data(contacts = contacts.toList().toImmutableList(), query = null)
+        CreateChatUiState.Data(contacts = contacts.toList().toImmutableList(), query = null)
 
     private fun contact(
         handle: Long,

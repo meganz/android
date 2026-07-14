@@ -4,16 +4,15 @@ import kotlinx.collections.immutable.ImmutableList
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 
 /**
- * Create group chat ui state. Backs the distinct "create group chat" screen, whose first step is a
- * MEGA-contacts multi-select picker (identical to the shared picker) and whose second step is a group
- * settings form. The group settings and the selection are owned by the Compose layer; this state only
- * carries the searchable contact list.
+ * Create chat ui state. Backs the searchable MEGA-contacts multi-select picker shared by the
+ * "create group chat" and "new chat" flows. The selection and any settings form are owned by the
+ * Compose layer; this state only carries the searchable contact list.
  */
-sealed interface CreateGroupChatUiState {
+sealed interface CreateChatUiState {
     /**
      * Loading
      */
-    data object Loading : CreateGroupChatUiState
+    data object Loading : CreateChatUiState
 
     /**
      * Data
@@ -24,7 +23,7 @@ sealed interface CreateGroupChatUiState {
     data class Data(
         val contacts: ImmutableList<ContactItemUiState>,
         val query: String?,
-    ) : CreateGroupChatUiState {
+    ) : CreateChatUiState {
         /**
          * Whether there are no contacts to display (no contacts at all, or none match the query).
          */

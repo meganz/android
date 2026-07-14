@@ -27,6 +27,7 @@ import mega.privacy.android.app.presentation.contact.AddContactToShareComposeAct
 import mega.privacy.android.app.presentation.contact.AddContactsComposeActivity
 import mega.privacy.android.app.presentation.contact.AddParticipantsComposeActivity
 import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActivity
+import mega.privacy.android.app.presentation.contact.NewChatComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
 import mega.privacy.android.app.presentation.contact.navigation.intValue
@@ -1146,6 +1147,45 @@ internal class MegaNavigatorImpl @Inject constructor(
                 if (allowEmptyGroup) {
                     putExtra(AddContactActivity.EXTRA_IS_START_CONVERSATION, true)
                 }
+            }
+        }
+    }
+
+    override fun openNewChatForResult(
+        activity: Activity,
+        requestCode: Int,
+    ) {
+        applicationScope.launch {
+            val intent = newChatIntent(activity)
+            withContext(mainDispatcher) {
+                if (!activity.isFinishing && !activity.isDestroyed) {
+                    activity.startActivityForResult(intent, requestCode)
+                }
+            }
+        }
+    }
+
+    override fun openNewChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+    ) {
+        applicationScope.launch {
+            val intent = newChatIntent(context)
+            withContext(mainDispatcher) {
+                launcher.launch(intent)
+            }
+        }
+    }
+
+    private suspend fun newChatIntent(context: Context): Intent {
+        val isContactsComposeUIEnabled = runCatching {
+            getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+        }.getOrDefault(false)
+        return if (isContactsComposeUIEnabled) {
+            NewChatComposeActivity.getIntent(context)
+        } else {
+            Intent(context, AddContactActivity::class.java).apply {
+                putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_MEGA)
             }
         }
     }

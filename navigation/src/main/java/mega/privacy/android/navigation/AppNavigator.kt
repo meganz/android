@@ -667,6 +667,29 @@ interface AppNavigator {
     )
 
     /**
+     * Opens the "new chat" flow (the share/forward target pickers' new-chat entry) for a result,
+     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactsComposeUI
+     * flag. The result is delivered to [activity]'s onActivityResult under [requestCode], mirroring the
+     * legacy AddContactActivity contract: RESULT_OK + EXTRA_CONTACTS, plus the group-chat extras when
+     * two or more contacts are selected.
+     */
+    fun openNewChatForResult(
+        activity: Activity,
+        requestCode: Int,
+    )
+
+    /**
+     * Opens the "new chat" flow (the share/forward target pickers' new-chat entry) for a result,
+     * choosing the Compose contacts UI or the legacy AddContactActivity based on the ContactsComposeUI
+     * flag. The result is delivered to [launcher], mirroring the legacy AddContactActivity contract:
+     * RESULT_OK + EXTRA_CONTACTS, plus the group-chat extras when two or more contacts are selected.
+     */
+    fun openNewChatForResult(
+        context: Context,
+        launcher: ActivityResultLauncher<Intent>,
+    )
+
+    /**
      * Opens the "add contacts" picker for a result with the already-chosen participants
      * pre-selected, choosing the Compose contacts UI or the legacy AddContactActivity based on the
      * ContactsComposeUI flag. The result is delivered to [launcher], mirroring the legacy

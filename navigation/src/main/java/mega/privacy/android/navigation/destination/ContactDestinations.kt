@@ -55,6 +55,42 @@ data class AddMeetingParticipantsNavKey(val chatId: Long) : NavKey {
 }
 
 /**
+ * Launches the "new chat" flow used by the share/forward target pickers; result published under
+ * [KEY]. This is a single mode-less MEGA-contacts multi-select picker whose selection count decides
+ * the outcome: exactly one selected contact yields a 1:1 chat (no group settings); two or more yields
+ * a group chat with the chosen settings.
+ */
+@Serializable
+data object NewChatNavKey : NavKey {
+    const val KEY: String = "new_chat"
+
+    /**
+     * @property emails the selected contact emails.
+     * @property groupSettings the chosen group settings, or null for a 1:1 chat (a single selected
+     * contact). When non-null the caller creates a group; when null the caller creates a 1:1 chat.
+     */
+    @Serializable
+    data class NewChatResult(
+        val emails: List<String>,
+        val groupSettings: GroupSettings?,
+    ) {
+        /**
+         * @property title Optional chat room title.
+         * @property isEkr Encrypted key rotation enabled (private, cannot be made public).
+         * @property isChatLink A public chat link should be created.
+         * @property allowAddParticipants Non-host participants may add others.
+         */
+        @Serializable
+        data class GroupSettings(
+            val title: String?,
+            val isEkr: Boolean,
+            val isChatLink: Boolean,
+            val allowAddParticipants: Boolean,
+        )
+    }
+}
+
+/**
  * Launches the "create group chat" flow; result published under [KEY].
  *
  * @property allowEmptyGroup When true the group may be created with no other participants (the

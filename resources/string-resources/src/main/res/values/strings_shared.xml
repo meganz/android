@@ -2856,6 +2856,8 @@
     <string name="home_configuration_widget_my_account_widget_name">My account</string>
     <!-- General new group chat label -->
     <string name="general_new_group_chat">New group chat</string>
+    <!-- Top bar title for the "new chat" contact picker before any contact is selected -->
+    <string name="new_chat_title">New chat</string>
     <!-- Section header in Chat explorer grouping the most recent chats and meetings -->
     <string name="chat_explorer_recent_chats_header">Recent chats and meetings</string>
     <!-- Section header in the Chat explorer grouping every other contact, chat and meeting -->
@@ -3089,6 +3091,8 @@
     <string name="create_group_chat_get_chat_link_label">Get chat link</string>
     <!-- Create group chat: label of the toggle allowing non-host participants to add others -->
     <string name="create_group_chat_allow_add_participants_label">Allow non-hosts to add participants</string>
+    <!-- Create group chat: inline error shown under the group name field when the user enables "Get chat link" without entering a name -->
+    <string name="create_group_chat_link_requires_name_error">Enter a group name to get a chat link</string>
     <!-- Choose folders and files to pin to Home. Used both as the picker's top bar title and as the add button/link on the empty Pinned widget. -->
     <string name="home_pinned_choose_files_and_folders">Choose files &amp; folders</string>
     <!-- Title at the top of the redesigned subscription/upgrade page -->

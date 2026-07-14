@@ -12,7 +12,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
-import mega.privacy.android.feature.contact.group.create.model.CreateGroupChatUiState
+import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
 import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
@@ -27,9 +27,9 @@ import org.mockito.kotlin.stub
 import java.time.Instant
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
-class CreateGroupChatViewModelTest {
+class CreateChatViewModelTest {
 
-    private lateinit var underTest: CreateGroupChatViewModel
+    private lateinit var underTest: CreateChatViewModel
 
     private val getContactsUseCase = mock<GetContactsUseCase>()
     private val contactItemUiStateMapper = ContactItemUiStateMapper(
@@ -47,7 +47,7 @@ class CreateGroupChatViewModelTest {
         reset(getContactsUseCase)
     }
 
-    private fun createViewModel() = CreateGroupChatViewModel(
+    private fun createViewModel() = CreateChatViewModel(
         getContactsUseCase = getContactsUseCase,
         contactItemUiStateMapper = contactItemUiStateMapper,
     )
@@ -55,7 +55,7 @@ class CreateGroupChatViewModelTest {
     @Test
     fun `test that initial state is Loading`() = runTest {
         stubContactsFlow(emptyList())
-        assertThat(underTest.uiState.value).isEqualTo(CreateGroupChatUiState.Loading)
+        assertThat(underTest.uiState.value).isEqualTo(CreateChatUiState.Loading)
     }
 
     @Test
@@ -169,13 +169,13 @@ class CreateGroupChatViewModelTest {
         }
 
         underTest.uiState.test {
-            assertThat(awaitItem()).isInstanceOf(CreateGroupChatUiState::class.java)
+            assertThat(awaitItem()).isInstanceOf(CreateChatUiState::class.java)
         }
     }
 
-    private suspend fun ReceiveTurbine<CreateGroupChatUiState>.awaitDataState(): CreateGroupChatUiState.Data {
+    private suspend fun ReceiveTurbine<CreateChatUiState>.awaitDataState(): CreateChatUiState.Data {
         var item = awaitItem()
-        while (item !is CreateGroupChatUiState.Data) {
+        while (item !is CreateChatUiState.Data) {
             item = awaitItem()
         }
         return item
