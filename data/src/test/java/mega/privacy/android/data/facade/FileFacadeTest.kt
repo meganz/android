@@ -52,6 +52,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -984,6 +985,172 @@ internal class FileFacadeTest {
             assertThat(actual).isEqualTo(uriPath)
             verify(existingFile).delete()
             verify(doc).renameTo(newName)
+        }
+
+    @Test
+    fun `test that renameFileOverwriteSync retries once when the provider uniquifies a case-only rename`(): Unit =
+        mockStatic(Uri::class.java).use {
+            val newName = "Foo.txt"
+            val originalUri = externalStorageDocumentUri("primary:Sync/foo.txt", "content://original")
+            val uniquifiedUri =
+                externalStorageDocumentUri("primary:Sync/Foo (1).txt", "content://uniquified")
+            val finalUri = externalStorageDocumentUri("primary:Sync/Foo.txt", "content://final")
+            var currentUri = originalUri
+            val doc = mock<DocumentFile>()
+            whenever(doc.uri).thenAnswer { currentUri }
+            whenever(doc.renameTo(newName)).thenAnswer {
+                currentUri = if (currentUri === originalUri) uniquifiedUri else finalUri
+                true
+            }
+            val parentDoc = mock<DocumentFile> {
+                on { findFile(newName) } doReturn null
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val parentUri = stubGetDocumentFileFromUri(parentDoc)
+            val uriPath = UriPath("content://foo")
+            val parentUriPath = UriPath("content://parent")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+            whenever(Uri.parse(parentUriPath.value)) doReturn parentUri
+
+            val actual = underTest.renameFileOverwriteSync(
+                uriPath = uriPath,
+                parentUriPath = parentUriPath,
+                newName = newName,
+                overwrite = true,
+            )
+
+            assertThat(actual).isEqualTo(UriPath("content://final"))
+            verify(doc, times(2)).renameTo(newName)
+        }
+
+    @Test
+    fun `test that renameFileOverwriteSync restores the original name and returns null when a case-variant sibling obstructs the rename`(): Unit =
+        mockStatic(Uri::class.java).use {
+            val newName = "Foo.txt"
+            val originalUri = externalStorageDocumentUri("primary:Sync/foo.txt", "content://original")
+            val firstAttemptUri =
+                externalStorageDocumentUri("primary:Sync/Foo (1).txt", "content://first")
+            val secondAttemptUri =
+                externalStorageDocumentUri("primary:Sync/Foo (2).txt", "content://second")
+            var currentUri = originalUri
+            val doc = mock<DocumentFile>()
+            whenever(doc.uri).thenAnswer { currentUri }
+            whenever(doc.renameTo(newName)).thenAnswer {
+                currentUri = if (currentUri === originalUri) firstAttemptUri else secondAttemptUri
+                true
+            }
+            whenever(doc.renameTo("foo.txt")).thenAnswer {
+                currentUri = originalUri
+                true
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val uriPath = UriPath("content://foo")
+            val parentUriPath = UriPath("content://parent")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+            val actual = underTest.renameFileOverwriteSync(
+                uriPath = uriPath,
+                parentUriPath = parentUriPath,
+                newName = newName,
+                overwrite = false,
+            )
+
+            assertThat(actual).isNull()
+            verify(doc, times(2)).renameTo(newName)
+            verify(doc).renameTo("foo.txt")
+        }
+
+    @Test
+    fun `test that renameFileOverwriteSync rolls back without retrying when a non case-only rename is uniquified`(): Unit =
+        mockStatic(Uri::class.java).use {
+            val newName = "b.txt"
+            val originalUri = externalStorageDocumentUri("primary:Sync/a.txt", "content://original")
+            val uniquifiedUri =
+                externalStorageDocumentUri("primary:Sync/b (1).txt", "content://uniquified")
+            var currentUri = originalUri
+            val doc = mock<DocumentFile>()
+            whenever(doc.uri).thenAnswer { currentUri }
+            whenever(doc.renameTo(newName)).thenAnswer {
+                currentUri = uniquifiedUri
+                true
+            }
+            whenever(doc.renameTo("a.txt")).thenAnswer {
+                currentUri = originalUri
+                true
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val uriPath = UriPath("content://foo")
+            val parentUriPath = UriPath("content://parent")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+            val actual = underTest.renameFileOverwriteSync(
+                uriPath = uriPath,
+                parentUriPath = parentUriPath,
+                newName = newName,
+                overwrite = false,
+            )
+
+            assertThat(actual).isNull()
+            verify(doc, times(1)).renameTo(newName)
+            verify(doc).renameTo("a.txt")
+        }
+
+    @Test
+    fun `test that renameFileOverwriteSync does not retry when the rename applies the exact requested name`(): Unit =
+        mockStatic(Uri::class.java).use {
+            val newName = "Foo.txt"
+            val originalUri = externalStorageDocumentUri("primary:Sync/foo.txt", "content://original")
+            val finalUri = externalStorageDocumentUri("primary:Sync/Foo.txt", "content://final")
+            var currentUri = originalUri
+            val doc = mock<DocumentFile>()
+            whenever(doc.uri).thenAnswer { currentUri }
+            whenever(doc.renameTo(newName)).thenAnswer {
+                currentUri = finalUri
+                true
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val uriPath = UriPath("content://foo")
+            val parentUriPath = UriPath("content://parent")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+            val actual = underTest.renameFileOverwriteSync(
+                uriPath = uriPath,
+                parentUriPath = parentUriPath,
+                newName = newName,
+                overwrite = false,
+            )
+
+            assertThat(actual).isEqualTo(UriPath("content://final"))
+            verify(doc, times(1)).renameTo(newName)
+        }
+
+    @Test
+    fun `test that renameFileOverwriteSync accepts a provider name transformation that is not a collision counter`(): Unit =
+        mockStatic(Uri::class.java).use {
+            val newName = "Fo*o.txt"
+            val originalUri = externalStorageDocumentUri("primary:Sync/foo.txt", "content://original")
+            val mangledUri = externalStorageDocumentUri("primary:Sync/Fo_o.txt", "content://mangled")
+            var currentUri = originalUri
+            val doc = mock<DocumentFile>()
+            whenever(doc.uri).thenAnswer { currentUri }
+            whenever(doc.renameTo(newName)).thenAnswer {
+                currentUri = mangledUri
+                true
+            }
+            val uri = stubGetDocumentFileFromUri(doc)
+            val uriPath = UriPath("content://foo")
+            val parentUriPath = UriPath("content://parent")
+            whenever(Uri.parse(uriPath.value)) doReturn uri
+
+            val actual = underTest.renameFileOverwriteSync(
+                uriPath = uriPath,
+                parentUriPath = parentUriPath,
+                newName = newName,
+                overwrite = false,
+            )
+
+            assertThat(actual).isEqualTo(UriPath("content://mangled"))
+            verify(doc, times(1)).renameTo(newName)
         }
 
     @Test
@@ -2332,6 +2499,13 @@ internal class FileFacadeTest {
 
             assertThat(result).isEqualTo(expectedUri)
         }
+    }
+
+    private fun externalStorageDocumentUri(docId: String, uriString: String): Uri = mock {
+        on { this.scheme } doReturn "content"
+        on { this.authority } doReturn "com.android.externalstorage.documents"
+        on { this.lastPathSegment } doReturn docId
+        on { toString() } doReturn uriString
     }
 
     private fun stubGetDocumentFileFromUri(documentFile: DocumentFile): Uri {

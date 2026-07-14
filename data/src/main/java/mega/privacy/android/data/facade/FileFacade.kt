@@ -1476,11 +1476,67 @@ internal class FileFacade @Inject constructor(
         renameFileSync(getDocumentFileFromUri(uriPath.toUri(), existsCheck = false), newName)
 
     private fun renameFileSync(documentFile: DocumentFile?, newName: String): UriPath? {
-        return if (documentFile?.renameTo(newName) == true) {
-            UriPath(documentFile.uri.toString())
-        } else {
-            null
+        documentFile ?: return null
+        val originalName = displayNameFromDocumentUri(documentFile.uri)
+        if (!documentFile.renameTo(newName)) return null
+        val actualName = displayNameFromDocumentUri(documentFile.uri)
+        if (actualName == null || !isUniquifiedVariantOf(actualName, newName)) {
+            return UriPath(documentFile.uri.toString())
         }
+        // FileSystemProvider.renameDocument passes the requested name through
+        // buildUniqueFile, whose File.exists() probe is case-insensitive on emulated
+        // storage (FUSE/sdcardfs) and FAT/exFAT SD cards, and silently lands the file
+        // as "name (1).ext" on any collision while renameTo still reports success.
+        // For a case-only rename the collision can only be the source file itself
+        // (case-variants cannot coexist on such filesystems), and the first attempt
+        // has vacated the old name — so a single retry is guaranteed to apply the
+        // exact requested casing. For any other collision the obstruction is a real
+        // sibling that a retry cannot displace, so skip straight to rollback.
+        val selfCollision = originalName?.equals(newName, ignoreCase = true) == true
+        if (selfCollision) {
+            Timber.d("Case-only rename to $newName was uniquified to $actualName; retrying")
+            if (documentFile.renameTo(newName) &&
+                displayNameFromDocumentUri(documentFile.uri) == newName
+            ) {
+                return UriPath(documentFile.uri.toString())
+            }
+        }
+        // Restore the original name and report failure so the SDK applies its
+        // collision handling (debris move / suffix fallbacks) to the true on-disk state.
+        Timber.w("Rename to $newName is obstructed; restoring $originalName")
+        originalName?.let { documentFile.renameTo(it) }
+        return null
+    }
+
+    /**
+     * Resolves the current display name of a document from its URI without IPC.
+     *
+     * Scoped to file URIs and [EXTERNAL_STORAGE_AUTHORITY] document IDs, which have the
+     * documented format `"<storageId>:<relativePath>"`. Other authorities use opaque
+     * document IDs, so this returns null and callers skip name verification for them.
+     */
+    private fun displayNameFromDocumentUri(uri: Uri?): String? = when {
+        uri == null -> null
+        isFileUri(uri) -> uri.lastPathSegment
+        uri.authority == EXTERNAL_STORAGE_AUTHORITY ->
+            uri.lastPathSegment?.substringAfter(':', "")
+                ?.takeIf { it.isNotEmpty() }
+                ?.substringAfterLast('/')
+
+        else -> null
+    }
+
+    /**
+     * Whether [actualName] is [requestedName] with a `" (N)"` counter inserted before the
+     * extension — the transformation FileSystemProvider's buildUniqueFile applies when it
+     * considers the requested name taken.
+     */
+    private fun isUniquifiedVariantOf(actualName: String, requestedName: String): Boolean {
+        val dotIndex = requestedName.lastIndexOf('.')
+        val base = if (dotIndex >= 0) requestedName.take(dotIndex) else requestedName
+        val extension = if (dotIndex >= 0) requestedName.substring(dotIndex) else ""
+        return Regex("${Regex.escape(base)} \\(\\d+\\)${Regex.escape(extension)}")
+            .matches(actualName)
     }
 
     override fun renameFileOverwriteSync(
