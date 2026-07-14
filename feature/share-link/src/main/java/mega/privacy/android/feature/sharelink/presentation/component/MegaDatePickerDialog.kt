@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.sharelink.presentation.component
 
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SelectableDates
@@ -15,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import mega.android.core.ui.components.button.TextOnlyButton
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.tokens.theme.DSTokens
 import mega.privacy.android.shared.resources.R as sharedR
 import java.util.Calendar
 import java.util.TimeZone
@@ -46,10 +49,12 @@ fun MegaDatePickerDialog(
     val confirmEnabled by remember {
         derivedStateOf { datePickerState.selectedDateMillis != null }
     }
+    val colors = megaDatePickerColors()
 
     DatePickerDialog(
         modifier = modifier.testTag(MEGA_DATE_PICKER_DIALOG_TAG),
         onDismissRequest = onDismiss,
+        colors = colors,
         confirmButton = {
             TextOnlyButton(
                 modifier = Modifier.testTag(MEGA_DATE_PICKER_CONFIRM_TAG),
@@ -66,9 +71,44 @@ fun MegaDatePickerDialog(
             )
         },
     ) {
-        DatePicker(state = datePickerState)
+        DatePicker(state = datePickerState, colors = colors)
     }
 }
+
+/**
+ * Maps the Material3 date-picker palette onto MEGA design tokens.
+ *
+ * [mega.android.core.ui.theme.AndroidTheme] does not populate the Material3 `colorScheme`, so the
+ * platform picker would otherwise fall back to the stock baseline colors and ignore dark mode.
+ */
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun megaDatePickerColors(): DatePickerColors = DatePickerDefaults.colors(
+    containerColor = DSTokens.colors.background.surface1,
+    titleContentColor = DSTokens.colors.text.secondary,
+    headlineContentColor = DSTokens.colors.text.primary,
+    weekdayContentColor = DSTokens.colors.text.secondary,
+    subheadContentColor = DSTokens.colors.text.secondary,
+    navigationContentColor = DSTokens.colors.icon.primary,
+    yearContentColor = DSTokens.colors.text.primary,
+    disabledYearContentColor = DSTokens.colors.text.disabled,
+    currentYearContentColor = DSTokens.colors.text.accent,
+    selectedYearContentColor = DSTokens.colors.text.onColor,
+    disabledSelectedYearContentColor = DSTokens.colors.text.onColorDisabled,
+    selectedYearContainerColor = DSTokens.colors.button.brand,
+    disabledSelectedYearContainerColor = DSTokens.colors.button.disabled,
+    dayContentColor = DSTokens.colors.text.primary,
+    disabledDayContentColor = DSTokens.colors.text.disabled,
+    selectedDayContentColor = DSTokens.colors.text.onColor,
+    disabledSelectedDayContentColor = DSTokens.colors.text.onColorDisabled,
+    selectedDayContainerColor = DSTokens.colors.button.brand,
+    disabledSelectedDayContainerColor = DSTokens.colors.button.disabled,
+    todayContentColor = DSTokens.colors.text.accent,
+    todayDateBorderColor = DSTokens.colors.border.strongSelected,
+    dayInSelectionRangeContentColor = DSTokens.colors.text.primary,
+    dayInSelectionRangeContainerColor = DSTokens.colors.background.surface2,
+    dividerColor = DSTokens.colors.border.subtle,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 private object TodayOnwardSelectableDates : SelectableDates {
@@ -94,7 +134,10 @@ private fun todayStartUtcMillis(): Long =
 @Composable
 private fun MegaDatePickerContentPreview() {
     AndroidThemeForPreviews {
-        DatePicker(state = rememberDatePickerState(selectableDates = TodayOnwardSelectableDates))
+        DatePicker(
+            state = rememberDatePickerState(selectableDates = TodayOnwardSelectableDates),
+            colors = megaDatePickerColors(),
+        )
     }
 }
 
