@@ -207,6 +207,7 @@ private fun OfferCountdownSection(validUntil: Long?, locale: Locale) {
     LaunchedEffect(validUntil) {
         while (true) {
             now = System.currentTimeMillis()
+            if (validUntil * 1000L - now <= 0L) break
             delay(60_000L)
         }
     }

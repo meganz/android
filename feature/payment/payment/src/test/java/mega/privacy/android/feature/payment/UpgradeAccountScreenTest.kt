@@ -1,5 +1,9 @@
 package mega.privacy.android.feature.payment
 
+import android.content.res.Configuration
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -38,6 +42,7 @@ import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyC
 import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountScreen
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_ADDITIONAL_BENEFITS
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_FEATURE_ROW
+import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_IMAGE_HEADER
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_LAZY_COLUMN
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_MONTHLY_CHIP
 import mega.privacy.android.feature.payment.presentation.upgrade.TEST_TAG_OFFER_HEADER_BADGE
@@ -472,6 +477,60 @@ class UpgradeAccountScreenTest {
     }
 
     @Test
+    fun `test that portrait revamp shows top image header banner`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            uiState = revampUiState(currentPlan = null),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_IMAGE_HEADER).assertExists()
+    }
+
+    @Test
+    fun `test that landscape revamp shows side image header and revamp content`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            isLandscape = true,
+            uiState = revampUiState(currentPlan = null),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_IMAGE_HEADER).assertIsDisplayed()
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag("${TEST_TAG_REVAMP_PLAN_CARD}0"))
+            .assertExists()
+    }
+
+    @Test
+    fun `test that landscape revamp still shows subscription info in the content column`() {
+        setContent(
+            isUpgradeAccount = true,
+            isSubscriptionRevampEnabled = true,
+            isLandscape = true,
+            uiState = revampUiState(currentPlan = null),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_SUBSCRIPTION_INFO_TITLE))
+            .assertExists()
+    }
+
+    @Test
+    fun `test that landscape does not use two-pane layout when revamp disabled`() {
+        setContent(
+            isUpgradeAccount = false,
+            isSubscriptionRevampEnabled = false,
+            isLandscape = true,
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_IMAGE_HEADER))
+            .assertExists()
+    }
+
+    @Test
     fun `test that revamp current plan card is shown for upgrade account`() {
         setContent(
             isUpgradeAccount = true,
@@ -791,6 +850,7 @@ class UpgradeAccountScreenTest {
     private fun setContent(
         isUpgradeAccount: Boolean = false,
         isSubscriptionRevampEnabled: Boolean = false,
+        isLandscape: Boolean = false,
         onBuyPlanClick: (Subscription) -> Unit = {},
         onFreePlanClick: () -> Unit = {},
         maybeLaterClicked: () -> Unit = {},
@@ -800,15 +860,27 @@ class UpgradeAccountScreenTest {
             isSubscriptionFeatureAvailable = true,
         ),
     ) = composeRule.setContent {
-        UpgradeAccountScreen(
-            onInAppCheckoutClick = onBuyPlanClick,
-            onFreePlanClicked = onFreePlanClick,
-            maybeLaterClicked = maybeLaterClicked,
-            uiState = uiState,
-            onBack = {},
-            isUpgradeAccount = isUpgradeAccount,
-            isSubscriptionRevampEnabled = isSubscriptionRevampEnabled,
-            onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
-        )
+        val screen: @Composable () -> Unit = {
+            UpgradeAccountScreen(
+                onInAppCheckoutClick = onBuyPlanClick,
+                onFreePlanClicked = onFreePlanClick,
+                maybeLaterClicked = maybeLaterClicked,
+                uiState = uiState,
+                onBack = {},
+                isUpgradeAccount = isUpgradeAccount,
+                isSubscriptionRevampEnabled = isSubscriptionRevampEnabled,
+                onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
+            )
+        }
+        if (isLandscape) {
+            val landscapeConfiguration = Configuration(LocalConfiguration.current).apply {
+                orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+            CompositionLocalProvider(LocalConfiguration provides landscapeConfiguration) {
+                screen()
+            }
+        } else {
+            screen()
+        }
     }
 }

@@ -5,21 +5,28 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -41,6 +48,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffold
@@ -95,18 +103,20 @@ fun UpgradeAccountScreen(
     val locale = LocalLocale.current.platformLocale
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isLandscapeRevamp = isLandscape && isSubscriptionRevampEnabled
 
     val lazyListState = rememberLazyListState()
     val topBarHeightPx =
         with(LocalDensity.current) { 56.dp.roundToPx() + WindowInsets.statusBars.getTop(this) }
-    val headerHeightPx = with(LocalDensity.current) { 180.dp.roundToPx() }
+    val headerHeightPx = with(LocalDensity.current) { HEADER_IMAGE_HEIGHT.roundToPx() }
     val position by remember { derivedStateOf { lazyListState.firstVisibleItemIndex } }
     val itemOffset by remember { derivedStateOf { lazyListState.firstVisibleItemScrollOffset } }
     val currentHeaderHeightPx = headerHeightPx - itemOffset
     val showFullSkeleton = isSubscriptionRevampEnabled &&
             uiState.localisedSubscriptionsList.isEmpty() &&
             uiState.isSubscriptionFeatureAvailable != false
-    val transparent = !showFullSkeleton && position == 0 && currentHeaderHeightPx > topBarHeightPx
+    val transparent = isLandscapeRevamp ||
+            (!showFullSkeleton && position == 0 && currentHeaderHeightPx > topBarHeightPx)
     val alpha by animateFloatAsState(targetValue = if (transparent) 0f else 1f)
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -248,35 +258,10 @@ fun UpgradeAccountScreen(
             }
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .testTag(TEST_TAG_LAZY_COLUMN)
-                .padding(top = if (showFullSkeleton) innerPadding.calculateTopPadding() else 0.dp)
-                .padding(bottom = innerPadding.calculateBottomPadding())
-                .fillMaxSize(),
-            state = lazyListState,
-        ) {
+        val bodyContent: LazyListScope.() -> Unit = {
             if (showFullSkeleton) {
                 upgradeAccountRevampSkeleton()
             } else {
-                item("image_header") {
-                    Image(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(180.dp)
-                            .testTag(TEST_TAG_IMAGE_HEADER),
-                        painter = painterResource(
-                            if (showOfferBanner) {
-                                IconPackR.drawable.subscription_offer_banner
-                            } else {
-                                IconPackR.drawable.choose_account_type_header
-                            }
-                        ),
-                        contentDescription = "Header Image",
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
                 if (isSubscriptionRevampEnabled) {
                     when (offerHighlight) {
                         is OfferHighlight.Single -> subscriptionOfferContent(
@@ -391,6 +376,115 @@ fun UpgradeAccountScreen(
                 }
             }
         }
+
+        if (isLandscapeRevamp) {
+            LandscapeUpgradeAccountLayout(
+                showOfferBanner = showOfferBanner,
+                lazyListState = lazyListState,
+                innerPadding = innerPadding,
+                content = bodyContent,
+            )
+        } else {
+            PortraitUpgradeAccountLayout(
+                showFullSkeleton = showFullSkeleton,
+                showOfferBanner = showOfferBanner,
+                lazyListState = lazyListState,
+                innerPadding = innerPadding,
+                content = bodyContent,
+            )
+        }
+    }
+}
+
+/**
+ * Header artwork for the upgrade screen: the seasonal offer banner when an offer is being
+ * highlighted, otherwise the standard Pro header image. Rendered as a full-width top banner in
+ * portrait and as the full-height left panel in the landscape two-pane layout.
+ */
+@Composable
+private fun UpgradeAccountHeaderImage(
+    showOfferBanner: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Image(
+        modifier = modifier.testTag(TEST_TAG_IMAGE_HEADER),
+        painter = painterResource(
+            if (showOfferBanner) {
+                IconPackR.drawable.subscription_offer_banner
+            } else {
+                IconPackR.drawable.choose_account_type_header
+            }
+        ),
+        contentDescription = "Header Image",
+        contentScale = ContentScale.Crop,
+    )
+}
+
+/**
+ * Default single-column layout: the header image scrolls as the first item above [content]. The
+ * image is omitted while the full-page skeleton is shown.
+ */
+@Composable
+private fun PortraitUpgradeAccountLayout(
+    showFullSkeleton: Boolean,
+    showOfferBanner: Boolean,
+    lazyListState: LazyListState,
+    innerPadding: PaddingValues,
+    content: LazyListScope.() -> Unit,
+) {
+    LazyColumn(
+        modifier = Modifier
+            .testTag(TEST_TAG_LAZY_COLUMN)
+            .padding(top = if (showFullSkeleton) innerPadding.calculateTopPadding() else 0.dp)
+            .padding(bottom = innerPadding.calculateBottomPadding())
+            .fillMaxSize(),
+        state = lazyListState,
+    ) {
+        if (!showFullSkeleton) {
+            item("image_header") {
+                UpgradeAccountHeaderImage(
+                    showOfferBanner = showOfferBanner,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(HEADER_IMAGE_HEIGHT),
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+        content()
+    }
+}
+
+/**
+ * Landscape two-pane layout for the revamped subscription page: the header image fills the left
+ * panel edge-to-edge while [content] scrolls in the right column (DSN-3131 landscape design). The
+ * right column clears only the status bar; the transparent top app bar's back button floats over
+ * the image on the left.
+ */
+@Composable
+private fun LandscapeUpgradeAccountLayout(
+    showOfferBanner: Boolean,
+    lazyListState: LazyListState,
+    innerPadding: PaddingValues,
+    content: LazyListScope.() -> Unit,
+) {
+    Row(modifier = Modifier.fillMaxSize()) {
+        UpgradeAccountHeaderImage(
+            showOfferBanner = showOfferBanner,
+            modifier = Modifier
+                .weight(LANDSCAPE_IMAGE_WEIGHT)
+                .fillMaxHeight(),
+        )
+        LazyColumn(
+            modifier = Modifier
+                .testTag(TEST_TAG_LAZY_COLUMN)
+                .weight(LANDSCAPE_CONTENT_WEIGHT)
+                .fillMaxHeight()
+                .statusBarsPadding()
+                .padding(bottom = innerPadding.calculateBottomPadding()),
+            state = lazyListState,
+            content = content,
+        )
     }
 }
 
@@ -545,6 +639,58 @@ internal fun UpgradeAccountScreenSingleOfferPreview() {
         )
     }
 }
+
+@Preview(name = "Revamp landscape", widthDp = 800, heightDp = 400)
+@Composable
+private fun UpgradeAccountScreenRevampLandscapePreview(
+    @PreviewParameter(UpgradeAccountPreviewProvider::class) state: UpgradeAccountState,
+) {
+    val landscapeConfiguration = Configuration(LocalConfiguration.current).apply {
+        orientation = Configuration.ORIENTATION_LANDSCAPE
+    }
+    AndroidTheme(isSystemInDarkTheme()) {
+        CompositionLocalProvider(LocalConfiguration provides landscapeConfiguration) {
+            UpgradeAccountScreen(
+                uiState = state.copy(
+                    isSubscriptionFeatureAvailable = true,
+                    currentSubscriptionPlan = AccountType.PRO_I,
+                    subscriptionCycle = AccountSubscriptionCycle.YEARLY,
+                    subscriptionStatus = SubscriptionStatus.VALID,
+                    subscriptionRenewTime = 1_815_000_000L,
+                    cheapestSubscriptionAvailable = state.localisedSubscriptionsList.getOrNull(2),
+                ),
+                accountStorageUiState = AccountStorageUIState(
+                    baseStorage = 15L * 1024 * 1024 * 1024,
+                    totalStorage = 100L * 1024 * 1024 * 1024,
+                ),
+                isNewCreationAccount = false,
+                isUpgradeAccount = true,
+                isSubscriptionRevampEnabled = true,
+                onInAppCheckoutClick = { },
+                onFreePlanClicked = {},
+                maybeLaterClicked = {},
+                onBack = {}
+            )
+        }
+    }
+}
+
+/**
+ * Height of the header image when shown as the portrait top banner.
+ */
+private val HEADER_IMAGE_HEIGHT = 180.dp
+
+/**
+ * Left image panel width weight in the landscape revamp two-pane layout (matches the Figma
+ * 407/1133 split).
+ */
+private const val LANDSCAPE_IMAGE_WEIGHT = 0.36f
+
+/**
+ * Right content column width weight in the landscape revamp two-pane layout (matches the Figma
+ * 726/1133 split).
+ */
+private const val LANDSCAPE_CONTENT_WEIGHT = 0.64f
 
 /**
  * Test tag for the yearly chip selector
