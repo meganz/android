@@ -24,6 +24,7 @@ import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
+import mega.privacy.android.core.sharedcomponents.permission.getCameraUploadsPermissions
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.AllowNotificationsCTAButtonPressedEvent
@@ -134,7 +135,7 @@ fun PermissionsScreenComposable(
                     Permission.CameraBackup,
                     hasPermissions(
                         activity,
-                        *getCameraUploadsPermissions().toTypedArray()
+                        *getCameraUploadsPermissions()
                     )
                 )
             )
@@ -154,7 +155,7 @@ fun PermissionsScreenComposable(
             },
             askCameraBackupPermission = {
                 Analytics.tracker.trackEvent(EnableCameraBackupsCTAButtonPressedEvent)
-                mediaPermissionLauncher.launch(getCameraUploadsPermissions().toTypedArray())
+                mediaPermissionLauncher.launch(getCameraUploadsPermissions())
             },
             onSkipNotificationPermission = {
                 Analytics.tracker.trackEvent(SkipNotificationsCTAButtonPressedEvent)
@@ -173,22 +174,6 @@ fun PermissionsScreenComposable(
             resetFinishEvent = viewModel::resetFinishEvent,
             onPermissionPageShown = viewModel::setPermissionPageShown
         )
-    }
-}
-
-private fun getCameraUploadsPermissions(): List<String> = buildList {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-        // Only request the generic External Storage Permission on Devices below API 33
-        add(READ_EXTERNAL_STORAGE)
-    } else {
-        // Request Granular Media Permissions beginning on API 33
-        add(READ_MEDIA_IMAGES)
-        add(READ_MEDIA_VIDEO)
-    }.apply {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            // Request Partial Media Permissions beginning on API 34
-            add(READ_MEDIA_VISUAL_USER_SELECTED)
-        }
     }
 }
 

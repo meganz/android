@@ -37,10 +37,11 @@ import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
+import mega.privacy.android.navigation.destination.CameraBackupPermissionsNavKey
 import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
-import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
+import mega.privacy.android.navigation.destination.SyncPromotionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
 
@@ -75,7 +76,11 @@ class DoMoreWithMegaWidget @Inject constructor() : HomeWidget, Flagged {
                 DoMoreWithMegaSection(
                     items = uiState.items,
                     onItemClick = { item ->
-                        navigationHandler.navigateForItem(item.identifier)
+                        navigationHandler.navigateForItem(
+                            identifier = item.identifier,
+                            isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
+                            hasPreviouslyEnabledCameraUploads = uiState.hasPreviouslyEnabledCameraUploads,
+                        )
                     },
                     modifier = modifier,
                 )
@@ -93,13 +98,19 @@ class DoMoreWithMegaWidget @Inject constructor() : HomeWidget, Flagged {
  */
 private fun NavigationHandler.navigateForItem(
     identifier: DoMoreWithMegaItem.Identifier,
+    isCameraUploadsEnabled: Boolean,
+    hasPreviouslyEnabledCameraUploads: Boolean,
 ) {
     when (identifier) {
         DoMoreWithMegaItem.Identifier.CameraUploads ->
-            navigate(LegacySettingsCameraUploadsActivityNavKey())
+            if (isCameraUploadsEnabled || hasPreviouslyEnabledCameraUploads) {
+                navigate(LegacySettingsCameraUploadsActivityNavKey())
+            } else {
+                navigate(CameraBackupPermissionsNavKey)
+            }
 
         DoMoreWithMegaItem.Identifier.AddSync ->
-            navigate(SyncNewFolderNavKey())
+            navigate(SyncPromotionNavKey)
 
         DoMoreWithMegaItem.Identifier.ScanDocument ->
             navigate(ContinuousScanNavKey)
@@ -142,7 +153,7 @@ private fun DoMoreWithMegaSection(
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             items.forEach { item ->
                 DoMoreWithMegaItemButton(
                     icon = item.icon,
@@ -150,7 +161,7 @@ private fun DoMoreWithMegaSection(
                     onClick = { onItemClick(item) },
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(4.dp))
         }
     }
 }

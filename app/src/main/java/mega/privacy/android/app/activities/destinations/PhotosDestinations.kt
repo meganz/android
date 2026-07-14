@@ -14,14 +14,18 @@ import mega.privacy.android.app.presentation.imagepreview.fetcher.AlbumContentIm
 import mega.privacy.android.app.presentation.imagepreview.fetcher.TimelineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewMenuSource
+import mega.privacy.android.app.presentation.permissions.view.CameraBackupPermissionsScreen
 import mega.privacy.android.app.presentation.photos.albums.add.AddToAlbumActivity
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumType
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsActivity
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPLOAD_PROMPT
+import mega.privacy.android.core.sharedcomponents.permission.getCameraUploadsPermissions
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
 import mega.privacy.android.navigation.destination.AlbumImportPreviewNavKey
+import mega.privacy.android.navigation.destination.CameraBackupPermissionsNavKey
 import mega.privacy.android.navigation.destination.LegacyAddToAlbumActivityNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
@@ -165,5 +169,32 @@ fun EntryProviderScope<NavKey>.legacySettingsCameraUploadsActivityNavKey(removeD
             // Immediately pop this destination from the back stack
             removeDestination()
         }
+    }
+}
+
+/**
+ * Registers the Camera backup permissions destination. Prompts the user to grant the media
+ * permissions required by Camera uploads and, once granted, continues into the Camera uploads
+ * settings so the feature can be enabled.
+ *
+ * @param navigationHandler Handler used to continue to the Camera uploads settings and to pop
+ * this destination from the back stack.
+ */
+fun EntryProviderScope<NavKey>.cameraBackupPermissionsScreen(navigationHandler: NavigationHandler) {
+    entry<CameraBackupPermissionsNavKey> {
+        val mediaPermissionLauncher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { results ->
+            if (results.values.any { it }) {
+                navigationHandler.navigate(LegacySettingsCameraUploadsActivityNavKey())
+            }
+            navigationHandler.remove(CameraBackupPermissionsNavKey)
+        }
+        CameraBackupPermissionsScreen(
+            onEnablePermission = {
+                mediaPermissionLauncher.launch(getCameraUploadsPermissions())
+            },
+            onSkipPermission = navigationHandler::back,
+        )
     }
 }

@@ -195,6 +195,9 @@ data object SyncMegaPickerNavKey : NavKey
 data object SyncEmptyRouteNavKey : NavKey
 
 @Serializable
+data object SyncPromotionNavKey : NavKey
+
+@Serializable
 @Parcelize
 data class UpgradeAccountNavKey(
     val isUpgrade: Boolean = true,
@@ -354,6 +357,13 @@ data class LegacyAddToAlbumActivityNavKey(
 data class LegacySettingsCameraUploadsActivityNavKey(
     val isShowHowToUploadPrompt: Boolean = false,
 ) : NavKey
+
+/**
+ * Navigation key for the Camera backup permissions screen, shown when the user attempts to
+ * enable Camera uploads while the required media permissions have not been granted yet.
+ */
+@Serializable
+data object CameraBackupPermissionsNavKey : NavKey
 
 /**
  * Navigation key for GetLinkActivity that handles legacy navigation.

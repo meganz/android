@@ -143,6 +143,7 @@ class LegacyCoreActivityFeatureGraph(
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
             createScheduledMeetingScreen(navigationHandler::back)
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
+            cameraBackupPermissionsScreen(navigationHandler)
             fileInfoScreen(navigationHandler::back)
             tagsScreen(navigationHandler::back)
             mediaDiscoveryLegacyDestination(navigationHandler::back)

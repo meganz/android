@@ -1,9 +1,11 @@
 package mega.privacy.android.feature.sync.navigation
 
+import android.content.Intent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -23,8 +25,10 @@ import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderScreenRou
 import mega.privacy.android.feature.sync.ui.newfolderpair.SyncNewFolderViewModel
 import mega.privacy.android.feature.sync.ui.synclist.SyncChip
 import mega.privacy.android.feature.sync.ui.synclist.SyncListRoute
+import mega.privacy.android.feature.sync.ui.views.SyncPromotionBottomSheet
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
+import mega.privacy.android.navigation.contract.bottomsheet.bottomSheetMetadata
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
 import mega.privacy.android.navigation.destination.SelectStopBackupDestinationNavKey
 import mega.privacy.android.navigation.destination.SelectSyncFolderNavKey
@@ -33,6 +37,7 @@ import mega.privacy.android.navigation.destination.SyncEmptyRouteNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.SyncMegaPickerNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
+import mega.privacy.android.navigation.destination.SyncPromotionNavKey
 import mega.privacy.android.navigation.destination.SyncSelectStopBackupDestinationNavKey
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.navigation.launchFolderPicker
@@ -196,6 +201,27 @@ fun EntryProviderScope<NavKey>.syncScreens(
                 Analytics.tracker.trackEvent(AndroidSyncGetStartedButtonEvent)
                 navigationHandler.navigate(SyncNewFolderNavKey())
             }
+        }
+    }
+
+    entry<SyncPromotionNavKey>(metadata = bottomSheetMetadata()) {
+        val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
+        val context = LocalContext.current
+        OriginalTheme(isDark = themeMode.isDarkMode()) {
+            SyncPromotionBottomSheet(
+                onSyncFoldersClicked = {
+                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_TWOWAY))
+                },
+                onBackUpFoldersClicked = {
+                    navigationHandler.navigate(SyncNewFolderNavKey(syncType = SyncType.TYPE_BACKUP))
+                },
+                onLearnMoreClicked = { url ->
+                    context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                },
+                hideSheet = {
+                    navigationHandler.remove(SyncPromotionNavKey)
+                },
+            )
         }
     }
 }

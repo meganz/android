@@ -22,6 +22,7 @@ import de.palm.composestateevents.EventEffect
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.privacy.android.core.sharedcomponents.permission.getCameraUploadsPermissions
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber

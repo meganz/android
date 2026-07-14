@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.permissions
 
 import android.Manifest.permission.ACCESS_MEDIA_LOCATION
-import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
@@ -27,6 +26,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.presentation.settings.camerauploads.dialogs.MediaPermissionsRationaleDialog
+import mega.privacy.android.core.sharedcomponents.permission.getCameraUploadsPermissions
 
 /**
  * A Composable that checks the Camera Uploads permissions necessary to run the feature
@@ -96,7 +96,7 @@ internal fun CameraUploadsPermissionsHandler(
     EventEffect(
         event = requestMediaPermissions,
         onConsumed = { onRequestMediaPermissionsStateChanged.invoke(consumed) },
-        action = { mediaPermissionsLauncher.launch(getCameraUploadsPermissions().toTypedArray()) }
+        action = { mediaPermissionsLauncher.launch(getCameraUploadsPermissions()) }
     )
 
     if (showMediaPermissionsRationale) {
@@ -109,28 +109,6 @@ internal fun CameraUploadsPermissionsHandler(
             },
             onMediaAccessDenied = { showMediaPermissionsRationale = false },
         )
-    }
-}
-
-/**
- * Retrieves the Camera Uploads permissions
- *
- * @return A list of Camera Uploads permissions
- */
-private fun getCameraUploadsPermissions(): List<String> = buildList {
-    if (SDK_INT < TIRAMISU) {
-        // Only request the generic External Storage Permission on Devices below API 33
-        add(READ_EXTERNAL_STORAGE)
-    } else {
-        // Request Granular Media and Notifications Permissions beginning on API 33
-        add(READ_MEDIA_IMAGES)
-        add(READ_MEDIA_VIDEO)
-        add(POST_NOTIFICATIONS)
-    }.apply {
-        if (SDK_INT >= UPSIDE_DOWN_CAKE) {
-            // Request Partial Media Permissions beginning on API 34
-            add(READ_MEDIA_VISUAL_USER_SELECTED)
-        }
     }
 }
 
