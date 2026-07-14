@@ -16,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,6 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.AnchoredButtonGroup
+import mega.android.core.ui.components.datepicker.MegaDatePickerDialog
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.inputfields.PasswordTextInputField
@@ -44,10 +46,10 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.values.IconColor
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
-import mega.privacy.android.feature.sharelink.presentation.component.MegaDatePickerDialog
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import java.text.DateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
 
@@ -222,7 +224,10 @@ private fun LinkSettingsContent(
 
     if (showDatePicker) {
         MegaDatePickerDialog(
+            confirmText = stringResource(sharedR.string.general_ok_only),
+            dismissText = stringResource(sharedR.string.general_dialog_cancel_button),
             initialSelectedTimeMillis = uiState.expiryDate,
+            selectableDates = TodayOnwardSelectableDates,
             onDateSelected = {
                 onExpiryDateChanged(it)
                 showDatePicker = false
@@ -231,6 +236,26 @@ private fun LinkSettingsContent(
         )
     }
 }
+
+/** A link expiry cannot be in the past, so only today onwards is selectable. */
+@OptIn(ExperimentalMaterial3Api::class)
+private object TodayOnwardSelectableDates : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+        utcTimeMillis >= todayStartUtcMillis()
+
+    override fun isSelectableYear(year: Int): Boolean =
+        year >= Calendar.getInstance(UTC).get(Calendar.YEAR)
+}
+
+private val UTC: TimeZone = TimeZone.getTimeZone("UTC")
+
+private fun todayStartUtcMillis(): Long =
+    Calendar.getInstance(UTC).apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
 
 @Composable
 private fun ExpiryDateField(
@@ -262,7 +287,7 @@ private fun ExpiryDateField(
 
 private fun formatExpiryDate(millis: Long): String =
     DateFormat.getDateInstance(DateFormat.MEDIUM)
-        .apply { timeZone = TimeZone.getTimeZone("UTC") }
+        .apply { timeZone = UTC }
         .format(Date(millis))
 
 @StringRes

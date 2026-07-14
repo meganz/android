@@ -12,7 +12,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
-import mega.privacy.android.feature.sharelink.presentation.component.MEGA_DATE_PICKER_DIALOG_TAG
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
@@ -148,7 +147,8 @@ class LinkSettingsScreenTest {
 
         composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_FIELD_TAG).performClick()
 
-        composeRule.onNodeWithTag(MEGA_DATE_PICKER_DIALOG_TAG).assertIsDisplayed()
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_ok_only))
+            .assertIsDisplayed()
     }
 
     @Test
