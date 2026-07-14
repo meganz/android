@@ -42,7 +42,6 @@ internal fun FileContactListTopBar(
     selectAll: () -> Unit,
     deselectAll: () -> Unit,
     changePermissions: () -> Unit,
-    shareFolder: () -> Unit,
     removeShare: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -74,7 +73,6 @@ internal fun FileContactListTopBar(
             navigationType = AppBarNavigationType.Back(onBackPressed),
             trailingIcons = {
                 DefaultActions(
-                    shareFolder = shareFolder,
                     selectAll = selectAll,
                 )
             }
@@ -97,7 +95,6 @@ private fun PreviewFileContactListTopBar(
                     selectAll = {},
                     deselectAll = {},
                     changePermissions = {},
-                    shareFolder = {},
                     removeShare = {},
                     modifier = Modifier.systemBarsPadding(),
                 )
@@ -116,20 +113,9 @@ private fun PreviewFileContactListTopBar(
 
 @Composable
 private fun RowScope.DefaultActions(
-    shareFolder: () -> Unit,
     selectAll: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    IconButton(
-        modifier = Modifier.testTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_SHARE_FOLDER_ITEM),
-        onClick = shareFolder,
-    ) {
-        MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.FolderUsers),
-            contentDescription = stringResource(R.string.context_share_folder),
-            tint = IconColor.Primary,
-        )
-    }
 
     IconButton(
         modifier = Modifier.testTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_OVERFLOW),
@@ -189,7 +175,7 @@ private fun RowScope.SelectModeActions(
         onClick = removeShare,
     ) {
         MegaIcon(
-            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.X),
+            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.UserMinus),
             contentDescription = stringResource(R.string.context_remove),
             tint = IconColor.Primary,
         )
@@ -245,8 +231,6 @@ private class SelectionStatePreviewParameterProvider : PreviewParameterProvider<
 }
 
 internal const val TEST_TAG_FILE_CONTACT_LIST_TOP_BAR = "file_contact_list_top_bar"
-internal const val TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_SHARE_FOLDER_ITEM =
-    "file_contact_list_top_bar:menu_item_share_folder"
 internal const val TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_REMOVE_SHARE =
     "file_contact_list_top_bar:menu_item_remove_share"
 internal const val TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_CHANGE_PERMISSION_ITEM =

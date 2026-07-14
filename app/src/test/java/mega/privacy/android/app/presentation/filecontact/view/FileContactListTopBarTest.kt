@@ -5,7 +5,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -34,7 +33,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -59,7 +57,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -84,7 +81,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -108,7 +104,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -117,19 +112,17 @@ class FileContactListTopBarTest {
             }
         }
 //Expected menu items
-        composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_SHARE_FOLDER_ITEM)
-            .assertIsDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_OVERFLOW)
             .assertIsDisplayed()
 //Not expected menu items
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_REMOVE_SHARE)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_CHANGE_PERMISSION_ITEM)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_SELECT_ALL_ITEM)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_UNSELECT_ALL_ITEM)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
     }
 
     @Test
@@ -144,7 +137,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -161,12 +153,10 @@ class FileContactListTopBarTest {
             .assertIsDisplayed()
 
 //Not expected menu items
-        composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_SHARE_FOLDER_ITEM)
-            .assertIsNotDisplayed()
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_UNSELECT_ALL_ITEM)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_SELECT_ALL_ITEM)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
     }
 
 
@@ -182,7 +172,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -197,7 +186,7 @@ class FileContactListTopBarTest {
             .assertIsDisplayed()
 
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_UNSELECT_ALL_ITEM)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
     }
 
     @Test
@@ -212,7 +201,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -241,7 +229,6 @@ class FileContactListTopBarTest {
                         selectAll = {},
                         deselectAll = {},
                         changePermissions = {},
-                        shareFolder = {},
                         removeShare = {}
                     )
                 }
@@ -256,7 +243,7 @@ class FileContactListTopBarTest {
             .assertIsDisplayed()
 
         composeTestRule.onNodeWithTag(TEST_TAG_FILE_CONTACT_LIST_TOP_BAR_SELECT_ALL_ITEM)
-            .assertIsNotDisplayed()
+            .assertDoesNotExist()
     }
 }
 

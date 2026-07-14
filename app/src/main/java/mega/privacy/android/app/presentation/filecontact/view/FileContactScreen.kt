@@ -12,7 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContentConsumed
@@ -20,9 +20,9 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.CoroutineScope
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.banner.TopWarningBanner
-import mega.android.core.ui.components.button.PrimaryLargeIconButton
+import mega.android.core.ui.components.fab.MegaFab
+import mega.android.core.ui.components.snackbar.MegaSnackbar
 import mega.android.core.ui.components.surface.ColumnSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.shares.ShareRecipient
 import mega.privacy.android.domain.entity.user.UserVisibility
+import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,7 +119,6 @@ internal fun FileContactScreen(
                 selectAll = selectAll,
                 deselectAll = deselectAll,
                 changePermissions = changePermissions,
-                shareFolder = addContact,
                 removeShare = removeShare,
             )
         },
@@ -128,10 +128,12 @@ internal fun FileContactScreen(
             )
         },
         floatingActionButton = {
-            PrimaryLargeIconButton(
-                icon = painterResource(id = R.drawable.ic_add_white),
-                onClick = addContact,
-            )
+            if (selectedItems.isEmpty()) {
+                MegaFab(
+                    onClick = addContact,
+                    painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.UserPlus),
+                )
+            }
         }
     ) { paddingValues ->
         ColumnSurface(

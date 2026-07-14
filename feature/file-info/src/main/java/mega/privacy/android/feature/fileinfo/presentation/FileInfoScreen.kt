@@ -197,7 +197,9 @@ private fun FileInfoContent(
                     onNavigate(
                         FileContactInfoNavKey(
                             folderHandle = nodeHandle,
-                            folderName = uiState.title,
+                            // The shared-recipients screen uses folderName as its title
+                            // TODO extract to a localized string resource
+                            folderName = "Shared with",
                         )
                     )
                 },

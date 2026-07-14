@@ -216,7 +216,7 @@ class FileInfoScreenTest {
         composeRule.onNodeWithTag(FILE_INFO_SHARED_WITH_TAG).performScrollTo().performClick()
 
         assertThat(navKey).isEqualTo(
-            FileContactInfoNavKey(folderHandle = NODE_HANDLE, folderName = folderState.title)
+            FileContactInfoNavKey(folderHandle = NODE_HANDLE, folderName = "Shared with")
         )
     }
 

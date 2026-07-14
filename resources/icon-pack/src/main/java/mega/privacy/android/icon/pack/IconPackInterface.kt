@@ -246,6 +246,7 @@ interface IconPackInterface {
                 val Trash: ImageVector
                 val User: ImageVector
                 val UserPlus: ImageVector
+                val UserMinus: ImageVector
                 val UserRight: ImageVector
                 val Users: ImageVector
                 val UserSquare: ImageVector
