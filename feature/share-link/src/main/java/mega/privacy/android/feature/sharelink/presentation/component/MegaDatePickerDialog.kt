@@ -89,14 +89,12 @@ private fun todayStartUtcMillis(): Long =
         set(Calendar.MILLISECOND, 0)
     }.timeInMillis
 
+@OptIn(ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
-private fun MegaDatePickerDialogPreview() {
+private fun MegaDatePickerContentPreview() {
     AndroidThemeForPreviews {
-        MegaDatePickerDialog(
-            onDateSelected = {},
-            onDismiss = {},
-        )
+        DatePicker(state = rememberDatePickerState(selectableDates = TodayOnwardSelectableDates))
     }
 }
 
