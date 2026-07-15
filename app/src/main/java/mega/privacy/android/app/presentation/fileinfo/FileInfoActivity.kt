@@ -84,7 +84,6 @@ import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
-import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -475,7 +474,6 @@ class FileInfoActivity : BaseActivity() {
         megaNavigator.openAddContactToShare(
             context = this,
             launcher = selectContactForShareFolderLauncher,
-            contactType = AddContactToShareNavKey.ContactType.All,
             nodeHandles = listOf(nodeId.longValue),
         )
     }

@@ -120,16 +120,8 @@ data class ManageChatHistoryNavKey(
 
 @Serializable
 data class AddContactToShareNavKey(
-    val contactType: ContactType,
     val nodeHandle: List<Long>,
 ) : NavKey {
-    @Keep
-    enum class ContactType {
-        Mega,
-        Device,
-        All,
-    }
-
     companion object Companion {
         const val KEY = "extra_contacts"
     }

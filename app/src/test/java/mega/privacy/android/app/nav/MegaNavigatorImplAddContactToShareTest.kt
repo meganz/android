@@ -25,7 +25,6 @@ import mega.privacy.android.domain.usecase.file.GetFileTypeInfoUseCase
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
-import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.argumentCaptor
@@ -68,7 +67,6 @@ class MegaNavigatorImplAddContactToShareTest {
             navigator.openAddContactToShare(
                 context = ApplicationProvider.getApplicationContext(),
                 launcher = launcher,
-                contactType = AddContactToShareNavKey.ContactType.All,
                 nodeHandles = listOf(123L),
             )
             advanceUntilIdle()
@@ -94,7 +92,6 @@ class MegaNavigatorImplAddContactToShareTest {
             navigator.openAddContactToShare(
                 context = ApplicationProvider.getApplicationContext(),
                 launcher = launcher,
-                contactType = AddContactToShareNavKey.ContactType.All,
                 nodeHandles = listOf(123L),
             )
             advanceUntilIdle()
@@ -126,7 +123,6 @@ class MegaNavigatorImplAddContactToShareTest {
             navigator.openAddContactToShare(
                 context = ApplicationProvider.getApplicationContext(),
                 launcher = launcher,
-                contactType = AddContactToShareNavKey.ContactType.All,
                 nodeHandles = listOf(1L, 2L),
             )
             advanceUntilIdle()

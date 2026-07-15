@@ -236,7 +236,6 @@ internal fun HandleNodeOptionsActionEvent(
             onActionTriggered()
             onNavigate(
                 AddContactToShareNavKey(
-                    contactType = AddContactToShareNavKey.ContactType.All,
                     nodeHandle = handles.toList(),
                 )
             )

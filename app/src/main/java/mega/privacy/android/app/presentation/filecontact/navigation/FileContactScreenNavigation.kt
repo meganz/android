@@ -59,7 +59,6 @@ internal fun EntryProviderScope<NavKey>.fileContacts(
             ) { handle ->
                 onNavigate(
                     AddContactToShareNavKey(
-                        contactType = AddContactToShareNavKey.ContactType.All,
                         nodeHandle = listOf(handle),
                     )
                 )

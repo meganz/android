@@ -18,7 +18,7 @@ class AddContactsContract :
 
     override fun createIntent(context: Context, input: AddContactToShareNavKey): Intent {
         return Intent(context, AddContactActivity::class.java).apply {
-            putExtra("contactType", input.contactType.intValue)
+            putExtra("contactType", Constants.CONTACT_TYPE_BOTH)
             if (input.nodeHandle.size == 1) {
                 putExtra("node_handle", input.nodeHandle[0])
                 putExtra("MULTISELECT", 0)
@@ -39,10 +39,3 @@ class AddContactsContract :
         return Output(emails, nodeHandle)
     }
 }
-
-internal val AddContactToShareNavKey.ContactType.intValue
-    get() = when (this) {
-        AddContactToShareNavKey.ContactType.Mega -> Constants.CONTACT_TYPE_MEGA
-        AddContactToShareNavKey.ContactType.Device -> Constants.CONTACT_TYPE_DEVICE
-        AddContactToShareNavKey.ContactType.All -> Constants.CONTACT_TYPE_BOTH
-    }

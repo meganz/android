@@ -29,7 +29,6 @@ import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.navigation.MegaNavigatorEntryPointKt;
-import mega.privacy.android.navigation.destination.AddContactToShareNavKey;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -165,7 +164,6 @@ public class NodeController {
         MegaNavigatorEntryPointKt.getMegaNavigator(context).openAddContactToShare(
                 context,
                 launcher,
-                AddContactToShareNavKey.ContactType.All,
                 handleList
         );
     }
@@ -183,7 +181,6 @@ public class NodeController {
         MegaNavigatorEntryPointKt.getMegaNavigator(context).openAddContactToShare(
                 context,
                 launcher,
-                AddContactToShareNavKey.ContactType.All,
                 handleList
         );
     }

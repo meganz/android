@@ -18,7 +18,6 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
-import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import java.io.File
 
@@ -324,13 +323,11 @@ interface AppNavigator {
      *
      * @param context the launching context.
      * @param launcher the caller's result launcher receiving the picker's Activity result.
-     * @param contactType the contact source to surface in the picker.
      * @param nodeHandles the handle(s) of the folder(s) being shared.
      */
     fun openAddContactToShare(
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
-        contactType: AddContactToShareNavKey.ContactType,
         nodeHandles: List<Long>,
     )
 

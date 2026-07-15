@@ -55,9 +55,6 @@ class AddContactToShareComposeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val contactType = AddContactToShareNavKey.ContactType.entries[
-            intent.getIntExtra(EXTRA_CONTACT_TYPE, AddContactToShareNavKey.ContactType.All.ordinal)
-        ]
         val nodeHandles = intent.getLongArrayExtra(EXTRA_NODE_HANDLES)?.toList().orEmpty()
 
         navigationResultManager.clearResult(AddContactToShareNavKey.KEY)
@@ -68,7 +65,7 @@ class AddContactToShareComposeActivity : AppCompatActivity() {
             val themeMode by monitorThemeModeUseCase()
                 .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val startKey = remember {
-                AddContactToShareNavKey(contactType = contactType, nodeHandle = nodeHandles)
+                AddContactToShareNavKey(nodeHandle = nodeHandles)
             }
             LegacyActivityScaffold(
                 container = { content ->
@@ -116,22 +113,18 @@ class AddContactToShareComposeActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val EXTRA_CONTACT_TYPE = "extra_contact_type"
         private const val EXTRA_NODE_HANDLES = "extra_node_handles"
 
         /**
          * Builds an [Intent] to open the picker for adding contacts to a shared folder.
          *
-         * @param contactType the contact source to surface in the picker.
          * @param nodeHandles the handle(s) of the folder(s) being shared.
          */
         fun getIntent(
             context: Context,
-            contactType: AddContactToShareNavKey.ContactType,
             nodeHandles: List<Long>,
         ): Intent =
             Intent(context, AddContactToShareComposeActivity::class.java)
-                .putExtra(EXTRA_CONTACT_TYPE, contactType.ordinal)
                 .putExtra(EXTRA_NODE_HANDLES, nodeHandles.toLongArray())
     }
 }

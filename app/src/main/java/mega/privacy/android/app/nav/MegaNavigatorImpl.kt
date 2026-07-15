@@ -30,7 +30,6 @@ import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActiv
 import mega.privacy.android.app.presentation.contact.NewChatComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
-import mega.privacy.android.app.presentation.contact.navigation.intValue
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -50,6 +49,7 @@ import mega.privacy.android.app.uploadFolder.UploadFolderActivity
 import mega.privacy.android.app.uploadFolder.UploadFolderType
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_BOTH
 import mega.privacy.android.app.utils.Constants.CONTACT_TYPE_MEGA
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.EXTRA_HANDLE_ZIP
@@ -102,7 +102,6 @@ import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.navigation.destination.AchievementNavKey
-import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.AuthenticityCredentialsNavKey
 import mega.privacy.android.navigation.destination.ChatNavKey
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -615,7 +614,6 @@ internal class MegaNavigatorImpl @Inject constructor(
     override fun openAddContactToShare(
         context: Context,
         launcher: ActivityResultLauncher<Intent>,
-        contactType: AddContactToShareNavKey.ContactType,
         nodeHandles: List<Long>,
     ) {
         applicationScope.launch {
@@ -625,12 +623,11 @@ internal class MegaNavigatorImpl @Inject constructor(
             val intent = if (isContactsComposeUIEnabled) {
                 AddContactToShareComposeActivity.getIntent(
                     context = context,
-                    contactType = contactType,
                     nodeHandles = nodeHandles,
                 )
             } else {
                 Intent(context, AddContactActivity::class.java).apply {
-                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, contactType.intValue)
+                    putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, CONTACT_TYPE_BOTH)
                     if (nodeHandles.size == 1) {
                         putExtra(AddContactActivity.EXTRA_NODE_HANDLE, nodeHandles.first())
                         putExtra(AddContactActivity.EXTRA_MULTISELECT, 0)

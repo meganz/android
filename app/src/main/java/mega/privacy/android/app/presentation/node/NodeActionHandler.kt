@@ -31,7 +31,6 @@ import mega.privacy.android.app.presentation.node.model.menuaction.UnhideMenuAct
 import mega.privacy.android.app.presentation.node.model.menuaction.VersionsMenuAction
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.megaNavigator
 
 /**
@@ -171,7 +170,6 @@ class NodeActionHandler(
             activity.megaNavigator.openAddContactToShare(
                 context = activity,
                 launcher = launcher,
-                contactType = AddContactToShareNavKey.ContactType.All,
                 nodeHandles = nodeHandles,
             )
         }
