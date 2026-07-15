@@ -22,8 +22,10 @@ import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineGridSizeUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineGridSizeUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
@@ -41,6 +43,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.isA
 import org.mockito.kotlin.mock
@@ -62,6 +65,8 @@ class TimelineTabViewModelTest {
     private val monitorTimelineMediaUseCase: MonitorTimelineMediaUseCase = mock()
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase = mock()
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase = mock()
+    private val monitorTimelineGridSizeUseCase: MonitorTimelineGridSizeUseCase = mock()
+    private val setTimelineGridSizeUseCase: SetTimelineGridSizeUseCase = mock()
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper = mock()
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase = mock()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
@@ -70,15 +75,23 @@ class TimelineTabViewModelTest {
     private val analyticsTracker: AnalyticsTracker = mock()
 
     private val isHiddenNodesEnabledFlow = MutableStateFlow(false)
+    private val gridSizePreference = MutableStateFlow<Int?>(null)
 
     @BeforeEach
     fun setup() = runTest {
         Analytics.initialise(analyticsTracker)
         whenever(monitorHiddenNodesEnabledUseCase()) doReturn isHiddenNodesEnabledFlow
         whenever(getDeviceCurrentTimeUseCase()) doReturn FIXED_NOW.toInstant().toEpochMilli()
+        gridSizePreference.value = null
+        whenever(monitorTimelineGridSizeUseCase()) doReturn gridSizePreference
+        whenever(setTimelineGridSizeUseCase(any())) doSuspendableAnswer {
+            gridSizePreference.value = it.getArgument(0)
+        }
         underTest = TimelineTabViewModel(
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
+            monitorTimelineGridSizeUseCase = monitorTimelineGridSizeUseCase,
+            setTimelineGridSizeUseCase = setTimelineGridSizeUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,
             monitorTimelineMediaUseCase = monitorTimelineMediaUseCase,
@@ -95,6 +108,8 @@ class TimelineTabViewModelTest {
             monitorTimelineMediaUseCase,
             getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase,
+            monitorTimelineGridSizeUseCase,
+            setTimelineGridSizeUseCase,
             timelineFilterUiStateMapper,
             monitorHiddenNodesEnabledUseCase,
             durationInSecondsTextMapper,

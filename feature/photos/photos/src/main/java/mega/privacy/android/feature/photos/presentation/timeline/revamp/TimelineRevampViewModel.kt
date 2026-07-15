@@ -54,7 +54,9 @@ import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCas
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorMediaNodeContentChangesUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineGridSizeUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineGridSizeUseCase
 import mega.privacy.android.domain.usecase.photos.SignalMediaCountChangesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
@@ -102,6 +104,8 @@ class TimelineRevampViewModel @Inject constructor(
     private val mediaTimelineNodeUiItemMapper: MediaTimelineNodeUiItemMapper,
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
+    private val monitorTimelineGridSizeUseCase: MonitorTimelineGridSizeUseCase,
+    private val setTimelineGridSizeUseCase: SetTimelineGridSizeUseCase,
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
     private val getCameraUploadFolderHandlesUseCase: GetCameraUploadFolderHandlesUseCase,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
@@ -126,10 +130,19 @@ class TimelineRevampViewModel @Inject constructor(
     private val _takenDownDialogEvent = MutableStateFlow<StateEvent>(consumed)
 
     /**
-     * The grid size (Compact / Default / Large). Drives only the grid column count, so it lives in
-     * [uiState] (not [currentFilter]) — changing it must not reload the timeline.
+     * The grid size (Compact / Default / Large), sourced from the persisted preference. Drives only
+     * the grid column count, so it lives in [uiState] (not [currentFilter]) — changing it must not
+     * reload the timeline. Eagerly shared so [onZoomIn] / [onZoomOut] can read the current value.
      */
-    private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
+    private val gridSizeFlow: StateFlow<TimelineGridSize> = monitorTimelineGridSizeUseCase()
+        .map { ordinal ->
+            ordinal?.let { TimelineGridSize.entries.getOrNull(it) } ?: TimelineGridSize.Default
+        }
+        .catch {
+            Timber.e(it, "Unable to monitor timeline grid size")
+            emit(TimelineGridSize.Default)
+        }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, TimelineGridSize.Default)
 
     /**
      * The selected sort option (Newest / Oldest). Drives the section order and the per-section page
@@ -809,8 +822,15 @@ class TimelineRevampViewModel @Inject constructor(
      * not reload the timeline.
      */
     fun onGridSizeChange(size: TimelineGridSize) {
-        gridSizeFlow.update { size }
+        persistGridSize(size)
         trackGridSizeSelection(size)
+    }
+
+    private fun persistGridSize(size: TimelineGridSize) {
+        viewModelScope.launch {
+            runCatching { setTimelineGridSizeUseCase(size.ordinal) }
+                .onFailure { Timber.e(it, "Unable to persist timeline grid size") }
+        }
     }
 
     /**

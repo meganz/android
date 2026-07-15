@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -31,7 +32,9 @@ import mega.privacy.android.domain.usecase.photos.GetMediaTimelineSectionsUseCas
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
 import mega.privacy.android.domain.usecase.photos.ListMediaNodesByOffsetUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorMediaNodeContentChangesUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineGridSizeUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineGridSizeUseCase
 import mega.privacy.android.domain.usecase.photos.SignalMediaCountChangesUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
@@ -76,6 +79,8 @@ internal class TimelineRevampViewModelTest {
     private val mediaTimelineNodeUiItemMapper = mock<MediaTimelineNodeUiItemMapper>()
     private val getTimelineFilterPreferencesUseCase = mock<GetTimelineFilterPreferencesUseCase>()
     private val setTimelineFilterPreferencesUseCase = mock<SetTimelineFilterPreferencesUseCase>()
+    private val monitorTimelineGridSizeUseCase = mock<MonitorTimelineGridSizeUseCase>()
+    private val setTimelineGridSizeUseCase = mock<SetTimelineGridSizeUseCase>()
     private val timelineFilterUiStateMapper = mock<TimelineFilterUiStateMapper>()
     private val getCameraUploadFolderHandlesUseCase = mock<GetCameraUploadFolderHandlesUseCase>()
     private val monitorHiddenNodesEnabledUseCase = mock<MonitorHiddenNodesEnabledUseCase>()
@@ -84,6 +89,7 @@ internal class TimelineRevampViewModelTest {
     private val signalMediaCountChangesUseCase = mock<SignalMediaCountChangesUseCase>()
     private val monitorMediaNodeContentChangesUseCase =
         mock<MonitorMediaNodeContentChangesUseCase>()
+    private val gridSizePreference = MutableStateFlow<Int?>(null)
 
     private suspend fun initUnderTest(
         filterUiState: TimelineFilterUiState = TimelineFilterUiState(),
@@ -101,12 +107,18 @@ internal class TimelineRevampViewModelTest {
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(showHiddenItems))
         whenever(signalMediaCountChangesUseCase()).thenReturn(mediaChanges)
         whenever(monitorMediaNodeContentChangesUseCase()).thenReturn(contentChanges)
+        whenever(monitorTimelineGridSizeUseCase()).thenReturn(gridSizePreference)
+        whenever(setTimelineGridSizeUseCase(any())) doSuspendableAnswer {
+            gridSizePreference.value = it.getArgument(0)
+        }
         underTest = TimelineRevampViewModel(
             getMediaTimelineSectionsUseCase = getMediaTimelineSectionsUseCase,
             listMediaNodesByOffsetUseCase = listMediaNodesByOffsetUseCase,
             mediaTimelineNodeUiItemMapper = mediaTimelineNodeUiItemMapper,
             getTimelineFilterPreferencesUseCase = getTimelineFilterPreferencesUseCase,
             setTimelineFilterPreferencesUseCase = setTimelineFilterPreferencesUseCase,
+            monitorTimelineGridSizeUseCase = monitorTimelineGridSizeUseCase,
+            setTimelineGridSizeUseCase = setTimelineGridSizeUseCase,
             timelineFilterUiStateMapper = timelineFilterUiStateMapper,
             getCameraUploadFolderHandlesUseCase = getCameraUploadFolderHandlesUseCase,
             monitorHiddenNodesEnabledUseCase = monitorHiddenNodesEnabledUseCase,

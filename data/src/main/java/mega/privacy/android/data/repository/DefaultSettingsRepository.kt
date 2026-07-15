@@ -192,6 +192,12 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setMediaDiscoveryView(value: Int) =
         uiPreferencesGateway.setMediaDiscoveryView(value)
 
+    override fun monitorTimelineGridSize(): Flow<Int?> =
+        uiPreferencesGateway.monitorTimelineGridSize()
+
+    override suspend fun setTimelineGridSize(value: Int) =
+        uiPreferencesGateway.setTimelineGridSize(value)
+
     override fun monitorSubfolderMediaDiscoveryEnabled(): Flow<Boolean?> =
         uiPreferencesGateway.monitorSubfolderMediaDiscoveryEnabled()
 

@@ -94,6 +94,20 @@ interface SettingsRepository {
     suspend fun setMediaDiscoveryView(value: Int)
 
     /**
+     * Monitor the timeline grid size preference
+     *
+     * @return timeline grid size preference as a flow
+     */
+    fun monitorTimelineGridSize(): Flow<Int?>
+
+    /**
+     * Set the timeline grid size preference
+     *
+     * @param value
+     */
+    suspend fun setTimelineGridSize(value: Int)
+
+    /**
      * Monitor subfolder media discovery setting
      *
      * @return subfolder media discovery option enabled status as a flow

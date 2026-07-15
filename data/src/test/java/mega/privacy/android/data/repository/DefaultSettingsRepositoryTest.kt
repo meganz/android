@@ -348,6 +348,26 @@ internal class DefaultSettingsRepositoryTest {
         }
 
     @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2])
+    fun `test setTimelineGridSize calls uiPreferencesGateway setTimelineGridSize`(value: Int) =
+        runTest {
+            underTest.setTimelineGridSize(value)
+            verify(uiPreferencesGateway).setTimelineGridSize(value)
+        }
+
+    @ParameterizedTest
+    @ValueSource(ints = [0, 1, 2])
+    fun `test monitorTimelineGridSize returns flow from uiPreferencesGateway`(value: Int) =
+        runTest {
+            whenever(uiPreferencesGateway.monitorTimelineGridSize()).thenReturn(flowOf(value))
+
+            underTest.monitorTimelineGridSize().test {
+                assertThat(awaitItem()).isEqualTo(value)
+                awaitComplete()
+            }
+        }
+
+    @ParameterizedTest
     @EnumSource(SortingPreference::class)
     fun `test setSortingPreference calls uiPreferencesGateway setSortingPreference`(
         preference: SortingPreference,

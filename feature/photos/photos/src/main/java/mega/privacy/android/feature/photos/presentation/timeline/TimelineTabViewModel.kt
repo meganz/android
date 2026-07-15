@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
@@ -31,8 +33,10 @@ import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.photos.GetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.photos.MonitorTimelineGridSizeUseCase
 import mega.privacy.android.domain.usecase.photos.MonitorTimelineMediaUseCase
 import mega.privacy.android.domain.usecase.photos.SetTimelineFilterPreferencesUseCase
+import mega.privacy.android.domain.usecase.photos.SetTimelineGridSizeUseCase
 import mega.privacy.android.feature.photos.mapper.TimelineFilterUiStateMapper
 import mega.privacy.android.feature.photos.model.FilterMediaSource
 import mega.privacy.android.feature.photos.model.FilterMediaSource.Companion.toLocationValue
@@ -44,7 +48,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTime
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
-import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
@@ -60,6 +63,8 @@ import javax.inject.Inject
 class TimelineTabViewModel @Inject constructor(
     private val getTimelineFilterPreferencesUseCase: GetTimelineFilterPreferencesUseCase,
     private val setTimelineFilterPreferencesUseCase: SetTimelineFilterPreferencesUseCase,
+    private val monitorTimelineGridSizeUseCase: MonitorTimelineGridSizeUseCase,
+    private val setTimelineGridSizeUseCase: SetTimelineGridSizeUseCase,
     private val timelineFilterUiStateMapper: TimelineFilterUiStateMapper,
     private val monitorHiddenNodesEnabledUseCase: MonitorHiddenNodesEnabledUseCase,
     private val monitorTimelineMediaUseCase: MonitorTimelineMediaUseCase,
@@ -70,7 +75,14 @@ class TimelineTabViewModel @Inject constructor(
 
     private var allMediaInTypedFileNodes: List<TypedFileNode> = emptyList()
     private var lastDisplayedPhotos: List<PhotosNodeContentItemV2> = emptyList()
-    private val gridSizeFlow = MutableStateFlow(TimelineGridSize.Default)
+    private val gridSizeFlow: Flow<TimelineGridSize> = monitorTimelineGridSizeUseCase()
+        .map { ordinal ->
+            ordinal?.let { TimelineGridSize.entries.getOrNull(it) } ?: TimelineGridSize.Default
+        }
+        .catch {
+            Timber.e(it, "Unable to monitor timeline grid size")
+            emit(TimelineGridSize.Default)
+        }
     private val sortOptionsFlow = MutableStateFlow(TimelineTabSortOptions.Newest)
 
     /**
@@ -387,12 +399,19 @@ class TimelineTabViewModel @Inject constructor(
         isEnableCameraUploadPageShowing: Boolean,
         mediaSource: FilterMediaSource,
     ) {
-        gridSizeFlow.update { size }
+        persistGridSize(size)
         trackGridSizeSelection(size)
         updateSortActionEnablement(
             isEnableCameraUploadPageShowing = isEnableCameraUploadPageShowing,
             mediaSource = mediaSource
         )
+    }
+
+    private fun persistGridSize(size: TimelineGridSize) {
+        viewModelScope.launch {
+            runCatching { setTimelineGridSizeUseCase(size.ordinal) }
+                .onFailure { Timber.e(it, "Unable to persist timeline grid size") }
+        }
     }
 
     /** Track analytics for grid size selection */

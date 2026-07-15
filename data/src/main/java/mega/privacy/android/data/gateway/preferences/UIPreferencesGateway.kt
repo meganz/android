@@ -64,6 +64,20 @@ interface UIPreferencesGateway {
     suspend fun setMediaDiscoveryView(value: Int)
 
     /**
+     * Monitor the timeline grid size preference
+     *
+     * @return a [Flow] to observe the timeline grid size preference
+     */
+    fun monitorTimelineGridSize(): Flow<Int?>
+
+    /**
+     * Set the timeline grid size preference
+     *
+     * @param value An [Int] representing the new timeline grid size preference
+     */
+    suspend fun setTimelineGridSize(value: Int)
+
+    /**
      * Monitor subfolder media discovery setting
      *
      * @return subfolder media discovery option enabled status as a flow
