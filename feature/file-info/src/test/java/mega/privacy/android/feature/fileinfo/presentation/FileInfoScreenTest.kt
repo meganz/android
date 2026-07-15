@@ -247,6 +247,26 @@ class FileInfoScreenTest {
     }
 
     @Test
+    fun `test that the duration badge and subtitle duration are shown for a video`() {
+        setContent(
+            uiState = fileState.copy(
+                fileTypeExtension = "mov",
+                durationText = "1:24",
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_DURATION_BADGE_TAG).assertExists()
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains("1:24", substring = true)
+    }
+
+    @Test
+    fun `test that the duration badge is hidden when there is no duration`() {
+        setContent(uiState = fileState.copy(durationText = null))
+
+        composeRule.onNodeWithTag(FILE_INFO_DURATION_BADGE_TAG).assertDoesNotExist()
+    }
+
+    @Test
     fun `test that the folder version rows are hidden for a file`() {
         setContent(uiState = fileState.copy(numberOfVersions = 91))
 

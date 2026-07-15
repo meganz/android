@@ -15,9 +15,15 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
+import mega.privacy.android.domain.entity.toDuration
+import mega.privacy.android.domain.entity.uri.UriPath
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -60,6 +66,8 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder,
     private val getFolderTreeInfo: GetFolderTreeInfo,
+    private val getPreviewUseCase: GetPreviewUseCase,
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val nodeDestinationMapper: NodeDestinationMapper,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
@@ -117,6 +125,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
             val modificationTime: Long?
             val fileTypeExtension: String?
             val thumbnailData: ThumbnailData?
+            val durationText: String?
             when (node) {
                 is TypedFileNode -> {
                     isFile = true
@@ -124,6 +133,8 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     modificationTime = node.modificationTime
                     fileTypeExtension = node.type.extension
                     thumbnailData = ThumbnailRequest(nodeId)
+                    durationText = node.type.toDuration()
+                        ?.let(durationInSecondsTextMapper::invoke)
                 }
 
                 else -> {
@@ -132,6 +143,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     modificationTime = null
                     fileTypeExtension = null
                     thumbnailData = null
+                    durationText = null
                 }
             }
 
@@ -142,6 +154,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     isFile = isFile,
                     iconRes = node.getIcon(fileTypeIconMapper),
                     thumbnailData = thumbnailData,
+                    durationText = durationText,
                     fileTypeExtension = fileTypeExtension,
                     sizeInBytes = sizeInBytes,
                     creationTime = node.creationTime,
@@ -161,6 +174,29 @@ internal class FileInfoViewModel @AssistedInject constructor(
             }
 
             loadFolderVersions(node)
+            loadPreview(node)
+        }
+    }
+
+    /**
+     * Upgrades the header image from the low-res thumbnail to the full-resolution preview for image
+     * and video nodes. Runs as a separate launch (preview fetch can hit the server) so the header
+     * shows the thumbnail/icon first and swaps to the preview when ready. Reuses the node from
+     * [loadNodeInfo].
+     */
+    private fun loadPreview(node: TypedNode) {
+        val type = (node as? TypedFileNode)?.type
+        if (type !is ImageFileTypeInfo && type !is VideoFileTypeInfo) return
+        viewModelScope.launch {
+            runCatching { getPreviewUseCase(node) }
+                .onSuccess { previewFile ->
+                    if (previewFile != null) {
+                        _uiState.update {
+                            it.copy(thumbnailData = ThumbnailUriRequest(UriPath.fromFile(previewFile)))
+                        }
+                    }
+                }
+                .onFailure { Timber.e(it, "Failed to load preview for $nodeHandle") }
         }
     }
 

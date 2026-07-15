@@ -36,8 +36,13 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
+import java.io.File
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import org.junit.jupiter.api.BeforeEach
@@ -51,6 +56,7 @@ import org.mockito.kotlin.wheneverBlocking
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.time.Duration.Companion.seconds
 
@@ -73,6 +79,8 @@ internal class FileInfoViewModelTest {
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder = mock()
     private val getFolderTreeInfo: GetFolderTreeInfo = mock()
+    private val getPreviewUseCase: GetPreviewUseCase = mock()
+    private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val nodeDestinationMapper: NodeDestinationMapper = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
@@ -95,6 +103,8 @@ internal class FileInfoViewModelTest {
             getNodeOutSharesUseCase = getNodeOutSharesUseCase,
             getContactItemFromInShareFolder = getContactItemFromInShareFolder,
             getFolderTreeInfo = getFolderTreeInfo,
+            getPreviewUseCase = getPreviewUseCase,
+            durationInSecondsTextMapper = durationInSecondsTextMapper,
             nodeDestinationMapper = nodeDestinationMapper,
             nodeHandle = nodeHandle,
         )
@@ -117,6 +127,8 @@ internal class FileInfoViewModelTest {
             getNodeOutSharesUseCase,
             getContactItemFromInShareFolder,
             getFolderTreeInfo,
+            getPreviewUseCase,
+            durationInSecondsTextMapper,
             nodeDestinationMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
@@ -139,6 +151,7 @@ internal class FileInfoViewModelTest {
         tags: List<String>? = listOf("marketing", "2026"),
         isTakenDown: Boolean = false,
         versionCount: Int = 0,
+        type: FileTypeInfo = fileTypeInfo,
     ): TypedFileNode = mock {
         on { id } doReturn NodeId(NODE_HANDLE)
         on { this.name } doReturn name
@@ -149,7 +162,7 @@ internal class FileInfoViewModelTest {
         on { this.tags } doReturn tags
         on { this.isTakenDown } doReturn isTakenDown
         on { this.versionCount } doReturn versionCount
-        on { this.type } doReturn fileTypeInfo
+        on { this.type } doReturn type
     }
 
     private fun mockFolderNode(
@@ -663,6 +676,42 @@ internal class FileInfoViewModelTest {
             assertThat(numberOfVersions).isEqualTo(0)
             assertThat(showFolderVersions).isFalse()
         }
+    }
+
+    @Test
+    fun `test that a video node loads its duration and full-resolution preview`() = runTest {
+        val videoType = VideoFileTypeInfo(mimeType = "video/mp4", extension = "mov", duration = 84.seconds)
+        val node = mockFileNode(type = videoType)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        val previewFile = File("/cache/preview.jpg")
+        whenever(durationInSecondsTextMapper(84.seconds)).thenReturn("1:24")
+        whenever(getPreviewUseCase(node)).thenReturn(previewFile)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(durationText).isEqualTo("1:24")
+            assertThat(thumbnailData)
+                .isEqualTo(ThumbnailUriRequest(UriPath.fromFile(previewFile)))
+        }
+    }
+
+    @Test
+    fun `test that a non-media file has no duration and keeps its thumbnail`() = runTest {
+        val node = mockFileNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(durationText).isNull()
+            assertThat(thumbnailData).isEqualTo(ThumbnailRequest(NodeId(NODE_HANDLE)))
+        }
+        verifyNoInteractions(getPreviewUseCase)
     }
 
     private companion object {

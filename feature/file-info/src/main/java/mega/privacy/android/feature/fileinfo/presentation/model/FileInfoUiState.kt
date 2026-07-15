@@ -13,7 +13,9 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @property title the node name
  * @property isFile true if the node is a file, false if it is a folder
  * @property iconRes the header icon: the file-type icon for files, the folder icon for folders
- * @property thumbnailData the thumbnail request for files (image/video preview), or null for folders
+ * @property thumbnailData the header image request for files — upgraded to a full-resolution preview
+ * for image/video nodes; null for folders
+ * @property durationText the formatted playback duration for audio/video nodes, or null otherwise
  * @property fileTypeExtension the file extension for files (e.g. "pdf"), or null for folders
  * @property sizeInBytes the file size in bytes (0 for folders; folder size arrives with folder stats)
  * @property creationTime the node creation time in seconds, or null if unknown
@@ -44,6 +46,7 @@ internal data class FileInfoUiState(
     val isFile: Boolean = true,
     @DrawableRes val iconRes: Int? = null,
     val thumbnailData: ThumbnailData? = null,
+    val durationText: String? = null,
     val fileTypeExtension: String? = null,
     val sizeInBytes: Long = 0L,
     val creationTime: Long? = null,

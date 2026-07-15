@@ -41,6 +41,7 @@ import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
+import mega.privacy.android.feature.fileinfo.presentation.view.DurationBadge
 import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoDetailRow
 import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoMapView
 import mega.privacy.android.feature.fileinfo.presentation.view.PermissionsRow
@@ -139,6 +140,7 @@ private fun FileInfoContent(
         if (uiState.isFile && uiState.sizeInBytes > 0) {
             add(formatFileSize(uiState.sizeInBytes, context))
         }
+        uiState.durationText?.let { add(it) }
     }.joinToString(separator = " • ")
 
     Column(
@@ -146,7 +148,8 @@ private fun FileInfoContent(
             .fillMaxSize()
             .imePadding()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         BoxSurface(
@@ -154,7 +157,7 @@ private fun FileInfoContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(8.dp))
                 .testTag(FILE_INFO_HEADER_TAG),
         ) {
             uiState.iconRes?.let { iconRes ->
@@ -165,6 +168,15 @@ private fun FileInfoContent(
                     contentDescription = uiState.title,
                     contentScale = ContentScale.Crop,
                     layoutType = ThumbnailLayoutType.FullSize,
+                )
+            }
+            uiState.durationText?.let { duration ->
+                DurationBadge(
+                    text = duration,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(8.dp)
+                        .testTag(FILE_INFO_DURATION_BADGE_TAG),
                 )
             }
         }
@@ -396,6 +408,34 @@ private fun FileInfoScreenFilePreview() {
 @OptIn(ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
+private fun FileInfoScreenVideoPreview() {
+    AndroidThemeForPreviews {
+        FileInfoScreen(
+            uiState = FileInfoUiState(
+                isLoading = false,
+                title = "housetour.mov",
+                isFile = true,
+                iconRes = iconPackR.drawable.ic_video_medium_solid,
+                fileTypeExtension = "mov",
+                sizeInBytes = 4L * 1024 * 1024,
+                durationText = "1:24",
+                creationTime = 1_749_000_000L,
+                modificationTime = 1_749_500_000L,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                accessPermission = AccessPermission.OWNER,
+            ),
+            nodeHandle = 0L,
+            onBack = {},
+            onLocationClick = {},
+            onNavigate = {},
+            onDescriptionChange = {},
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@CombinedThemePreviews
+@Composable
 private fun FileInfoScreenFolderPreview() {
     AndroidThemeForPreviews {
         FileInfoScreen(
@@ -466,6 +506,7 @@ private fun FileInfoScreenLoadingPreview() {
 internal const val FILE_INFO_SCREEN_TAG = "file_info_screen:scaffold"
 internal const val FILE_INFO_APP_BAR_TAG = "file_info_screen:app_bar"
 internal const val FILE_INFO_HEADER_TAG = "file_info_screen:header"
+internal const val FILE_INFO_DURATION_BADGE_TAG = "file_info_screen:duration_badge"
 internal const val FILE_INFO_NAME_TAG = "file_info_screen:name"
 internal const val FILE_INFO_SUBTITLE_TAG = "file_info_screen:subtitle"
 internal const val FILE_INFO_ADDED_TAG = "file_info_screen:added"
