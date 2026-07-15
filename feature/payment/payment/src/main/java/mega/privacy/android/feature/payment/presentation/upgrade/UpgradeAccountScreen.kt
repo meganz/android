@@ -137,12 +137,14 @@ fun UpgradeAccountScreen(
 
     val hasDiscount = remember(uiState) { uiState.hasDiscount() }
 
-    val offerHighlight = if (isSubscriptionRevampEnabled) {
-        uiState.offerHighlight(isMonthly, isUpgradeAccount)
-    } else {
-        OfferHighlight.None
+    val offerHighlight = remember(uiState, isMonthly, isUpgradeAccount, isSubscriptionRevampEnabled) {
+        if (isSubscriptionRevampEnabled) {
+            uiState.offerHighlight(isMonthly, isUpgradeAccount)
+        } else {
+            OfferHighlight.None
+        }
     }
-    val showOfferBanner = offerHighlight is OfferHighlight.Single
+    val showOfferBanner = offerHighlight !is OfferHighlight.None
 
     // pre select discounted plan if user has discount and no plan is currently selected
     LaunchedEffect(uiState.localisedSubscriptionsList) {
@@ -277,11 +279,19 @@ fun UpgradeAccountScreen(
                             onPricingPageClick = onPricingPageClick,
                         )
 
-                        // TODO: render a dedicated multiple-offer layout for OfferHighlight.Multiple.
-                        //  Until then multiple concurrent offers use the standard revamp layout.
-                        is OfferHighlight.Multiple,
-                        OfferHighlight.None,
-                            -> subscriptionRevampContent(
+                        is OfferHighlight.Multiple -> subscriptionMultipleOfferContent(
+                            uiState = uiState,
+                            isMonthly = isMonthly,
+                            onMonthlyChange = { isMonthly = it },
+                            locale = locale,
+                            context = context,
+                            isUpgradeAccount = isUpgradeAccount,
+                            onInAppCheckoutClick = onInAppCheckoutClick,
+                            onSubscriptionUnavailableLearnMoreClick = onSubscriptionUnavailableLearnMoreClick,
+                            onPricingPageClick = onPricingPageClick,
+                        )
+
+                        OfferHighlight.None -> subscriptionRevampContent(
                             uiState = uiState,
                             isMonthly = isMonthly,
                             onMonthlyChange = { isMonthly = it },
@@ -346,10 +356,7 @@ fun UpgradeAccountScreen(
                             stringResource(id = sharedR.string.pro_plan_benefit_password_protected_links),
                             stringResource(id = sharedR.string.pro_plan_benefit_links_with_expiry_dates),
                             stringResource(id = sharedR.string.pro_plan_benefit_auto_sync_mobile),
-                            stringResource(
-                                id = sharedR.string.pro_plan_benefit_rewind_days,
-                                if (isSubscriptionRevampEnabled) 180 else 60
-                            ),
+                            stringResource(id = sharedR.string.pro_plan_benefit_rewind_days, 60),
                             stringResource(id = sharedR.string.pro_plan_benefit_host_calls_unlimited),
                             stringResource(id = sharedR.string.pro_plan_benefit_schedule_rubbish_bin_clearing),
                             stringResource(id = sharedR.string.pro_plan_benefit_priority_support),
@@ -541,6 +548,17 @@ fun getCampaignName(context: Context, discountName: String?, discountPercentage:
         )
     }
 
+/** Aggregate campaign label, e.g. "Mid-year sale: Up to 48% off"; falls back to "Special offer" when unnamed. */
+internal fun getAggregateCampaignName(context: Context, discountName: String?, maxPercentage: Int): String {
+    val name = discountName?.takeUnless { it.isBlank() }
+        ?: context.getString(sharedR.string.subscription_offer_special_offer_badge)
+    return context.getString(
+        sharedR.string.campaign_name_with_discount_up_to,
+        name,
+        maxPercentage,
+    )
+}
+
 @CombinedThemePreviews
 @Composable
 internal fun ChooseAccountScreenPreview(
@@ -624,6 +642,31 @@ internal fun UpgradeAccountScreenSingleOfferPreview() {
                 localisedSubscriptionsList = UpgradeAccountPreviewProvider.singleOfferSubscriptionsList,
                 isSubscriptionFeatureAvailable = true,
                 cheapestSubscriptionAvailable = UpgradeAccountPreviewProvider.subscriptionProLite,
+            ),
+            accountStorageUiState = AccountStorageUIState(
+                baseStorage = 15L * 1024 * 1024 * 1024,
+                totalStorage = 100L * 1024 * 1024 * 1024,
+            ),
+            isNewCreationAccount = false,
+            isUpgradeAccount = false,
+            isSubscriptionRevampEnabled = true,
+            onInAppCheckoutClick = { },
+            onFreePlanClicked = {},
+            maybeLaterClicked = {},
+            onBack = {}
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+internal fun UpgradeAccountScreenMultipleOfferPreview() {
+    AndroidTheme(isSystemInDarkTheme()) {
+        UpgradeAccountScreen(
+            uiState = UpgradeAccountState(
+                localisedSubscriptionsList = UpgradeAccountPreviewProvider.multipleOfferSubscriptionsList,
+                isSubscriptionFeatureAvailable = true,
+                cheapestSubscriptionAvailable = UpgradeAccountPreviewProvider.subscriptionProI,
             ),
             accountStorageUiState = AccountStorageUIState(
                 baseStorage = 15L * 1024 * 1024 * 1024,

@@ -209,6 +209,12 @@ class UpgradeAccountScreenTest {
         subscriptionProIII,
     )
 
+    private val multipleOfferSubscriptionsList = listOf(
+        subscriptionProIOffer,
+        subscriptionProIIOffer,
+        subscriptionProIII,
+    )
+
     @get:Rule
     var composeRule = createComposeRule()
 
@@ -750,20 +756,29 @@ class UpgradeAccountScreenTest {
     }
 
     @Test
-    fun `test that offer highlight falls back to revamp when there are multiple offers`() {
+    fun `test that multiple offers show the offer header without a revamp title`() {
         setContent(
             isSubscriptionRevampEnabled = true,
-            uiState = offerUiState(
-                subscriptions = listOf(
-                    subscriptionProIOffer,
-                    subscriptionProIIOffer,
-                    subscriptionProIII,
-                ),
-            ),
+            uiState = offerUiState(subscriptions = multipleOfferSubscriptionsList),
         )
 
-        composeRule.onNodeWithTag(TEST_TAG_OFFER_PRICE_CARD).assertDoesNotExist()
-        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_OFFER_HEADER_BADGE).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_REVAMP_TITLE).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that multiple offers render discounted plans inline without a featured card excluded`() {
+        setContent(
+            isSubscriptionRevampEnabled = true,
+            uiState = offerUiState(subscriptions = multipleOfferSubscriptionsList),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag(TEST_TAG_OFFER_PRICE_CARD))
+            .assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_LAZY_COLUMN)
+            .performScrollToNode(hasTestTag("${TEST_TAG_REVAMP_PLAN_CARD}2"))
+            .assertExists()
     }
 
     private fun offerUiState(

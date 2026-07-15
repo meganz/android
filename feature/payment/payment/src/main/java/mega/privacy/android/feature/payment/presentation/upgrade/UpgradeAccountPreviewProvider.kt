@@ -150,5 +150,29 @@ internal class UpgradeAccountPreviewProvider :
             subscriptionProII,
             subscriptionProIII
         )
+
+        private fun LocalisedSubscription.withOffer(
+            discountedMonthly: Float,
+            percentage: Int,
+        ): LocalisedSubscription = copy(
+            monthlySubscription = monthlySubscription?.copy(
+                discountedAmountMonthly = CurrencyAmount(discountedMonthly, Currency("EUR")),
+                discountedPercentage = percentage,
+                offerPeriod = OfferPeriod.Month(12),
+                discountName = "Mid-year sale",
+            ),
+            yearlySubscription = yearlySubscription?.copy(
+                discountedAmountMonthly = CurrencyAmount(discountedMonthly, Currency("EUR")),
+                discountedPercentage = percentage,
+                offerPeriod = OfferPeriod.Month(12),
+                discountName = "Mid-year sale",
+            ),
+        )
+
+        val multipleOfferSubscriptionsList: List<LocalisedSubscription> = listOf(
+            subscriptionProI.withOffer(discountedMonthly = 3.59F, percentage = 28),
+            subscriptionProII.withOffer(discountedMonthly = 6.19F, percentage = 38),
+            subscriptionProIII.withOffer(discountedMonthly = 8.32F, percentage = 48),
+        )
     }
 }

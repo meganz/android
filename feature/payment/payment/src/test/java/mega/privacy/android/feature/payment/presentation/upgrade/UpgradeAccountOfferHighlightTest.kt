@@ -26,23 +26,32 @@ class UpgradeAccountOfferHighlightTest {
     private fun subscription(
         accountType: AccountType,
         discounted: Boolean,
+    ): LocalisedSubscription = subscription(
+        accountType = accountType,
+        discountedMonthly = discounted,
+        discountedYearly = discounted,
+    )
+
+    private fun subscription(
+        accountType: AccountType,
+        discountedMonthly: Boolean,
+        discountedYearly: Boolean,
     ): LocalisedSubscription {
-        val discount = if (discounted) CurrencyAmount(4.99F, Currency("EUR")) else null
-        fun option(transfer: Int) = Subscription(
+        fun option(transfer: Int, discounted: Boolean) = Subscription(
             sku = "${accountType.name}_$transfer",
             accountType = accountType,
             handle = accountType.ordinal.toLong(),
             storage = 2048,
             transfer = transfer,
             amount = CurrencyAmount(9.99F, Currency("EUR")),
-            discountedAmountMonthly = discount,
+            discountedAmountMonthly = if (discounted) CurrencyAmount(4.99F, Currency("EUR")) else null,
             discountedPercentage = if (discounted) 50 else null,
             offerPeriod = if (discounted) OfferPeriod.Month(12) else null,
             discountName = if (discounted) "Black Friday" else null,
         )
         return LocalisedSubscription(
-            monthlySubscription = option(2048),
-            yearlySubscription = option(24576),
+            monthlySubscription = option(2048, discountedMonthly),
+            yearlySubscription = option(24576, discountedYearly),
             localisedPriceCurrencyCode = priceMapper,
             formattedSize = sizeMapper,
         )
@@ -85,17 +94,41 @@ class UpgradeAccountOfferHighlightTest {
     }
 
     @Test
-    fun `test that offerHighlight excludes the current recurring plan`() {
+    fun `test that offerHighlight is Multiple for both periods when only yearly plans are discounted`() {
+        val first = subscription(
+            AccountType.PRO_I,
+            discountedMonthly = false,
+            discountedYearly = true,
+        )
+        val second = subscription(
+            AccountType.PRO_II,
+            discountedMonthly = false,
+            discountedYearly = true,
+        )
+        val state = state(first, second)
+
+        assertThat(state.offerHighlight(isMonthly = false, isUpgradeAccount = false))
+            .isEqualTo(OfferHighlight.Multiple(listOf(first, second)))
+        // Multiple persists across periods so the promotional header stays visible even when the
+        // selected period (monthly) has no discounted cards.
+        assertThat(state.offerHighlight(isMonthly = true, isUpgradeAccount = false))
+            .isEqualTo(OfferHighlight.Multiple(listOf(first, second)))
+    }
+
+    @Test
+    fun `test that offerHighlight excludes the current recurring plan on its own period`() {
         val current = subscription(AccountType.PRO_I, discounted = true)
-        val other = subscription(AccountType.PRO_II, discounted = true)
         val result = UpgradeAccountState(
-            localisedSubscriptionsList = listOf(current, other),
+            localisedSubscriptionsList = listOf(
+                current,
+                subscription(AccountType.PRO_II, discounted = false),
+            ),
             isSubscriptionFeatureAvailable = true,
             currentSubscriptionPlan = AccountType.PRO_I,
             subscriptionCycle = AccountSubscriptionCycle.YEARLY,
             subscriptionStatus = SubscriptionStatus.VALID,
         ).offerHighlight(isMonthly = false, isUpgradeAccount = true)
 
-        assertThat(result).isEqualTo(OfferHighlight.Single(other))
+        assertThat(result).isEqualTo(OfferHighlight.None)
     }
 }

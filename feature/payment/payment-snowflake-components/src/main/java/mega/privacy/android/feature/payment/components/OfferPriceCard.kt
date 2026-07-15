@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.SpannedText
+import mega.android.core.ui.components.button.BrandFilledButton
 import mega.android.core.ui.components.button.PrimaryFilledButton
 import mega.android.core.ui.model.MegaSpanStyle
 import mega.android.core.ui.model.SpanIndicator
@@ -47,6 +48,7 @@ import mega.privacy.android.icon.pack.IconPack
  * @param onBuyClick called when the buy button is tapped
  * @param monthlyPriceText the per-month price shown above the yearly total (e.g. "€4.99/month"),
  * null for monthly plans
+ * @param useBrandButton when true, renders the brand (red) buy button instead of the primary one
  */
 @Composable
 fun OfferPriceCard(
@@ -61,6 +63,7 @@ fun OfferPriceCard(
     onBuyClick: () -> Unit,
     modifier: Modifier = Modifier,
     monthlyPriceText: String? = null,
+    useBrandButton: Boolean = false,
 ) {
     val cardShape = RoundedCornerShape(16.dp)
     Box(
@@ -69,6 +72,10 @@ fun OfferPriceCard(
             .border(
                 width = 1.dp,
                 color = DSTokens.colors.border.strong,
+                shape = cardShape,
+            )
+            .background(
+                color = DSTokens.colors.brand.containerDefault,
                 shape = cardShape,
             )
             .clip(cardShape)
@@ -134,13 +141,23 @@ fun OfferPriceCard(
                     modifier = Modifier.testTag(TEST_TAG_OFFER_PRICE_CARD_TRANSFER),
                 )
             }
-            PrimaryFilledButton(
-                text = buyButtonText,
-                onClick = onBuyClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(TEST_TAG_OFFER_PRICE_CARD_BUTTON),
-            )
+            if (useBrandButton) {
+                BrandFilledButton(
+                    text = buyButtonText,
+                    onClick = onBuyClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TEST_TAG_OFFER_PRICE_CARD_BUTTON),
+                )
+            } else {
+                PrimaryFilledButton(
+                    text = buyButtonText,
+                    onClick = onBuyClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TEST_TAG_OFFER_PRICE_CARD_BUTTON),
+                )
+            }
         }
         DiscountBadge(
             text = discountBadgeText,
@@ -177,11 +194,11 @@ private fun OfferPriceCardMonthlyPreview() {
             planName = "Pro I",
             priceText = "€4.99/month",
             originalPriceText = "€9.99",
-            discountDescriptionText = "Discount price for the first 12 months",
+            discountDescriptionText = "Billed at €4.99/month for the first year, €9.99/month after",
             discountBadgeText = "Black Friday · 50% off",
             storageText = "2 TB cloud storage",
             transferText = "2 TB transfer",
-            buyButtonText = "Get Pro I for €4.99/month",
+            buyButtonText = "Get Pro I",
             onBuyClick = {},
             modifier = Modifier.padding(16.dp),
         )
@@ -194,15 +211,35 @@ private fun OfferPriceCardYearlyPreview() {
     AndroidTheme(isSystemInDarkTheme()) {
         OfferPriceCard(
             planName = "Pro I",
-            priceText = "€59.88 charged yearly",
+            priceText = "€59.88/year",
             originalPriceText = "€120",
-            discountDescriptionText = "Discount price for the first 12 months",
+            discountDescriptionText = "Billed at €59.88 for the first year, €120 charged yearly after",
             discountBadgeText = "Black Friday · 50% off",
             storageText = "2 TB cloud storage",
             transferText = "2 TB transfer",
-            buyButtonText = "Get Pro I for €59.88",
+            buyButtonText = "Get Pro I",
             onBuyClick = {},
             monthlyPriceText = "€4.99/month",
+            modifier = Modifier.padding(16.dp),
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun OfferPriceCardBrandButtonPreview() {
+    AndroidTheme(isSystemInDarkTheme()) {
+        OfferPriceCard(
+            planName = "Pro I",
+            priceText = "€4.99/month",
+            originalPriceText = "€9.99",
+            discountDescriptionText = "Billed at €4.99/month for the first year, €9.99/month after",
+            discountBadgeText = "Black Friday · 50% off",
+            storageText = "2 TB cloud storage",
+            transferText = "2 TB transfer",
+            buyButtonText = "Get Pro I",
+            onBuyClick = {},
+            useBrandButton = true,
             modifier = Modifier.padding(16.dp),
         )
     }

@@ -2896,6 +2896,8 @@
     <string name="video_player_subtitles_add_subtitles_button">Add subtitle</string>
     <!-- Campaign name format with a localised label from the SDK. %1$s is the localised campaign label provided by the API, %2$d is the discount percentage. -->
     <string name="campaign_name_with_discount">%1$s: %2$d%% off</string>
+    <!-- Aggregate campaign name shown in the header when several plans are discounted at once. %1$s is the campaign label (the localised label from the SDK, or the default "Special offer" when none is provided), %2$d is the highest discount percentage across the discounted plans. -->
+    <string name="campaign_name_with_discount_up_to">%1$s: Up to %2$d%% off</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_confirmation_title">Discard scan?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->
@@ -3119,6 +3121,8 @@
     <string name="subscription_revamp_price_per_month">%1$s/month</string>
     <!-- Total amount charged yearly on a plan card on the redesigned subscription page. Placeholder is the total price, e.g. "€29.94". -->
     <string name="subscription_revamp_charged_yearly">%1$s charged yearly</string>
+    <!-- Discounted yearly price shown on a discount offer card. Placeholder is the discounted yearly total, e.g. "€59.88". Shown as "€59.88/year" to avoid looking like a recurring price. -->
+    <string name="subscription_revamp_price_per_year">%1$s/year</string>
     <!-- Savings label shown on the Yearly option of the billing period selector on the redesigned subscription page -->
     <string name="subscription_revamp_save_label">Save up to 16%</string>
     <!-- Buy button label on a plan card on the redesigned subscription page. Placeholder is the plan name, e.g. "Pro I". -->
@@ -3182,6 +3186,26 @@
     <plurals name="subscription_offer_discount_period_year">
         <item quantity="one">Discount price for the first year</item>
         <item quantity="other">Discount price for the first %1$d years</item>
+    </plurals>
+    <!-- Discount explanation on a discounted YEARLY plan card when the offer lasts a number of months. %1$d is the number of months, %2$s is the discounted yearly price (e.g. "€59.88"), %3$s is the original yearly price (e.g. "€120"). -->
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="one">Billed at %2$s for the first month, %3$s charged yearly after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d months, %3$s charged yearly after</item>
+    </plurals>
+    <!-- Discount explanation on a discounted YEARLY plan card when the offer lasts a number of years. %1$d is the number of years, %2$s is the discounted yearly price (e.g. "€59.88"), %3$s is the original yearly price (e.g. "€120"). -->
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="one">Billed at %2$s for the first year, %3$s charged yearly after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d years, %3$s charged yearly after</item>
+    </plurals>
+    <!-- Discount explanation on a discounted MONTHLY plan card when the offer lasts a number of months. %1$d is the number of months, %2$s is the discounted per-month price (e.g. "€4.99/month"), %3$s is the original per-month price (e.g. "€9.99/month"). -->
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="one">Billed at %2$s for the first month, %3$s after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d months, %3$s after</item>
+    </plurals>
+    <!-- Discount explanation on a discounted MONTHLY plan card when the offer lasts a number of years. %1$d is the number of years, %2$s is the discounted per-month price (e.g. "€4.99/month"), %3$s is the original per-month price (e.g. "€9.99/month"). -->
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="one">Billed at %2$s for the first year, %3$s after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d years, %3$s after</item>
     </plurals>
     <!-- Days unit label on the offer countdown timer. %1$d is the number of days shown above the label. -->
     <plurals name="subscription_offer_countdown_days">

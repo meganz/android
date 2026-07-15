@@ -1,26 +1,19 @@
 package mega.privacy.android.feature.payment.model
 
 /**
- * How the active discount offer(s) should be highlighted on the upgrade screen for the currently
- * selected billing period. Computed from [UpgradeAccountState] (see `UpgradeAccountState.offerHighlight`).
- *
- * This is the single extension point for the discount-display designs: the screen
- * dispatches on this type exhaustively, so adding the multiple-offer layout is a localized change —
- * split the [Multiple] branch and the compiler flags every site that must handle it.
+ * How active discount offer(s) are highlighted on the upgrade screen. The screen dispatches on this
+ * exhaustively (see `UpgradeAccountState.offerHighlight`).
  */
 sealed interface OfferHighlight {
-    /** No purchasable discount offer for the selected period; render the standard content. */
+    /** No discount offer; render the standard content. */
     data object None : OfferHighlight
 
-    /**
-     * Exactly one discounted plan — shown as a featured [LocalisedSubscription] with a promotional
-     * header (Figma 9925-20171). This is the case implemented today.
-     */
+    /** A single discounted plan, featured on top and excluded from the list (Figma 9925-20171). */
     data class Single(val subscription: LocalisedSubscription) : OfferHighlight
 
     /**
-     * More than one discounted plan (Figma 10286-9598). Not yet implemented; currently falls back to
-     * the standard revamp layout. When the dedicated layout is built, handle this branch instead.
+     * Multiple discounted plans, all rendered inline with a shared header (Figma 10286-9598).
+     * [subscriptions] are the plans carrying the campaign in either period.
      */
     data class Multiple(val subscriptions: List<LocalisedSubscription>) : OfferHighlight
 }

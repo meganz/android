@@ -40,9 +40,8 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * The single [LocalisedSubscription]s that carry an active discount for [isMonthly] and are not the
- * user's current plan. A discount is "single-offer" when this list has exactly one entry (see
- * [singleOfferOrNull]); multiple offers use a different design that is out of scope for now.
+ * The [LocalisedSubscription]s that carry an active discount for [isMonthly] and are not the user's
+ * current plan. See [offerHighlight] for how the count of offers across periods selects the layout.
  */
 internal fun UpgradeAccountState.offerPlansFor(
     isMonthly: Boolean,
@@ -53,18 +52,27 @@ internal fun UpgradeAccountState.offerPlansFor(
 }
 
 /**
- * Classifies the active offers for [isMonthly] into an [OfferHighlight]. Exactly one offer produces
- * [OfferHighlight.Single] (implemented today); more than one produces [OfferHighlight.Multiple]
- * (reserved for the future multi-offer design). The screen dispatches on the result exhaustively.
+ * Classifies active offers: more than one discounted plan in either period -> [OfferHighlight.Multiple]
+ * (persists across the Monthly/Yearly toggle); a single plan for [isMonthly] -> [OfferHighlight.Single];
+ * none -> [OfferHighlight.None].
  */
 internal fun UpgradeAccountState.offerHighlight(
     isMonthly: Boolean,
     isUpgradeAccount: Boolean,
-): OfferHighlight = with(offerPlansFor(isMonthly, isUpgradeAccount)) {
-    when (size) {
-        0 -> OfferHighlight.None
-        1 -> OfferHighlight.Single(first())
-        else -> OfferHighlight.Multiple(this)
+): OfferHighlight {
+    val offerTypesAnyPeriod = (offerPlansFor(isMonthly = true, isUpgradeAccount) +
+            offerPlansFor(isMonthly = false, isUpgradeAccount))
+        .map { it.accountType }
+        .distinct()
+    if (offerTypesAnyPeriod.size > 1) {
+        val plans = localisedSubscriptionsList.filter { it.accountType in offerTypesAnyPeriod }
+        return OfferHighlight.Multiple(plans)
+    }
+    return with(offerPlansFor(isMonthly, isUpgradeAccount)) {
+        when (size) {
+            0 -> OfferHighlight.None
+            else -> OfferHighlight.Single(first())
+        }
     }
 }
 
@@ -87,22 +95,26 @@ internal fun LazyListScope.subscriptionOfferContent(
     onPricingPageClick: () -> Unit,
 ) {
     item("offer_header") {
+        val subscription = offerSubscription.getSubscription(isMonthly)
         OfferHeader(
-            offerSubscription = offerSubscription,
-            isMonthly = isMonthly,
-            context = context,
+            campaignText = getCampaignName(
+                context = context,
+                discountName = subscription?.discountName,
+                discountPercentage = subscription?.discountedPercentage ?: 0,
+            ),
             offerValidUntil = uiState.offerValidUntil,
             locale = locale,
         )
     }
 
     item("offer_featured_card") {
-        OfferFeaturedCard(
+        OfferPlanCardItem(
             offerSubscription = offerSubscription,
             isMonthly = isMonthly,
             context = context,
             locale = locale,
             onInAppCheckoutClick = onInAppCheckoutClick,
+            featured = true,
         )
     }
 
@@ -156,15 +168,106 @@ internal fun LazyListScope.subscriptionOfferContent(
     }
 }
 
+/**
+ * Multiple-offer subscription page (Figma 10286-9598 / 10311-24214): a promotional header followed by
+ * every plan inline — none featured on top or excluded. Each plan is a discounted [OfferPriceCard]
+ * when the selected period has a discount, otherwise a plain [PlanPriceCard].
+ */
+internal fun LazyListScope.subscriptionMultipleOfferContent(
+    uiState: UpgradeAccountState,
+    isMonthly: Boolean,
+    onMonthlyChange: (Boolean) -> Unit,
+    locale: Locale,
+    context: Context,
+    isUpgradeAccount: Boolean,
+    onInAppCheckoutClick: (Subscription) -> Unit,
+    onSubscriptionUnavailableLearnMoreClick: () -> Unit,
+    onPricingPageClick: () -> Unit,
+) {
+    item("offer_header") {
+        val discountedSubscriptions = uiState.localisedSubscriptionsList
+            .flatMap { listOfNotNull(it.monthlySubscription, it.yearlySubscription) }
+            .filter { it.discountedPercentage != null }
+        val maxPercentage =
+            discountedSubscriptions.maxOfOrNull { it.discountedPercentage ?: 0 } ?: 0
+        val campaignName = discountedSubscriptions.firstNotNullOfOrNull { it.discountName }
+        OfferHeader(
+            campaignText = getAggregateCampaignName(
+                context = context,
+                discountName = campaignName,
+                maxPercentage = maxPercentage,
+            ),
+            offerValidUntil = uiState.offerValidUntil,
+            locale = locale,
+        )
+    }
+
+    whyGoProItem(uiState)
+
+    currentPlanItem(uiState, locale, isUpgradeAccount, onPricingPageClick)
+
+    if (uiState.isSubscriptionFeatureAvailable == false) {
+        subscriptionUnavailableContent(onLearnMoreClick = onSubscriptionUnavailableLearnMoreClick)
+        return
+    }
+
+    item("offer_billing_period") {
+        BillingPeriodSelector(
+            isMonthly = isMonthly,
+            onPeriodSelected = onMonthlyChange,
+            monthlyLabel = stringResource(sharedR.string.subscription_type_monthly),
+            yearlyLabel = stringResource(sharedR.string.subscription_type_yearly),
+            saveLabel = stringResource(sharedR.string.subscription_revamp_save_label),
+        )
+    }
+
+    if (uiState.localisedSubscriptionsList.isEmpty() || uiState.isSubscriptionFeatureAvailable != true) {
+        upgradeAccountSkeleton(itemCount = 3)
+    } else {
+        val plans = uiState.localisedSubscriptionsList
+            .filter { it.hasSubscriptionFor(isMonthly) }
+            .filterNot { subscription ->
+                isCurrentRecurringPlan(
+                    uiState = uiState,
+                    subscriptionAccountType = subscription.accountType,
+                    isMonthly = isMonthly,
+                    isUpgradeAccount = isUpgradeAccount,
+                )
+            }
+        itemsIndexed(
+            plans,
+            key = { _, subscription -> subscription.accountType.name }
+        ) { index, subscription ->
+            val hasOffer = subscription.getSubscription(isMonthly)?.discountedAmountMonthly != null
+            if (hasOffer) {
+                OfferPlanCardItem(
+                    offerSubscription = subscription,
+                    isMonthly = isMonthly,
+                    context = context,
+                    locale = locale,
+                    onInAppCheckoutClick = onInAppCheckoutClick,
+                )
+            } else {
+                PlanPriceCardItem(
+                    uiState = uiState,
+                    subscription = subscription,
+                    index = index,
+                    isMonthly = isMonthly,
+                    locale = locale,
+                    isUpgradeAccount = isUpgradeAccount,
+                    onInAppCheckoutClick = onInAppCheckoutClick,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun OfferHeader(
-    offerSubscription: LocalisedSubscription,
-    isMonthly: Boolean,
-    context: Context,
+    campaignText: String,
     offerValidUntil: Long?,
     locale: Locale,
 ) {
-    val subscription = offerSubscription.getSubscription(isMonthly) ?: return
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -183,11 +286,7 @@ private fun OfferHeader(
             modifier = Modifier.testTag(TEST_TAG_OFFER_HEADER_TITLE),
         )
         MegaText(
-            text = getCampaignName(
-                context = context,
-                discountName = subscription.discountName,
-                discountPercentage = subscription.discountedPercentage ?: 0,
-            ),
+            text = campaignText,
             style = MaterialTheme.typography.headlineSmall,
             textColor = TextColor.Primary,
             modifier = Modifier.testTag(TEST_TAG_OFFER_HEADER_CAMPAIGN),
@@ -225,19 +324,33 @@ private fun OfferCountdownSection(validUntil: Long?, locale: Locale) {
         days = days.toString().padStart(2, '0'),
         hours = hours.toString().padStart(2, '0'),
         minutes = minutes.toString().padStart(2, '0'),
-        daysLabel = pluralStringResource(sharedR.plurals.subscription_offer_countdown_days, days.toInt()),
-        hoursLabel = pluralStringResource(sharedR.plurals.subscription_offer_countdown_hours, hours.toInt()),
-        minutesLabel = pluralStringResource(sharedR.plurals.subscription_offer_countdown_minutes, minutes.toInt()),
+        daysLabel = pluralStringResource(
+            sharedR.plurals.subscription_offer_countdown_days,
+            days.toInt()
+        ),
+        hoursLabel = pluralStringResource(
+            sharedR.plurals.subscription_offer_countdown_hours,
+            hours.toInt()
+        ),
+        minutesLabel = pluralStringResource(
+            sharedR.plurals.subscription_offer_countdown_minutes,
+            minutes.toInt()
+        ),
     )
 }
 
+/**
+ * Renders [offerSubscription] as a discounted [OfferPriceCard]. Used for the single-offer featured
+ * card and the inline multiple-offer cards.
+ */
 @Composable
-private fun OfferFeaturedCard(
+private fun OfferPlanCardItem(
     offerSubscription: LocalisedSubscription,
     isMonthly: Boolean,
     context: Context,
     locale: Locale,
     onInAppCheckoutClick: (Subscription) -> Unit,
+    featured: Boolean = false,
 ) {
     val subscription = offerSubscription.getSubscription(isMonthly) ?: return
     val planName = stringResource(offerSubscription.accountType.toUIAccountType().textValue)
@@ -254,30 +367,48 @@ private fun OfferFeaturedCard(
     )
 
     val discountedMonthly =
-        offerSubscription.localiseDiscountedPriceMonthlyCurrencyCode(locale, isMonthly)?.price.orEmpty()
+        offerSubscription.localiseDiscountedPriceMonthlyCurrencyCode(
+            locale,
+            isMonthly
+        )?.price.orEmpty()
     val discountedYearly =
-        offerSubscription.localiseDiscountedPriceYearlyCurrencyCode(locale, isMonthly)?.price.orEmpty()
+        offerSubscription.localiseDiscountedPriceYearlyCurrencyCode(
+            locale,
+            isMonthly
+        )?.price.orEmpty()
+
+    val originalPrice = offerSubscription.localisePriceCurrencyCode(locale, isMonthly).price
 
     val priceText: String
-    val buyPriceText: String
     val monthlyPriceText: String?
+    val billedDiscountedPrice: String
+    val billedOriginalPrice: String
     if (isMonthly) {
-        priceText = stringResource(sharedR.string.subscription_revamp_price_per_month, discountedMonthly)
-        buyPriceText = priceText
+        priceText =
+            stringResource(sharedR.string.subscription_revamp_price_per_month, discountedMonthly)
         monthlyPriceText = null
+        billedDiscountedPrice = priceText
+        billedOriginalPrice =
+            stringResource(sharedR.string.subscription_revamp_price_per_month, originalPrice)
     } else {
-        priceText = stringResource(sharedR.string.subscription_revamp_charged_yearly, discountedYearly)
-        buyPriceText = discountedYearly
+        priceText =
+            stringResource(sharedR.string.subscription_revamp_price_per_year, discountedYearly)
         monthlyPriceText =
             stringResource(sharedR.string.subscription_revamp_price_per_month, discountedMonthly)
+        billedDiscountedPrice = discountedYearly
+        billedOriginalPrice = originalPrice
     }
-    val originalPriceText = offerSubscription.localisePriceCurrencyCode(locale, isMonthly).price
 
     OfferPriceCard(
         planName = planName,
         priceText = priceText,
-        originalPriceText = originalPriceText,
-        discountDescriptionText = discountDescription(subscription.offerPeriod),
+        originalPriceText = originalPrice,
+        discountDescriptionText = billedDescription(
+            offerPeriod = subscription.offerPeriod,
+            isMonthly = isMonthly,
+            discountedPrice = billedDiscountedPrice,
+            originalPrice = billedOriginalPrice,
+        ),
         discountBadgeText = getCampaignName(
             context = context,
             discountName = subscription.discountName,
@@ -286,32 +417,51 @@ private fun OfferFeaturedCard(
         storageText = storageText,
         transferText = transferText,
         buyButtonText = stringResource(
-            sharedR.string.subscription_offer_get_plan_button,
-            planName,
-            buyPriceText,
+            sharedR.string.subscription_revamp_get_plan_button,
+            planName
         ),
         onBuyClick = { onInAppCheckoutClick(subscription) },
         monthlyPriceText = monthlyPriceText,
+        useBrandButton = featured,
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
 }
 
+/**
+ * Discount explanation, e.g. "Billed at €59.88 for the first year, €120 charged yearly after". The
+ * wording is tailored to the billing period ([isMonthly]) and the offer duration; a 12-month offer
+ * reads as "the first year".
+ */
 @Composable
-private fun discountDescription(offerPeriod: OfferPeriod?): String = when (offerPeriod) {
-    is OfferPeriod.Month -> pluralStringResource(
-        sharedR.plurals.subscription_offer_discount_period_month,
-        offerPeriod.value,
-        offerPeriod.value,
-    )
-
-    is OfferPeriod.Year -> pluralStringResource(
-        sharedR.plurals.subscription_offer_discount_period_year,
-        offerPeriod.value,
-        offerPeriod.value,
-    )
-
-    null -> ""
+private fun billedDescription(
+    offerPeriod: OfferPeriod?,
+    isMonthly: Boolean,
+    discountedPrice: String,
+    originalPrice: String,
+): String {
+    val (count, inYears) = normalizeOfferPeriod(offerPeriod) ?: return ""
+    val plural = when {
+        isMonthly && inYears -> sharedR.plurals.subscription_offer_billed_monthly_years
+        isMonthly -> sharedR.plurals.subscription_offer_billed_monthly_months
+        inYears -> sharedR.plurals.subscription_offer_billed_yearly_years
+        else -> sharedR.plurals.subscription_offer_billed_yearly_months
+    }
+    return pluralStringResource(plural, count, count, discountedPrice, originalPrice)
 }
+
+/**
+ * Normalises an [OfferPeriod] to a (count, inYears) pair, collapsing whole-year month spans (e.g.
+ * 12 months) to years so a one-year offer reads as "year" rather than "12 months". Null for no offer.
+ */
+private fun normalizeOfferPeriod(offerPeriod: OfferPeriod?): Pair<Int, Boolean>? =
+    when (offerPeriod) {
+        is OfferPeriod.Year -> offerPeriod.value to true
+        is OfferPeriod.Month ->
+            if (offerPeriod.value % 12 == 0) (offerPeriod.value / 12) to true
+            else offerPeriod.value to false
+
+        null -> null
+    }
 
 /**
  * Test tag for the single-offer header badge
