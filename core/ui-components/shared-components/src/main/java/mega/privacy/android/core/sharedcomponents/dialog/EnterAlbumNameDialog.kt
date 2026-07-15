@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.photos.presentation.albums.dialog
+package mega.privacy.android.core.sharedcomponents.dialog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,8 +15,12 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.shared.resources.R as sharedResR
 
+/**
+ * Dialog prompting the user for an album name. Shared across features that create albums
+ * (e.g. the Photos albums screen and the Home "Do more with MEGA" widget).
+ */
 @Composable
-internal fun EnterAlbumNameDialog(
+fun EnterAlbumNameDialog(
     onConfirm: (String) -> Unit,
     onDismiss: () -> Unit,
     resetErrorMessage: () -> Unit,
@@ -70,7 +74,7 @@ internal fun EnterAlbumNameDialog(
 
 @CombinedThemePreviews
 @Composable
-private fun AddNewAlbumDialogPreview() {
+private fun EnterAlbumNameDialogPreview() {
     AndroidThemeForPreviews {
         EnterAlbumNameDialog(
             onConfirm = {},

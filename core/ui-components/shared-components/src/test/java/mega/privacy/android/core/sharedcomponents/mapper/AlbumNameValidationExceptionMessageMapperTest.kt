@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.photos.mapper
+package mega.privacy.android.core.sharedcomponents.mapper
 
 import android.content.Context
 import com.google.common.truth.Truth.assertThat
@@ -92,4 +92,3 @@ class AlbumNameValidationExceptionMessageMapperTest {
         assertThat(underTest(exception)).isEqualTo(expected)
     }
 }
-

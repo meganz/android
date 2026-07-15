@@ -1,4 +1,4 @@
-package mega.privacy.android.feature.photos.mapper
+package mega.privacy.android.core.sharedcomponents.mapper
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext

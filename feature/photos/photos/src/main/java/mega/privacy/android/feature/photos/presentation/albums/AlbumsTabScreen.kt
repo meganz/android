@@ -44,7 +44,7 @@ import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
-import mega.privacy.android.feature.photos.presentation.albums.dialog.EnterAlbumNameDialog
+import mega.privacy.android.core.sharedcomponents.dialog.EnterAlbumNameDialog
 import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbumConfirmationDialog
 import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
 import mega.privacy.android.shared.resources.R as sharedR
