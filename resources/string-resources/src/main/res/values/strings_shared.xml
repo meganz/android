@@ -3242,4 +3242,9 @@
     <string name="home_do_more_with_mega_album_created_message">Album “%1$s” created</string>
     <!-- Snackbar action that opens the newly created album -->
     <string name="home_do_more_with_mega_see_album_action">See album</string>
+    <!-- Title shown in the Android system share sheet preview when sharing several links at once, telling the user how many links are being shared. %1$d is the number of links -->
+    <plurals name="general_share_link_count_title">
+        <item quantity="one">%1$d link</item>
+        <item quantity="other">%1$d links</item>
+    </plurals>
 </resources>
