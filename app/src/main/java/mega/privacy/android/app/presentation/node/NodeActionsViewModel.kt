@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.FileNodeContent
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.backup.BackupNodeType
@@ -51,6 +52,7 @@ import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -59,7 +61,9 @@ import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 import java.io.File
@@ -111,6 +115,8 @@ class NodeActionsViewModel @Inject constructor(
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
     private val fileTypeInfoMapper: FileTypeInfoMapper,
     private val isHiddenNodesOnboardedUseCase: IsHiddenNodesOnboardedUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getShareFolderSensitiveWarningUseCase: GetShareFolderSensitiveWarningUseCase,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : ViewModel() {
 
@@ -609,6 +615,60 @@ class NodeActionsViewModel @Inject constructor(
     fun resetAddVideoToPlaylistResultEvent() {
         _state.update {
             it.copy(addVideoToPlaylistResultEvent = consumed())
+        }
+    }
+
+    /**
+     * Called when the user chooses to share the folder(s) with contacts. On the Compose picker
+     * path ([AppFeatures.ContactsComposeUI]) a hidden/sensitive-node warning is shown first when
+     * needed; the legacy picker warns itself, so no warning is surfaced here for it.
+     */
+    fun verifyShareFolder(nodeHandles: List<Long>) {
+        viewModelScope.launch {
+            val isComposeContactsPicker = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)
+            }.getOrDefault(false)
+            val warning = if (isComposeContactsPicker) {
+                runCatching {
+                    getShareFolderSensitiveWarningUseCase(nodeHandles.map { NodeId(it) })
+                }.getOrDefault(SensitiveNodeShareWarning.None)
+            } else {
+                SensitiveNodeShareWarning.None
+            }
+            if (warning == SensitiveNodeShareWarning.None) {
+                _state.update {
+                    it.copy(shareFolderPickerEvent = triggered(nodeHandles))
+                }
+            } else {
+                _state.update {
+                    it.copy(
+                        shareHiddenNodeWarningEvent = triggered(
+                            nodeHandles to (warning == SensitiveNodeShareWarning.Folders)
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Called when the user confirms the hidden/sensitive-node warning; proceeds to the picker.
+     */
+    fun shareHiddenNodeWarningConfirmed(nodeHandles: List<Long>) {
+        _state.update {
+            it.copy(shareFolderPickerEvent = triggered(nodeHandles))
+        }
+    }
+
+    fun markShareHiddenNodeWarningEventConsumed() {
+        _state.update {
+            it.copy(shareHiddenNodeWarningEvent = consumed())
+        }
+    }
+
+    fun markShareFolderPickerEventConsumed() {
+        _state.update {
+            it.copy(shareFolderPickerEvent = consumed())
         }
     }
 }

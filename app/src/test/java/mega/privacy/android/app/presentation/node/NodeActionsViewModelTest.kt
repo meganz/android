@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
+import mega.privacy.android.domain.entity.node.SensitiveNodeShareWarning
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.exception.node.ForeignNodeException
@@ -53,6 +54,7 @@ import mega.privacy.android.domain.usecase.account.SetCopyLatestTargetPathUseCas
 import mega.privacy.android.domain.usecase.account.SetMoveLatestTargetPathUseCase
 import mega.privacy.android.domain.usecase.chat.AttachMultipleNodesUseCase
 import mega.privacy.android.domain.usecase.chat.Get1On1ChatIdUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsUseCase
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionUseCase
 import mega.privacy.android.domain.usecase.node.CopyNodesUseCase
@@ -61,7 +63,9 @@ import mega.privacy.android.domain.usecase.node.GetNodeContentUriUseCase
 import mega.privacy.android.domain.usecase.node.GetNodePreviewFileUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesUseCase
 import mega.privacy.android.domain.usecase.node.backup.CheckBackupNodeTypeUseCase
+import mega.privacy.android.domain.usecase.node.hiddennode.GetShareFolderSensitiveWarningUseCase
 import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersMapper
+import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -79,6 +83,7 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.util.stream.Stream
@@ -119,6 +124,9 @@ class NodeActionsViewModelTest {
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val fileTypeInfoMapper = mock<FileTypeInfoMapper>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
+    private val getShareFolderSensitiveWarningUseCase =
+        mock<GetShareFolderSensitiveWarningUseCase>()
 
     private fun initViewModel() {
         viewModel = NodeActionsViewModel(
@@ -146,7 +154,9 @@ class NodeActionsViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getBusinessStatusUseCase = getBusinessStatusUseCase,
             fileTypeInfoMapper = fileTypeInfoMapper,
-            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase
+            isHiddenNodesOnboardedUseCase = isHiddenNodesOnboardedUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase = getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -181,7 +191,9 @@ class NodeActionsViewModelTest {
             monitorAccountDetailUseCase,
             getBusinessStatusUseCase,
             fileTypeInfoMapper,
-            isHiddenNodesOnboardedUseCase
+            isHiddenNodesOnboardedUseCase,
+            getFeatureFlagValueUseCase,
+            getShareFolderSensitiveWarningUseCase,
         )
     }
 
@@ -630,6 +642,114 @@ class NodeActionsViewModelTest {
 
             viewModel.resetAddVideoToPlaylistResultEvent()
             assertThat(awaitItem().addVideoToPlaylistResultEvent).isEqualTo(consumed())
+        }
+    }
+
+    @Test
+    fun `test that verifyShareFolder triggers the picker event without a sensitive check when the ContactsComposeUI flag is off`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(false)
+
+            viewModel.verifyShareFolder(listOf(1L, 2L))
+            advanceUntilIdle()
+
+            verifyNoInteractions(getShareFolderSensitiveWarningUseCase)
+            viewModel.state.test {
+                assertThat(awaitItem().shareFolderPickerEvent)
+                    .isEqualTo(triggered(listOf(1L, 2L)))
+            }
+        }
+
+    @Test
+    fun `test that verifyShareFolder triggers the picker event when the warning is None`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L))))
+                .thenReturn(SensitiveNodeShareWarning.None)
+
+            viewModel.verifyShareFolder(listOf(1L))
+            advanceUntilIdle()
+
+            viewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.shareFolderPickerEvent).isEqualTo(triggered(listOf(1L)))
+                assertThat(state.shareHiddenNodeWarningEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that verifyShareFolder triggers the warning event instead of the picker when the warning is Folder`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L))))
+                .thenReturn(SensitiveNodeShareWarning.Folder)
+
+            viewModel.verifyShareFolder(listOf(1L))
+            advanceUntilIdle()
+
+            viewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent)
+                    .isEqualTo(triggered(listOf(1L) to false))
+                assertThat(state.shareFolderPickerEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that verifyShareFolder triggers the warning event with the plural flag when the warning is Folders`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+            whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L), NodeId(2L))))
+                .thenReturn(SensitiveNodeShareWarning.Folders)
+
+            viewModel.verifyShareFolder(listOf(1L, 2L))
+            advanceUntilIdle()
+
+            viewModel.state.test {
+                val state = awaitItem()
+                assertThat(state.shareHiddenNodeWarningEvent)
+                    .isEqualTo(triggered(listOf(1L, 2L) to true))
+                assertThat(state.shareFolderPickerEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that shareHiddenNodeWarningConfirmed triggers the picker event`() = runTest {
+        viewModel.shareHiddenNodeWarningConfirmed(listOf(1L))
+
+        viewModel.state.test {
+            assertThat(awaitItem().shareFolderPickerEvent).isEqualTo(triggered(listOf(1L)))
+        }
+    }
+
+    @Test
+    fun `test that markShareHiddenNodeWarningEventConsumed resets the warning event`() = runTest {
+        whenever(getFeatureFlagValueUseCase(AppFeatures.ContactsComposeUI)).thenReturn(true)
+        whenever(getShareFolderSensitiveWarningUseCase(listOf(NodeId(1L))))
+            .thenReturn(SensitiveNodeShareWarning.Folder)
+        viewModel.verifyShareFolder(listOf(1L))
+        advanceUntilIdle()
+
+        viewModel.markShareHiddenNodeWarningEventConsumed()
+
+        viewModel.state.test {
+            assertThat(awaitItem().shareHiddenNodeWarningEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
+    }
+
+    @Test
+    fun `test that markShareFolderPickerEventConsumed resets the picker event`() = runTest {
+        viewModel.shareHiddenNodeWarningConfirmed(listOf(1L))
+
+        viewModel.markShareFolderPickerEventConsumed()
+
+        viewModel.state.test {
+            assertThat(awaitItem().shareFolderPickerEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
         }
     }
 }

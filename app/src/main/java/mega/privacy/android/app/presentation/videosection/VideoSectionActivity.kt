@@ -18,6 +18,9 @@ import androidx.compose.material.SnackbarResult
 import androidx.compose.material.navigation.rememberBottomSheetNavigator
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
@@ -88,6 +91,7 @@ import mega.privacy.android.feature.sync.data.mapper.ListToStringWithDelimitersM
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.MegaNavigator
+import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.buttons.MegaFloatingActionButton
 import mega.privacy.android.shared.original.core.ui.controls.images.MegaIcon
@@ -186,6 +190,9 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
             val navHostController = rememberNavController(bottomSheetNavigator)
             val uiState by videoSectionViewModel.state.collectAsStateWithLifecycle()
             val tabState by videoSectionViewModel.tabState.collectAsStateWithLifecycle()
+            var shareHiddenNodeWarning by remember {
+                mutableStateOf<Pair<List<Long>, Boolean>?>(null)
+            }
 
             val isPlaylistsTab = tabState.selectedTab == VideoSectionTab.Playlists
             val isUserPlaylistDetail =
@@ -367,6 +374,31 @@ class VideoSectionActivity : PasscodeActivity(), ActionNodeCallback {
                         }
                     }
                 )
+
+                EventEffect(
+                    event = nodeActionState.shareHiddenNodeWarningEvent,
+                    onConsumed = nodeActionsViewModel::markShareHiddenNodeWarningEventConsumed,
+                    action = { warning -> shareHiddenNodeWarning = warning }
+                )
+
+                EventEffect(
+                    event = nodeActionState.shareFolderPickerEvent,
+                    onConsumed = nodeActionsViewModel::markShareFolderPickerEventConsumed,
+                    action = { handles ->
+                        bottomSheetActionHandler.launchShareFolderPicker(handles)
+                    }
+                )
+
+                shareHiddenNodeWarning?.let { (handles, sharingMultipleFolders) ->
+                    ShareHiddenNodeWarningDialog(
+                        sharingMultipleFolders = sharingMultipleFolders,
+                        onConfirm = {
+                            shareHiddenNodeWarning = null
+                            nodeActionsViewModel.shareHiddenNodeWarningConfirmed(handles)
+                        },
+                        onCancel = { shareHiddenNodeWarning = null },
+                    )
+                }
             }
         }
         setupCollectFlow()

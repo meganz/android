@@ -27,6 +27,9 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
  * @property clearAll clear All Event
  * @property infoToShowEvent Info to show event
  * @property addVideoToPlaylistResultEvent Add video to playlist result event
+ * @property shareHiddenNodeWarningEvent Hidden/sensitive-node share warning event. Carries the
+ * handles of the folders being shared and whether multiple folders are involved.
+ * @property shareFolderPickerEvent Launch the add-contacts picker for the given folder handles
  */
 data class NodeActionState(
     val selectedNodes: List<TypedNode> = emptyList(),
@@ -43,4 +46,6 @@ data class NodeActionState(
     val clearAll: StateEvent = consumed,
     val infoToShowEvent: StateEventWithContent<InfoToShow?> = consumed(),
     val addVideoToPlaylistResultEvent: StateEventWithContent<AddVideoToPlaylistResult> = consumed(),
+    val shareHiddenNodeWarningEvent: StateEventWithContent<Pair<List<Long>, Boolean>> = consumed(),
+    val shareFolderPickerEvent: StateEventWithContent<List<Long>> = consumed(),
 )

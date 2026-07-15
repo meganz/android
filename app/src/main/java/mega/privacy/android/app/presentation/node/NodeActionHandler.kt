@@ -166,6 +166,14 @@ class NodeActionHandler(
     }
 
     private fun launchShareFolder(nodeHandles: List<Long>) {
+        nodeActionsViewModel.verifyShareFolder(nodeHandles)
+    }
+
+    /**
+     * Opens the add-contacts picker for the given folder handles. Call only once any
+     * hidden/sensitive-node share warning has been resolved; [launchShareFolder] runs that check.
+     */
+    fun launchShareFolderPicker(nodeHandles: List<Long>) {
         shareFolderActivityLauncher?.let { launcher ->
             activity.megaNavigator.openAddContactToShare(
                 context = activity,
