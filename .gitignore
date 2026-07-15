@@ -97,6 +97,7 @@ replay_pid*
 .claude/settings.local.json
 /.claude/temp
 /.claude/skills/ht-*/
+/.claude/skills/release-checklist/local-constants.md
 ./review.md
 review.md
 .trees
