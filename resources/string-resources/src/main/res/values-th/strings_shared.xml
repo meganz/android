@@ -2158,7 +2158,7 @@
     <string name="pdf_viewer_error_no_network">ไม่มีการเชื่อมต่อกับเครือข่าย กรุณาเชื่อมต่อใหม่เพื่อเปิดไฟล์</string>
     <string name="open_link_dialog_title">เปิดลิงก์</string>
     <string name="open_link_dialog_hint">https://mega.nz/&#8230;</string>
-    <string name="new_text_file_invalid_extension_error_message">กรุณาใช้นามสกุลไฟล์ที่ถูกต้อง เช่น .txt .md หรือ .xml</string>
+    <string name="new_text_file_invalid_extension_error_message">กรุณาใช้ส่วนขยายไฟล์ข้อความที่ถูกต้อง เช่น .txt .md หรือ .xml</string>
     <string name="link_decryption_key_dialog_message">ใส่คีย์เพื่อเปิดลิงก์นี้\nหากไม่มีคีย์ กรุณาติดต่อเจ้าของลิงก์</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2488,13 +2488,48 @@
     <string name="document_scanner_capture_button">จับภาพ</string>
     <string name="share_link_set_password">ตั้งรหัสผ่าน</string>
     <string name="document_scanner_auto_capture_label">อัตโนมัติ</string>
-    <string name="share_link_settings_title">การตั้งค่าลิงก์</string>
-    <string name="share_link_set_expiry_date">กำหนดวันหมดอายุ</string>
-    <string name="share_link_expiry_subtitle">ปิดใช้งานการระบุวันที่ในลิงก์</string>
+    <string name="share_link_settings_title">ตั้งค่าลิงก์</string>
+    <string name="share_link_set_expiry_date">ตั้งวันหมดอายุ</string>
+    <string name="share_link_expiry_subtitle">ปิดใช้งานลิงก์ตามวันที่กำหนด</string>
     <string name="share_link_password_subtitle">จำกัดการเข้าถึงด้วยรหัสผ่าน</string>
-    <string name="settings_sorting_and_view_mode_title">เรียงลําดับและโหมดมุมมอง</string>
-    <string name="settings_sorting_preference_title">กำหนดลักษณะการจัดเรียง</string>
-    <string name="settings_view_mode_preference_title">กำหนดลักษณะโหมดมุมมอง</string>
-    <string name="settings_preference_option_per_folder">ต่อโฟลเดอร์</string>
-    <string name="settings_preference_option_all_folders">เหมือนกันทั้งหมด</string>
+    <string name="settings_sorting_and_view_mode_title">การจัดเรียงและโหมดมุมมอง</string>
+    <string name="settings_sorting_preference_title">วิธีจัดเรียงที่ต้องการ</string>
+    <string name="settings_view_mode_preference_title">โหมดมุมมองที่ต้องการ</string>
+    <string name="settings_preference_option_per_folder">แยกตามโฟลเดอร์</string>
+    <string name="settings_preference_option_all_folders">เหมือนกันทุกโฟลเดอร์</string>
+    <string name="document_scanner_auto_capture_on">เปิดใช้งานการจับภาพอัตโนมัติ</string>
+    <string name="document_scanner_auto_capture_off">ปิดใช้งานการจับภาพอัตโนมัติ</string>
+    <string name="settings_sorting_preference_description">ตั้งค่าการจัดเรียงแยกตามโฟลเดอร์ หรือใช้การจัดเรียงรูปแบบเดียวกันกับทุกโฟลเดอร์</string>
+    <string name="settings_view_mode_preference_description">ตั้งค่าโหมดมุมมองแยกตามโฟลเดอร์ หรือใช้โหมดมุมมองรูปแบบเดียวกันกับทุกโฟลเดอร์</string>
+    <string name="password_strength_very_weak">คาดเดาได้ง่ายมาก</string>
+    <string name="password_strength_weak">รหัสผ่านคาดเดาง่าย</string>
+    <string name="password_strength_medium">ปานกลาง</string>
+    <string name="password_strength_good">คาดเดาได้ยาก</string>
+    <string name="password_strength_strong">รหัสผ่านคาดเดายาก</string>
+    <string name="document_scanner_review_title">ตรวจสอบรายการสแกน</string>
+    <string name="document_scanner_review_empty">ยังไม่ได้สแกนหน้าใด ๆ เลย</string>
+    <string name="document_scanner_review_delete_page">ลบหน้านี้</string>
+    <string name="document_scanner_review_retake_page">สแกนใหม่</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">อัปเกรดการสมัครใช้งานปัจจุบันได้ที่ [A]หน้าแสดงราคา[/A] ของเรา</string>
+    <string name="add_tags_placeholder_label">#ใส่แท็ก</string>
+    <string name="subscription_offer_special_offer_badge">ข้อเสนอพิเศษ</string>
+    <string name="subscription_offer_get_plan_button">เลือก %1$s ในราคาเพียง %2$s</string>
+    <string name="subscription_offer_countdown_valid_until">ใช้งานได้ถึง %1$s</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="other">ราคาพิเศษสำหรับ %1$d เดือนแรก</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="other">ราคาพิเศษสำหรับ %1$d ปีแรก</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="other">วัน</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="other">ชั่วโมง</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="other">นาที</item>
+    </plurals>
+    <string name="password_placeholder">กรอกรหัสผ่าน</string>
+    <string name="new_chat_title">แชทใหม่</string>
 </resources>

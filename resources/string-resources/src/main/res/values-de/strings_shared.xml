@@ -2589,7 +2589,14 @@
     <string name="settings_sorting_preference_title">Spaltensortierung</string>
     <string name="settings_sorting_preference_description">Ordnerspezifische Spaltensortierung oder identische Einstellung für alle Ordner.</string>
     <string name="settings_view_mode_preference_title">Ordnerdarstellung</string>
-    <string name="settings_view_mode_preference_description">Ordnerspezifische Ansicht (Liste oder Thumbnails) oder identische Einstellung für alle Ordner.</string>
+    <string name="settings_view_mode_preference_description">Ordnerspezifische Ansicht oder identische Einstellung für alle Ordner.</string>
     <string name="settings_preference_option_per_folder">Ordnerspezifisch</string>
-    <string name="settings_preference_option_all_folders">Alle Ordner</string>
+    <string name="settings_preference_option_all_folders">Für alle identisch</string>
+    <string name="password_strength_strong">Starkes Passwort</string>
+    <string name="password_strength_very_weak">Sehr schwach</string>
+    <string name="password_strength_weak">Schwaches Passwort</string>
+    <string name="password_strength_medium">Mittel</string>
+    <string name="password_strength_good">Gut</string>
+    <string name="password_placeholder">Passwort eingeben</string>
+    <string name="new_chat_title">Neuer Chat</string>
 </resources>

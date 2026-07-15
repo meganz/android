@@ -909,11 +909,11 @@
     <!-- chat message when a participant left a group chat -->
     <string name="message_participant_left_group_chat">[A]%1$s[/A][B] saiu do chat de grupo[/B]</string>
     <!-- chat message alert when the message have to been manually -->
-    <string name="manual_retry_alert">A mensagem não foi enviada. Toque para ver as opções.</string>
+    <string name="manual_retry_alert">A mensagem não foi enviada. Toque para ver as opções</string>
     <!-- Chat alert of an attachment message when the upload is in progress but the queue of transfers is paused. -->
     <string name="manual_resume_alert">Transferências pausadas. Toque para continuar.</string>
     <!-- message shown when the status of the user coudn’t be changed -->
-    <string name="changing_status_error">Erro. O seu status não foi atualizado.</string>
+    <string name="changing_status_error">Erro. O seu status não foi atualizado</string>
     <!-- message shown when a chat has not been created -->
     <string name="create_chat_error">Aconteceu um erro ao criar do chat</string>
     <!-- settings of the chat to choose the status -->
@@ -1133,7 +1133,7 @@
     <!-- Message when an user avatar has been changed successfully -->
     <string name="success_changing_user_avatar">Foto de perfil atualizada</string>
     <!-- Message when an error ocurred when changing an user avatar -->
-    <string name="error_changing_user_avatar_image_not_available">Erro. A imagem selecionada não existe.</string>
+    <string name="error_changing_user_avatar_image_not_available">Erro. A imagem selecionada não existe</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar">Erro ao modificar a foto de perfil</string>
     <!-- Message when an user avatar has been deleted successfully -->
@@ -1897,7 +1897,7 @@
     <!-- Label for observers of a group chat -->
     <string name="observers_chat_label">Expectadores</string>
     <!-- Message on the title of the chat screen if there were any error loading the chat link without logging -->
-    <string name="error_chat_link_init_error">Ocorreu um erro ao inicializar o chat, no momento de carregar o link do chat</string>
+    <string name="error_chat_link_init_error">Ocorreu um erro ao inicializar o chat, no momento de carregar o link do chat.</string>
     <!-- Text shown when a moderator changes the chat to private. Please keep the placeholder because is to show the moderator’s name in runtime. -->
     <string name="message_set_chat_private">[A]%1$s[/A][B] ativou a rotação da chave de criptografia.[/B]</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2387,7 +2387,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Você não tem a permissão necessária para corrigir este arquivo. Você quer criar um novo arquivo?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">A versão foi criada como um novo arquivo.</string>
+    <string name="version_as_new_file_created">A versão foi criada como um novo arquivo</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">em %1$s</string>
     <!-- Download location label -->
@@ -4229,7 +4229,7 @@
     <!-- The select time dialog in schedule meeting -->
     <string name="meetings_schedule_meeting_enter_time_title_dialog">Digite a hora</string>
     <!-- Notification description for scheduled meetings that starts in 15 minutes -->
-    <string name="notification_sched_meeting_starts_15_minutes">A reunião começa em 15 minutos.</string>
+    <string name="notification_sched_meeting_starts_15_minutes">A reunião começa em 15 minutos</string>
     <!-- Notification description for scheduled meetings that starts now -->
     <string name="notification_sched_meeting_starts_now">A reunião está começando</string>
     <!-- Title for the Album Link share with decryption key separated dialog -->
@@ -4290,9 +4290,9 @@
     <string name="meetings_schedule_meeting_recurrence_monthly_label">Mensal</string>
     <!-- Text of the description when the user establishes a monthly recurrence, informing that some months do not have 29 or 30 or 31 days -->
     <plurals name="meetings_schedule_meeting_recurrence_monthly_description">
-        <item quantity="one">Alguns meses não têm dia %1$d. Nestes meses, o agendamento será no último dia do mês.</item>
-        <item quantity="many">Alguns meses não têm dia %1$d. Nestes meses, o agendamento será no último dia do mês.</item>
-        <item quantity="other">Alguns meses não têm dia %1$d. Nestes meses, o agendamento será no último dia do mês.</item>
+        <item quantity="one">Alguns meses não têm %1$d dia. Nestes meses, o agendamento será no último dia do mês.</item>
+        <item quantity="many">Alguns meses não têm %1$d dias. Nestes meses, o agendamento será no último dia do mês.</item>
+        <item quantity="other">Alguns meses não têm %1$d dias. Nestes meses, o agendamento será no último dia do mês.</item>
     </plurals>
     <!-- Title of the dialog, shown for disputed or taken down folder. The dialog will be shown, when user will try to open folder, which was taken down  -->
     <string name="dialog_taken_down_folder_title">Não foi possível abrir a pasta</string>
@@ -4651,12 +4651,12 @@
     <!-- Message after selected albums are deleted (singular) -->
     <string name="photos_album_deleted_message_singular">“%s” foi deletado</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit a participant to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting -->
-    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s está esperando para entrar em “%2$s”</string>
+    <string name="meetings_waiting_room_admit_user_to_call_outside_call_screen_dialog_message">%1$s está esperando para entrar em “%2$s”.</string>
     <!-- Descriptive text in the dialogue, outside the call screen, to admit several participants to the call. The first placeholder indicates the name of the participant in the waiting room and the second placeholder indicates the name of the meeting. -->
     <plurals name="meetings_waiting_room_admit_users_to_call_outside_call_screen_dialog_message">
-        <item quantity="one">%1$d participante está esperando para entrar em “%2$s“</item>
-        <item quantity="many">%1$d de participantes estão esperando para entrar em “%2$s“</item>
-        <item quantity="other">%1$d participantes estão esperando para entrar em “%2$s“</item>
+        <item quantity="one">%1$d participante está esperando para entrar em “%2$s”.</item>
+        <item quantity="many">%1$d de participantes estão esperando para entrar em “%2$s”.</item>
+        <item quantity="other">%1$d participantes estão esperando para entrar em “%2$s”.</item>
     </plurals>
     <!-- Title of video option of snapshot-->
     <string name="media_player_video_option_snapshot_title">Capturar</string>
@@ -4727,7 +4727,7 @@
     <!-- Label indicating that a participant is presenting in the main view of the call -->
     <string name="meetings_meeting_screen_main_view_participant_is_presenting_label">%1$s está apresentando</string>
     <!-- Warning indicating that a participant is sharing the screen-->
-    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Esta pessoa está compartilhando a tela.</string>
+    <string name="meetings_meeting_screen_main_view_participant_is_sharing_screen_warning">Esta pessoa está compartilhando a tela</string>
     <!-- Message of the snackbar displayed when call recording has started. The placeholder is for the name of who started the recording -->
     <string name="meetings_call_recording_started_snackbar_message">%1$s começou a gravar</string>
     <!-- Message of the snackbar displayed when call recording has stopped. The placeholder is for the name of who stopped the recording -->
@@ -4813,7 +4813,7 @@
     <!-- Camera uploads no internet info in Photos screen. -->
     <string name="photos_camera_uploads_no_internet">O upload foi pausado por falta de conexão à Internet</string>
     <!-- Camera uploads low battery info in Photos screen. -->
-    <string name="photos_camera_uploads_low_battery">O upload foi pausado porque a bateria há menos de %1$d%% de bateria</string>
+    <string name="photos_camera_uploads_low_battery">O upload foi pausado porque há menos de %1$d%% de bateria</string>
     <!-- Camera uploads general issue info in Photos screen. -->
     <string name="photos_camera_uploads_general_issue">Os uploads da câmera pararam de funcionar - tente ativá-los novamente. Se o problema persistir,entre em contato com o Suporte em https://mega.nz/support</string>
     <!-- Camera uploads pending info in Photos screen. -->

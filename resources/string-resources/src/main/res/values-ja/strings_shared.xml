@@ -2148,7 +2148,7 @@
     <string name="text_editor_fast_scroll_line_tooltip">%1$d 行目</string>
     <string name="select_videos_search_empty_view_description">クラウドドライブ内の動画を検索</string>
     <string name="folder_link_unavailable_tos_violation">このフォルダリンクは当社のご利用規約に違反するため、削除されました。</string>
-    <string name="new_text_file_invalid_extension_error_message">有効なファイル拡張子を使用してください（例：.txt、.md、または.xml）</string>
+    <string name="new_text_file_invalid_extension_error_message">有効なテキストファイル拡張子を使用してください（例：.txt、.md、または.xml）</string>
     <string name="link_decryption_key_dialog_title">復号キーを入力してください</string>
     <string name="link_decryption_key_dialog_error_invalid_key">復号キーが無効です</string>
     <string name="link_decryption_key_dialog_message">このリンクを開くにはキーを入力してください。\nお持ちでない場合は、リンク所有者に連絡してください。</string>
@@ -2510,4 +2510,36 @@
     <string name="settings_view_mode_preference_description">フォルダごとに表示モードを適用するか、すべてのフォルダに同じ表示モードを適用できます。</string>
     <string name="settings_preference_option_per_folder">フォルダごと</string>
     <string name="settings_preference_option_all_folders">すべてのフォルダに同じ</string>
+    <string name="document_scanner_review_title">スキャンの確認</string>
+    <string name="document_scanner_review_empty">まだスキャンされたページがありません</string>
+    <string name="document_scanner_review_delete_page">ページを削除</string>
+    <string name="document_scanner_review_retake_page">再スキャン</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">弊社の[A]料金ページ[/A]で、現在のご契約プランをアップグレードできます。</string>
+    <string name="add_tags_placeholder_label">#タグを追加</string>
+    <string name="subscription_offer_special_offer_badge">特別オファー</string>
+    <string name="subscription_offer_get_plan_button">%2$sで%1$sを購入</string>
+    <string name="subscription_offer_countdown_valid_until">有効期限：%1$s</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="other">最初の%1$dか月は割引価格</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="other">最初の%1$d年は割引価格</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="other">日</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="other">時間</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="other">分</item>
+    </plurals>
+    <string name="password_strength_very_weak">非常に弱い</string>
+    <string name="password_strength_weak">弱いパスワード</string>
+    <string name="password_strength_medium">普通</string>
+    <string name="password_strength_good">強い</string>
+    <string name="password_strength_strong">強力なパスワード</string>
+    <string name="password_placeholder">パスワードを入力</string>
+    <string name="new_chat_title">新しいチャット</string>
+    <string name="create_group_chat_link_requires_name_error">チャットリンクを取得するには、グループ名を入力してください。</string>
 </resources>

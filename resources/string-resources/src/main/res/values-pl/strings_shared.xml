@@ -2333,7 +2333,7 @@
     <string name="select_videos_search_empty_view_description">Wyszukaj filmy w swoim dysku w chmurze</string>
     <string name="link_decryption_key_dialog_title">Wprowadź klucz deszyfrujący</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Nieprawidłowy klucz</string>
-    <string name="new_text_file_invalid_extension_error_message">Użyj prawidłowego rozszerzenia pliku (np. .txt, .md lub .xml)</string>
+    <string name="new_text_file_invalid_extension_error_message">Użyj prawidłowego rozszerzenia pliku tekstowego (np. .txt, .md lub .xml)</string>
     <string name="link_decryption_key_dialog_message">Wprowadź klucz, aby otworzyć ten link.\nNie masz go? Skontaktuj się z właścicielem linku.</string>
     <string name="upload_bottom_sheet_action_upload_files">Wgraj pliki</string>
     <string name="upload_bottom_sheet_action_upload_folder">Wgraj katalog</string>
@@ -2798,4 +2798,51 @@
     <string name="settings_view_mode_preference_description">Zastosuj tryb widoku dla każdego folderu, lub użyj tego samego trybu widoku dla wszystkich folderów.</string>
     <string name="settings_preference_option_per_folder">Za folder</string>
     <string name="settings_preference_option_all_folders">To samo dla wszystkich</string>
+    <string name="document_scanner_review_title">Przejrzyj skan</string>
+    <string name="document_scanner_review_empty">Nie zeskanowano jeszcze żadnych stron</string>
+    <string name="document_scanner_review_delete_page">Usuń stronę</string>
+    <string name="document_scanner_review_retake_page">Powtórz</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Zaktualizuj swoją bieżącą subskrypcję na naszej [A]stronie z cennikiem[/A]</string>
+    <string name="add_tags_placeholder_label">#Dodaj tagi</string>
+    <string name="subscription_offer_special_offer_badge">Oferta specjalna</string>
+    <string name="subscription_offer_get_plan_button">Wybierz %1$s za %2$s</string>
+    <string name="subscription_offer_countdown_valid_until">ważne do %1$s</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="one">Cena promocyjna na pierwszy miesiąc</item>
+        <item quantity="few">Cena promocyjna na pierwsze %1$d miesięce</item>
+        <item quantity="many">Cena promocyjna na pierwsze %1$d miesięcy</item>
+        <item quantity="other">Cena promocyjna na pierwsze %1$d miesięcy</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="one">Cena promocyjna na pierwszy rok</item>
+        <item quantity="few">Cena promocyjna na pierwsze %1$d lata</item>
+        <item quantity="many">Cena promocyjna na pierwsze %1$d lat</item>
+        <item quantity="other">Cena promocyjna na pierwsze %1$d lat</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="one">Dzień</item>
+        <item quantity="few">Dni</item>
+        <item quantity="many">Dni</item>
+        <item quantity="other">Dni</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="one">Godzina</item>
+        <item quantity="few">Godziny</item>
+        <item quantity="many">Godzin</item>
+        <item quantity="other">Godzin</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="one">Minuta</item>
+        <item quantity="few">Minuty</item>
+        <item quantity="many">Minut</item>
+        <item quantity="other">Minut</item>
+    </plurals>
+    <string name="password_strength_very_weak">Bardzo słabe hasło</string>
+    <string name="password_strength_weak">Słabe hasło</string>
+    <string name="password_strength_medium">Średnie hasło</string>
+    <string name="password_strength_good">Dobre hasło</string>
+    <string name="password_strength_strong">Silne hasło</string>
+    <string name="password_placeholder">Wprowadź hasło</string>
+    <string name="new_chat_title">Nowy czat</string>
+    <string name="create_group_chat_link_requires_name_error">Wprowadź nazwę grupy, aby uzyskać link do czatu</string>
 </resources>

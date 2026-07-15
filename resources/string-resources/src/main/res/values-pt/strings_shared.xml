@@ -725,7 +725,7 @@
     <!-- The additional security label in the ads free introduction screen -->
     <string name="payment_ads_free_intro_additional_security_label">MEGA&#160;Pass e MEGA&#160;VPN</string>
     <!-- The additional security description in the ads free introduction screen -->
-    <string name="payment_ads_free_intro_additional_security_description">Adicione senhas e datas de validade para links de arquivos e de pastas.</string>
+    <string name="payment_ads_free_intro_additional_security_description">Torne a sua vida online mais segura, rápida e fácil com o nosso gerenciador de senhas e a nossa VPN de alta velocidade</string>
     <!-- The button text view pro plan in the ads free introduction screen -->
     <string name="payment_ads_free_intro_button_view_pro_plan">Ver os planos Pro</string>
     <!-- Label for call option on settings -->
@@ -865,7 +865,7 @@
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading -->
     <string name="device_center_list_view_item_status_uploading">Enviando&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is currently uploading with a percentage completion -->
-    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% fazendo upload...</string>
+    <string name="device_center_list_view_item_status_uploading_with_progress">%1$d%% fazendo upload&#8230;</string>
     <!-- The name of the Device or Folder Status which signifies that it is inactive -->
     <string name="device_center_list_view_item_status_inactive">Inativo</string>
     <!-- The name of the Device or Folder Status which signifies that some action is needed -->
@@ -893,7 +893,7 @@
     <!--The title of the Email Confirmation page-->
     <string name="email_confirmation_title">Email de confirmação</string>
     <!--The Content of the Email Confirmation page-->
-    <string name="email_confirmation_content">Enviamos um email com um link para [P]%s[/P]. Acesse o link para verificar o seu email e ativar a sua conta.\n\nSe você não tiver recebido o email, verifique a sua pasta de spam ou tente novamente. Para qualquer outro problema, acessse a nossa [A]Central de ajuda[/A]</string>
+    <string name="email_confirmation_content">Enviamos um email com um link para [P]%s[/P]. Acesse o link para verificar o seu email e ativar a sua conta.\n\nSe você não tiver recebido o email, verifique a sua pasta de spam ou tente novamente. Para qualquer outro problema, acesse a nossa [A]Central de ajuda[/A].</string>
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="general_resend_button">Reenviar</string>
     <!-- General change email address -->
@@ -919,7 +919,7 @@
     <!-- Title of the notification displayed when Syncs are stopped due to some sync error -->
     <string name="general_sync_notification_generic_error_title">A sincronização foi interrompida</string>
     <!-- Text of the notification displayed when Syncs are stopped due to some sync error -->
-    <string name="general_sync_notification_generic_error_text">Verifique as suas sincronizações no aplicativo para solucionar</string>
+    <string name="general_sync_notification_generic_error_text">Verifique as suas sincronizações no aplicativo para solucionar.</string>
     <!-- Title of the notification displayed when a Sync has stalled issues -->
     <string name="general_sync_notification_stalled_issues_title">Problemas de sincronização detectados</string>
     <!-- Text of the notification displayed when a Sync has stalled issues -->
@@ -965,7 +965,7 @@
     <!--Sign up page text to ask the user to login if they already have a MEGA account-->
     <string name="sign_up_already_have_account_login_link_text">Já tem uma conta no MEGA? [A]Faça login[/A]</string>
     <!-- Text shown in the fake preview screen -->
-    <string name="transfers_fake_preview_text">Carregando o arquivo...</string>
+    <string name="transfers_fake_preview_text">Carregando o arquivo&#8230;</string>
     <!-- Title or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
     <string name="transfers_cancel_preview_download_warning_title">Cancelar a visualização?</string>
     <!-- Text or a warning, related to cancel a preview download, asking for confirmation before proceeding. -->
@@ -1101,7 +1101,7 @@
     <!-- Title for transfer sharing feature -->
     <string name="pro_plan_feature_transfer_title">Compartilhamento de transferência</string>
     <!-- Description for transfer sharing feature -->
-    <string name="pro_plan_feature_transfer_desc">As pessoas com as quais você compartilhar itens podem usar a sua cota para fazer download e streaming de arquivos.</string>
+    <string name="pro_plan_feature_transfer_desc">As pessoas com as quais você compartilhar itens podem usar a sua cota para fazer download e streaming de arquivos</string>
     <!-- Title for MEGA VPN feature -->
     <string name="pro_plan_feature_vpn_title">MEGA&#160;VPN</string>
     <!-- Description for MEGA VPN feature -->
@@ -1375,7 +1375,7 @@
     <!-- Message displayed when user tries to open a file with a 3rd party app using the option "Open with" but there isn't any app installed in the device which can open that file type, e.g. user tries to open a ".txt" but doesn’t have any installed 3rd party app which supports ".txt" files. -->
     <string name="intent_not_available_file">Parece que não há nenhum aplicativo que suporte este tipo de arquivo instalado neste dispositivo</string>
     <!-- Text to inform the user when an error occurs -->
-    <string name="general_text_error">Ocorreu um erro. Por favor, tente novamente.</string>
+    <string name="general_text_error">Ocorreu um erro, tente novamente</string>
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="general_select_create_folder">Selecione ou crie uma nova pasta</string>
     <!-- Snackbar message when backup is moved to a cloud drive folder -->
@@ -1415,7 +1415,7 @@
     <!-- Step 1: instruction step no.1 to Visit the MEGA website -->
     <string name="account_cancellation_instructions_visit_website_domain_placeholder">1. Acesse [A]https://%1$s[/A] usando um navegador.</string>
     <!-- Text of the Camera Uploads checking uploads banner in Photos -->
-    <string name="camera_uploads_banner_checking_uploads_text">Verificando se há uploads...</string>
+    <string name="camera_uploads_banner_checking_uploads_text">Verificando se há uploads&#8230;</string>
     <!-- Text of the Camera Uploads uploading pending count banner in Photos -->
     <string name="camera_uploads_banner_uploading_pending_count_text">Upload: %d itens restantes</string>
     <!--  when Rename all items action is selected , title of the apply to all dialog  -->
@@ -1637,7 +1637,7 @@
     <!-- Benefit: Rewind up to specified days of deleted data -->
     <string name="pro_plan_benefit_rewind_days">Retroceder até %1$d dias de dados deletados</string>
     <!-- Error message when removing 1 or more public links from nodes. -->
-    <string name="public_link_node_removal_error_message">Não foi possível remover o link. Tente novamente mais tarde.</string>
+    <string name="public_link_node_removal_error_message">Não foi possível remover o link. Tente novamente mais tarde</string>
     <!-- Warning that appears prior to remove links of files-->
     <string name="remove_links_warning_message">Remover um link significa que o seu conteúdo já não vai poder ser acessado de forma pública</string>
     <!-- Success message after removing a share of a folder. a contact has no access to the folder now -->
@@ -1793,9 +1793,9 @@
     <!-- Error message for creating an album with a duplicate name -->
     <string name="album_name_exists_error_message">Já existe um álbum com este nome. Digite outro nome.</string>
     <!-- sentence to detail the permanent awarded text related to VPN achievement -->
-    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Obtenha %1$s de armazenamento grátis ao iniciar o teste gratuito da MEGA&#160;VPN, válido permanentemente.</string>
+    <string name="mega_vpn_achievement_awarded_storage_text_permanent">Obtenha %1$s de armazenamento grátis ao iniciar o teste gratuito da MEGA&#160;VPN, válido permanentemente</string>
     <!-- sentence to detail the permanent awarded text related to PWM achievement -->
-    <string name="mega_pass_achievement_awarded_storage_text_permanent">Obtenha %1$s de armazenamento grátis ao iniciar o teste gratuito do MEGA&#160;Pass, válido permanentemente.</string>
+    <string name="mega_pass_achievement_awarded_storage_text_permanent">Obtenha %1$s de armazenamento grátis ao iniciar o teste gratuito do MEGA&#160;Pass, válido permanentemente</string>
     <!-- sentence to detail the figures of award achievement days left -->
     <plurals name="trial_awarded_achievement_days_left_text">
         <item quantity="one">%1$d dia restante</item>
@@ -1863,7 +1863,7 @@
     <!-- Alert to inform the user that have to be logged in to perform the action -->
     <string name="general_alert_not_logged_in">Você precisa estar logado para realizar esta ação</string>
     <!-- camera uploads limited access -->
-    <string name="timeline_tab_camera_uploads_limited_access">O MEGA tem acesso limitado à sua biblioteca de fotos e não pode fazer backup de todas as suas fotos.</string>
+    <string name="timeline_tab_camera_uploads_limited_access">O MEGA tem acesso limitado à sua biblioteca de fotos e não pode fazer backup de todas as suas fotos</string>
     <!-- menu item -->
     <string name="timeline_tab_file_properties_shared_folder_change_permissions">Alterar permissões</string>
     <!-- Timeline tab screen: Empty state no media found -->
@@ -1925,7 +1925,7 @@
     <!-- Title of the empty screen when there are no items in the root Cloud Drive -->
     <string name="context_empty_cloud_drive_title">Ainda não há nada no seu cofre privado</string>
     <!-- Description of the empty screen when there are no items in the root Cloud Drive or folder -->
-    <string name="context_empty_cloud_drive_description">Mantenha algo seguro com criptografia de conhecimento zero.</string>
+    <string name="context_empty_cloud_drive_description">Mantenha algo seguro com criptografia de conhecimento zero</string>
     <!-- Error shown when trying to confirm an account from a confirmation link and the app is already logged in -->
     <string name="open_link_account_confirmation_error">Você já está logado com outra conta do MEGA. Faça logout e, a continuação, acesse novamente o link de confirmação da conta.</string>
     <!-- error message shown when a chat link is invalid -->
@@ -2058,8 +2058,8 @@
     </plurals>
     <plurals name="alert_remove_several_shares">
         <item quantity="one">Deixar de compartilhar esta pasta?</item>
-        <item quantity="many">Deixar de compartilhar estas pastas?</item>
-        <item quantity="other">Deixar de compartilhar estas pastas?</item>
+        <item quantity="many">Deixar de compartilhar estas %1$d de pastas?</item>
+        <item quantity="other">Deixar de compartilhar estas %1$d pastas?</item>
     </plurals>
     <string name="general_invalid_link">Link inválido. Por favor, tente novamente ou solicite um novo link.</string>
     <string name="can_only_join_one_call_error_message">Para participar dessa chamada, você precisa finalizar a sua chamada atual</string>
@@ -2271,7 +2271,7 @@
     <string name="select_videos_search_empty_view_description">Pesquisar vídeos na sua Nuvem de arquivos</string>
     <string name="link_decryption_key_dialog_title">Digite a chave de decodificação</string>
     <string name="link_decryption_key_dialog_error_invalid_key">Chave de decodificação inválida</string>
-    <string name="new_text_file_invalid_extension_error_message">Use uma extensão de arquivo válida (por exemplo, .txt, .md, ou .xml)</string>
+    <string name="new_text_file_invalid_extension_error_message">Use uma extensão de arquivo de texto válida (por exemplo, .txt, .md, ou .xml)</string>
     <string name="link_decryption_key_dialog_message">Digite a chave para acessar este link.\nNão tem a chave? Entre em contato com o proprietário do link.</string>
     <string name="upload_bottom_sheet_action_upload_files">Fazer upload de arquivos</string>
     <string name="upload_bottom_sheet_action_upload_folder">Fazer upload de pasta</string>
@@ -2701,4 +2701,46 @@
     <string name="settings_view_mode_preference_description">Aplicar as preferências de visualização por pasta ou usar a mesma visualização para todas as pastas.</string>
     <string name="settings_preference_option_per_folder">Por pasta</string>
     <string name="settings_preference_option_all_folders">Igual em todas as pastas</string>
+    <string name="document_scanner_review_title">Revisar escaneado</string>
+    <string name="document_scanner_review_empty">Ainda não há páginas escaneadas</string>
+    <string name="document_scanner_review_delete_page">Deletar página</string>
+    <string name="document_scanner_review_retake_page">Escanear novamente</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Faça upgrade da sua assinatura na nossa [A]página de preços[/A]</string>
+    <string name="add_tags_placeholder_label">#Adicionar etiquetas</string>
+    <string name="password_strength_very_weak">Senha muito fraca</string>
+    <string name="password_strength_weak">Senha fraca</string>
+    <string name="password_strength_medium">Senha média</string>
+    <string name="password_strength_good">Senha forte</string>
+    <string name="password_strength_strong">Senha forte</string>
+    <string name="subscription_offer_special_offer_badge">Oferta especial</string>
+    <string name="subscription_offer_get_plan_button">Obtenha %1$s por %2$s</string>
+    <string name="subscription_offer_countdown_valid_until">válido até %1$s</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="one">Preço com desconto durante o primeiro mês</item>
+        <item quantity="many">Preço com desconto durante os primeiros %1$d de meses</item>
+        <item quantity="other">Preço com desconto durante os primeiros %1$d meses</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="one">Preço com desconto durante o primeiro ano</item>
+        <item quantity="many">Preço com desconto durante os primeiros %1$d de anos</item>
+        <item quantity="other">Preço com desconto durante os primeiros %1$d anos</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="one">dia</item>
+        <item quantity="many">de dias</item>
+        <item quantity="other">dias</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="one">hora</item>
+        <item quantity="many">de horas</item>
+        <item quantity="other">horas</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="one">minuto</item>
+        <item quantity="many">de minutos</item>
+        <item quantity="other">minutos</item>
+    </plurals>
+    <string name="password_placeholder">Digite a senha</string>
+    <string name="new_chat_title">Novo chat</string>
+    <string name="create_group_chat_link_requires_name_error">Digite o nome do grupo para obter um link do chat</string>
 </resources>

@@ -2476,4 +2476,15 @@
     <string name="settings_view_mode_preference_title">Tùy chỉnh chế độ xem</string>
     <string name="settings_preference_option_per_folder">Riêng từng thư mục</string>
     <string name="settings_preference_option_all_folders">Giống nhau hết</string>
+    <string name="document_scanner_auto_capture_on">Tự động chụp: Bật</string>
+    <string name="document_scanner_auto_capture_off">Tự động chụp: Tắt</string>
+    <string name="settings_sorting_preference_description">Áp dụng sắp xếp theo từng thư mục, hoặc sử dụng cùng một cách sắp xếp cho tất cả các thư mục.</string>
+    <string name="settings_view_mode_preference_description">Áp dụng chế độ xem theo từng thư mục, hoặc sử dụng cùng một chế độ xem cho tất cả các thư mục.</string>
+    <string name="password_strength_very_weak">Quá đơn giản</string>
+    <string name="password_strength_weak">Mật khẩu yếu</string>
+    <string name="password_strength_medium">Thường</string>
+    <string name="password_strength_good">Được</string>
+    <string name="password_strength_strong">Mật khẩu mạnh</string>
+    <string name="password_placeholder">Nhập mật khẩu</string>
+    <string name="new_chat_title">Cuộc chat mới</string>
 </resources>

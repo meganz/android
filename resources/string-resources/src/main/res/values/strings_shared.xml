@@ -1739,12 +1739,14 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. 
+    is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. 
+    is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1781,9 +1783,11 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. 
+    is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2856,8 +2860,6 @@
     <string name="home_configuration_widget_my_account_widget_name">My account</string>
     <!-- General new group chat label -->
     <string name="general_new_group_chat">New group chat</string>
-    <!-- Top bar title for the "new chat" contact picker before any contact is selected -->
-    <string name="new_chat_title">New chat</string>
     <!-- Section header in Chat explorer grouping the most recent chats and meetings -->
     <string name="chat_explorer_recent_chats_header">Recent chats and meetings</string>
     <!-- Section header in the Chat explorer grouping every other contact, chat and meeting -->
@@ -3091,8 +3093,6 @@
     <string name="create_group_chat_get_chat_link_label">Get chat link</string>
     <!-- Create group chat: label of the toggle allowing non-host participants to add others -->
     <string name="create_group_chat_allow_add_participants_label">Allow non-hosts to add participants</string>
-    <!-- Create group chat: inline error shown under the group name field when the user enables "Get chat link" without entering a name -->
-    <string name="create_group_chat_link_requires_name_error">Enter a group name to get a chat link</string>
     <!-- Choose folders and files to pin to Home. Used both as the picker's top bar title and as the add button/link on the empty Pinned widget. -->
     <string name="home_pinned_choose_files_and_folders">Choose files &amp; folders</string>
     <!-- Title at the top of the redesigned subscription/upgrade page -->
@@ -3141,18 +3141,6 @@
     <string name="share_link_set_password">Set password</string>
     <!-- Share link revamp: subtitle explaining the "Set password" row -->
     <string name="share_link_password_subtitle">Limit access with a password</string>
-    <!-- Placeholder shown inside an empty password input field, prompting the user to type a password -->
-    <string name="password_placeholder">Enter password</string>
-    <!-- Password strength label shown below a password field when the password is very weak -->
-    <string name="password_strength_very_weak">Very weak password</string>
-    <!-- Password strength label shown below a password field when the password is weak -->
-    <string name="password_strength_weak">Weak password</string>
-    <!-- Password strength label shown below a password field when the password is of medium strength -->
-    <string name="password_strength_medium">Medium password</string>
-    <!-- Password strength label shown below a password field when the password is good -->
-    <string name="password_strength_good">Good password</string>
-    <!-- Password strength label shown below a password field when the password is strong -->
-    <string name="password_strength_strong">Strong password</string>
     <!-- Settings: title of the Sorting and view mode screen -->
     <string name="settings_sorting_and_view_mode_title">Sorting and view mode</string>
     <!-- Settings: title of the sorting preference option -->
@@ -3167,10 +3155,24 @@
     <string name="settings_preference_option_per_folder">Per folder</string>
     <!-- Settings: preference option that uses the same sorting order or view mode for all folders -->
     <string name="settings_preference_option_all_folders">Same for all</string>
+    <!-- Title of the screen where the user reviews the pages they have scanned -->
+    <string name="document_scanner_review_title">Review scan</string>
+    <!-- Message shown on the scan review screen when no pages have been captured yet -->
+    <string name="document_scanner_review_empty">No pages scanned yet</string>
+    <!-- Accessibility description for the button that deletes a scanned page from the review grid -->
+    <string name="document_scanner_review_delete_page">Delete page</string>
+    <!-- Label for the action that re-captures (retakes) a scanned page, replacing it in place -->
+    <string name="document_scanner_review_retake_page">Retake</string>
+    <!-- Hint shown under the current plan card when the user is already on the highest plan, pointing them to the web pricing page to upgrade. [A] and [/A] wrap the "pricing page" link. -->
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Upgrade your current subscription on our [A]pricing page[/A]</string>
+    <!-- placeholder shown inside the add-tags text field, hinting that tags start with a # -->
+    <string name="add_tags_placeholder_label">#Add tags</string>
     <!-- Badge shown above the featured plan on the subscription page when a single discount offer is active -->
     <string name="subscription_offer_special_offer_badge">Special offer</string>
     <!-- Buy button label on the featured offer card. %1$s is the plan name (e.g. "Pro I"), %2$s is the discounted price (e.g. "€4.99/month"). -->
     <string name="subscription_offer_get_plan_button">Get %1$s for %2$s</string>
+    <!-- Caption above the offer countdown timer. %1$s is the expiry date, e.g. "July 11, 2026". -->
+    <string name="subscription_offer_countdown_valid_until">valid until %1$s</string>
     <!-- Discount description on the featured offer card when the offer lasts a number of months. %1$d is the number of months. -->
     <plurals name="subscription_offer_discount_period_month">
         <item quantity="one">Discount price for the first month</item>
@@ -3181,8 +3183,6 @@
         <item quantity="one">Discount price for the first year</item>
         <item quantity="other">Discount price for the first %1$d years</item>
     </plurals>
-    <!-- Caption above the offer countdown timer. %1$s is the expiry date, e.g. "July 11, 2026". -->
-    <string name="subscription_offer_countdown_valid_until">valid until %1$s</string>
     <!-- Days unit label on the offer countdown timer. %1$d is the number of days shown above the label. -->
     <plurals name="subscription_offer_countdown_days">
         <item quantity="one">Day</item>
@@ -3198,16 +3198,20 @@
         <item quantity="one">Minute</item>
         <item quantity="other">Minutes</item>
     </plurals>
-    <!-- Title of the screen where the user reviews the pages they have scanned -->
-    <string name="document_scanner_review_title">Review scan</string>
-    <!-- Message shown on the scan review screen when no pages have been captured yet -->
-    <string name="document_scanner_review_empty">No pages scanned yet</string>
-    <!-- Accessibility description for the button that deletes a scanned page from the review grid -->
-    <string name="document_scanner_review_delete_page">Delete page</string>
-    <!-- Label for the action that re-captures (retakes) a scanned page, replacing it in place -->
-    <string name="document_scanner_review_retake_page">Retake</string>
-    <!-- Hint shown under the current plan card when the user is already on the highest plan, pointing them to the web pricing page to upgrade. [A] and [/A] wrap the "pricing page" link. -->
-    <string name="subscription_revamp_current_plan_upgrade_on_web">Upgrade your current subscription on our [A]pricing page[/A]</string>
-    <!-- placeholder shown inside the add-tags text field, hinting that tags start with a # -->
-    <string name="add_tags_placeholder_label">#Add tags</string>
+    <!-- Password strength label shown below a password field when the password is very weak -->
+    <string name="password_strength_very_weak">Very weak password</string>
+    <!-- Password strength label shown below a password field when the password is weak -->
+    <string name="password_strength_weak">Weak password</string>
+    <!-- Password strength label shown below a password field when the password is of medium strength -->
+    <string name="password_strength_medium">Medium password</string>
+    <!-- Password strength label shown below a password field when the password is good -->
+    <string name="password_strength_good">Good password</string>
+    <!-- Password strength label shown below a password field when the password is strong -->
+    <string name="password_strength_strong">Strong password</string>
+    <!-- Placeholder shown inside an empty password input field, prompting the user to type a password -->
+    <string name="password_placeholder">Enter password</string>
+    <!-- Top bar title for the "new chat" contact picker before any contact is selected -->
+    <string name="new_chat_title">New chat</string>
+    <!-- Create group chat: inline error shown under the group name field when the user enables "Get chat link" without entering a name -->
+    <string name="create_group_chat_link_requires_name_error">Enter a group name to get a chat link</string>
 </resources>

@@ -3951,7 +3951,7 @@
     <!-- Call UI button label for answering with audio only -->
     <string name="calls_answer_audio_button">語音</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">按年計費最多可節省16%</string>
+    <string name="account_upgrade_account_label_save_up_to">年繳最多可省16%</string>
     <!-- Title of label, which will be shown next to the plan, which our app recommends user to purchase. -->
     <string name="account_upgrade_account_pro_plan_info_recommended_label">推薦的</string>
     <!-- Title of label, which will be shown next to the plan user have already purchased. -->

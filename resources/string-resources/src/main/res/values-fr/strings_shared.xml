@@ -2689,4 +2689,15 @@
     <string name="settings_view_mode_preference_title">Préférence du mode d’affichage</string>
     <string name="settings_preference_option_per_folder">Par dossier</string>
     <string name="settings_preference_option_all_folders">Identique pour tous</string>
+    <string name="document_scanner_auto_capture_on">Capture automatique activée</string>
+    <string name="document_scanner_auto_capture_off">Capture automatique désactivée</string>
+    <string name="settings_sorting_preference_description">Appliquer le tri par dossier, ou utiliser le même tri pour tous les dossiers.</string>
+    <string name="settings_view_mode_preference_description">Appliquer le mode d\’affichage par dossier, ou utiliser le même mode d\’affichage pour tous les dossiers.</string>
+    <string name="password_strength_strong">Le mot de passe est robuste</string>
+    <string name="password_strength_very_weak">Très vulnérable</string>
+    <string name="password_strength_weak">Le mot de passe est faible</string>
+    <string name="password_strength_medium">Moyenne</string>
+    <string name="password_strength_good">Bon</string>
+    <string name="password_placeholder">Entrer un mot de passe</string>
+    <string name="new_chat_title">Nouvelle conversation</string>
 </resources>

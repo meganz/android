@@ -1296,7 +1296,7 @@
     <!-- Option in the sliding panel to open the folder which contains the file selected after performing a search -->
     <string name="search_open_location">Konumu aç</string>
     <!-- Item menu option to reproduce audio or video in external reproductors -->
-    <string name="external_play">Şununla aç</string>
+    <string name="external_play">Birlikte aç</string>
     <!-- Context menu item. Allows user to delete file/folder from favourites -->
     <string name="file_properties_unfavourite">Favorilerden kaldır</string>
     <!-- Item menu option upon right click on one or multiple files. -->
@@ -2312,7 +2312,7 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">Yanlış şifre</string>
     <string name="text_editor_fast_scroll_line_tooltip">%1$d. satır</string>
     <string name="select_videos_search_empty_view_description">Bulut depolamanızda video arayın</string>
-    <string name="new_text_file_invalid_extension_error_message">Geçerli bir dosya uzantısı kullanın (örn. .txt, .md ya da .xml)</string>
+    <string name="new_text_file_invalid_extension_error_message">Geçerli bir metin dosyası uzantısı kullanın (örn. .txt, .md ya da .xml)</string>
     <string name="link_decryption_key_dialog_message">Bu bağlantıyı açmak için anahtarı girin.\nAnahtarınız yok mu? Bağlantı sahibiyle iletişime geçin.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2608,4 +2608,41 @@
     <string name="settings_view_mode_preference_description">Görüntüleme modunu klasör bazında uygulayın veya tüm klasörler için aynı görüntüleme modunu kullanın.</string>
     <string name="settings_preference_option_per_folder">Klasör başına</string>
     <string name="settings_preference_option_all_folders">Tümü için aynı</string>
+    <string name="document_scanner_review_title">Taramayı gözden geçir</string>
+    <string name="document_scanner_review_empty">Henüz taranmış sayfa yok</string>
+    <string name="document_scanner_review_delete_page">Sayfayı sil</string>
+    <string name="document_scanner_review_retake_page">Yeniden çek</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Mevcut aboneliğinizi [A]fiyatlandırma sayfamız[/A] üzerinden yükseltin</string>
+    <string name="add_tags_placeholder_label">#Etiket ekle</string>
+    <string name="subscription_offer_special_offer_badge">Özel teklif</string>
+    <string name="subscription_offer_get_plan_button">%2$s fiyatına %1$s alın</string>
+    <string name="subscription_offer_countdown_valid_until">%1$s tarihine kadar geçerli</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="one">İlk ay için indirimli fiyat</item>
+        <item quantity="other">İlk %1$d ay için indirimli fiyat</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="one">İlk yıl için indirimli fiyat</item>
+        <item quantity="other">İlk %1$d yıl için indirimli fiyat</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="one">Gün</item>
+        <item quantity="other">Gün</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="one">Saat</item>
+        <item quantity="other">Saat</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="one">Dakika</item>
+        <item quantity="other">Dakika</item>
+    </plurals>
+    <string name="password_strength_very_weak">Şifre çok zayıf</string>
+    <string name="password_strength_weak">Şifre zayıf</string>
+    <string name="password_strength_medium">Şifre orta</string>
+    <string name="password_strength_good">Şifre iyi</string>
+    <string name="password_strength_strong">Şifre güçlü</string>
+    <string name="password_placeholder">Şifreyi girin</string>
+    <string name="new_chat_title">Yeni sohbet</string>
+    <string name="create_group_chat_link_requires_name_error">Bir sohbet bağlantısı almak için bir grup adı girin</string>
 </resources>

@@ -2225,7 +2225,7 @@
     </plurals>
     <string name="general_title_incoming_shares">Binnenkomende delingen</string>
     <string name="select_videos_search_empty_view_description">Zoek video\’s in uw Cloudopslag</string>
-    <string name="new_text_file_invalid_extension_error_message">Gebruik een geldige bestandsextensie (bijv. .txt, .md of .xml)</string>
+    <string name="new_text_file_invalid_extension_error_message">Gebruik een geldige tekst bestandsextensie (bijv. .txt, .md of .xml)</string>
     <string name="link_decryption_key_dialog_message">Voer de sleutel in om deze link te openen. \nHeeft u hem niet? Neem contact op met de eigenaar van de link.</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2596,9 +2596,50 @@
     <string name="share_link_set_expiry_date">Vervaldatum instellen</string>
     <string name="share_link_expiry_subtitle">De link op een specifieke datum uitschakelen</string>
     <string name="share_link_password_subtitle">Beperk de toegang met een wachtwoord</string>
-    <string name="settings_sorting_and_view_mode_title">Sorteer- en Weergavemodus</string>
+    <string name="settings_sorting_and_view_mode_title">Sorteer- en weergavemodus</string>
     <string name="settings_sorting_preference_title">Sorteer voorkeur</string>
     <string name="settings_view_mode_preference_title">Voorkeur voor weergavemodus</string>
     <string name="settings_preference_option_per_folder">Per map</string>
-    <string name="settings_preference_option_all_folders">Hetzelfde voor Alles</string>
+    <string name="settings_preference_option_all_folders">Hetzelfde voor alles</string>
+    <string name="document_scanner_auto_capture_on">Automatisch vastleggen aan</string>
+    <string name="document_scanner_auto_capture_off">Automatisch vastleggen uit</string>
+    <string name="settings_sorting_preference_description">Pas sortering per map toe, of gebruik dezelfde sortering voor alle mappen.</string>
+    <string name="settings_view_mode_preference_description">Pas weergavemodus per map toe, of gebruik dezelfde weergavemodus voor alle mappen.</string>
+    <string name="password_strength_very_weak">Heel zwak wachtwoord</string>
+    <string name="password_strength_weak">Zwak wachtwoord</string>
+    <string name="password_strength_medium">Gemiddeld wachtwoord</string>
+    <string name="password_strength_good">Goed wachtwoord</string>
+    <string name="password_strength_strong">Sterk wachtwoord</string>
+    <string name="password_placeholder">Wachtwoord invoeren</string>
+    <string name="new_chat_title">Nieuw gesprek</string>
+    <string name="document_scanner_review_title">Scan beoordelen</string>
+    <string name="document_scanner_review_empty">Nog geen pagina\’s gescand</string>
+    <string name="document_scanner_review_delete_page">Pagina verwijderen</string>
+    <string name="document_scanner_review_retake_page">Opnieuw scannen</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Upgrade uw huidige abonnement op onze [A]prijzenpagina[/A]</string>
+    <string name="add_tags_placeholder_label">#Tags toevoegen</string>
+    <string name="subscription_offer_special_offer_badge">Speciale aanbieding</string>
+    <string name="subscription_offer_get_plan_button">Ontvang %1$s voor %2$s</string>
+    <string name="subscription_offer_countdown_valid_until">geldig tot %1$s</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="one">Gereduceerde prijs voor de eerste maand</item>
+        <item quantity="other">Gereduceerde prijs voor de eerste %1$d maanden</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="one">Gereduceerde prijs voor het eerste jaar</item>
+        <item quantity="other">Gereduceerde prijs voor de eerste %1$d jaar</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="one">Dag</item>
+        <item quantity="other">Dagen</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="one">Uur</item>
+        <item quantity="other">Uur</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="one">Minuut</item>
+        <item quantity="other">Minuten</item>
+    </plurals>
+    <string name="create_group_chat_link_requires_name_error">Voer een groepsnaam in om een chatlink te krijgen</string>
 </resources>

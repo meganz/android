@@ -1107,7 +1107,7 @@
     <!-- Maybe later button text in the choose account screen-->
     <string name="choose_account_screen_maybe_later_button_text">稍後</string>
     <!-- Label shown to encourage users to buy yearly plans. The label is shown on Upgrade account screen, where user can choose plan to buy. -->
-    <string name="account_upgrade_account_label_save_up_to">按年計費最多可節省16%</string>
+    <string name="account_upgrade_account_label_save_up_to">年繳最多可省16%</string>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB storage’. -->
     <string name="choose_account_screen_storage_label">%1$s儲存空間</string>
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer, e.g. for LITE ‘1TB transfer’. -->
@@ -1349,7 +1349,7 @@
     <!-- Name for a general label which action is "Select or create new folder" -->
     <string name="sync_snackbar_message_confirm_backup_deleted">備份已停止。資料夾已從MEGA中刪除。</string>
     <!-- Explanation text when choose the local file is selected when conflict issue is resolved -->
-    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA上的檔案將被替換為[A]%1$s。[/A]現有版本將被移到垃圾筒中的同步碎片資料夾。</string>
+    <string name="sync_stalled_issue_choose_local_file_explanation">MEGA上的檔案將被替換為[A]%1$s。[/A]當前版本將移到垃圾筒中的SyncDebris資料夾。</string>
     <!-- Explanation text when choose the remote file is selected when conflict issue is resolved -->
     <string name="sync_stalled_issue_choose_remote_file_explanation">本機檔案[A]%1$s[/A]將被移到.debris資料夾</string>
     <!-- Explanation text when choose the rename file is selected when conflict issue is resolved -->
@@ -1747,7 +1747,7 @@
         <item quantity="other">相簿將會被刪除但裡面的內容將保留在您的時間軸中。</item>
     </plurals>
     <!-- External checkout button text -->
-    <string name="external_checkout_button_text">在我們的網站上購買（最多可節省%1$.0f%%）</string>
+    <string name="external_checkout_button_text">在我們網站上購買（最多可省%1$.0f%%）</string>
     <!-- Explanation text for the album remove link(s) confirmation dialog -->
     <plurals name="album_content_remove_links_dialog_description">
         <item quantity="other">與您共享連結的人將無法存取相簿。</item>
@@ -2164,7 +2164,7 @@
     <string name="pdf_viewer_dialog_error_incorrect_password">密碼錯誤</string>
     <string name="text_editor_fast_scroll_line_tooltip">第%1$d行</string>
     <string name="select_videos_search_empty_view_description">搜尋雲端硬碟中的影片</string>
-    <string name="new_text_file_invalid_extension_error_message">請輸入正確的副檔名（例如.txt、.md、或.xml）</string>
+    <string name="new_text_file_invalid_extension_error_message">使用有效的純文字檔副檔名（例如.txt、.md 或.xml）</string>
     <string name="link_decryption_key_dialog_message">請輸入金鑰以開啟連結。\n若無金鑰，請聯繫連結擁有者。</string>
     <string name="file_info_subtitle_format">%1$s · %2$s</string>
     <string name="label_file_size_petabytes">%s&#160;PB</string>
@@ -2480,7 +2480,7 @@
     <string name="document_scanner_capture_button">拍攝</string>
     <string name="share_link_set_password">設定密碼</string>
     <string name="subscription_revamp_why_go_pro_storage">儲存高達%1$s的資料</string>
-    <string name="subscription_revamp_save_label">最多節省16%</string>
+    <string name="subscription_revamp_save_label">最多可省16%</string>
     <string name="document_scanner_auto_capture_label">自動</string>
     <string name="share_link_settings_title">連結設定</string>
     <string name="share_link_set_expiry_date">設定到期日期</string>
@@ -2492,4 +2492,51 @@
     <string name="settings_preference_option_per_folder">每個資料夾</string>
     <string name="settings_preference_option_all_folders">所有都相同</string>
     <string name="add_contacts_mega_contacts_section_title">MEGA聯絡人</string>
+    <string name="create_group_chat_ekr_explanation">加密金鑰輪替略微更安全，但無法建立聊天連結，新參與者不會看到過去的訊息。</string>
+    <string name="home_pinned_choose_files_and_folders">選取檔案與資料夾</string>
+    <string name="subscription_revamp_title">升級至 MEGA Pro</string>
+    <string name="subscription_revamp_why_go_pro_title">為什麼要升級成為 MEGA Pro？</string>
+    <string name="subscription_revamp_why_go_pro_transfer">享有高達 %1$s 的傳輸配額</string>
+    <string name="subscription_revamp_why_go_pro_vpn">使用 MEGA VPN，線上更安全</string>
+    <string name="subscription_revamp_why_go_pro_pass">使用 MEGA Pass，讓密碼更安全</string>
+    <string name="subscription_revamp_current_plan_cycle_yearly">每年訂閱</string>
+    <string name="subscription_revamp_price_per_month">%1$s/月</string>
+    <string name="subscription_revamp_charged_yearly">%1$s 按年收費</string>
+    <string name="subscription_revamp_get_plan_button">取得 %1$s</string>
+    <string name="document_scanner_auto_capture_on">自動擷取 開啟</string>
+    <string name="document_scanner_auto_capture_off">自動擷取 關閉</string>
+    <string name="settings_sorting_preference_description">對每個資料夾套用排序，或對所有資料夾使用相同排序。</string>
+    <string name="settings_view_mode_preference_description">對每個資料夾套用檢視模式，或對所有資料夾使用相同檢視模式。</string>
+    <string name="add_contacts_phone_contacts_allow_access">允許存取聯絡人</string>
+    <string name="add_contacts_phone_contacts_select">選取手機聯絡人</string>
+    <string name="password_strength_very_weak">非常弱</string>
+    <string name="password_strength_weak">低強度密碼</string>
+    <string name="password_strength_medium">普通</string>
+    <string name="password_strength_good">好</string>
+    <string name="password_strength_strong">高強度密碼</string>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="other">分</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="other">小時</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="other">天</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="other">前%1$d年的折扣價格</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="other">前%1$d個月的折扣價格</item>
+    </plurals>
+    <string name="subscription_offer_countdown_valid_until">有效期限至%1$s</string>
+    <string name="subscription_offer_get_plan_button">以%2$s購買%1$s</string>
+    <string name="subscription_offer_special_offer_badge">特別優惠</string>
+    <string name="add_tags_placeholder_label">#新增標籤</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">請前往我們的[A]定價頁面[/A]升級您目前的訂閱方案</string>
+    <string name="document_scanner_review_retake_page">重新拍攝</string>
+    <string name="document_scanner_review_delete_page">刪除頁面</string>
+    <string name="document_scanner_review_empty">尚未掃描任何頁面</string>
+    <string name="password_placeholder">輸入密碼</string>
+    <string name="new_chat_title">新的對話</string>
 </resources>

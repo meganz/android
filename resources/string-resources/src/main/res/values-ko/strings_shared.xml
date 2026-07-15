@@ -2139,7 +2139,7 @@
     <string name="link_decryption_key_dialog_title">복호화 키를 입력하세요</string>
     <string name="link_decryption_key_dialog_error_invalid_key">잘못된 복호화 키</string>
     <string name="link_decryption_key_dialog_message">이 링크를 열려면 키를 입력하세요.\n가지고 있지 않나요? 링크 소유자에게 연락하세요.</string>
-    <string name="new_text_file_invalid_extension_error_message">유효한 파일 확장자를 쓰세요 (예: .txt, .md, or .xml)</string>
+    <string name="new_text_file_invalid_extension_error_message">유효한 텍스트 파일 확장자를 쓰세요 (예: .txt, .md, or .xml)</string>
     <string name="select_videos_search_empty_view_description">클라우드 드라이브에서 동영상을 찾아보세요</string>
     <string name="upload_bottom_sheet_action_upload_files">파일 업로드</string>
     <string name="upload_bottom_sheet_action_upload_folder">폴더 업로드</string>
@@ -2497,4 +2497,38 @@
     <string name="settings_view_mode_preference_title">보기 모드 설정</string>
     <string name="settings_preference_option_per_folder">폴더마다</string>
     <string name="settings_preference_option_all_folders">모두 동일</string>
+    <string name="settings_sorting_preference_description">폴더별로 정렬을 적용하거나, 모든 폴더에 동일한 정렬을 사용합니다.</string>
+    <string name="settings_view_mode_preference_description">폴더별로 보기 모드를 적용하거나, 모든 폴더에 동일한 보기 모드를 사용합니다.</string>
+    <string name="document_scanner_review_title">스캔 검토</string>
+    <string name="document_scanner_review_empty">아직 스캔된 페이지 없음</string>
+    <string name="document_scanner_review_delete_page">페이지 삭제</string>
+    <string name="document_scanner_review_retake_page">다시 찍기</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">[A]가격 페이지[/A]에서 현재 구독을 업그레이드하세요</string>
+    <string name="add_tags_placeholder_label">#태그 추가</string>
+    <string name="subscription_offer_special_offer_badge">특별 할인</string>
+    <string name="subscription_offer_get_plan_button">%2$s을/를 %1$s에 구입</string>
+    <string name="subscription_offer_countdown_valid_until">%1$s까지 유효</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="other">첫 %1$d개월 동안 할인된 가격</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="other">첫 %1$d년 동안 할인된 가격</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="other">일</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="other">시간</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="other">분</item>
+    </plurals>
+    <string name="password_strength_very_weak">매우 약한 암호</string>
+    <string name="password_strength_weak">약한 암호</string>
+    <string name="password_strength_medium">중간 강도의 암호</string>
+    <string name="password_strength_good">좋은 암호</string>
+    <string name="password_strength_strong">강력한 암호</string>
+    <string name="password_placeholder">암호 입력</string>
+    <string name="new_chat_title">새 대화</string>
+    <string name="create_group_chat_link_requires_name_error">대화 링크를 받으려면 그룹 이름을 입력하세요</string>
 </resources>

@@ -2505,4 +2505,39 @@
     <string name="settings_view_mode_preference_title">视图模式偏好</string>
     <string name="settings_preference_option_per_folder">每个文件夹</string>
     <string name="settings_preference_option_all_folders">全部相同</string>
+    <string name="document_scanner_auto_capture_on">自动截取已开启</string>
+    <string name="document_scanner_auto_capture_off">自动截取已关闭</string>
+    <string name="settings_sorting_preference_description">对每个文件夹分别应用排序，或对所有文件夹使用相同的排序。</string>
+    <string name="settings_view_mode_preference_description">对每个文件夹分别应用视图模式，或对所有文件夹使用相同的视图模式。</string>
+    <string name="document_scanner_review_title">查看扫描</string>
+    <string name="document_scanner_review_empty">尚未扫描任何页面</string>
+    <string name="document_scanner_review_delete_page">删除页面</string>
+    <string name="document_scanner_review_retake_page">重新拍摄</string>
+    <string name="subscription_revamp_current_plan_upgrade_on_web">在我们的 [A]定价页面[/A] 上升级您当前的订阅。</string>
+    <string name="add_tags_placeholder_label">#添加标签</string>
+    <string name="password_strength_very_weak">非常弱</string>
+    <string name="password_strength_weak">低强度密码</string>
+    <string name="password_strength_medium">中</string>
+    <string name="password_strength_good">很好</string>
+    <string name="password_strength_strong">高强度密码</string>
+    <string name="subscription_offer_special_offer_badge">特别优惠</string>
+    <string name="subscription_offer_get_plan_button">以%2$s获取%1$s</string>
+    <string name="subscription_offer_countdown_valid_until">有效期至 %1$s</string>
+    <plurals name="subscription_offer_discount_period_month">
+        <item quantity="other">前 %1$d 个月的折扣价</item>
+    </plurals>
+    <plurals name="subscription_offer_discount_period_year">
+        <item quantity="other">前 %1$d 年的折扣价</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_days">
+        <item quantity="other">天</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_hours">
+        <item quantity="other">小时</item>
+    </plurals>
+    <plurals name="subscription_offer_countdown_minutes">
+        <item quantity="other">分钟</item>
+    </plurals>
+    <string name="password_placeholder">输入密码</string>
+    <string name="new_chat_title">新建聊天</string>
 </resources>
