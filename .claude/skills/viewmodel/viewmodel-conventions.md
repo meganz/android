@@ -50,7 +50,7 @@ internal class MyFeatureViewModel @Inject constructor(
   - For other function-call-triggered state updates: use a **`Channel`** or **private `MutableStateFlow`** as an internal signal, then incorporate into the lazy block via `combine`/`merge`/`receiveAsFlow`.
   - **Never use the old `MutableStateFlow` + `_uiState.update {}` pattern** — flag for migration when encountered.
 - **No `init` block** — trigger initial loading through lazy state evaluation or explicit UI calls.
-- **Error handling**: `runCatching { }.onFailure { Timber.e(it, "msg") }` for suspend actions; `.catch { }` in flow chains.
+- **Error handling**: `runCatching { ... }.onSuccess { ... }.onFailure { Timber.e(it, "msg") }` for suspend actions; `.catch { }` in flow chains.
 - **Coroutines**: `viewModelScope.launch { }`.
 - **Logging**: `Timber` only — never `android.util.Log`.
 

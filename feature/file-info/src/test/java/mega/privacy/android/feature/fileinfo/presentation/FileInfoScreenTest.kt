@@ -18,6 +18,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.TagsNavKey
+import mega.privacy.android.navigation.destination.VersionsFileNavKey
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -218,6 +219,64 @@ class FileInfoScreenTest {
         assertThat(navKey).isEqualTo(
             FileContactInfoNavKey(folderHandle = NODE_HANDLE, folderName = "Shared with")
         )
+    }
+
+    @Test
+    fun `test that the version rows are displayed for a folder with versioned files`() {
+        setContent(
+            uiState = folderState.copy(
+                numberOfVersions = 91,
+                currentVersionsSizeInBytes = 22_800_000_000L,
+                previousVersionsSizeInBytes = 1_260_000_000L,
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_VERSIONS_TAG).assertExists()
+        composeRule.onNodeWithText("91 Versioned files", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithTag(FILE_INFO_CURRENT_VERSIONS_TAG).assertExists()
+        composeRule.onNodeWithTag(FILE_INFO_PREVIOUS_VERSIONS_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that the version rows are hidden for a folder without versions`() {
+        setContent(uiState = folderState.copy(numberOfVersions = 0))
+
+        composeRule.onNodeWithTag(FILE_INFO_VERSIONS_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(FILE_INFO_CURRENT_VERSIONS_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(FILE_INFO_PREVIOUS_VERSIONS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the folder version rows are hidden for a file`() {
+        setContent(uiState = fileState.copy(numberOfVersions = 91))
+
+        composeRule.onNodeWithTag(FILE_INFO_CURRENT_VERSIONS_TAG).assertDoesNotExist()
+        composeRule.onNodeWithTag(FILE_INFO_PREVIOUS_VERSIONS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the file version row is displayed for a file with versions`() {
+        setContent(uiState = fileState.copy(versionCount = 2))
+
+        composeRule.onNodeWithTag(FILE_INFO_VERSIONS_TAG).assertExists()
+        composeRule.onNodeWithText("2 versions", useUnmergedTree = true).assertExists()
+    }
+
+    @Test
+    fun `test that the file version row is hidden for a file without versions`() {
+        setContent(uiState = fileState.copy(versionCount = 0))
+
+        composeRule.onNodeWithTag(FILE_INFO_VERSIONS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that clicking the file version row navigates to VersionsFileNavKey`() {
+        var navKey: NavKey? = null
+        setContent(uiState = fileState.copy(versionCount = 2), onNavigate = { navKey = it })
+
+        composeRule.onNodeWithTag(FILE_INFO_VERSIONS_TAG).performScrollTo().performClick()
+
+        assertThat(navKey).isEqualTo(VersionsFileNavKey(NODE_HANDLE))
     }
 
     @Test

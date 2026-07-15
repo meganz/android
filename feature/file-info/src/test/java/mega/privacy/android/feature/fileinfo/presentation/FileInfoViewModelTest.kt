@@ -11,6 +11,7 @@ import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.contacts.ContactData
+import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.node.IsNodeInRubbishBinUseCase
 import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
@@ -45,6 +47,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.wheneverBlocking
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -69,6 +72,7 @@ internal class FileInfoViewModelTest {
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase = mock()
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder = mock()
+    private val getFolderTreeInfo: GetFolderTreeInfo = mock()
     private val nodeDestinationMapper: NodeDestinationMapper = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
@@ -90,6 +94,7 @@ internal class FileInfoViewModelTest {
             setNodeDescriptionUseCase = setNodeDescriptionUseCase,
             getNodeOutSharesUseCase = getNodeOutSharesUseCase,
             getContactItemFromInShareFolder = getContactItemFromInShareFolder,
+            getFolderTreeInfo = getFolderTreeInfo,
             nodeDestinationMapper = nodeDestinationMapper,
             nodeHandle = nodeHandle,
         )
@@ -111,10 +116,18 @@ internal class FileInfoViewModelTest {
             setNodeDescriptionUseCase,
             getNodeOutSharesUseCase,
             getContactItemFromInShareFolder,
+            getFolderTreeInfo,
             nodeDestinationMapper,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
         whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
+        wheneverBlocking { getFolderTreeInfo(any()) } doReturn FolderTreeInfo(
+            numberOfFiles = 0,
+            numberOfFolders = 0,
+            totalCurrentSizeInBytes = 0L,
+            numberOfVersions = 0,
+            sizeOfPreviousVersionsInBytes = 0L,
+        )
     }
 
     private fun mockFileNode(
@@ -125,6 +138,7 @@ internal class FileInfoViewModelTest {
         description: String? = "a description",
         tags: List<String>? = listOf("marketing", "2026"),
         isTakenDown: Boolean = false,
+        versionCount: Int = 0,
     ): TypedFileNode = mock {
         on { id } doReturn NodeId(NODE_HANDLE)
         on { this.name } doReturn name
@@ -134,6 +148,7 @@ internal class FileInfoViewModelTest {
         on { this.description } doReturn description
         on { this.tags } doReturn tags
         on { this.isTakenDown } doReturn isTakenDown
+        on { this.versionCount } doReturn versionCount
         on { this.type } doReturn fileTypeInfo
     }
 
@@ -591,6 +606,62 @@ internal class FileInfoViewModelTest {
         with(underTest.uiState.value) {
             assertThat(ownerEmail).isNull()
             assertThat(isIncomingShare).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that init loads folder versions for a folder with versioned files`() = runTest {
+        val node = mockFolderNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(getFolderTreeInfo(node)).thenReturn(
+            FolderTreeInfo(
+                numberOfFiles = 3223,
+                numberOfFolders = 540,
+                totalCurrentSizeInBytes = 22_800L,
+                numberOfVersions = 91,
+                sizeOfPreviousVersionsInBytes = 1_260L,
+            )
+        )
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(numberOfVersions).isEqualTo(91)
+            assertThat(currentVersionsSizeInBytes).isEqualTo(22_800L)
+            assertThat(previousVersionsSizeInBytes).isEqualTo(1_260L)
+            assertThat(showFolderVersions).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that init loads the version count for a file with versions`() = runTest {
+        val node = mockFileNode(versionCount = 2)
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(versionCount).isEqualTo(2)
+            assertThat(showFileVersions).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that a file does not load folder versions`() = runTest {
+        val node = mockFileNode()
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+
+        initViewModel()
+        advanceUntilIdle()
+
+        with(underTest.uiState.value) {
+            assertThat(numberOfVersions).isEqualTo(0)
+            assertThat(showFolderVersions).isFalse()
         }
     }
 

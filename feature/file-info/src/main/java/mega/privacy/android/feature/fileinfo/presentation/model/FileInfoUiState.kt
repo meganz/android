@@ -27,6 +27,10 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @property sharedContactCount the number of contacts this node is shared with (0 when not an outgoing share)
  * @property ownerName the display name (or email) of the incoming-share owner, or null when not an incoming share
  * @property ownerEmail the email of the incoming-share owner, or null when not an incoming share
+ * @property versionCount the number of versions of a file (0 when none / not a file)
+ * @property numberOfVersions the number of versioned files inside a folder (0 when none / not a folder)
+ * @property currentVersionsSizeInBytes the total size of the folder's current versions
+ * @property previousVersionsSizeInBytes the total size of the folder's previous versions
  * @property descriptionText the node description, empty when none
  * @property tags the tags associated with the node
  * @property isTakenDown whether the node has been taken down
@@ -58,13 +62,31 @@ internal data class FileInfoUiState(
     val sharedContactCount: Int = 0,
     val ownerName: String? = null,
     val ownerEmail: String? = null,
+    val versionCount: Int = 0,
+    val numberOfVersions: Int = 0,
+    val currentVersionsSizeInBytes: Long = 0L,
+    val previousVersionsSizeInBytes: Long = 0L,
 ) {
+    /**
+     * Whether to show the file's "Versions" row (navigates to the version history). Only files with
+     * at least one version have it.
+     */
+    val showFileVersions: Boolean
+        get() = isFile && versionCount > 0
+
     /**
      * Whether the node is an outgoing share (an owned folder shared with at least one contact);
      * drives the "Shared with" section. Outgoing shares only apply to folders, never files.
      */
     val isOutgoingShare: Boolean
         get() = !isFile && sharedContactCount > 0
+
+    /**
+     * Whether to show the folder's version sections (Versions / Current versions / Previous
+     * versions). Only folders containing versioned files have them.
+     */
+    val showFolderVersions: Boolean
+        get() = !isFile && numberOfVersions > 0
 
     /**
      * Whether the node is an incoming share (a folder shared with the current user by its owner);

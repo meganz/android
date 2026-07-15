@@ -50,6 +50,7 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.TagsNavKey
+import mega.privacy.android.navigation.destination.VersionsFileNavKey
 import mega.privacy.android.shared.nodes.components.NodeDescriptionField
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
@@ -229,6 +230,27 @@ private fun FileInfoContent(
             )
         }
 
+        if (uiState.showFolderVersions) {
+            FileInfoDetailRow(
+                // TODO extract to a localized (pluralized) string resource
+                label = "Versions",
+                value = "${uiState.numberOfVersions} Versioned files",
+                modifier = Modifier.testTag(FILE_INFO_VERSIONS_TAG),
+            )
+            FileInfoDetailRow(
+                // TODO extract to a localized string resource
+                label = "Current versions",
+                value = formatFileSize(uiState.currentVersionsSizeInBytes, context),
+                modifier = Modifier.testTag(FILE_INFO_CURRENT_VERSIONS_TAG),
+            )
+            FileInfoDetailRow(
+                // TODO extract to a localized string resource
+                label = "Previous versions",
+                value = formatFileSize(uiState.previousVersionsSizeInBytes, context),
+                modifier = Modifier.testTag(FILE_INFO_PREVIOUS_VERSIONS_TAG),
+            )
+        }
+
         uiState.creationTime?.let { added ->
             FileInfoDetailRow(
                 // TODO extract to a localized string resource
@@ -244,6 +266,17 @@ private fun FileInfoContent(
                 label = "Last modified",
                 value = formatModifiedDate(locale, modified),
                 modifier = Modifier.testTag(FILE_INFO_LAST_MODIFIED_TAG),
+            )
+        }
+
+        if (uiState.showFileVersions) {
+            FileInfoDetailRow(
+                // TODO extract to a localized (pluralized) string resource
+                label = "Versions",
+                value = "${uiState.versionCount} versions",
+                trailingIcon = IconPack.Medium.Thin.Outline.ChevronRight,
+                onClick = { onNavigate(VersionsFileNavKey(nodeHandle)) },
+                modifier = Modifier.testTag(FILE_INFO_VERSIONS_TAG),
             )
         }
 
@@ -348,6 +381,7 @@ private fun FileInfoScreenFilePreview() {
                 locationFolders = listOf("Documents", "Marketing"),
                 descriptionText = "This is test description",
                 tags = listOf("marketing", "2024", "confidential"),
+                versionCount = 2,
                 accessPermission = AccessPermission.OWNER
             ),
             nodeHandle = 0L,
@@ -400,6 +434,9 @@ private fun FileInfoScreenIncomingShareFolderPreview() {
                 accessPermission = AccessPermission.FULL,
                 ownerName = "John Doe",
                 ownerEmail = "johndoe@mail.com",
+                numberOfVersions = 91,
+                currentVersionsSizeInBytes = 22_800_000_000L,
+                previousVersionsSizeInBytes = 1_260_000_000L,
             ),
             nodeHandle = 0L,
             onBack = {},
@@ -437,6 +474,9 @@ internal const val FILE_INFO_LOCATION_TAG = "file_info_screen:location"
 internal const val FILE_INFO_SHARED_WITH_TAG = "file_info_screen:shared_with"
 internal const val FILE_INFO_OWNER_TAG = "file_info_screen:owner"
 internal const val FILE_INFO_PERMISSIONS_TAG = "file_info_screen:permissions"
+internal const val FILE_INFO_VERSIONS_TAG = "file_info_screen:versions"
+internal const val FILE_INFO_CURRENT_VERSIONS_TAG = "file_info_screen:current_versions"
+internal const val FILE_INFO_PREVIOUS_VERSIONS_TAG = "file_info_screen:previous_versions"
 internal const val FILE_INFO_LOADING_TAG = "file_info_screen:loading"
 internal const val FILE_INFO_DESCRIPTION_TAG = "file_info_screen:description"
 internal const val FILE_INFO_TAGS_TAG = "file_info_screen:tags"

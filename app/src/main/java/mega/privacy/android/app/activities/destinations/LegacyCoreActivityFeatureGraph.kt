@@ -41,6 +41,7 @@ import mega.privacy.android.app.presentation.photos.mediadiscovery.navigation.me
 import mega.privacy.android.app.presentation.settings.cookieSettingsNavigationDestination
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.legacyExportRecoveryKeyScreen
 import mega.privacy.android.app.presentation.settings.startscreen.startScreenPreferenceScreen
+import mega.privacy.android.app.main.versionsFileScreen
 import mega.privacy.android.app.presentation.tags.tagsScreen
 import mega.privacy.android.app.presentation.testpassword.navigation.testPasswordLegacyDestination
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
@@ -146,6 +147,7 @@ class LegacyCoreActivityFeatureGraph(
             cameraBackupPermissionsScreen(navigationHandler)
             fileInfoScreen(navigationHandler::back)
             tagsScreen(navigationHandler::back)
+            versionsFileScreen(navigationHandler::back)
             mediaDiscoveryLegacyDestination(navigationHandler::back)
             legacyVideoToPlaylistDestination(
                 navigationHandler::back,

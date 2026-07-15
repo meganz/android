@@ -16,11 +16,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -57,6 +59,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val setNodeDescriptionUseCase: SetNodeDescriptionUseCase,
     private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder,
+    private val getFolderTreeInfo: GetFolderTreeInfo,
     private val nodeDestinationMapper: NodeDestinationMapper,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
@@ -146,6 +149,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     descriptionText = node.description.orEmpty(),
                     tags = node.tags.orEmpty(),
                     isTakenDown = node.isTakenDown,
+                    versionCount = node.versionCount,
                     accessPermission = accessPermission,
                     isNodeInRubbish = isInRubbish,
                     isNodeInBackups = isInBackups,
@@ -155,6 +159,8 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     ownerEmail = owner?.email,
                 )
             }
+
+            loadFolderVersions(node)
         }
     }
 
@@ -224,6 +230,29 @@ internal class FileInfoViewModel @AssistedInject constructor(
                 .getOrNull()
                 ?.size ?: 0
             _uiState.update { it.copy(sharedContactCount = count) }
+        }
+    }
+
+    /**
+     * Loads the folder version stats (versioned-file count + current/previous version sizes). Runs
+     * separately from the main info emission because the folder-tree traversal can be slow, so the
+     * rest of the screen shows first and the version rows populate when ready. Reuses the node from
+     * [loadNodeInfo] to avoid an extra fetch.
+     */
+    private fun loadFolderVersions(node: TypedNode) {
+        val folder = node as? TypedFolderNode ?: return
+        viewModelScope.launch {
+            runCatching { getFolderTreeInfo(folder) }
+                .onSuccess { info ->
+                    _uiState.update {
+                        it.copy(
+                            numberOfVersions = info.numberOfVersions,
+                            currentVersionsSizeInBytes = info.totalCurrentSizeInBytes,
+                            previousVersionsSizeInBytes = info.sizeOfPreviousVersionsInBytes,
+                        )
+                    }
+                }
+                .onFailure { Timber.e(it, "Failed to load folder tree info for $nodeHandle") }
         }
     }
 

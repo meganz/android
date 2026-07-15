@@ -162,6 +162,14 @@ data class OfflineInfoNavKey(val handle: String) : NavKey
 @Serializable
 data class TagsNavKey(val nodeHandle: Long) : NavKey
 
+/**
+ * Navigation key for the version-history screen (VersionsFileActivity) of the given file.
+ *
+ * @param nodeHandle The file node handle whose versions are shown.
+ */
+@Serializable
+data class VersionsFileNavKey(val nodeHandle: Long) : NavKey
+
 @Serializable
 data class LegacyFileInfoNavKey(val handle: Long) : NavKey
 

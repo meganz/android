@@ -121,4 +121,46 @@ class FileInfoUiStateTest {
     fun `test that a node without an owner email is not an incoming share`() {
         assertThat(FileInfoUiState(ownerEmail = null).isIncomingShare).isFalse()
     }
+
+    @Test
+    fun `test that a folder with versioned files shows folder versions`() {
+        assertThat(
+            FileInfoUiState(isFile = false, numberOfVersions = 91).showFolderVersions
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that a folder without versions does not show folder versions`() {
+        assertThat(
+            FileInfoUiState(isFile = false, numberOfVersions = 0).showFolderVersions
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that a file never shows folder versions`() {
+        assertThat(
+            FileInfoUiState(isFile = true, numberOfVersions = 91).showFolderVersions
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that a file with versions shows file versions`() {
+        assertThat(
+            FileInfoUiState(isFile = true, versionCount = 2).showFileVersions
+        ).isTrue()
+    }
+
+    @Test
+    fun `test that a file without versions does not show file versions`() {
+        assertThat(
+            FileInfoUiState(isFile = true, versionCount = 0).showFileVersions
+        ).isFalse()
+    }
+
+    @Test
+    fun `test that a folder never shows file versions`() {
+        assertThat(
+            FileInfoUiState(isFile = false, versionCount = 2).showFileVersions
+        ).isFalse()
+    }
 }
