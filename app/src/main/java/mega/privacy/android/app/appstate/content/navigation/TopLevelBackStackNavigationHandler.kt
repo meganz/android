@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.NavigationResultsHandler
+import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 import mega.privacy.android.navigation.contract.navkey.MainNavItemNavKey
 
 /**
@@ -19,18 +20,22 @@ class TopLevelBackStackNavigationHandler(
     }
 
     override fun remove(navKey: NavKey) {
-        backStack.topLevelBackStacks.values.forEach {
-            it.remove(navKey)
-        }
+        backStack.removeAll { it == navKey }
     }
 
     override fun navigate(destination: NavKey, navOptions: NavOptions?) {
-        applyNavOptions(navOptions)
-        backStack.add(destination)
+        navigate(listOf(destination), navOptions)
     }
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
-        applyNavOptions(navOptions)
+        applyNavOptions(navOptions, destinations)
+        if (backStack.backStack.takeLast(destinations.size).containsAll(destinations)) {
+            return
+        }
+        val incomingDialogs = destinations.filterIsInstance<DialogNavKey>().toSet()
+        if (incomingDialogs.isNotEmpty()) {
+            backStack.removeAll { it in incomingDialogs }
+        }
         backStack.addAll(destinations)
     }
 
@@ -55,8 +60,18 @@ class TopLevelBackStackNavigationHandler(
         backStack.removeLast()
     }
 
-    private fun applyNavOptions(navOptions: NavOptions?) {
+    private fun applyNavOptions(navOptions: NavOptions?, destinations: List<NavKey>) {
         if (navOptions == null) return
+        if (navOptions.launchSingleTop) {
+            val backStackKeys = backStack.backStack.takeLast(destinations.size)
+            if (backStackKeys.size == destinations.size &&
+                backStackKeys.zip(destinations).all { (a, b) -> a::class == b::class }
+            ) {
+                repeat(destinations.size) {
+                    backStack.removeLast()
+                }
+            }
+        }
         val popUpTo = navOptions.popUpTo ?: return
         val popUpToKey = findPopUpToKey(popUpTo) ?: return
         removeFromBackStackTo(popUpToKey, popUpTo.inclusive)

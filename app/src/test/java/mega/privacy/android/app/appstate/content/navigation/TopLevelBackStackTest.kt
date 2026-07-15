@@ -189,6 +189,48 @@ class TopLevelBackStackTest {
     }
 
     @Test
+    fun `test that addAll moves existing destinations to the top instead of duplicating`() {
+        underTest.add(Destination1)
+        underTest.add(Destination2)
+
+        underTest.addAll(listOf(Destination1, Destination3))
+
+        assertThat(underTest.backStack).containsExactly(
+            StartKey,
+            Destination2,
+            Destination1,
+            Destination3,
+        ).inOrder()
+        assertThat(underTest.backStack.count { it == Destination1 }).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that addAll reorders the whole stack when all destinations were already present`() {
+        underTest.add(Destination1)
+        underTest.add(Destination2)
+
+        underTest.addAll(listOf(Destination2, Destination1))
+
+        assertThat(underTest.backStack).containsExactly(
+            StartKey,
+            Destination2,
+            Destination1,
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that addAll ignores the top level key when it appears in incoming destinations`() {
+        underTest.switchTopLevel(TopLevelKey1)
+        underTest.add(Destination1)
+
+        underTest.addAll(listOf(TopLevelKey1, Destination2))
+
+        assertThat(underTest.topLevelBackStacks[TopLevelKey1])
+            .containsExactly(TopLevelKey1, Destination1, Destination2)
+            .inOrder()
+    }
+
+    @Test
     fun `test that switching between top levels preserves each stack independently`() {
         underTest.add(Destination1)
         underTest.switchTopLevel(TopLevelKey1)
@@ -272,5 +314,45 @@ class TopLevelBackStackTest {
             Destination2,
             Destination3
         )
+    }
+
+    @Test
+    fun `test that updateBackStack keeps current tab occurrence when start and current tab share a key`() {
+        underTest.add(Destination1)
+        underTest.switchTopLevel(TopLevelKey1)
+        underTest.add(Destination1)
+        underTest.add(Destination2)
+
+        assertThat(underTest.backStack).containsExactly(
+            StartKey,
+            TopLevelKey1,
+            Destination1,
+            Destination2,
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that updateBackStack does not duplicate keys shared by start and current tab stacks`() {
+        underTest.add(Destination1)
+        underTest.add(Destination2)
+        underTest.switchTopLevel(TopLevelKey1)
+        underTest.add(Destination1)
+
+        assertThat(underTest.backStack).containsNoDuplicates()
+    }
+
+    @Test
+    fun `test that removeAll removes matching keys from all tab stacks`() {
+        underTest.add(Destination1)
+        underTest.switchTopLevel(TopLevelKey1)
+        underTest.add(Destination2)
+        underTest.switchTopLevel(TopLevelKey2)
+        underTest.add(Destination1)
+
+        underTest.removeAll { it == Destination1 }
+
+        assertThat(underTest.topLevelBackStacks[StartKey]).containsExactly(StartKey)
+        assertThat(underTest.topLevelBackStacks[TopLevelKey1]).containsExactly(TopLevelKey1, Destination2)
+        assertThat(underTest.topLevelBackStacks[TopLevelKey2]).containsExactly(TopLevelKey2)
     }
 }

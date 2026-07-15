@@ -43,7 +43,7 @@ class TopLevelBackStack<T : NavKey, U : T>(val startKey: U) {
             backStack.addAll(currentStack)
         } else {
             val startStack = topLevelBackStacks[startKey] ?: emptyList()
-            backStack.addAll(startStack + currentStack)
+            backStack.addAll(startStack.filterNot { it in currentStack } + currentStack)
         }
     }
 
@@ -87,7 +87,20 @@ class TopLevelBackStack<T : NavKey, U : T>(val startKey: U) {
     }
 
     fun addAll(destinations: List<T>) {
-        topLevelBackStacks[topLevelKey]?.addAll(destinations)
+        if (destinations.isEmpty()) return
+        val current = topLevelBackStacks[topLevelKey] ?: return
+        val incoming = destinations.filterNot { it == topLevelKey }
+        if (incoming.isEmpty()) return
+        val incomingSet = incoming.toSet()
+        current.removeAll { it != topLevelKey && it in incomingSet }
+        current.addAll(incoming)
+        updateBackStack()
+    }
+
+    fun removeAll(predicate: (T) -> Boolean) {
+        topLevelBackStacks.values.forEach { stack ->
+            stack.removeAll(predicate)
+        }
         updateBackStack()
     }
 }
