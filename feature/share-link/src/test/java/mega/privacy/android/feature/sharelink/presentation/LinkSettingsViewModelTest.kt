@@ -35,6 +35,9 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class LinkSettingsViewModelTest {
 
@@ -535,7 +538,8 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), newMillis / 1_000L, CALLER_NAME)
+            verify(exportNodeUseCase)
+                .invoke(NodeId(NODE_HANDLE), newMillis.milliseconds.inWholeSeconds, CALLER_NAME)
         }
 
     private companion object {
@@ -544,10 +548,12 @@ class LinkSettingsViewModelTest {
         const val ENCRYPTED_LINK = "https://mega.nz/#P!encrypted"
         const val PASSWORD = "Str0ngP@ss"
         const val OLD_PASSWORD = "0ldP@ssw0rd"
-        const val EXPIRY_TIME = 1_800_000_000_000L
-        const val EXPIRY_TIME_SECONDS = EXPIRY_TIME / 1_000L
-        const val MILLIS_PER_DAY = 86_400_000L
         const val CALLER_NAME = "LinkSettingsViewModel"
+
+        // A fixed, far-future instant (~2027) used as the expiry across the expiry tests.
+        val EXPIRY_TIME_SECONDS = 1_800_000_000L
+        val EXPIRY_TIME = EXPIRY_TIME_SECONDS.seconds.inWholeMilliseconds
+        val MILLIS_PER_DAY = 1.days.inWholeMilliseconds
 
         @JvmField
         @RegisterExtension

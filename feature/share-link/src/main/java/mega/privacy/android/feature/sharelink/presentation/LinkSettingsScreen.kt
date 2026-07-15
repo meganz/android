@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +21,14 @@ import androidx.compose.material3.SelectableDates
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -263,12 +266,14 @@ private fun ExpiryDateField(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val dateText = remember(expiryDate) { expiryDate?.let(::formatExpiryDate).orEmpty() }
+    val openPickerLabel = stringResource(sharedR.string.share_link_set_expiry_date)
     Box(modifier = modifier) {
         ReadOnlyTextInputField(
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag(LINK_SETTINGS_EXPIRY_FIELD_TAG),
-            text = expiryDate?.let(::formatExpiryDate).orEmpty(),
+            text = dateText,
             trailingIcon = {
                 MegaIcon(
                     painter = painterResource(iconPackR.drawable.ic_calendar_01_medium_thin_outline),
@@ -280,7 +285,13 @@ private fun ExpiryDateField(
         Box(
             modifier = Modifier
                 .matchParentSize()
-                .clickable(onClick = onClick),
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    role = Role.Button,
+                    onClickLabel = openPickerLabel,
+                    onClick = onClick,
+                ),
         )
     }
 }

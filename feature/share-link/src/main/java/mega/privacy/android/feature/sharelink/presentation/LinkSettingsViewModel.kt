@@ -23,6 +23,8 @@ import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * ViewModel for the revamped Link settings editor screen.
@@ -126,7 +128,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
         if (state.isExpiryDirty) {
             val expireTimeSeconds = state.expiryDate
                 ?.takeIf { state.isExpiryEnabled }
-                ?.let { it / MILLIS_PER_SECOND }
+                ?.milliseconds?.inWholeSeconds
             exportNodeUseCase(
                 nodeToExport = nodeId,
                 expireTime = expireTimeSeconds,
@@ -153,7 +155,7 @@ class LinkSettingsViewModel @AssistedInject constructor(
                 .onFailure { Timber.e(it, "Failed to load node for link settings") }
                 .getOrNull()
             publicLink = exportedData?.publicLink
-            val expiryMillis = exportedData?.expirationTime?.let { it * MILLIS_PER_SECOND }
+            val expiryMillis = exportedData?.expirationTime?.seconds?.inWholeMilliseconds
             if (expiryMillis != null) {
                 update {
                     it.copy(
@@ -221,6 +223,5 @@ class LinkSettingsViewModel @AssistedInject constructor(
 
     private companion object {
         const val CALLER_NAME = "LinkSettingsViewModel"
-        const val MILLIS_PER_SECOND = 1_000L
     }
 }
