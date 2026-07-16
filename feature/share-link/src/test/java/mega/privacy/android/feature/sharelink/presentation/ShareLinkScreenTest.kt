@@ -119,6 +119,18 @@ class ShareLinkScreenTest {
     }
 
     @Test
+    fun `test that the access banner mentions the key when the key is separate`() {
+        setContent(uiState = data.copy(isKeySeparate = true))
+
+        composeRule.onNodeWithText(
+            context.resources.getQuantityString(
+                sharedR.plurals.share_link_access_banner_description_with_key,
+                data.handles.size,
+            )
+        ).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that tapping the key copy icon invokes onCopyKey`() {
         var copied = false
         setContent(uiState = data.copy(isKeySeparate = true), onCopyKey = { copied = true })

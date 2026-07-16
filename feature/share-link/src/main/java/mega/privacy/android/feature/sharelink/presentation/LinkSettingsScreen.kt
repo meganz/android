@@ -29,9 +29,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.datepicker.MegaDatePickerDialog
@@ -44,10 +46,15 @@ import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.model.Button
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
+import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.LinkColor
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -62,6 +69,7 @@ import java.util.TimeZone
  * @param uiState The current [LinkSettingsUiState].
  * @param onBack Invoked when the Close action is tapped.
  * @param onSeparateKeyEnabled Invoked when the "Separate link and key" toggle changes.
+ * @param onLearnMore Invoked when the "Learn more" link under the separate-key row is tapped.
  * @param onExpiryEnabled Invoked when the "Set expiry date" toggle changes.
  * @param onExpiryDateChanged Invoked with the chosen expiry date, in UTC milliseconds.
  * @param onPasswordEnabled Invoked when the "Set password" toggle changes.
@@ -75,6 +83,7 @@ fun LinkSettingsScreen(
     uiState: LinkSettingsUiState,
     onBack: () -> Unit,
     onSeparateKeyEnabled: (Boolean) -> Unit,
+    onLearnMore: () -> Unit,
     onExpiryEnabled: (Boolean) -> Unit,
     onExpiryDateChanged: (Long) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
@@ -128,6 +137,7 @@ fun LinkSettingsScreen(
                 LinkSettingsContent(
                     uiState = uiState,
                     onSeparateKeyEnabled = onSeparateKeyEnabled,
+                    onLearnMore = onLearnMore,
                     onExpiryEnabled = onExpiryEnabled,
                     onExpiryDateChanged = onExpiryDateChanged,
                     onPasswordEnabled = onPasswordEnabled,
@@ -158,6 +168,7 @@ fun LinkSettingsScreen(
 private fun LinkSettingsContent(
     uiState: LinkSettingsUiState,
     onSeparateKeyEnabled: (Boolean) -> Unit,
+    onLearnMore: () -> Unit,
     onExpiryEnabled: (Boolean) -> Unit,
     onExpiryDateChanged: (Long) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
@@ -184,6 +195,24 @@ private fun LinkSettingsContent(
                     onCheckedChange = onSeparateKeyEnabled,
                 )
             },
+        )
+        LinkSpannedText(
+            modifier = Modifier
+                .padding(start = 16.dp, end = 16.dp)
+                .padding(bottom = 8.dp)
+                .testTag(LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG),
+            value = "[A]${stringResource(sharedR.string.general_learn_more)}[/A]",
+            spanStyles = mapOf(
+                SpanIndicator('A') to SpanStyleWithAnnotation(
+                    megaSpanStyle = MegaSpanStyle.LinkColorStyle(
+                        spanStyle = SpanStyle(),
+                        linkColor = LinkColor.Primary,
+                    ),
+                    annotation = LEARN_MORE_ANNOTATION,
+                )
+            ),
+            baseStyle = AppTheme.typography.bodyMedium,
+            onAnnotationClick = { onLearnMore() },
         )
         FlexibleLineListItem(
             modifier = Modifier.testTag(LINK_SETTINGS_EXPIRY_ROW_TAG),
@@ -370,6 +399,7 @@ private fun LinkSettingsScreenPreview() {
             uiState = previewData,
             onBack = {},
             onSeparateKeyEnabled = {},
+            onLearnMore = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -387,6 +417,7 @@ private fun LinkSettingsScreenDirtyPreview() {
             uiState = previewData.copy(isExpiryEnabled = true, isSaveEnabled = true),
             onBack = {},
             onSeparateKeyEnabled = {},
+            onLearnMore = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -411,6 +442,7 @@ private fun LinkSettingsScreenPasswordPreview(
             ),
             onBack = {},
             onSeparateKeyEnabled = {},
+            onLearnMore = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -438,6 +470,7 @@ private fun LinkSettingsScreenLoadingPreview() {
             uiState = LinkSettingsUiState(isLoading = true),
             onBack = {},
             onSeparateKeyEnabled = {},
+            onLearnMore = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -451,6 +484,8 @@ internal const val LINK_SETTINGS_APP_BAR_TAG = "link_settings_screen:app_bar"
 internal const val LINK_SETTINGS_SAVE_BUTTON_TAG = "link_settings_screen:button_save"
 internal const val LINK_SETTINGS_SEPARATE_KEY_ROW_TAG = "link_settings_screen:row_separate_key"
 internal const val LINK_SETTINGS_SEPARATE_KEY_TOGGLE_TAG = "link_settings_screen:toggle_separate_key"
+internal const val LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG = "link_settings_screen:separate_key_learn_more"
+private const val LEARN_MORE_ANNOTATION = "learn_more"
 internal const val LINK_SETTINGS_EXPIRY_ROW_TAG = "link_settings_screen:row_expiry"
 internal const val LINK_SETTINGS_EXPIRY_TOGGLE_TAG = "link_settings_screen:toggle_expiry"
 internal const val LINK_SETTINGS_EXPIRY_FIELD_TAG = "link_settings_screen:field_expiry"

@@ -162,7 +162,11 @@ private fun ShareLinkContent(
                 modifier = Modifier.testTag(SHARE_LINK_ACCESS_BANNER_TAG),
                 title = stringResource(sharedR.string.share_link_access_banner_title),
                 body = pluralStringResource(
-                    sharedR.plurals.share_link_access_banner_description,
+                    if (uiState.isKeySeparate) {
+                        sharedR.plurals.share_link_access_banner_description_with_key
+                    } else {
+                        sharedR.plurals.share_link_access_banner_description
+                    },
                     uiState.handles.size,
                 ),
                 showCancelButton = false,

@@ -4,6 +4,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import de.palm.composestateevents.EventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -93,6 +94,7 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
         val resources = LocalResources.current
         val snackbarQueue = rememberSnackBarQueue()
         val coroutineScope = rememberCoroutineScope()
+        val uriHandler = LocalUriHandler.current
 
         EventEffect(event = uiState.savedEvent, onConsumed = viewModel::onSavedEventConsumed) {
             navigationHandler.back()
@@ -109,6 +111,7 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
             uiState = uiState,
             onBack = navigationHandler::back,
             onSeparateKeyEnabled = viewModel::onSeparateKeyEnabled,
+            onLearnMore = { uriHandler.openUri(SEPARATE_KEY_LEARN_MORE_URL) },
             onExpiryEnabled = viewModel::onExpiryEnabled,
             onExpiryDateChanged = viewModel::onExpiryDateChanged,
             onPasswordEnabled = viewModel::onPasswordEnabled,
@@ -117,3 +120,6 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
         )
     }
 }
+
+/** MEGA security help page opened from the "Separate link and key" learn-more link. */
+private const val SEPARATE_KEY_LEARN_MORE_URL = "https://mega.io/security"

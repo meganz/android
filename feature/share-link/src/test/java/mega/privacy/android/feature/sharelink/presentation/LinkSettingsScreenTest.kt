@@ -59,6 +59,16 @@ class LinkSettingsScreenTest {
     }
 
     @Test
+    fun `test that tapping the separate-key Learn more link invokes onLearnMore`() {
+        var clicked = false
+        setContent(uiState = loaded, onLearnMore = { clicked = true })
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG).performClick()
+
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
     fun `test that tapping the expiry toggle invokes onExpiryEnabled`() {
         var enabled: Boolean? = null
         setContent(uiState = loaded, onExpiryEnabled = { enabled = it })
@@ -186,7 +196,8 @@ class LinkSettingsScreenTest {
     fun `test that the password field is revealed when the password toggle is on`() {
         setContent(uiState = loaded.copy(isPasswordEnabled = true))
 
-        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_FIELD_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_FIELD_TAG).performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Test
@@ -218,6 +229,7 @@ class LinkSettingsScreenTest {
         uiState: LinkSettingsUiState,
         onBack: () -> Unit = {},
         onSeparateKeyEnabled: (Boolean) -> Unit = {},
+        onLearnMore: () -> Unit = {},
         onExpiryEnabled: (Boolean) -> Unit = {},
         onExpiryDateChanged: (Long) -> Unit = {},
         onPasswordEnabled: (Boolean) -> Unit = {},
@@ -229,6 +241,7 @@ class LinkSettingsScreenTest {
                 uiState = uiState,
                 onBack = onBack,
                 onSeparateKeyEnabled = onSeparateKeyEnabled,
+                onLearnMore = onLearnMore,
                 onExpiryEnabled = onExpiryEnabled,
                 onExpiryDateChanged = onExpiryDateChanged,
                 onPasswordEnabled = onPasswordEnabled,
