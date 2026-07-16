@@ -13,6 +13,13 @@ import kotlinx.serialization.Serializable
 import mega.privacy.android.app.mediaplayer.AudioPlayerLaunchSourceHolder
 import mega.privacy.android.app.mediaplayer.AudioPlayerScreen
 import mega.privacy.android.app.mediaplayer.AudioPlayerViewModel
+import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
+import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
+import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
+import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
@@ -25,11 +32,10 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 @Parcelize
 data class AudioPlayerScreenNavKey(val launchId: String) : NavKey, Parcelable
 
-// TODO: Use navigationHandler for back navigation from audio player
-@Suppress("UNUSED_PARAMETER")
 internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
     navigationHandler: NavigationHandler,
     launchSourceHolder: AudioPlayerLaunchSourceHolder,
+    onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<AudioPlayerScreenNavKey> { navKey ->
         val viewModel = hiltViewModel<AudioPlayerViewModel>()
@@ -49,6 +55,27 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
         }
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        val nodeSourceType = (uiState as? AudioPlayerUiState.Data)?.nodeSourceType
+            ?: NodeSourceType.VIDEO_PLAYER_DEFAULT
+
+        val nodeOptionsActionViewModel =
+            hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
+                key = nodeSourceType.name,
+                creationCallback = { it.create(nodeSourceType) }
+            )
+        val nodeActionHandler = rememberSingleNodeActionHandler(
+            viewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+        )
+
+        HandleNodeOptionsActionResult(
+            nodeOptionsActionViewModel = nodeOptionsActionViewModel,
+            navigationHandler = navigationHandler,
+            nodeActionHandler = nodeActionHandler,
+            onTransfer = onTransfer,
+        )
+
         AudioPlayerScreen(
             uiState = uiState,
             onPlayPauseClicked = viewModel::togglePlayPause,
@@ -58,7 +85,38 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             onShuffleClicked = viewModel::toggleShuffle,
             onRepeatClicked = viewModel::cycleRepeatMode,
             onPlaylistClicked = { /* TODO: navigate to queue */ },
-            onScreenClicked = { /* TODO: toggle toolbar */ },
+            onBackPressed = navigationHandler::back,
+            onMoreActionsClicked = {
+                val navKey = (uiState as? AudioPlayerUiState.Data)?.buildNodeOptionsNavKey()
+                    ?: return@AudioPlayerScreen
+                navigationHandler.navigate(navKey)
+            },
         )
     }
 }
+
+private fun AudioPlayerUiState.Data.buildNodeOptionsNavKey(): NodeOptionsBottomSheetNavKey? {
+    val handle = currentPlayingHandle ?: return null
+    return NodeOptionsBottomSheetNavKey(
+        nodeHandle = handle,
+        nodeSourceType = nodeSourceType,
+        publicLinkUrl = fileLinkUrl,
+        localFilePath = localFilePath,
+        chatId = chatId,
+        msgId = msgId,
+        partiallyExpand = nodeSourceType.shouldPartiallyExpand,
+    )
+}
+
+private val NodeSourceType.shouldPartiallyExpand: Boolean
+    get() = when (this) {
+        NodeSourceType.CHAT,
+        NodeSourceType.FILE_LINK,
+        NodeSourceType.FOLDER_LINK,
+        NodeSourceType.VIDEO_PLAYER_VERSIONS,
+        NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+        NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER,
+            -> false
+
+        else -> true
+    }

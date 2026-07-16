@@ -59,7 +59,8 @@ class AudioPlayerScreenTest {
         onShuffleClicked: () -> Unit = {},
         onRepeatClicked: () -> Unit = {},
         onPlaylistClicked: () -> Unit = {},
-        onScreenClicked: () -> Unit = {},
+        onBackPressed: () -> Unit = {},
+        onMoreActionsClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             AudioPlayerScreen(
@@ -71,7 +72,8 @@ class AudioPlayerScreenTest {
                 onShuffleClicked = onShuffleClicked,
                 onRepeatClicked = onRepeatClicked,
                 onPlaylistClicked = onPlaylistClicked,
-                onScreenClicked = onScreenClicked,
+                onBackPressed = onBackPressed,
+                onMoreActionsClicked = onMoreActionsClicked,
             )
         }
     }
@@ -273,21 +275,4 @@ class AudioPlayerScreenTest {
 
         verify(onPlaylistClicked).invoke()
     }
-
-    @Test
-    fun `test that onScreenClicked is invoked when a non-interactive area of the screen is tapped`() {
-        val onScreenClicked = mock<() -> Unit>()
-        setContent(
-            uiState = defaultData(title = "Bohemian Rhapsody"),
-            onScreenClicked = onScreenClicked,
-        )
-
-        composeTestRule
-            .onNodeWithText("Bohemian Rhapsody", substring = true, useUnmergedTree = true)
-            .performClick()
-
-        verify(onScreenClicked).invoke()
-    }
-
-    // endregion
 }

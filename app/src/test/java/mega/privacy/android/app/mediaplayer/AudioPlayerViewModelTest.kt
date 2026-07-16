@@ -6,20 +6,30 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.analytics.tracker.AnalyticsTracker
 import mega.privacy.android.app.mediaplayer.gateway.AudioMediaControllerGateway
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.model.AudioControllerState
 import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
-import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.analytics.tracker.AnalyticsTracker
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.URL_LOCAL_FILE_PATH
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_LINK_ADAPTER
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -306,4 +316,146 @@ class AudioPlayerViewModelTest {
             underTest.startPlayback(intent)
             verify(gateway, never()).startService(intent)
         }
+
+    @Test
+    fun `test that startPlayback sets nodeSourceType to OFFLINE when adapter type is OFFLINE_ADAPTER`() =
+        runTest {
+            val intent = mockIntent(adapterType = OFFLINE_ADAPTER)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.OFFLINE)
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets nodeSourceType to FOLDER_LINK when adapter type is FOLDER_LINK_ADAPTER`() =
+        runTest {
+            val intent = mockIntent(adapterType = FOLDER_LINK_ADAPTER)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.FOLDER_LINK)
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets nodeSourceType to FOLDER_LINK when adapter type is FROM_ALBUM_SHARING`() =
+        runTest {
+            val intent = mockIntent(adapterType = FROM_ALBUM_SHARING)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.FOLDER_LINK)
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets nodeSourceType to CHAT when adapter type is FROM_CHAT`() =
+        runTest {
+            val intent = mockIntent(adapterType = FROM_CHAT)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.CHAT)
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets nodeSourceType to FILE_LINK when adapter type is FILE_LINK_ADAPTER`() =
+        runTest {
+            val intent = mockIntent(adapterType = FILE_LINK_ADAPTER)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.FILE_LINK)
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets nodeSourceType to VIDEO_PLAYER_DEFAULT when adapter type is not a known type`() =
+        runTest {
+            val intent = mockIntent(adapterType = 9999)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.VIDEO_PLAYER_DEFAULT)
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets fileLinkUrl in uiState from URL_FILE_LINK intent extra`() =
+        runTest {
+            val intent = mockIntent(fileLinkUrl = "https://mega.nz/file/abc123")
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.fileLinkUrl).isEqualTo("https://mega.nz/file/abc123")
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets chatId in uiState when INTENT_EXTRA_KEY_CHAT_ID is a valid handle`() =
+        runTest {
+            val intent = mockIntent(chatId = 12345L)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.chatId).isEqualTo(12345L)
+            }
+        }
+
+    @Test
+    fun `test that startPlayback sets chatId to null in uiState when INTENT_EXTRA_KEY_CHAT_ID is INVALID_HANDLE`() =
+        runTest {
+            // Use OFFLINE_ADAPTER to ensure the state changes and a new emission is triggered.
+            val intent = mockIntent(adapterType = OFFLINE_ADAPTER, chatId = -1L)
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState())
+                awaitItem() // Data (initial)
+                underTest.startPlayback(intent)
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.chatId).isNull()
+            }
+        }
+
+    private fun mockIntent(
+        adapterType: Int = -1,
+        fileLinkUrl: String? = null,
+        localFilePath: String? = null,
+        chatId: Long = -1L,
+        msgId: Long = -1L,
+    ): Intent = mock<Intent>().apply {
+        whenever(getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)).thenReturn(false)
+        whenever(getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, -1)).thenReturn(adapterType)
+        whenever(getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, -1L)).thenReturn(chatId)
+        whenever(getLongExtra(INTENT_EXTRA_KEY_MSG_ID, -1L)).thenReturn(msgId)
+        whenever(getStringExtra(URL_FILE_LINK)).thenReturn(fileLinkUrl)
+        whenever(getStringExtra(URL_LOCAL_FILE_PATH)).thenReturn(localFilePath)
+    }
 }
