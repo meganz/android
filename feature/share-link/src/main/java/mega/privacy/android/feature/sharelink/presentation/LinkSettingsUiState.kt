@@ -17,11 +17,14 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
  * so the password toggle starts on and Save only enables on an actual change or removal.
  * @property initialPassword The existing plaintext password pre-filled for change/remove, used as
  * the baseline for detecting an actual change; null when no password was set.
+ * @property initialSeparateKeyEnabled The "separate link and key" preference when the screen
+ * opened, used as the baseline for detecting an actual change.
  */
 @Stable
 data class LinkSettingsUiState(
     val isLoading: Boolean = true,
     val isSeparateKeyEnabled: Boolean = false,
+    val initialSeparateKeyEnabled: Boolean = false,
     val isExpiryEnabled: Boolean = false,
     val expiryDate: Long? = null,
     val isExpiryAlreadySet: Boolean = false,

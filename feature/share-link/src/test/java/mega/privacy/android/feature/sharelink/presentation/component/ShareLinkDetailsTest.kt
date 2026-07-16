@@ -35,14 +35,43 @@ class ShareLinkDetailsTest {
         assertThat(copied).isTrue()
     }
 
+    @Test
+    fun `test that the key card is hidden when no key is provided`() {
+        setContent()
+
+        composeRule.onNodeWithTag(SHARE_LINK_KEY_DETAILS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the key card and value are displayed when a key is provided`() {
+        setContent(key = "decryptionKey")
+
+        composeRule.onNodeWithTag(SHARE_LINK_KEY_DETAILS_TAG).assertIsDisplayed()
+        composeRule.onNodeWithText("decryptionKey").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that tapping the key copy icon invokes onCopyKey`() {
+        var copied = false
+        setContent(key = "decryptionKey", onCopyKey = { copied = true })
+
+        composeRule.onNodeWithTag(SHARE_LINK_KEY_COPY_TAG).performClick()
+
+        assertThat(copied).isTrue()
+    }
+
     private fun setContent(
         link: String = "https://mega.nz/file/abc123",
         onCopyLink: () -> Unit = {},
+        key: String? = null,
+        onCopyKey: () -> Unit = {},
     ) {
         composeRule.setContent {
             ShareLinkDetails(
                 link = link,
                 onCopyLink = onCopyLink,
+                key = key,
+                onCopyKey = onCopyKey,
             )
         }
     }

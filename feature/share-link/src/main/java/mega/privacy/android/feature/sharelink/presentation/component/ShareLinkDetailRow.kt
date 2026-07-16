@@ -34,6 +34,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onCopy Invoked when the trailing copy icon is tapped.
  * @param modifier Modifier for the row.
  * @param copyContentDescription Accessibility description for the copy icon.
+ * @param copyTestTag Test tag for the trailing copy icon, so callers rendering more than one row
+ * can target each copy action distinctly.
  */
 @Composable
 fun ShareLinkDetailRow(
@@ -42,6 +44,7 @@ fun ShareLinkDetailRow(
     onCopy: () -> Unit,
     modifier: Modifier = Modifier,
     copyContentDescription: String = stringResource(sharedR.string.general_copy),
+    copyTestTag: String = SHARE_LINK_DETAIL_ROW_COPY_TAG,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -68,7 +71,7 @@ fun ShareLinkDetailRow(
             MegaIcon(
                 modifier = Modifier
                     .size(24.dp)
-                    .testTag(SHARE_LINK_DETAIL_ROW_COPY_TAG)
+                    .testTag(copyTestTag)
                     .clickable(onClick = onCopy),
                 painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.Copy01),
                 tint = IconColor.Primary,

@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCa
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,6 +49,7 @@ class LinkSettingsViewModelTest {
     private val getPasswordStrengthUseCase = mock<GetPasswordStrengthUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val passwordCache = mock<ShareLinkPasswordCache>()
+    private val separateKeyCache = mock<ShareLinkSeparateKeyCache>()
 
     @BeforeEach
     fun setUp() {
@@ -63,6 +65,7 @@ class LinkSettingsViewModelTest {
             getPasswordStrengthUseCase,
             monitorAccountDetailUseCase,
             passwordCache,
+            separateKeyCache,
         )
     }
 
@@ -91,6 +94,10 @@ class LinkSettingsViewModelTest {
         whenever(passwordCache.get(NODE_HANDLE)).thenReturn(LinkPassword(password, PUBLIC_LINK))
     }
 
+    private fun stubCachedSeparateKey() {
+        whenever(separateKeyCache.get(NODE_HANDLE)).thenReturn(true)
+    }
+
     private fun createUnderTest() = LinkSettingsViewModel(
         args = LinkSettingsViewModel.Args(handles = listOf(NODE_HANDLE)),
         getNodeByIdUseCase = getNodeByIdUseCase,
@@ -99,6 +106,7 @@ class LinkSettingsViewModelTest {
         getPasswordStrengthUseCase = getPasswordStrengthUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         passwordCache = passwordCache,
+        separateKeyCache = separateKeyCache,
     )
 
     private suspend fun ReceiveTurbine<LinkSettingsUiState>.awaitUntil(
@@ -624,6 +632,83 @@ class LinkSettingsViewModelTest {
 
             verify(passwordCache, never()).set(any(), anyOrNull())
             verifyNoInteractions(encryptLinkWithPasswordUseCase)
+        }
+
+    @Test
+    fun `test that opening with a cached separate-key preference pre-fills it without marking it dirty`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubCachedSeparateKey()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSeparateKeyEnabled).isTrue()
+                assertThat(state.initialSeparateKeyEnabled).isTrue()
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that toggling separate key back to the initial keeps Save disabled`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                awaitUntil { it.isSaveEnabled }
+
+                underTest.onSeparateKeyEnabled(false)
+                val state = awaitUntil { !it.isSeparateKeyEnabled }
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave persists the enabled separate-key preference and does not export`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache).set(NODE_HANDLE, true)
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that disabling a cached separate key onSave clears it in the cache`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubCachedSeparateKey()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(false)
+                awaitUntil { it.isSaveEnabled }
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache).set(NODE_HANDLE, false)
         }
 
     private companion object {

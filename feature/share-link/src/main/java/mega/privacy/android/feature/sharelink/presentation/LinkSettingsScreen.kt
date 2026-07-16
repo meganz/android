@@ -61,6 +61,7 @@ import java.util.TimeZone
  *
  * @param uiState The current [LinkSettingsUiState].
  * @param onBack Invoked when the Close action is tapped.
+ * @param onSeparateKeyEnabled Invoked when the "Separate link and key" toggle changes.
  * @param onExpiryEnabled Invoked when the "Set expiry date" toggle changes.
  * @param onExpiryDateChanged Invoked with the chosen expiry date, in UTC milliseconds.
  * @param onPasswordEnabled Invoked when the "Set password" toggle changes.
@@ -73,6 +74,7 @@ import java.util.TimeZone
 fun LinkSettingsScreen(
     uiState: LinkSettingsUiState,
     onBack: () -> Unit,
+    onSeparateKeyEnabled: (Boolean) -> Unit,
     onExpiryEnabled: (Boolean) -> Unit,
     onExpiryDateChanged: (Long) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
@@ -125,6 +127,7 @@ fun LinkSettingsScreen(
             } else {
                 LinkSettingsContent(
                     uiState = uiState,
+                    onSeparateKeyEnabled = onSeparateKeyEnabled,
                     onExpiryEnabled = onExpiryEnabled,
                     onExpiryDateChanged = onExpiryDateChanged,
                     onPasswordEnabled = onPasswordEnabled,
@@ -154,6 +157,7 @@ fun LinkSettingsScreen(
 @Composable
 private fun LinkSettingsContent(
     uiState: LinkSettingsUiState,
+    onSeparateKeyEnabled: (Boolean) -> Unit,
     onExpiryEnabled: (Boolean) -> Unit,
     onExpiryDateChanged: (Long) -> Unit,
     onPasswordEnabled: (Boolean) -> Unit,
@@ -167,6 +171,20 @@ private fun LinkSettingsContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
+        FlexibleLineListItem(
+            modifier = Modifier.testTag(LINK_SETTINGS_SEPARATE_KEY_ROW_TAG),
+            title = stringResource(sharedR.string.share_link_separate_key_title),
+            subtitle = stringResource(sharedR.string.share_link_separate_key_subtitle),
+            enableClick = true,
+            onClickListener = { onSeparateKeyEnabled(!uiState.isSeparateKeyEnabled) },
+            trailingElement = {
+                Toggle(
+                    modifier = Modifier.testTag(LINK_SETTINGS_SEPARATE_KEY_TOGGLE_TAG),
+                    isChecked = uiState.isSeparateKeyEnabled,
+                    onCheckedChange = onSeparateKeyEnabled,
+                )
+            },
+        )
         FlexibleLineListItem(
             modifier = Modifier.testTag(LINK_SETTINGS_EXPIRY_ROW_TAG),
             title = stringResource(sharedR.string.share_link_set_expiry_date),
@@ -351,6 +369,7 @@ private fun LinkSettingsScreenPreview() {
         LinkSettingsScreen(
             uiState = previewData,
             onBack = {},
+            onSeparateKeyEnabled = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -367,6 +386,7 @@ private fun LinkSettingsScreenDirtyPreview() {
         LinkSettingsScreen(
             uiState = previewData.copy(isExpiryEnabled = true, isSaveEnabled = true),
             onBack = {},
+            onSeparateKeyEnabled = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -390,6 +410,7 @@ private fun LinkSettingsScreenPasswordPreview(
                 isSaveEnabled = true,
             ),
             onBack = {},
+            onSeparateKeyEnabled = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -416,6 +437,7 @@ private fun LinkSettingsScreenLoadingPreview() {
         LinkSettingsScreen(
             uiState = LinkSettingsUiState(isLoading = true),
             onBack = {},
+            onSeparateKeyEnabled = {},
             onExpiryEnabled = {},
             onExpiryDateChanged = {},
             onPasswordEnabled = {},
@@ -427,6 +449,8 @@ private fun LinkSettingsScreenLoadingPreview() {
 
 internal const val LINK_SETTINGS_APP_BAR_TAG = "link_settings_screen:app_bar"
 internal const val LINK_SETTINGS_SAVE_BUTTON_TAG = "link_settings_screen:button_save"
+internal const val LINK_SETTINGS_SEPARATE_KEY_ROW_TAG = "link_settings_screen:row_separate_key"
+internal const val LINK_SETTINGS_SEPARATE_KEY_TOGGLE_TAG = "link_settings_screen:toggle_separate_key"
 internal const val LINK_SETTINGS_EXPIRY_ROW_TAG = "link_settings_screen:row_expiry"
 internal const val LINK_SETTINGS_EXPIRY_TOGGLE_TAG = "link_settings_screen:toggle_expiry"
 internal const val LINK_SETTINGS_EXPIRY_FIELD_TAG = "link_settings_screen:field_expiry"

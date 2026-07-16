@@ -66,6 +66,13 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                         )
                     }
                 },
+                onCopyKey = {
+                    coroutineScope.launch {
+                        snackbarQueue.queueMessage(
+                            resources.getString(sharedR.string.album_get_link_copy_key_success_message)
+                        )
+                    }
+                },
             )
         }
     }
@@ -101,6 +108,7 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
         LinkSettingsScreen(
             uiState = uiState,
             onBack = navigationHandler::back,
+            onSeparateKeyEnabled = viewModel::onSeparateKeyEnabled,
             onExpiryEnabled = viewModel::onExpiryEnabled,
             onExpiryDateChanged = viewModel::onExpiryDateChanged,
             onPasswordEnabled = viewModel::onPasswordEnabled,

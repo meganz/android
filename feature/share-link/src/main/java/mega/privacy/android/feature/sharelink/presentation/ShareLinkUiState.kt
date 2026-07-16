@@ -35,6 +35,8 @@ sealed interface ShareLinkUiState {
      * @property link The full public link including the decryption key.
      * @property linkWithoutKey The public link with the decryption key stripped, or null.
      * @property key The decryption key split from the link, or null.
+     * @property isKeySeparate Whether the link and key are shared separately (session state): the
+     * link card then shows the key-less link and a separate key card is shown.
      * @property accountType The current account type, used for Pro gating of link settings.
      * @property isPasswordSet Whether the link is currently password-protected (session state).
      * @property password The current plaintext password, kept in-session so Link settings can
@@ -52,6 +54,7 @@ sealed interface ShareLinkUiState {
         val linkWithoutKey: String?,
         val key: String?,
         val accountType: AccountType?,
+        val isKeySeparate: Boolean = false,
         val isPasswordSet: Boolean = false,
         val password: String? = null,
         val linkWithPassword: String? = null,

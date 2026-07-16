@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -45,6 +46,7 @@ class ShareLinkViewModel @AssistedInject constructor(
     private val splitLinkAndKeyUseCase: SplitLinkAndKeyUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
     private val passwordCache: ShareLinkPasswordCache,
+    private val separateKeyCache: ShareLinkSeparateKeyCache,
 ) : ViewModel() {
 
     /**
@@ -56,11 +58,19 @@ class ShareLinkViewModel @AssistedInject constructor(
         val accountTypeFlow = monitorAccountDetailUseCase()
             .map { it.levelDetail?.accountType }
             .onStart { emit(null) }
-        val passwordFlow = args.handles.firstOrNull()?.let(passwordCache::monitor) ?: flowOf(null)
-        combine(linkFlow, accountTypeFlow, passwordFlow) { state, accountType, password ->
+        val handle = args.handles.firstOrNull()
+        val passwordFlow = handle?.let(passwordCache::monitor) ?: flowOf(null)
+        val separateKeyFlow = handle?.let(separateKeyCache::monitor) ?: flowOf(false)
+        combine(
+            linkFlow,
+            accountTypeFlow,
+            passwordFlow,
+            separateKeyFlow,
+        ) { state, accountType, password, isKeySeparate ->
             if (state !is ShareLinkUiState.Data) return@combine state
             state.copy(
                 accountType = accountType,
+                isKeySeparate = isKeySeparate,
                 isPasswordSet = password != null,
                 password = password?.password,
                 linkWithPassword = password?.linkWithPassword,

@@ -3137,6 +3137,10 @@
     <string name="document_scanner_capture_button">Capture</string>
     <!-- Share link revamp: title of the Link settings screen -->
     <string name="share_link_settings_title">Link settings</string>
+    <!-- Share link revamp: title of the row that toggles sharing the link without its decryption key -->
+    <string name="share_link_separate_key_title">Separate link and key</string>
+    <!-- Share link revamp: subtitle explaining the "Separate link and key" row -->
+    <string name="share_link_separate_key_subtitle">The link will not include the decryption key. Share the key through a different channel for extra security.</string>
     <!-- Share link revamp: title of the row that toggles setting an expiry date on the link -->
     <string name="share_link_set_expiry_date">Set expiry date</string>
     <!-- Share link revamp: subtitle explaining the "Set expiry date" row -->

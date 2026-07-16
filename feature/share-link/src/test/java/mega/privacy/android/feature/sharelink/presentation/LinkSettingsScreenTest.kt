@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -38,12 +39,23 @@ class LinkSettingsScreenTest {
     }
 
     @Test
-    fun `test that the expiry and password rows and Save button are displayed once loaded`() {
+    fun `test that the separate-key, expiry and password rows and Save button are displayed once loaded`() {
         setContent(uiState = loaded)
 
+        composeRule.onNodeWithTag(LINK_SETTINGS_SEPARATE_KEY_ROW_TAG).assertIsDisplayed()
         composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_ROW_TAG).assertIsDisplayed()
         composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_ROW_TAG).assertIsDisplayed()
         composeRule.onNodeWithTag(LINK_SETTINGS_SAVE_BUTTON_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that tapping the separate-key toggle invokes onSeparateKeyEnabled`() {
+        var enabled: Boolean? = null
+        setContent(uiState = loaded, onSeparateKeyEnabled = { enabled = it })
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_SEPARATE_KEY_TOGGLE_TAG).performClick()
+
+        assertThat(enabled).isTrue()
     }
 
     @Test
@@ -199,12 +211,13 @@ class LinkSettingsScreenTest {
 
         composeRule.onNodeWithText(
             context.getString(sharedR.string.password_strength_strong)
-        ).assertIsDisplayed()
+        ).performScrollTo().assertIsDisplayed()
     }
 
     private fun setContent(
         uiState: LinkSettingsUiState,
         onBack: () -> Unit = {},
+        onSeparateKeyEnabled: (Boolean) -> Unit = {},
         onExpiryEnabled: (Boolean) -> Unit = {},
         onExpiryDateChanged: (Long) -> Unit = {},
         onPasswordEnabled: (Boolean) -> Unit = {},
@@ -215,6 +228,7 @@ class LinkSettingsScreenTest {
             LinkSettingsScreen(
                 uiState = uiState,
                 onBack = onBack,
+                onSeparateKeyEnabled = onSeparateKeyEnabled,
                 onExpiryEnabled = onExpiryEnabled,
                 onExpiryDateChanged = onExpiryDateChanged,
                 onPasswordEnabled = onPasswordEnabled,

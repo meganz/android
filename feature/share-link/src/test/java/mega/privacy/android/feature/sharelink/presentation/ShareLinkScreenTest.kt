@@ -11,10 +11,13 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_DETAILS_TAG
+import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_KEY_COPY_TAG
+import mega.privacy.android.feature.sharelink.presentation.component.SHARE_LINK_KEY_DETAILS_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
@@ -99,12 +102,50 @@ class ShareLinkScreenTest {
         assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.link)
     }
 
+    @Test
+    fun `test that the key card and key-less link are displayed when the key is separate`() {
+        setContent(uiState = data.copy(isKeySeparate = true))
+
+        composeRule.onNodeWithText("https://mega.nz/file/abc123").assertIsDisplayed()
+        composeRule.onNodeWithTag(SHARE_LINK_KEY_DETAILS_TAG).performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("decryptionKey").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the key card is hidden when the key is not separate`() {
+        setContent(uiState = data)
+
+        composeRule.onNodeWithTag(SHARE_LINK_KEY_DETAILS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that tapping the key copy icon invokes onCopyKey`() {
+        var copied = false
+        setContent(uiState = data.copy(isKeySeparate = true), onCopyKey = { copied = true })
+
+        composeRule.onNodeWithTag(SHARE_LINK_KEY_COPY_TAG).performScrollTo().performClick()
+
+        assertThat(copied).isTrue()
+    }
+
+    @Test
+    fun `test that tapping the key copy icon copies the key to the clipboard`() {
+        val clipboard = FakeClipboard()
+        setContent(uiState = data.copy(isKeySeparate = true), clipboard = clipboard)
+
+        composeRule.onNodeWithTag(SHARE_LINK_KEY_COPY_TAG).performScrollTo().performClick()
+        composeRule.waitForIdle()
+
+        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.key)
+    }
+
     private fun setContent(
         uiState: ShareLinkUiState,
         onBack: () -> Unit = {},
         onOpenSettings: () -> Unit = {},
         onShareLink: () -> Unit = {},
         onCopyLink: () -> Unit = {},
+        onCopyKey: () -> Unit = {},
         clipboard: Clipboard = FakeClipboard(),
     ) {
         composeRule.setContent {
@@ -115,6 +156,7 @@ class ShareLinkScreenTest {
                     onOpenSettings = onOpenSettings,
                     onShareLink = onShareLink,
                     onCopyLink = onCopyLink,
+                    onCopyKey = onCopyKey,
                 )
             }
         }
