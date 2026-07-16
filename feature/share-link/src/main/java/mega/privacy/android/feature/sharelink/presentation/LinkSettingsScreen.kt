@@ -30,11 +30,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.datepicker.MegaDatePickerDialog
 import mega.android.core.ui.components.dialogs.BasicDialog
@@ -42,6 +44,7 @@ import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.inputfields.PasswordTextInputField
 import mega.android.core.ui.components.inputfields.ReadOnlyTextInputField
 import mega.android.core.ui.components.list.FlexibleLineListItem
+import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.toggle.Toggle
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -55,6 +58,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.LinkColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.resources.R as sharedR
@@ -182,10 +186,41 @@ private fun LinkSettingsContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        FlexibleLineListItem(
+        GenericListItem(
             modifier = Modifier.testTag(LINK_SETTINGS_SEPARATE_KEY_ROW_TAG),
-            title = stringResource(sharedR.string.share_link_separate_key_title),
-            subtitle = stringResource(sharedR.string.share_link_separate_key_subtitle),
+            title = {
+                MegaText(
+                    text = stringResource(sharedR.string.share_link_separate_key_title),
+                    textColor = TextColor.Primary,
+                    style = AppTheme.typography.bodyLarge,
+                )
+            },
+            subtitle = {
+                MegaText(
+                    text = stringResource(sharedR.string.share_link_separate_key_subtitle),
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyMedium,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                LinkSpannedText(
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .testTag(LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG),
+                    value = "[A]${stringResource(sharedR.string.general_learn_more)}[/A]",
+                    spanStyles = mapOf(
+                        SpanIndicator('A') to SpanStyleWithAnnotation(
+                            megaSpanStyle = MegaSpanStyle.LinkColorStyle(
+                                spanStyle = SpanStyle(),
+                                linkColor = LinkColor.Primary,
+                            ),
+                            annotation = LEARN_MORE_ANNOTATION,
+                        )
+                    ),
+                    baseStyle = AppTheme.typography.bodyMedium,
+                    onAnnotationClick = { onLearnMore() },
+                )
+            },
             enableClick = true,
             onClickListener = { onSeparateKeyEnabled(!uiState.isSeparateKeyEnabled) },
             trailingElement = {
@@ -195,24 +230,6 @@ private fun LinkSettingsContent(
                     onCheckedChange = onSeparateKeyEnabled,
                 )
             },
-        )
-        LinkSpannedText(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .padding(bottom = 8.dp)
-                .testTag(LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG),
-            value = "[A]${stringResource(sharedR.string.general_learn_more)}[/A]",
-            spanStyles = mapOf(
-                SpanIndicator('A') to SpanStyleWithAnnotation(
-                    megaSpanStyle = MegaSpanStyle.LinkColorStyle(
-                        spanStyle = SpanStyle(),
-                        linkColor = LinkColor.Primary,
-                    ),
-                    annotation = LEARN_MORE_ANNOTATION,
-                )
-            ),
-            baseStyle = AppTheme.typography.bodyMedium,
-            onAnnotationClick = { onLearnMore() },
         )
         FlexibleLineListItem(
             modifier = Modifier.testTag(LINK_SETTINGS_EXPIRY_ROW_TAG),

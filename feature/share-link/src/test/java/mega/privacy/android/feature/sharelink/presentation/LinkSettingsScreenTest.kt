@@ -63,7 +63,8 @@ class LinkSettingsScreenTest {
         var clicked = false
         setContent(uiState = loaded, onLearnMore = { clicked = true })
 
-        composeRule.onNodeWithTag(LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG).performClick()
+        composeRule.onNodeWithTag(LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG, useUnmergedTree = true)
+            .performClick()
 
         assertThat(clicked).isTrue()
     }
