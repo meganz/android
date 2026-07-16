@@ -36,7 +36,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.fcm.FcmManager
 import mega.privacy.android.app.fetcher.MediaThumbnailFetcher
 import mega.privacy.android.app.fetcher.MediaThumbnailKeyer
 import mega.privacy.android.app.fetcher.MegaAvatarFetcher
@@ -59,17 +58,13 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
-import mega.privacy.android.app.utils.greeter.Greeter
 import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
-import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
 import mega.privacy.android.navigation.destination.ChatNavKey
 import nz.mega.sdk.MegaApiAndroid
@@ -79,7 +74,6 @@ import nz.mega.sdk.MegaChatCall
 import okhttp3.OkHttpClient
 import timber.log.Timber
 import javax.inject.Inject
-import javax.inject.Provider
 
 /**
  * Mega application
@@ -88,8 +82,6 @@ import javax.inject.Provider
  * @property megaApiFolder
  * @property megaChatApi
  * @property _dbH
- * @property getMiscFlagsUseCase
- * @property isUserLoggedInUseCase
  * @property myAccountInfo
  * @property crashReporter
  * @property updateCrashAndPerformanceReportersUseCase
@@ -140,12 +132,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         get() {
             return _dbH.get()
         }
-
-    @Inject
-    lateinit var getMiscFlagsUseCase: GetMiscFlagsUseCase
-
-    @Inject
-    lateinit var isUserLoggedInUseCase: IsUserLoggedInUseCase
 
     @Inject
     lateinit var myAccountInfo: MyAccountInfo
@@ -200,9 +186,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
 
     @Inject
-    internal lateinit var greeter: Provider<Greeter>
-
-    @Inject
     internal lateinit var thumbnailFactory: MegaThumbnailFetcher.Factory
 
     @Inject
@@ -210,12 +193,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
     @Inject
     internal lateinit var photoThumbnailFactory: MediaThumbnailFetcher.Factory
-
-    @Inject
-    internal lateinit var updateApiServerUseCase: UpdateApiServerUseCase
-
-    @Inject
-    lateinit var fcmManager: FcmManager
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
@@ -297,17 +274,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         isVerifySMSShowed = false
 
         setupMegaChatApi()
-        getMiscFlagsIfNeeded()
-        applicationScope.launch {
-            runCatching { updateApiServerUseCase() }
-        }
-
-        myAccountInfo.resetDefaults()
-
-        if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
-
-        // Subscribe to all users FCM topic
-        fcmManager.subscribeToAllUsersTopic()
+        globalInitialiser.onAppCreate()
     }
 
     // Image loader for coil3
@@ -449,22 +416,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
                 .collectLatest { next: CallSoundType ->
                     soundsController.playSound(next)
                 }
-        }
-    }
-
-    /**
-     * Get the misc flags
-     */
-    private fun getMiscFlagsIfNeeded() {
-        applicationScope.launch {
-            runCatching {
-                val isUserLoggedOut = isUserLoggedInUseCase().not()
-                if (isUserLoggedOut) {
-                    getMiscFlagsUseCase()
-                }
-            }.onFailure {
-                Timber.e("Failed to get misc flags: $it")
-            }
         }
     }
 
