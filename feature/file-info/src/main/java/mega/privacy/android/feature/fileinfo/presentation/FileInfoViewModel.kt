@@ -17,13 +17,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
-import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
-import mega.privacy.android.domain.entity.toDuration
-import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -31,8 +26,12 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
+import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.entity.toDuration
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.GetAddressFromCoordinatesUseCase
+import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetImageNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetNodePathByIdUseCase
@@ -44,6 +43,7 @@ import mega.privacy.android.domain.usecase.node.SetNodeDescriptionUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
+import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.shared.nodes.extension.getIcon
@@ -173,7 +173,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                 )
             }
 
-            loadFolderVersions(node)
+            loadFolderStats(node)
             loadPreview(node)
         }
     }
@@ -270,18 +270,22 @@ internal class FileInfoViewModel @AssistedInject constructor(
     }
 
     /**
-     * Loads the folder version stats (versioned-file count + current/previous version sizes). Runs
-     * separately from the main info emission because the folder-tree traversal can be slow, so the
-     * rest of the screen shows first and the version rows populate when ready. Reuses the node from
+     * Loads the folder stats (total size, contained file/sub-folder counts, and versioned-file
+     * count + current/previous version sizes). Runs separately from the main info emission because
+     * the folder-tree traversal can be slow, so the rest of the screen shows first and the folder
+     * size, content subtitle, and version rows populate when ready. Reuses the node from
      * [loadNodeInfo] to avoid an extra fetch.
      */
-    private fun loadFolderVersions(node: TypedNode) {
+    private fun loadFolderStats(node: TypedNode) {
         val folder = node as? TypedFolderNode ?: return
         viewModelScope.launch {
             runCatching { getFolderTreeInfo(folder) }
                 .onSuccess { info ->
                     _uiState.update {
                         it.copy(
+                            sizeInBytes = info.totalCurrentSizeInBytes,
+                            numberOfFiles = info.numberOfFiles,
+                            numberOfFolders = info.numberOfFolders,
                             numberOfVersions = info.numberOfVersions,
                             currentVersionsSizeInBytes = info.totalCurrentSizeInBytes,
                             previousVersionsSizeInBytes = info.sizeOfPreviousVersionsInBytes,

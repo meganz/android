@@ -55,6 +55,8 @@ import mega.privacy.android.navigation.destination.VersionsFileNavKey
 import mega.privacy.android.shared.nodes.components.NodeDescriptionField
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
+import mega.privacy.android.shared.nodes.model.NodeSubtitleText
+import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -121,27 +123,30 @@ private fun FileInfoContent(
 ) {
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
-    val typeLabel = if (uiState.isFile) {
-        uiState.fileTypeExtension?.uppercase()
+    val folderContent = if (!uiState.isFile &&
+        (uiState.numberOfFolders > 0 || uiState.numberOfFiles > 0)
+    ) {
+        NodeSubtitleText.FolderSubtitle(
+            childFolderCount = uiState.numberOfFolders,
+            childFileCount = uiState.numberOfFiles,
+        ).text()
     } else {
-        // TODO extract to a localized string resource
-        "Folder"
+        null
     }
     val subtitle = buildList {
-        if (uiState.isOutgoingShare) {
-            // TODO extract to a localized string resource
-            add("Outgoing share")
+        when {
+            // TODO extract to localized string resources
+            uiState.isOutgoingShare -> add("Outgoing share")
+            uiState.isIncomingShare -> add("Incoming share")
+            uiState.isFile -> uiState.fileTypeExtension?.uppercase()?.let(::add)
+            else -> add("Folder")
         }
-        if (uiState.isIncomingShare) {
-            // TODO extract to a localized string resource
-            add("Incoming share")
-        }
-        typeLabel?.let { add(it) }
-        if (uiState.isFile && uiState.sizeInBytes > 0) {
+        if (uiState.sizeInBytes > 0) {
             add(formatFileSize(uiState.sizeInBytes, context))
         }
         uiState.durationText?.let { add(it) }
-    }.joinToString(separator = " • ")
+        folderContent?.let { add(it) }
+    }.joinToString(separator = " ⋅ ")
 
     Column(
         modifier = modifier
@@ -448,6 +453,8 @@ private fun FileInfoScreenFolderPreview() {
                 nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                 locationFolders = listOf("Documents"),
                 sharedContactCount = 3,
+                sizeInBytes = 21L * 1024 * 1024,
+                numberOfFiles = 2,
             ),
             nodeHandle = 0L,
             onBack = {},

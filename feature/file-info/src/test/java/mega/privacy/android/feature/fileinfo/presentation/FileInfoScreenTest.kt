@@ -2,6 +2,7 @@ package mega.privacy.android.feature.fileinfo.presentation
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -76,6 +77,43 @@ class FileInfoScreenTest {
 
         composeRule.onNodeWithText("New folder").assertIsDisplayed()
         composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains("Folder", substring = true)
+    }
+
+    @Test
+    fun `test that the subtitle shows the folder size and file count for a folder`() {
+        setContent(
+            uiState = folderState.copy(
+                sizeInBytes = 21L * 1024 * 1024,
+                numberOfFiles = 2,
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextContains("21 MB", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextContains("2 files", substring = true)
+    }
+
+    @Test
+    fun `test that the subtitle shows both folder and file counts for a folder with sub-folders`() {
+        setContent(
+            uiState = folderState.copy(
+                numberOfFolders = 3,
+                numberOfFiles = 24,
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextContains("3 folders", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextContains("24 files", substring = true)
+    }
+
+    @Test
+    fun `test that the subtitle has no content count for an empty folder`() {
+        setContent(uiState = folderState.copy(numberOfFiles = 0, numberOfFolders = 0))
+
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextEquals("Folder")
     }
 
     @Test
@@ -182,13 +220,10 @@ class FileInfoScreenTest {
     }
 
     @Test
-    fun `test that the subtitle shows Outgoing share for a shared folder`() {
+    fun `test that the subtitle shows Outgoing share instead of Folder for a shared folder`() {
         setContent(uiState = folderState.copy(sharedContactCount = 3))
 
-        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
-            .assertTextContains("Outgoing share", substring = true)
-        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
-            .assertTextContains("Folder", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextEquals("Outgoing share")
     }
 
     @Test

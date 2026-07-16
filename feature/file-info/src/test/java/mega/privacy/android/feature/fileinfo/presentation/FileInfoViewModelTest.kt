@@ -623,7 +623,7 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test that init loads folder versions for a folder with versioned files`() = runTest {
+    fun `test that init loads folder stats for a folder`() = runTest {
         val node = mockFolderNode()
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
         whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
@@ -641,6 +641,9 @@ internal class FileInfoViewModelTest {
         advanceUntilIdle()
 
         with(underTest.uiState.value) {
+            assertThat(sizeInBytes).isEqualTo(22_800L)
+            assertThat(numberOfFiles).isEqualTo(3223)
+            assertThat(numberOfFolders).isEqualTo(540)
             assertThat(numberOfVersions).isEqualTo(91)
             assertThat(currentVersionsSizeInBytes).isEqualTo(22_800L)
             assertThat(previousVersionsSizeInBytes).isEqualTo(1_260L)

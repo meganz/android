@@ -30,6 +30,8 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * @property ownerName the display name (or email) of the incoming-share owner, or null when not an incoming share
  * @property ownerEmail the email of the incoming-share owner, or null when not an incoming share
  * @property versionCount the number of versions of a file (0 when none / not a file)
+ * @property numberOfFiles the number of files contained in a folder and its sub-folders (0 for files)
+ * @property numberOfFolders the number of sub-folders contained in a folder (0 for files)
  * @property numberOfVersions the number of versioned files inside a folder (0 when none / not a folder)
  * @property currentVersionsSizeInBytes the total size of the folder's current versions
  * @property previousVersionsSizeInBytes the total size of the folder's previous versions
@@ -66,6 +68,8 @@ internal data class FileInfoUiState(
     val ownerName: String? = null,
     val ownerEmail: String? = null,
     val versionCount: Int = 0,
+    val numberOfFiles: Int = 0,
+    val numberOfFolders: Int = 0,
     val numberOfVersions: Int = 0,
     val currentVersionsSizeInBytes: Long = 0L,
     val previousVersionsSizeInBytes: Long = 0L,
