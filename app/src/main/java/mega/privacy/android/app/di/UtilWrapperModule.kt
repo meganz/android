@@ -1,6 +1,5 @@
 package mega.privacy.android.app.di
 
-import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Base64
@@ -16,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.notifications.CameraUploadsNotificationManager
 import mega.privacy.android.app.presentation.extensions.getErrorStringId
+import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
@@ -140,14 +140,14 @@ abstract class UtilWrapperModule {
          * Provides the [ApplicationIpAddressWrapper]
          */
         @Provides
-        fun provideApplicationIpAddressWrapper(application: Application) =
+        fun provideApplicationIpAddressWrapper(globalNetworkStateHandler: GlobalNetworkStateHandler) =
             object : ApplicationIpAddressWrapper {
                 override fun setIpAddress(ipAddress: String?) {
-                    (application as MegaApplication).localIpAddress = ipAddress
+                    globalNetworkStateHandler.localIpAddress = ipAddress
                 }
 
                 override fun getIpAddress(): String? {
-                    return (application as MegaApplication).localIpAddress
+                    return globalNetworkStateHandler.localIpAddress
                 }
             }
 

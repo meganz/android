@@ -12,39 +12,23 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
-import com.google.firebase.Firebase
-import com.google.firebase.crashlytics.crashlytics
 import dagger.Lazy
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
-import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
-import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
+import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.jni.JniExceptionHandler
-import mega.privacy.android.app.jni.JniExceptionReporter
-import mega.privacy.android.app.listeners.GlobalChatListener
 import mega.privacy.android.app.meeting.CallService
-import mega.privacy.android.app.meeting.CallSoundType
-import mega.privacy.android.app.meeting.CallSoundsController
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
-import mega.privacy.android.app.meeting.listeners.MeetingListener
-import mega.privacy.android.app.presentation.theme.ThemeModeState
-import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
-import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
 import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
 import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.logging.Log
-import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.setting.GetCookieSettingsUseCase
 import mega.privacy.android.domain.usecase.setting.UpdateCrashAndPerformanceReportersUseCase
@@ -64,20 +48,12 @@ import javax.inject.Inject
  * @property megaChatApi
  * @property _dbH
  * @property myAccountInfo
- * @property crashReporter
  * @property updateCrashAndPerformanceReportersUseCase
- * @property monitorCallSoundsUseCase
- * @property themeModeState
  * @property activityLifecycleHandler
- * @property megaChatNotificationHandler
  * @property pushNotificationSettingManagement
  * @property chatManagement
- * @property chatRequestHandler
  * @property rtcAudioManagerGateway
  * @property callChangesObserver
- * @property globalChatListener
- * @property localIpAddress
- * @property globalNetworkStateHandler
  * @property applicationScope
  */
 @HiltAndroidApp
@@ -117,30 +93,17 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     lateinit var myAccountInfo: MyAccountInfo
 
     @Inject
-    lateinit var crashReporter: CrashReporter
-
-    @Inject
     lateinit var updateCrashAndPerformanceReportersUseCase: UpdateCrashAndPerformanceReportersUseCase
 
     @Inject
     lateinit var getCookieSettingsUseCase: GetCookieSettingsUseCase
-
-    @Inject
-    lateinit var monitorCallSoundsUseCase: MonitorCallSoundsUseCase
-
 
     @ApplicationScope
     @Inject
     lateinit var applicationScope: CoroutineScope
 
     @Inject
-    lateinit var themeModeState: ThemeModeState
-
-    @Inject
     lateinit var activityLifecycleHandler: ActivityLifecycleHandler
-
-    @Inject
-    lateinit var megaChatNotificationHandler: MegaChatNotificationHandler
 
     @Inject
     @get:JvmName("pushNotificationSettingManagement")
@@ -151,19 +114,13 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     lateinit var chatManagement: ChatManagement
 
     @Inject
-    lateinit var chatRequestHandler: MegaChatRequestHandler
-
-    @Inject
     lateinit var rtcAudioManagerGateway: RTCAudioManagerGateway
 
     @Inject
     lateinit var callChangesObserver: CallChangesObserver
 
     @Inject
-    lateinit var globalChatListener: GlobalChatListener
-
-    @Inject
-    lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
+    lateinit var chatApiListenerCoordinator: ChatApiListenerCoordinator
 
     @Inject
     lateinit var workManagerConfigurationProvider: WorkManagerConfigurationProvider
@@ -174,24 +131,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     @Inject
     lateinit var logFlushGateway: LogFlushGateway
 
-    var localIpAddress: String? = ""
-
-    private val meetingListener = MeetingListener()
-    private val soundsController = CallSoundsController()
-    private var callSoundsJob: Job? = null
-
-    private fun handleUncaughtException(throwable: Throwable) {
-        Timber.e(throwable, "UNCAUGHT EXCEPTION")
-        crashReporter.report(throwable)
-    }
-
-    /**
-     * Returns true if [throwable] has at least one stack frame inside the app's package.
-     * Pure third-party / system stacks return false so they can be reported as non-fatals
-     */
-    private fun isAppRelatedThrowable(throwable: Throwable): Boolean =
-        throwable.stackTrace.any { it.className.startsWith(APP_PACKAGE_PREFIX) }
-
     /**
      * On create
      *
@@ -201,53 +140,10 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
         super<Application>.onCreate()
         enableStrictMode()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        themeModeState.initialise()
-        callChangesObserver.init()
-
-        // Setup handler and RxJava for uncaught exceptions.
-        if (!BuildConfig.DEBUG) {
-            val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-            Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
-                handleUncaughtException(throwable)
-                if (isAppRelatedThrowable(throwable)) {
-                    defaultHandler?.uncaughtException(thread, throwable)
-                }
-            }
-
-            JniExceptionReporter.handler = object : JniExceptionHandler {
-                override fun onJniException(location: String, message: String, stacktrace: String) {
-                    try {
-                        Timber.e("JNI exception at %s: %s\n%s", location, message, stacktrace)
-
-                        Firebase.crashlytics.recordException(
-                            RuntimeException("JNI exception at $location: $message\n$stacktrace")
-                        )
-                    } catch (t: Throwable) {
-                        Log.e("Failed to log JNI exception: ${t.message}", t)
-                    }
-                }
-            }
-
-        } else {
-            val isDebugBuildType = BuildConfig.BUILD_TYPE == "debug"
-            Firebase.crashlytics.setCrashlyticsCollectionEnabled(!isDebugBuildType)
-            JniExceptionReporter.handler = object : JniExceptionHandler {
-                override fun onJniException(location: String, message: String, stacktrace: String) {
-                    try {
-                        Timber.e("JNI exception at %s: %s\n%s", location, message, stacktrace)
-                    } catch (t: Throwable) {
-                        Log.e("Failed to log JNI exception: ${t.message}", t)
-                    }
-                }
-            }
-        }
-
-
 
         registerActivityLifecycleCallbacks(activityLifecycleHandler)
         isVerifySMSShowed = false
 
-        setupMegaChatApi()
         globalInitialiser.onAppCreate()
     }
 
@@ -320,50 +216,13 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
      * Disable mega chat api
      *
      */
-    fun disableMegaChatApi() {
-        try {
-            megaChatApi.apply {
-                removeChatRequestListener(chatRequestHandler)
-                removeChatNotificationListener(megaChatNotificationHandler)
-                removeChatListener(globalChatListener)
-                removeChatCallListener(meetingListener)
-            }
-            registeredChatListeners = false
-        } catch (e: Exception) {
-            Timber.e(e)
-        }
-    }
+    fun disableMegaChatApi() = chatApiListenerCoordinator.unregister()
 
     /**
      * Setup mega chat api
      *
      */
-    fun setupMegaChatApi() {
-        if (!registeredChatListeners) {
-            Timber.d("Add listeners of megaChatApi")
-            megaChatApi.apply {
-                addChatRequestListener(chatRequestHandler)
-                addChatNotificationListener(megaChatNotificationHandler)
-                addChatListener(globalChatListener)
-                addChatCallListener(meetingListener)
-            }
-            registeredChatListeners = true
-            checkCallSounds()
-        }
-    }
-
-    /**
-     * Check the changes of the meeting to play the right sound
-     */
-    private fun checkCallSounds() {
-        callSoundsJob?.cancel()
-        callSoundsJob = applicationScope.launch {
-            monitorCallSoundsUseCase()
-                .collectLatest { next: CallSoundType ->
-                    soundsController.playSound(next)
-                }
-        }
-    }
+    fun setupMegaChatApi() = chatApiListenerCoordinator.register()
 
     /**
      * Check current enabled cookies and set the corresponding flags to true/false
@@ -384,7 +243,7 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
      *
      */
     fun getMegaChatApi(): MegaChatApiAndroid {
-        setupMegaChatApi()
+        chatApiListenerCoordinator.register()
         return megaChatApi
     }
 
@@ -467,8 +326,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
          */
         const val APP_KEY = "6tioyn8ka5l6hty"
 
-        private const val APP_PACKAGE_PREFIX = "mega.privacy.android."
-
         /**
          * Is logging out
          */
@@ -492,8 +349,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
          */
         @JvmStatic
         var isClosedChat = true
-
-        private var registeredChatListeners = false
 
         /**
          * Is verify s m s showed
