@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.file.GetPathByDocumentContentUriUseCa
 import mega.privacy.android.domain.usecase.file.SaveFileToDestinationUseCase
 import mega.privacy.android.domain.usecase.qrcode.CreateContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.DeleteQRCodeUseCase
+import mega.privacy.android.domain.usecase.qrcode.ParseScannedContactLinkHandleUseCase
 import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.domain.usecase.qrcode.ResetContactLinkUseCase
 import org.junit.After
@@ -82,6 +83,7 @@ class QRCodeViewModelTest {
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val getUserFullNameUseCase: GetUserFullNameUseCase = mock()
     private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
+    private val parseScannedContactLinkHandleUseCase = mock<ParseScannedContactLinkHandleUseCase>()
     private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
     private val myQRCodeTextErrorMapper = mock<MyQRCodeTextErrorMapper>()
@@ -115,6 +117,7 @@ class QRCodeViewModelTest {
             getUserFullNameUseCase = getUserFullNameUseCase,
             getMyAvatarFileUseCase = getMyAvatarFileUseCase,
             queryScannedContactLinkUseCase = queryScannedContactLinkUseCase,
+            parseScannedContactLinkHandleUseCase = parseScannedContactLinkHandleUseCase,
             inviteContactWithHandleUseCase = inviteContactWithHandleUseCase,
             avatarContentMapper = avatarContentMapper,
             myQRCodeTextErrorMapper = myQRCodeTextErrorMapper,
@@ -339,6 +342,55 @@ class QRCodeViewModelTest {
                 val result = awaitItem()
                 assertThat(result.scanCancel).isEqualTo(triggered)
             }
+        }
+
+    @Test
+    fun `test that scanned contact is queried with parsed handle when scanCode returns a valid contact link`() =
+        runTest {
+            val contactLink = "https://mega.nz/C!wf8jTYRB"
+            val handle = "wf8jTYRB"
+            val name = "abc"
+            val avatarColor = 4040
+            val scanResult = ScannedContactLinkResult(
+                name,
+                "abc@gmail.com",
+                12345,
+                false,
+                QRCodeQueryResults.CONTACT_QUERY_OK,
+                null,
+                avatarColor
+            )
+            whenever(scannerHandler.scanBarcode())
+                .thenReturn(BarcodeScanResult.Success(contactLink))
+            whenever(parseScannedContactLinkHandleUseCase(contactLink)).thenReturn(handle)
+            whenever(queryScannedContactLinkUseCase(handle)).thenReturn(scanResult)
+            whenever(avatarContentMapper(name, null, false, 36.sp, avatarColor))
+                .thenReturn(PhotoAvatarContent(path = "photo_path", size = 1L, showBorder = true))
+
+            underTest.scanCode(mock())
+
+            underTest.uiState.test {
+                val result = awaitItem()
+                assertThat(result.scannedContactLinkResult).isInstanceOf(triggered(scanResult).javaClass)
+            }
+        }
+
+    @Test
+    fun `test that invalid code message is shown when scanCode returns a value that is not a contact link`() =
+        runTest {
+            val scannedCode = "https://mega.io/C!wf8jTYRB"
+            whenever(scannerHandler.scanBarcode())
+                .thenReturn(BarcodeScanResult.Success(scannedCode))
+            whenever(parseScannedContactLinkHandleUseCase(scannedCode)).thenReturn(null)
+
+            underTest.scanCode(mock())
+
+            underTest.uiState.test {
+                val result = awaitItem()
+                assertThat(((result.resultMessage as? StateEventWithContentTriggered)?.content)?.first)
+                    .isEqualTo(R.string.invalid_code)
+            }
+            verifyNoInteractions(queryScannedContactLinkUseCase)
         }
 
     @Test

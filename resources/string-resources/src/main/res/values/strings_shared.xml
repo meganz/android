@@ -3159,18 +3159,6 @@
     <string name="settings_preference_option_per_folder">Per folder</string>
     <!-- Settings: preference option that uses the same sorting order or view mode for all folders -->
     <string name="settings_preference_option_all_folders">Same for all</string>
-    <!-- Title of the screen where the user reviews the pages they have scanned -->
-    <string name="document_scanner_review_title">Review scan</string>
-    <!-- Message shown on the scan review screen when no pages have been captured yet -->
-    <string name="document_scanner_review_empty">No pages scanned yet</string>
-    <!-- Accessibility description for the button that deletes a scanned page from the review grid -->
-    <string name="document_scanner_review_delete_page">Delete page</string>
-    <!-- Label for the action that re-captures (retakes) a scanned page, replacing it in place -->
-    <string name="document_scanner_review_retake_page">Retake</string>
-    <!-- Hint shown under the current plan card when the user is already on the highest plan, pointing them to the web pricing page to upgrade. [A] and [/A] wrap the "pricing page" link. -->
-    <string name="subscription_revamp_current_plan_upgrade_on_web">Upgrade your current subscription on our [A]pricing page[/A]</string>
-    <!-- placeholder shown inside the add-tags text field, hinting that tags start with a # -->
-    <string name="add_tags_placeholder_label">#Add tags</string>
     <!-- Badge shown above the featured plan on the subscription page when a single discount offer is active -->
     <string name="subscription_offer_special_offer_badge">Special offer</string>
     <!-- Buy button label on the featured offer card. %1$s is the plan name (e.g. "Pro I"), %2$s is the discounted price (e.g. "€4.99/month"). -->
@@ -3247,4 +3235,26 @@
         <item quantity="one">%1$d link</item>
         <item quantity="other">%1$d links</item>
     </plurals>
+    <!-- Title of the screen where the user reviews the pages they have scanned -->
+    <string name="document_scanner_review_title">Review scan</string>
+    <!-- Message shown on the scan review screen when no pages have been captured yet -->
+    <string name="document_scanner_review_empty">No pages scanned yet</string>
+    <!-- Accessibility description for the button that deletes a scanned page from the review grid -->
+    <string name="document_scanner_review_delete_page">Delete page</string>
+    <!-- Label for the action that re-captures (retakes) a scanned page, replacing it in place -->
+    <string name="document_scanner_review_retake_page">Retake</string>
+    <!-- Hint shown under the current plan card when the user is already on the highest plan, pointing them to the web pricing page to upgrade. [A] and [/A] wrap the "pricing page" link. -->
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Upgrade your current subscription on our [A]pricing page[/A]</string>
+    <!-- placeholder shown inside the add-tags text field, hinting that tags start with a # -->
+    <string name="add_tags_placeholder_label">#Add tags</string>
+    <!-- Title of the dialog shown when an invitation cannot be sent after scanning a contact QR code -->
+    <string name="contacts_qr_invitation_not_sent_dialog_title">Invitation not sent</string>
+    <!-- Body of the dialog shown when the scanned contact QR code belongs to someone who is already in the user's contact list. %1$s is the contact's email address. -->
+    <string name="contacts_qr_already_contact_dialog_body">The invitation has not been sent. %1$s is already in your contacts list.</string>
+    <!-- Body of the dialog shown when the scanned QR code or contact link is not a valid MEGA contact link -->
+    <string name="contacts_qr_invalid_code_dialog_body">The QR code or contact link is invalid. Try to scan a valid code or to open a valid link.</string>
+    <!-- Title of the dialog shown when the QR scanner needs a one-time download that has not finished yet -->
+    <string name="contacts_qr_scanner_not_ready_dialog_title">QR scanner not ready</string>
+    <!-- Body of the dialog shown when the QR scanner is still downloading, prompting the user to retry shortly -->
+    <string name="contacts_qr_scanner_not_ready_dialog_body">The QR scanner is still downloading. Try again in a few seconds.</string>
 </resources>
