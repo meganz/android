@@ -44,6 +44,28 @@ class GlobalInitialiserTest {
         }
 
     @Test
+    fun `test that onAppCreate runs critical initialisers before async ones regardless of list order`() =
+        runTest {
+            val executionOrder = mutableListOf<String>()
+            val async = AppCreateInitialiserAction(name = "async", isCritical = false) {
+                executionOrder += "async"
+            }
+            val critical = AppCreateInitialiserAction(name = "critical", isCritical = true) {
+                executionOrder += "critical"
+            }
+
+            initUnderTest(
+                testScope = this,
+                appCreateInitialisers = listOf(async, critical),
+            )
+
+            underTest.onAppCreate()
+            advanceUntilIdle()
+
+            assertThat(executionOrder).containsExactly("critical", "async").inOrder()
+        }
+
+    @Test
     fun `test that onAppCreate propagates exception when a critical initialiser fails`() =
         runTest {
             val critical = AppCreateInitialiserAction(name = "critical", isCritical = true) {

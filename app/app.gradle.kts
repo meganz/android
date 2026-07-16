@@ -296,7 +296,6 @@ dependencies {
     implementation(androidx.fragment)
     implementation(androidx.fragment.compose)
     implementation(androidx.legacy.support)
-    implementation(androidx.multidex)
     implementation(androidx.palette)
     implementation(androidx.preferences)
     implementation(androidx.recyclerview)

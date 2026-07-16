@@ -1,34 +1,21 @@
 package mega.privacy.android.app
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Handler
 import android.os.Looper
 import android.os.StrictMode
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
-import coil3.ImageLoader
-import coil3.PlatformContext
-import coil3.SingletonImageLoader
-import coil3.gif.AnimatedImageDecoder
-import coil3.gif.GifDecoder
-import coil3.network.okhttp.OkHttpNetworkFetcherFactory
-import coil3.svg.SvgDecoder
-import coil3.video.VideoFrameDecoder
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import dagger.Lazy
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -36,12 +23,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PushNotificationSettingManagement
-import mega.privacy.android.app.fetcher.MediaThumbnailFetcher
-import mega.privacy.android.app.fetcher.MediaThumbnailKeyer
-import mega.privacy.android.app.fetcher.MegaAvatarFetcher
-import mega.privacy.android.app.fetcher.MegaAvatarKeyer
-import mega.privacy.android.app.fetcher.MegaThumbnailFetcher
-import mega.privacy.android.app.fetcher.MegaThumbnailKeyer
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
@@ -58,6 +39,7 @@ import mega.privacy.android.app.meeting.listeners.MeetingListener
 import mega.privacy.android.app.presentation.theme.ThemeModeState
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
 import mega.privacy.android.app.usecase.call.MonitorCallSoundsUseCase
+import mega.privacy.android.app.workmanager.WorkManagerConfigurationProvider
 import mega.privacy.android.data.gateway.LogFlushGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
@@ -71,7 +53,6 @@ import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
-import okhttp3.OkHttpClient
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -100,8 +81,7 @@ import javax.inject.Inject
  * @property applicationScope
  */
 @HiltAndroidApp
-class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
-    SingletonImageLoader.Factory, Configuration.Provider {
+class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
     @MegaApi
     @Inject
     lateinit var _megaApi: Lazy<MegaApiAndroid>
@@ -186,13 +166,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
 
     @Inject
-    internal lateinit var thumbnailFactory: MegaThumbnailFetcher.Factory
-
-    @Inject
-    internal lateinit var avatarFactory: MegaAvatarFetcher.Factory
-
-    @Inject
-    internal lateinit var photoThumbnailFactory: MediaThumbnailFetcher.Factory
+    lateinit var workManagerConfigurationProvider: WorkManagerConfigurationProvider
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
@@ -224,7 +198,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
      */
     override fun onCreate() {
         instance = this
-        super<MultiDexApplication>.onCreate()
+        super<Application>.onCreate()
         enableStrictMode()
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         themeModeState.initialise()
@@ -275,34 +249,6 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
 
         setupMegaChatApi()
         globalInitialiser.onAppCreate()
-    }
-
-    // Image loader for coil3
-    override fun newImageLoader(context: PlatformContext): ImageLoader {
-        return ImageLoader.Builder(this)
-            .components {
-                if (SDK_INT >= Build.VERSION_CODES.P) {
-                    add(AnimatedImageDecoder.Factory())
-                } else {
-                    add(GifDecoder.Factory())
-                }
-                add(
-                    OkHttpNetworkFetcherFactory(
-                        callFactory = {
-                            OkHttpClient()
-                        }
-                    )
-                )
-                add(VideoFrameDecoder.Factory())
-                add(SvgDecoder.Factory())
-                add(thumbnailFactory)
-                add(avatarFactory)
-                add(photoThumbnailFactory)
-                add(MegaThumbnailKeyer)
-                add(MegaAvatarKeyer)
-                add(MediaThumbnailKeyer)
-            }
-            .build()
     }
 
     /**
@@ -513,24 +459,7 @@ class MegaApplication : MultiDexApplication(), DefaultLifecycleObserver,
         get() = activityLifecycleHandler.getCurrentActivity()
 
     override val workManagerConfiguration: Configuration
-        get() {
-            val workManagerEntryPoint = EntryPointAccessors.fromApplication(
-                this,
-                WorkManagerInitializerEntryPoint::class.java
-            )
-            return Configuration.Builder()
-                .setWorkerFactory(workManagerEntryPoint.hiltWorkerFactory())
-                .build()
-        }
-
-    @InstallIn(SingletonComponent::class)
-    @EntryPoint
-    internal interface WorkManagerInitializerEntryPoint {
-        /**
-         * HiltWorkerFactory
-         */
-        fun hiltWorkerFactory(): HiltWorkerFactory
-    }
+        get() = workManagerConfigurationProvider.workManagerConfiguration
 
     companion object {
         /**

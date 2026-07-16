@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.AccountDefaultsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ApiServerInitialiser
+import mega.privacy.android.app.appstate.global.initialisation.appcreate.CoilImageLoaderInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.FcmTopicInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.GreeterInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.MiscFlagsInitialiser
@@ -19,16 +20,18 @@ import mega.privacy.android.navigation.contract.initialisation.initialisers.AppC
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class AppCreateInitialisersModule {
+internal class AppCreateInitialisersModule {
 
     @Provides
     fun provideAppCreateInitialisers(
+        coilImageLoaderInitialiser: CoilImageLoaderInitialiser,
         miscFlagsInitialiser: MiscFlagsInitialiser,
         apiServerInitialiser: ApiServerInitialiser,
         accountDefaultsInitialiser: AccountDefaultsInitialiser,
         greeterInitialiser: GreeterInitialiser,
         fcmTopicInitialiser: FcmTopicInitialiser,
     ): List<@JvmSuppressWildcards AppCreateInitialiser> = listOf(
+        coilImageLoaderInitialiser,
         miscFlagsInitialiser,
         apiServerInitialiser,
         accountDefaultsInitialiser,
