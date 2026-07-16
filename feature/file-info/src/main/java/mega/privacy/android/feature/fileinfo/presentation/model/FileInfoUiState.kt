@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
  * the localized location root label built in the UI. Null while unresolved.
  * @property locationFolders the containing-folder names below the root (empty when the node is in the root)
  * @property locationDestinations the navigation back stack that opens the node's containing folder
+ * @property isMediaFile whether the node is an image or video (drives the location map section)
  * @property coordinates the media GPS coordinates, or null when the node has no valid location
  * @property locationCaption the reverse-geocoded place name for [coordinates], or null when unresolved
  * @property sharedContactCount the number of contacts this node is shared with (0 when not an outgoing share)
@@ -62,6 +63,7 @@ internal data class FileInfoUiState(
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
     val isNodeInRubbish: Boolean = false,
     val isNodeInBackups: Boolean = false,
+    val isMediaFile: Boolean = false,
     val coordinates: Coordinates? = null,
     val locationCaption: String? = null,
     val sharedContactCount: Int = 0,
@@ -101,6 +103,13 @@ internal data class FileInfoUiState(
      */
     val isIncomingShare: Boolean
         get() = ownerEmail != null
+
+    /**
+     * Whether to show the location "Map" section. It appears for the owner's own image/video nodes;
+     * inside it either the map ([mapCoordinates]) or a "no location information" placeholder is shown.
+     */
+    val showMapSection: Boolean
+        get() = isMediaFile && accessPermission == AccessPermission.OWNER
 
     /**
      * The coordinates whose location map should be shown, or null when there is nothing to show:

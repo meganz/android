@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
+import mega.privacy.android.feature.fileinfo.presentation.view.FILE_INFO_NO_LOCATION_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
@@ -372,6 +373,37 @@ class FileInfoScreenTest {
         composeRule.onNodeWithTag(FILE_INFO_OWNER_TAG).performScrollTo().performClick()
 
         assertThat(navKey).isEqualTo(ContactInfoNavKey("johndoe@mail.com"))
+    }
+
+    @Test
+    fun `test that the no-location placeholder is shown for an owned media file without coordinates`() {
+        setContent(
+            uiState = fileState.copy(
+                isMediaFile = true,
+                accessPermission = AccessPermission.OWNER,
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_NO_LOCATION_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that the no-location placeholder is hidden for a non-media file`() {
+        setContent(uiState = fileState.copy(accessPermission = AccessPermission.OWNER))
+
+        composeRule.onNodeWithTag(FILE_INFO_NO_LOCATION_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the location section is hidden for a media file the user does not own`() {
+        setContent(
+            uiState = fileState.copy(
+                isMediaFile = true,
+                accessPermission = AccessPermission.READ,
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_NO_LOCATION_TAG).assertDoesNotExist()
     }
 
     private fun setContent(

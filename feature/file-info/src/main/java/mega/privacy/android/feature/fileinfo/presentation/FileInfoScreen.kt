@@ -313,9 +313,9 @@ private fun FileInfoContent(
             )
         }
 
-        uiState.mapCoordinates?.let { coordinates ->
+        if (uiState.showMapSection) {
             FileInfoMapView(
-                coordinates = coordinates,
+                coordinates = uiState.mapCoordinates,
                 caption = uiState.locationCaption,
             )
         }

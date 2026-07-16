@@ -126,6 +126,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
             val fileTypeExtension: String?
             val thumbnailData: ThumbnailData?
             val durationText: String?
+            val isMediaFile: Boolean
             when (node) {
                 is TypedFileNode -> {
                     isFile = true
@@ -135,6 +136,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     thumbnailData = ThumbnailRequest(nodeId)
                     durationText = node.type.toDuration()
                         ?.let(durationInSecondsTextMapper::invoke)
+                    isMediaFile = node.type is ImageFileTypeInfo || node.type is VideoFileTypeInfo
                 }
 
                 else -> {
@@ -144,6 +146,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     fileTypeExtension = null
                     thumbnailData = null
                     durationText = null
+                    isMediaFile = false
                 }
             }
 
@@ -166,6 +169,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     accessPermission = accessPermission,
                     isNodeInRubbish = isInRubbish,
                     isNodeInBackups = isInBackups,
+                    isMediaFile = isMediaFile,
                     ownerName = owner?.let {
                         it.contactData.alias ?: it.contactData.fullName ?: it.email
                     },
@@ -245,7 +249,6 @@ internal class FileInfoViewModel @AssistedInject constructor(
             val coordinates = runCatching { getImageNodeByIdUseCase(nodeId) }
                 .onFailure { Timber.e(it, "Failed to load image node for $nodeHandle") }
                 .getOrNull()
-                ?.takeIf { it.type is ImageFileTypeInfo }
                 ?.let { Coordinates.createOrNull(latitude = it.latitude, longitude = it.longitude) }
             _uiState.update { it.copy(coordinates = coordinates) }
 
