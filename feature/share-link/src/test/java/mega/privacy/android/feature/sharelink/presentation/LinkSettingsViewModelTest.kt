@@ -31,6 +31,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -540,6 +541,89 @@ class LinkSettingsViewModelTest {
 
             verify(exportNodeUseCase)
                 .invoke(NodeId(NODE_HANDLE), newMillis.milliseconds.inWholeSeconds, CALLER_NAME)
+        }
+
+    @Test
+    fun `test that changing an existing expiry back to the original keeps Save disabled`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+            val newMillis = EXPIRY_TIME + MILLIS_PER_DAY
+
+            underTest.uiState.test {
+                awaitUntil { it.isExpiryAlreadySet }
+                underTest.onExpiryDateChanged(newMillis)
+                awaitUntil { it.isSaveEnabled }
+
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                val state = awaitUntil { it.expiryDate == EXPIRY_TIME }
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that disabling expiry clears the chosen date`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                awaitUntil { it.expiryDate == EXPIRY_TIME }
+
+                underTest.onExpiryEnabled(false)
+                val state = awaitUntil { !it.isExpiryEnabled }
+                assertThat(state.expiryDate).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave does not export the node when only the password changed`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that onSave does not touch the password cache when only the expiry changed`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(passwordCache, never()).set(any(), anyOrNull())
+            verifyNoInteractions(encryptLinkWithPasswordUseCase)
         }
 
     private companion object {

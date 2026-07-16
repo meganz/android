@@ -16,6 +16,9 @@ import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.text.DateFormat
+import java.util.Date
+import java.util.TimeZone
 
 @RunWith(AndroidJUnit4::class)
 class LinkSettingsScreenTest {
@@ -152,6 +155,15 @@ class LinkSettingsScreenTest {
     }
 
     @Test
+    fun `test that the seeded expiry date is displayed in the expiry field`() {
+        setContent(
+            uiState = loaded.copy(isExpiryEnabled = true, expiryDate = EXPIRY_MILLIS)
+        )
+
+        composeRule.onNodeWithText(formattedUtcDate(EXPIRY_MILLIS)).assertIsDisplayed()
+    }
+
+    @Test
     fun `test that the password field is hidden when the password toggle is off`() {
         setContent(uiState = loaded.copy(isPasswordEnabled = false))
 
@@ -212,11 +224,20 @@ class LinkSettingsScreenTest {
         }
     }
 
+    // Mirrors the screen's own UTC MEDIUM formatting so the assertion is locale-independent.
+    private fun formattedUtcDate(millis: Long): String =
+        DateFormat.getDateInstance(DateFormat.MEDIUM)
+            .apply { timeZone = TimeZone.getTimeZone("UTC") }
+            .format(Date(millis))
+
     private companion object {
         const val NAVIGATION_ICON = "Navigation Icon"
 
         // core-ui BaseTextField's editable OutlinedTextField tag; the input field's public
         // testTag is only on the wrapper, so text input must target the inner node.
         const val CORE_UI_TEXT_FIELD_TAG = "base_text_field:outlined_text_field"
+
+        // A fixed, far-future instant used to seed the expiry field.
+        const val EXPIRY_MILLIS = 1_800_000_000_000L
     }
 }
