@@ -37,7 +37,6 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
-import mega.privacy.android.domain.entity.ZipFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -59,7 +58,6 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
-import mega.privacy.android.domain.usecase.file.HasSuitableAppToOpenFileUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -186,7 +184,6 @@ class StartTransfersComponentViewModelTest {
     private val deleteCompletedTransfersByIdUseCase = mock<DeleteCompletedTransfersByIdUseCase>()
     private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase>()
     private val getPreviewDownloadUseCase = mock<GetPreviewDownloadUseCase>()
-    private val hasSuitableAppToOpenFileUseCase = mock<HasSuitableAppToOpenFileUseCase>()
     private val ratingHandlerImpl = mock<RatingHandlerImpl>()
     private val crashReporter = mock<CrashReporter>()
 
@@ -275,7 +272,6 @@ class StartTransfersComponentViewModelTest {
             deleteCompletedTransfersByIdUseCase = deleteCompletedTransfersByIdUseCase,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             getPreviewDownloadUseCase = getPreviewDownloadUseCase,
-            hasSuitableAppToOpenFileUseCase = hasSuitableAppToOpenFileUseCase,
             ratingHandler = ratingHandlerImpl,
             crashReporter = crashReporter,
         )
@@ -329,7 +325,6 @@ class StartTransfersComponentViewModelTest {
             deleteCompletedTransfersByIdUseCase,
             monitorStorageStateEventUseCase,
             getPreviewDownloadUseCase,
-            hasSuitableAppToOpenFileUseCase,
             crashReporter,
         )
         initialStub()
@@ -389,23 +384,8 @@ class StartTransfersComponentViewModelTest {
     }
 
     @Test
-    fun `test that NoAppToOpenFile is emitted and the download is not started when no app can open the preview file`() =
-        runTest {
-            commonStub()
-            whenever(hasSuitableAppToOpenFileUseCase(MIME_TYPE)).thenReturn(false)
-            val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, isOpenWith = false)
-
-            underTest.startTransfer(startEvent)
-
-            assertCurrentEventIsEqualTo(StartTransferEvent.Message.NoAppToOpenFile)
-            verifyNoInteractions(getPreviewDownloadUseCase)
-            verifyNoInteractions(startDownloadsWorkerAndWaitUntilIsStartedUseCase)
-        }
-
-    @Test
-    fun `test that the preview download starts when an app can open the file`() = runTest {
+    fun `test that the preview download starts`() = runTest {
         commonStub()
-        whenever(hasSuitableAppToOpenFileUseCase(MIME_TYPE)).thenReturn(true)
         whenever(getPreviewDownloadUseCase(node)).thenReturn(null)
         whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
         val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, isOpenWith = false)
@@ -414,21 +394,6 @@ class StartTransfersComponentViewModelTest {
 
         verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
     }
-
-    @Test
-    fun `test that a zip preview opened in-app is not blocked when no suitable app is available`() =
-        runTest {
-            commonStub()
-            whenever(node.type).thenReturn(ZipFileTypeInfo("application/zip", "zip"))
-            whenever(hasSuitableAppToOpenFileUseCase(any())).thenReturn(false)
-            whenever(getPreviewDownloadUseCase(node)).thenReturn(null)
-            whenever(getFilePreviewDownloadPathUseCase()).thenReturn(DESTINATION)
-            val startEvent = TransferTriggerEvent.StartDownloadForPreview(node, isOpenWith = false)
-
-            underTest.startTransfer(startEvent)
-
-            verify(startDownloadsWorkerAndWaitUntilIsStartedUseCase).invoke()
-        }
 
     @ParameterizedTest
     @MethodSource("provideStartChatUploadEvents")
@@ -1850,7 +1815,6 @@ class StartTransfersComponentViewModelTest {
         whenever(node.name).thenReturn(NODE_NAME)
         whenever(node.parentId).thenReturn(parentId)
         whenever(node.type).thenReturn(fileTypeInfo)
-        whenever(hasSuitableAppToOpenFileUseCase(any())).thenReturn(true)
         whenever(parentNode.id).thenReturn(parentId)
 
         whenever(getOrCreateDownloadLocationUseCase()).thenReturn(DESTINATION)
@@ -1879,6 +1843,5 @@ class StartTransfersComponentViewModelTest {
         private val parentId = NodeId(PARENT_NODE_HANDLE)
         private const val DESTINATION = "/destination/"
         private const val NODE_NAME = "node.txt"
-        private const val MIME_TYPE = "application/pdf"
     }
 }
