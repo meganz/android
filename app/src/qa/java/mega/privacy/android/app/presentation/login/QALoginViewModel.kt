@@ -12,12 +12,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
-import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
 import timber.log.Timber
 import javax.inject.Inject
@@ -84,17 +82,13 @@ class QALoginViewModel @Inject constructor(
 
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
-        val disableChatApiUseCase = DisableChatApiUseCase {
-            MegaApplication.getInstance().disableMegaChatApi()
-        }
-
         loginJob = viewModelScope.launch {
             // First, clean up chat resources to avoid crashes when logging in with a different account
             // This is similar to what happens in switchToAccount, but without invalidating the session
             Timber.d("Cleaning up chat resources before login: $email")
-            chatLogoutUseCase(disableChatApiUseCase)
+            chatLogoutUseCase(disableChatApi = true)
 
-            loginUseCase(email, password, disableChatApiUseCase)
+            loginUseCase(email, password, disableChatApi = true)
                 .catch { exception ->
                     Timber.e(exception, "Login error")
                     val errorMsg = when (exception) {

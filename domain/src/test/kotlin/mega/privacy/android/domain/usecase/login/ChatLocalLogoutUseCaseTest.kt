@@ -11,14 +11,14 @@ import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ChatLogoutUseCaseTest {
+class ChatLocalLogoutUseCaseTest {
 
     private val loginRepository = mock<LoginRepository> {
-        onBlocking { chatLogout() }.thenReturn(Unit)
+        onBlocking { chatLocalLogout() }.thenReturn(Unit)
     }
     private val disableChatApiUseCase = mock<DisableChatApiUseCase>()
 
-    private val underTest = ChatLogoutUseCase(
+    private val underTest = ChatLocalLogoutUseCase(
         loginRepository = loginRepository,
         disableChatApiUseCase = disableChatApiUseCase,
     )
@@ -29,9 +29,9 @@ class ChatLogoutUseCaseTest {
     }
 
     @Test
-    fun `test that invoke calls chatLogout`() = runTest {
+    fun `test that invoke calls chatLocalLogout`() = runTest {
         underTest.invoke(disableChatApi = false)
-        verify(loginRepository).chatLogout()
+        verify(loginRepository).chatLocalLogout()
     }
 
     @Test

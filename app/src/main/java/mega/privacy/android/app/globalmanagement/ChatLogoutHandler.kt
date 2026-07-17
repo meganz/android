@@ -11,7 +11,6 @@ import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
-import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import timber.log.Timber
@@ -27,7 +26,6 @@ class ChatLogoutHandler @Inject constructor(
     private val context: Context,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val localLogoutUseCase: LocalLogoutUseCase,
-    private val disableChatApiUseCase: DisableChatApiUseCase,
 ) {
     fun handleChatLogout(isLoggingIn: Boolean) {
         sharingScope.launch {
@@ -39,7 +37,7 @@ class ChatLogoutHandler @Inject constructor(
                     Timber.d("Already in Login Activity, not necessary to launch it again")
                     return@withContext
                 }
-                localLogoutUseCase(disableChatApiUseCase)
+                localLogoutUseCase(disableChatApi = true)
                 activityLifecycleHandler.getCurrentActivity()?.let { activity ->
                     if (activity !is MegaActivity) {
                         activity.startActivity(Intent(context, MegaActivity::class.java).apply {

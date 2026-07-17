@@ -55,7 +55,7 @@ class JoinMeetingAsGuestUseCaseTest {
         underTest(meetingLink, guestFirstName, guestLastName)
 
         verify(openChatPreviewUseCase, times(2)).invoke(meetingLink)
-        verify(chatLogoutUseCase).invoke()
+        verify(chatLogoutUseCase).invoke(disableChatApi = false)
         verify(initGuestChatSessionUseCase).invoke(false)
         verify(createEphemeralAccountUseCase).invoke(guestFirstName, guestLastName)
 

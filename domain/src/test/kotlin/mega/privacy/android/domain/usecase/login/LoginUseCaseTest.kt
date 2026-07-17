@@ -33,10 +33,9 @@ class LoginUseCaseTest {
 
     private val loginRepository = mock<LoginRepository>()
     private val chatLogoutUseCase = mock<ChatLogoutUseCase> {
-        on { invoke(disableChatApiUseCase) }.thenReturn(Unit)
+        on { invoke(true) }.thenReturn(Unit)
     }
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
-    private val disableChatApiUseCase = mock<DisableChatApiUseCase>()
     private val saveAccountCredentialsUseCase = mock<SaveAccountCredentialsUseCase>()
     private val chatAnonymousLogoutUseCase = mock<ChatAnonymousLogoutUseCase>()
     private val loginMutex = mock<Mutex>()
@@ -76,14 +75,14 @@ class LoginUseCaseTest {
             whenever(loginRepository.login(email, password))
                 .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest.invoke(email, password, disableChatApiUseCase).test {
+            underTest.invoke(email, password, disableChatApi = true).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }
 
             verify(chatAnonymousLogoutUseCase).invoke()
             verify(loginRepository).initMegaChat()
-            verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+            verify(chatLogoutUseCase).invoke(disableChatApi = true)
             verify(saveAccountCredentialsUseCase).invoke()
             val inOrder = inOrder(loginMutex)
             inOrder.verify(loginMutex).lock()
@@ -95,7 +94,7 @@ class LoginUseCaseTest {
         runTest {
             whenever(loginRepository.initMegaChat()).thenThrow(ChatNotInitializedUnknownStatus())
 
-            underTest.invoke(email, password, disableChatApiUseCase).test {
+            underTest.invoke(email, password, disableChatApi = true).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginCannotStart)
                 assertThat(awaitError()).isInstanceOf(ChatNotInitializedUnknownStatus::class.java)
                 cancelAndIgnoreRemainingEvents()
@@ -114,13 +113,13 @@ class LoginUseCaseTest {
             whenever(loginRepository.login(email, password))
                 .thenReturn(flow { throw LoginRequireValidation() })
 
-            underTest.invoke(email, password, disableChatApiUseCase).test {
+            underTest.invoke(email, password, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
             }
 
             verify(chatAnonymousLogoutUseCase).invoke()
             verify(loginRepository).initMegaChat()
-            verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+            verify(chatLogoutUseCase).invoke(disableChatApi = true)
             verify(resetChatSettingsUseCase).invoke()
             val inOrder = inOrder(loginMutex)
             inOrder.verify(loginMutex).lock()
@@ -133,7 +132,7 @@ class LoginUseCaseTest {
             whenever(loginRepository.login(email, password))
                 .thenReturn(flow { throw LoginLoggedOutFromOtherLocation() })
 
-            underTest.invoke(email, password, disableChatApiUseCase).test {
+            underTest.invoke(email, password, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
             }
 
@@ -151,7 +150,7 @@ class LoginUseCaseTest {
         whenever(loginRepository.login(email, password))
             .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-        underTest.invoke(email, password, disableChatApiUseCase).test {
+        underTest.invoke(email, password, disableChatApi = true).test {
             assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
             cancelAndIgnoreRemainingEvents()
         }

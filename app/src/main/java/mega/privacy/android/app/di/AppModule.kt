@@ -168,7 +168,7 @@ internal class AppModule {
 
     @Provides
     fun provideDisableChatApiUseCase(): DisableChatApiUseCase =
-        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+        DisableChatApiUseCase { MegaApplication.getInstance().disableMegaChatApi() }
 
     @Provides
     fun provideNavigationEventQueueReceiver(queue: CombinedEventQueueImpl): NavigationEventQueueReceiver =
