@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
@@ -224,6 +225,26 @@ class LinkSettingsScreenTest {
         composeRule.onNodeWithText(
             context.getString(sharedR.string.password_strength_strong)
         ).performScrollTo().assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the Pro badge is shown on the expiry and password rows for a free account`() {
+        setContent(uiState = loaded.copy(accountType = AccountType.FREE))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_PRO_BADGE_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_PRO_BADGE_TAG, useUnmergedTree = true)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the Pro badge is hidden on the expiry and password rows for a paid account`() {
+        setContent(uiState = loaded.copy(accountType = AccountType.PRO_I))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_PRO_BADGE_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
+        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_PRO_BADGE_TAG, useUnmergedTree = true)
+            .assertDoesNotExist()
     }
 
     private fun setContent(

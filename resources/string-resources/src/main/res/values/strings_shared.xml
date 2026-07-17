@@ -282,6 +282,8 @@
     <string name="hidden_items">Hidden items</string>
     <!-- Label to indicate that is a Pro only feature -->
     <string name="general_pro_only_label">Pro only</string>
+    <!-- Compact badge text marking a feature as available only on Pro (paid) plans -->
+    <string name="general_pro_label">Pro</string>
     <!-- Label for the file info information screen tags field -->
     <string name="file_info_information_tags_label">Tags</string>
     <!-- label for tags page tag description -->
