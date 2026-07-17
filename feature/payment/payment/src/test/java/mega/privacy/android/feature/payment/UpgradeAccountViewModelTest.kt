@@ -32,8 +32,10 @@ import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
+import mega.privacy.android.feature.payment.model.PlanPeriod
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -46,10 +48,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import java.time.temporal.ChronoUnit
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -76,6 +78,7 @@ class UpgradeAccountViewModelTest {
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val ageSignalUseCase = mock<AgeSignalUseCase>()
+    private val getCurrentTimeInMillisUseCase = mock<GetCurrentTimeInMillisUseCase>()
 
     @BeforeEach
     fun setUp() {
@@ -90,6 +93,7 @@ class UpgradeAccountViewModelTest {
             monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase,
             ageSignalUseCase,
+            getCurrentTimeInMillisUseCase,
         )
         wheneverBlocking { isSubscriptionFeatureAvailableUseCase() }.thenReturn(true)
     }
@@ -104,6 +108,7 @@ class UpgradeAccountViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             ageSignalUseCase = ageSignalUseCase,
+            getCurrentTimeInMillisUseCase = getCurrentTimeInMillisUseCase,
             isUpgradeAccount = isUpgradeAccount,
         )
     }
@@ -657,6 +662,187 @@ class UpgradeAccountViewModelTest {
             Truth.assertThat(state.isCurrentSubscriptionRenewing).isFalse()
         }
     }
+
+    @Test
+    fun `test that a one-off plan derives its period in months from start and expiry times`() =
+        runTest {
+            val startTime = 1_783_500_245L
+            val expiryTime = 1_815_036_245L
+            val planDetail = mock<AccountPlanDetail> {
+                on { this.startTime }.thenReturn(startTime)
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.proPlanStartTime).isEqualTo(startTime)
+                Truth.assertThat(state.currentPlanPeriod)
+                    .isEqualTo(PlanPeriod(12, ChronoUnit.MONTHS))
+            }
+        }
+
+    @Test
+    fun `test that a short one-off plan period is expressed in days`() =
+        runTest {
+            val startTime = 1_783_500_245L
+            val expiryTime = startTime + 5 * 24 * 60 * 60
+            val planDetail = mock<AccountPlanDetail> {
+                on { this.startTime }.thenReturn(startTime)
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().currentPlanPeriod)
+                    .isEqualTo(PlanPeriod(5, ChronoUnit.DAYS))
+            }
+        }
+
+    @Test
+    fun `test that the plan period is null when the plan has no start time`() =
+        runTest {
+            val planDetail = mock<AccountPlanDetail> {
+                on { this.startTime }.thenReturn(0L)
+            }
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.VALID)
+                on { proExpirationTime }.thenReturn(1_815_036_245L)
+                on { accountPlanDetail }.thenReturn(planDetail)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.proPlanStartTime).isNull()
+                Truth.assertThat(state.currentPlanPeriod).isNull()
+            }
+        }
+
+    @Test
+    fun `test that isCurrentPlanExpiring is true when a one-off plan expires within 30 days`() =
+        runTest {
+            val nowSeconds = 1_800_000_000L
+            val expiryTime = nowSeconds + 10 * 24 * 60 * 60
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getCurrentTimeInMillisUseCase()).thenReturn(nowSeconds * 1000)
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isCurrentPlanExpiring).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that isCurrentPlanExpiring is false when the plan expires beyond 30 days`() =
+        runTest {
+            val nowSeconds = 1_800_000_000L
+            val expiryTime = nowSeconds + 60 * 24 * 60 * 60
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.UNKNOWN)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.NONE)
+                on { proExpirationTime }.thenReturn(expiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getCurrentTimeInMillisUseCase()).thenReturn(nowSeconds * 1000)
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isCurrentPlanExpiring).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isCurrentPlanExpiring is false for a recurring plan even within 30 days`() =
+        runTest {
+            val nowSeconds = 1_800_000_000L
+            val expiryTime = nowSeconds + 10 * 24 * 60 * 60
+            val levelDetail = mock<AccountLevelDetail> {
+                on { accountType }.thenReturn(AccountType.PRO_I)
+                on { accountSubscriptionCycle }.thenReturn(AccountSubscriptionCycle.YEARLY)
+                on { subscriptionStatus }.thenReturn(SubscriptionStatus.VALID)
+                on { proExpirationTime }.thenReturn(expiryTime)
+            }
+            val accountDetail = mock<AccountDetail> {
+                on { this.levelDetail }.thenReturn(levelDetail)
+            }
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(accountDetail))
+            whenever(getCurrentTimeInMillisUseCase()).thenReturn(nowSeconds * 1000)
+            whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+            whenever(getSubscriptionsUseCase()).thenReturn(
+                Subscriptions(expectedMonthlySubscriptionsList, expectedYearlySubscriptionsList)
+            )
+            wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+            initViewModel()
+
+            underTest.state.test {
+                Truth.assertThat(awaitItem().isCurrentPlanExpiring).isFalse()
+            }
+        }
 
 
     private val subscriptionProIMonthly = Subscription(

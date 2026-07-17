@@ -3122,6 +3122,28 @@
     <string name="subscription_revamp_current_plan_cycle_monthly">Monthly</string>
     <!-- Billing cycle label on the current plan card for a yearly subscription -->
     <string name="subscription_revamp_current_plan_cycle_yearly">Yearly subscription</string>
+    <!-- Badge shown next to the "Current Plan" label when the plan expires within 30 days -->
+    <string name="subscription_revamp_current_plan_expiring_badge">Expiring</string>
+    <!-- Plan period label on the current plan card for a one-off (non-recurring) subscription. Placeholder is the number of months, e.g. "12 months". -->
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <!-- Plan period label on the current plan card for a short one-off (non-recurring) subscription. Placeholder is the number of days, e.g. "5 days". -->
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <!-- Plan period label on the current plan card for a short one-off (non-recurring) subscription. Placeholder is the number of hours, e.g. "3 hours". -->
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <!-- Plan period label on the current plan card for a short one-off (non-recurring) subscription. Placeholder is the number of minutes, e.g. "30 minutes". -->
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
     <!-- Per-month price on a plan card on the redesigned subscription page. Placeholder is the price, e.g. "€4.99". -->
     <string name="subscription_revamp_price_per_month">%1$s/month</string>
     <!-- Total amount charged yearly on a plan card on the redesigned subscription page. Placeholder is the total price, e.g. "€29.94". -->

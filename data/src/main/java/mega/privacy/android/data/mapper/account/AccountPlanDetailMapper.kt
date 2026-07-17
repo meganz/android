@@ -29,6 +29,7 @@ internal class AccountPlanDetailMapper @Inject constructor(
             subscriptionId = plan.id,
             featuresList = stringListMapper(plan.features),
             isFreeTrial = plan.isTrial,
+            startTime = plan.startTime,
         )
     }
 }
