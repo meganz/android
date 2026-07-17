@@ -7,13 +7,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.app.mediaplayer.mapper.AudioNodeToMediaItemMapper
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.Constants.SEARCH_BY_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
@@ -55,7 +55,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -118,40 +120,46 @@ class AudioPlayQueueBuilderTest {
             emptyList()
         )
         whenever(getOfflineNodesByParentIdUseCase(any<Int>(), anyOrNull())).thenReturn(emptyList())
-        whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>())).thenReturn(mock())
+        whenever(
+            audioNodeToMediaItemMapper(
+                any<Long>(),
+                any<Uri>(),
+                anyOrNull()
+            )
+        ).thenReturn(mock())
 
         underTest = AudioPlayQueueBuilder(
-                ioDispatcher = testDispatcher,
-                megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
-                megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
-                megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
-                megaApiFolderHttpServerStartUseCase = megaApiFolderHttpServerStartUseCase,
-                getLocalFilePathUseCase = getLocalFilePathUseCase,
-                getLocalLinkFromMegaApiUseCase = getLocalLinkFromMegaApiUseCase,
-                getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
-                getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase,
-                getAudioNodeByHandleUseCase = getAudioNodeByHandleUseCase,
-                getAudioNodesUseCase = getAudioNodesUseCase,
-                getAudioNodesByParentHandleUseCase = getAudioNodesByParentHandleUseCase,
-                getAudioNodesByHandlesUseCase = getAudioNodesByHandlesUseCase,
-                getAudioNodesByEmailUseCase = getAudioNodesByEmailUseCase,
-                getAudioNodesFromPublicLinksUseCase = getAudioNodesFromPublicLinksUseCase,
-                getAudioNodesFromInSharesUseCase = getAudioNodesFromInSharesUseCase,
-                getAudioNodesFromOutSharesUseCase = getAudioNodesFromOutSharesUseCase,
-                getAudiosByParentHandleFromMegaApiFolderUseCase = getAudiosByParentHandleFromMegaApiFolderUseCase,
-                getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
-                getRootNodeUseCase = getRootNodeUseCase,
-                getRubbishNodeUseCase = getRubbishNodeUseCase,
-                getBackupsNodeUseCase = getBackupsNodeUseCase,
-                getRootNodeFromMegaApiFolderUseCase = getRootNodeFromMegaApiFolderUseCase,
-                getParentNodeFromMegaApiFolderUseCase = getParentNodeFromMegaApiFolderUseCase,
-                hasCredentialsUseCase = hasCredentialsUseCase,
-                getFingerprintUseCase = getFingerprintUseCase,
-                monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
-                monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-                getBusinessStatusUseCase = getBusinessStatusUseCase,
-                audioNodeToMediaItemMapper = audioNodeToMediaItemMapper,
-            )
+            ioDispatcher = testDispatcher,
+            megaApiHttpServerIsRunningUseCase = megaApiHttpServerIsRunningUseCase,
+            megaApiHttpServerStartUseCase = megaApiHttpServerStartUseCase,
+            megaApiFolderHttpServerIsRunningUseCase = megaApiFolderHttpServerIsRunningUseCase,
+            megaApiFolderHttpServerStartUseCase = megaApiFolderHttpServerStartUseCase,
+            getLocalFilePathUseCase = getLocalFilePathUseCase,
+            getLocalLinkFromMegaApiUseCase = getLocalLinkFromMegaApiUseCase,
+            getLocalFolderLinkFromMegaApiUseCase = getLocalFolderLinkFromMegaApiUseCase,
+            getLocalFolderLinkFromMegaApiFolderUseCase = getLocalFolderLinkFromMegaApiFolderUseCase,
+            getAudioNodeByHandleUseCase = getAudioNodeByHandleUseCase,
+            getAudioNodesUseCase = getAudioNodesUseCase,
+            getAudioNodesByParentHandleUseCase = getAudioNodesByParentHandleUseCase,
+            getAudioNodesByHandlesUseCase = getAudioNodesByHandlesUseCase,
+            getAudioNodesByEmailUseCase = getAudioNodesByEmailUseCase,
+            getAudioNodesFromPublicLinksUseCase = getAudioNodesFromPublicLinksUseCase,
+            getAudioNodesFromInSharesUseCase = getAudioNodesFromInSharesUseCase,
+            getAudioNodesFromOutSharesUseCase = getAudioNodesFromOutSharesUseCase,
+            getAudiosByParentHandleFromMegaApiFolderUseCase = getAudiosByParentHandleFromMegaApiFolderUseCase,
+            getOfflineNodesByParentIdUseCase = getOfflineNodesByParentIdUseCase,
+            getRootNodeUseCase = getRootNodeUseCase,
+            getRubbishNodeUseCase = getRubbishNodeUseCase,
+            getBackupsNodeUseCase = getBackupsNodeUseCase,
+            getRootNodeFromMegaApiFolderUseCase = getRootNodeFromMegaApiFolderUseCase,
+            getParentNodeFromMegaApiFolderUseCase = getParentNodeFromMegaApiFolderUseCase,
+            hasCredentialsUseCase = hasCredentialsUseCase,
+            getFingerprintUseCase = getFingerprintUseCase,
+            monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
+            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+            getBusinessStatusUseCase = getBusinessStatusUseCase,
+            audioNodeToMediaItemMapper = audioNodeToMediaItemMapper,
+        )
     }
 
     @Test
@@ -334,6 +342,19 @@ class AudioPlayQueueBuilderTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test that invoke passes file name as display name to mapper on first emit`() = runTest {
+        val params = buildParams(adapterType = AUDIO_BROWSE_ADAPTER, fileName = "song.mp3")
+
+        underTest(params).test { cancelAndIgnoreRemainingEvents() }
+
+        verify(audioNodeToMediaItemMapper, atLeastOnce()).invoke(
+            any<Long>(),
+            any<Uri>(),
+            eq("song.mp3")
+        )
+    }
 
     private fun buildParams(
         adapterType: Int = AUDIO_BROWSE_ADAPTER,

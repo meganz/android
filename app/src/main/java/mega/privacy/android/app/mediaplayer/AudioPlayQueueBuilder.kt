@@ -137,7 +137,7 @@ class AudioPlayQueueBuilder @Inject constructor(
 
         emit(
             MediaPlaySources(
-                mediaItems = listOf(audioNodeToMediaItemMapper(handle, firstUri)),
+                mediaItems = listOf(audioNodeToMediaItemMapper(handle, firstUri, fileName)),
                 newIndexForCurrentItem = 0,
                 nameToDisplay = fileName,
             )
@@ -260,7 +260,13 @@ class AudioPlayQueueBuilder @Inject constructor(
             .forEachIndexed { index, item ->
                 if (item.handle.toLong() == firstPlayHandle) firstPlayIndex = index
                 runCatching { item.absolutePath.toUri() }.onSuccess { uri ->
-                    mediaItems.add(audioNodeToMediaItemMapper(item.handle.toLong(), uri))
+                    mediaItems.add(
+                        audioNodeToMediaItemMapper(
+                            handle = item.handle.toLong(),
+                            uri = uri,
+                            displayName = File(item.absolutePath).name,
+                        )
+                    )
                 }
             }
 
@@ -362,7 +368,7 @@ class AudioPlayQueueBuilder @Inject constructor(
             .forEachIndexed { index, file ->
                 val hashHandle = file.name.hashCode().toLong()
                 if (hashHandle == firstPlayHandle) firstPlayIndex = index
-                mediaItems.add(audioNodeToMediaItemMapper(hashHandle, file.toUri()))
+                mediaItems.add(audioNodeToMediaItemMapper(hashHandle, file.toUri(), file.name))
             }
 
         return mediaItems to firstPlayIndex
@@ -386,7 +392,7 @@ class AudioPlayQueueBuilder @Inject constructor(
 
                 val localPath = getLocalFilePathUseCase(node)
                 val mediaItem = if (localPath != null && isLocalFile(node, localPath)) {
-                    audioNodeToMediaItemMapper(node.id.longValue, File(localPath).toUri())
+                    audioNodeToMediaItemMapper(node, File(localPath).toUri())
                 } else {
                     val url = if (type == FOLDER_LINK_ADAPTER) {
                         if (isMegaApiFolder(type)) {
@@ -397,7 +403,7 @@ class AudioPlayQueueBuilder @Inject constructor(
                     } else {
                         getLocalLinkFromMegaApiUseCase(node.id.longValue)
                     } ?: return@forEachIndexed
-                    audioNodeToMediaItemMapper(node.id.longValue, url.toUri())
+                    audioNodeToMediaItemMapper(node, url.toUri())
                 }
 
                 mediaItems.add(mediaItem)
