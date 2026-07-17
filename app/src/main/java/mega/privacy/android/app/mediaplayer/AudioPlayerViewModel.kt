@@ -144,7 +144,7 @@ class AudioPlayerViewModel @Inject constructor(
             thumbnailData = state.currentMediaItemHandle?.let { ThumbnailRequest.fromHandle(it) },
             currentPlayingItemName = existing?.currentPlayingItemName,
             currentAdapterType = data?.adapterType ?: INVALID_VALUE,
-            nodeSourceType = data?.nodeSourceType ?: NodeSourceType.VIDEO_PLAYER_DEFAULT,
+            nodeSourceType = data?.nodeSourceType ?: NodeSourceType.MEDIA_PLAYER_DEFAULT,
             fileLinkUrl = data?.fileLinkUrl,
             localFilePath = data?.localFilePath,
             chatId = data?.chatId,
@@ -243,12 +243,10 @@ class AudioPlayerViewModel @Inject constructor(
             FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING -> NodeSourceType.FOLDER_LINK
             FROM_CHAT -> NodeSourceType.CHAT
             FILE_LINK_ADAPTER -> NodeSourceType.FILE_LINK
-            FROM_IMAGE_VIEWER -> NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER
-            VERSIONS_ADAPTER -> NodeSourceType.VIDEO_PLAYER_VERSIONS
-            ZIP_ADAPTER -> NodeSourceType.VIDEO_PLAYER_ZIP_FILE
-            // VIDEO_PLAYER_DEFAULT is reused as a generic fallback until a dedicated
-            // AUDIO_PLAYER_DEFAULT entry is added to NodeSourceType.
-            else -> NodeSourceType.VIDEO_PLAYER_DEFAULT
+            FROM_IMAGE_VIEWER -> NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER
+            VERSIONS_ADAPTER -> NodeSourceType.MEDIA_PLAYER_VERSIONS
+            ZIP_ADAPTER -> NodeSourceType.MEDIA_PLAYER_ZIP_FILE
+            else -> NodeSourceType.MEDIA_PLAYER_DEFAULT
         }
 
     fun stopPlayer() {

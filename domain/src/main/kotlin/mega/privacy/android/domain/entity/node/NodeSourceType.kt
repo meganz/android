@@ -114,24 +114,24 @@ enum class NodeSourceType {
     CHAT,
 
     /**
-     * When node source is Video Player default
+     * When node source is Media Player default
      */
-    VIDEO_PLAYER_DEFAULT,
+    MEDIA_PLAYER_DEFAULT,
 
     /**
-     * When node source is Video Player opened from Versions
+     * When node source is Media Player opened from Versions
      */
-    VIDEO_PLAYER_VERSIONS,
+    MEDIA_PLAYER_VERSIONS,
 
     /**
-     * When node source is Video Player opened from Image Viewer
+     * When node source is Media Player opened from Image Viewer
      */
-    VIDEO_PLAYER_IMAGE_VIEWER,
+    MEDIA_PLAYER_IMAGE_VIEWER,
 
     /**
-     * When node source is Video Player opened from Zip File
+     * When node source is Media Player opened from Zip File
      */
-    VIDEO_PLAYER_ZIP_FILE,
+    MEDIA_PLAYER_ZIP_FILE,
 
     /**
      * When node source is Continue Where Left Off

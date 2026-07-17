@@ -51,7 +51,7 @@ class ShareActionClickHandler @Inject constructor(
                 try {
                     when (nodeSourceType) {
                         NodeSourceType.OFFLINE -> handleOfflineShare(node, provider, isConnected)
-                        NodeSourceType.VIDEO_PLAYER_ZIP_FILE -> handleZipFile(node, provider)
+                        NodeSourceType.MEDIA_PLAYER_ZIP_FILE -> handleZipFile(node, provider)
                         else -> handleCloudShare(node, provider)
                     }
                 } finally {

@@ -344,10 +344,10 @@ class ComposeVideoPlayerViewModel @AssistedInject constructor(
             FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING -> NodeSourceType.FOLDER_LINK
             FROM_CHAT -> NodeSourceType.CHAT
             FILE_LINK_ADAPTER -> NodeSourceType.FILE_LINK
-            FROM_IMAGE_VIEWER -> NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER
-            VERSIONS_ADAPTER -> NodeSourceType.VIDEO_PLAYER_VERSIONS
-            ZIP_ADAPTER -> NodeSourceType.VIDEO_PLAYER_ZIP_FILE
-            else -> NodeSourceType.VIDEO_PLAYER_DEFAULT
+            FROM_IMAGE_VIEWER -> NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER
+            VERSIONS_ADAPTER -> NodeSourceType.MEDIA_PLAYER_VERSIONS
+            ZIP_ADAPTER -> NodeSourceType.MEDIA_PLAYER_ZIP_FILE
+            else -> NodeSourceType.MEDIA_PLAYER_DEFAULT
         }
 
     private fun updateNameWhenNodeUpdates() {

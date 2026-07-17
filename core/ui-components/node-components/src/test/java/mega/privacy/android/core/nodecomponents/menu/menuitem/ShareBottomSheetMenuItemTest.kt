@@ -113,7 +113,7 @@ class ShareBottomSheetMenuItemTest {
                 on { isTakenDown } doReturn false
             },
             false,
-            NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+            NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
             true,
         ),
         Arguments.of(
@@ -124,7 +124,7 @@ class ShareBottomSheetMenuItemTest {
                 on { isTakenDown } doReturn true
             },
             false,
-            NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+            NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
             false,
         ),
     )

@@ -57,7 +57,7 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
         val nodeSourceType = (uiState as? AudioPlayerUiState.Data)?.nodeSourceType
-            ?: NodeSourceType.VIDEO_PLAYER_DEFAULT
+            ?: NodeSourceType.MEDIA_PLAYER_DEFAULT
 
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
@@ -113,9 +113,9 @@ private val NodeSourceType.shouldPartiallyExpand: Boolean
         NodeSourceType.CHAT,
         NodeSourceType.FILE_LINK,
         NodeSourceType.FOLDER_LINK,
-        NodeSourceType.VIDEO_PLAYER_VERSIONS,
-        NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
-        NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER,
+        NodeSourceType.MEDIA_PLAYER_VERSIONS,
+        NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
+        NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER,
             -> false
 
         else -> true

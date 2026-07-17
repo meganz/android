@@ -51,7 +51,7 @@ sealed interface AudioPlayerUiState {
         val hasPlaylist: Boolean,
         val currentAdapterType: Int,
         val thumbnailData: ThumbnailData?,
-        val nodeSourceType: NodeSourceType = NodeSourceType.VIDEO_PLAYER_DEFAULT,
+        val nodeSourceType: NodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
         val fileLinkUrl: String? = null,
         val localFilePath: String? = null,
         val chatId: Long? = null,

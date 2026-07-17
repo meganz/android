@@ -5,16 +5,16 @@ import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.core.nodecomponents.model.NodeSelectionMenuItem
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.qualifier.features.VideoPlayerVersions
+import mega.privacy.android.domain.qualifier.features.MediaPlayerImageViewer
 import javax.inject.Inject
 
 /**
- * Provides node bottom sheet menu options for the Video Player Versions source type.
+ * Provides node bottom sheet menu options for the Media Player Image Viewer source type.
  */
-class VideoPlayerVersionsMenuOptionsProvider @Inject constructor(
-    @VideoPlayerVersions private val bottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
+class MediaPlayerImageViewerMenuOptionsProvider @Inject constructor(
+    @MediaPlayerImageViewer private val bottomSheetOptions: Lazy<Set<@JvmSuppressWildcards NodeBottomSheetMenuItem<MenuActionWithIcon>>>,
 ) : NodeMenuOptionsProvider {
-    override val supportedSourceType: NodeSourceType = NodeSourceType.VIDEO_PLAYER_VERSIONS
+    override val supportedSourceType: NodeSourceType = NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER
     override fun getBottomSheetOptions() = bottomSheetOptions.get()
     override fun getSelectionModeOptions(): Set<@JvmSuppressWildcards NodeSelectionMenuItem<MenuActionWithIcon>> =
         emptySet()

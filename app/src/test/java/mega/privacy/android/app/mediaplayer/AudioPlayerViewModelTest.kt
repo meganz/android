@@ -397,7 +397,7 @@ class AudioPlayerViewModelTest {
                 awaitItem() // Data (initial)
                 underTest.startPlayback(intent)
                 val state = awaitItem() as AudioPlayerUiState.Data
-                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.VIDEO_PLAYER_DEFAULT)
+                assertThat(state.nodeSourceType).isEqualTo(NodeSourceType.MEDIA_PLAYER_DEFAULT)
             }
         }
 
