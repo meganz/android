@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -95,8 +96,7 @@ internal fun FileInfoScreen(
         topBar = {
             MegaTopAppBar(
                 modifier = Modifier.testTag(FILE_INFO_APP_BAR_TAG),
-                // TODO extract to a localized string resource
-                title = "Info",
+                title = stringResource(sharedR.string.general_info),
                 navigationType = AppBarNavigationType.Close(onBack),
             )
         },
@@ -263,11 +263,14 @@ private fun FileInfoDetails(
     }
     val subtitle = buildList {
         when {
-            // TODO extract to localized string resources
-            uiState.isOutgoingShare -> add("Outgoing share")
-            uiState.isIncomingShare -> add("Incoming share")
+            uiState.isOutgoingShare ->
+                add(stringResource(sharedR.string.file_info_information_outgoing_share))
+
+            uiState.isIncomingShare ->
+                add(stringResource(sharedR.string.file_info_information_incoming_share))
+
             uiState.isFile -> uiState.fileTypeExtension?.uppercase()?.let(::add)
-            else -> add("Folder")
+            else -> add(stringResource(sharedR.string.file_info_information_type_folder))
         }
         if (uiState.sizeInBytes > 0) {
             add(formatFileSize(uiState.sizeInBytes, context))
@@ -275,6 +278,8 @@ private fun FileInfoDetails(
         uiState.durationText?.let { add(it) }
         folderContent?.let { add(it) }
     }.joinToString(separator = " ⋅ ")
+
+    val sharedWithLabel = stringResource(sharedR.string.file_info_information_shared_with_label)
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -298,17 +303,19 @@ private fun FileInfoDetails(
 
         if (uiState.isOutgoingShare) {
             FileInfoDetailRow(
-                // TODO extract to localized string resources
-                label = "Shared with",
-                value = "${uiState.sharedContactCount} contacts",
+                label = sharedWithLabel,
+                value = pluralStringResource(
+                    sharedR.plurals.file_info_information_num_contacts,
+                    uiState.sharedContactCount,
+                    uiState.sharedContactCount,
+                ),
                 trailingIcon = IconPack.Medium.Thin.Outline.ChevronRight,
                 onClick = {
                     onNavigate(
                         FileContactInfoNavKey(
                             folderHandle = nodeHandle,
                             // The shared-recipients screen uses folderName as its title
-                            // TODO extract to a localized string resource
-                            folderName = "Shared with",
+                            folderName = sharedWithLabel,
                         )
                     )
                 },
@@ -320,8 +327,7 @@ private fun FileInfoDetails(
             uiState.ownerEmail?.let { ownerEmail ->
                 val ownerName = uiState.ownerName.orEmpty()
                 FileInfoDetailRow(
-                    // TODO extract to a localized string resource
-                    label = "Owner",
+                    label = stringResource(sharedR.string.file_info_information_owner_label),
                     value = if (ownerName.isNotBlank() && ownerName != ownerEmail) {
                         "$ownerName ($ownerEmail)"
                     } else {
@@ -340,20 +346,21 @@ private fun FileInfoDetails(
 
         if (uiState.showFolderVersions) {
             FileInfoDetailRow(
-                // TODO extract to a localized (pluralized) string resource
-                label = "Versions",
-                value = "${uiState.numberOfVersions} Versioned files",
+                label = stringResource(sharedR.string.title_section_versions),
+                value = pluralStringResource(
+                    sharedR.plurals.file_info_information_num_versioned_files,
+                    uiState.numberOfVersions,
+                    uiState.numberOfVersions,
+                ),
                 modifier = Modifier.testTag(FILE_INFO_VERSIONS_TAG),
             )
             FileInfoDetailRow(
-                // TODO extract to a localized string resource
-                label = "Current versions",
+                label = stringResource(sharedR.string.file_info_information_current_versions_label),
                 value = formatFileSize(uiState.currentVersionsSizeInBytes, context),
                 modifier = Modifier.testTag(FILE_INFO_CURRENT_VERSIONS_TAG),
             )
             FileInfoDetailRow(
-                // TODO extract to a localized string resource
-                label = "Previous versions",
+                label = stringResource(sharedR.string.file_info_information_previous_versions_label),
                 value = formatFileSize(uiState.previousVersionsSizeInBytes, context),
                 modifier = Modifier.testTag(FILE_INFO_PREVIOUS_VERSIONS_TAG),
             )
@@ -361,8 +368,7 @@ private fun FileInfoDetails(
 
         uiState.creationTime?.let { added ->
             FileInfoDetailRow(
-                // TODO extract to a localized string resource
-                label = "Added",
+                label = stringResource(sharedR.string.info_added),
                 value = formatModifiedDate(locale, added),
                 modifier = Modifier.testTag(FILE_INFO_ADDED_TAG),
             )
@@ -370,8 +376,7 @@ private fun FileInfoDetails(
 
         uiState.modificationTime?.let { modified ->
             FileInfoDetailRow(
-                // TODO extract to a localized string resource
-                label = "Last modified",
+                label = stringResource(sharedR.string.search_dropdown_chip_filter_type_last_modified),
                 value = formatModifiedDate(locale, modified),
                 modifier = Modifier.testTag(FILE_INFO_LAST_MODIFIED_TAG),
             )
@@ -379,9 +384,12 @@ private fun FileInfoDetails(
 
         if (uiState.showFileVersions) {
             FileInfoDetailRow(
-                // TODO extract to a localized (pluralized) string resource
-                label = "Versions",
-                value = "${uiState.versionCount} versions",
+                label = stringResource(sharedR.string.title_section_versions),
+                value = pluralStringResource(
+                    sharedR.plurals.file_info_information_num_versions,
+                    uiState.versionCount,
+                    uiState.versionCount,
+                ),
                 trailingIcon = IconPack.Medium.Thin.Outline.ChevronRight,
                 onClick = { onNavigate(VersionsFileNavKey(nodeHandle)) },
                 modifier = Modifier.testTag(FILE_INFO_VERSIONS_TAG),
@@ -395,8 +403,7 @@ private fun FileInfoDetails(
                 uiState.locationFolders.joinToString(separator = " > ", prefix = "$rootLabel > ")
             }
             FileInfoDetailRow(
-                // TODO extract to a localized string resource
-                label = "Location",
+                label = stringResource(sharedR.string.video_section_videos_location_filter_title),
                 value = location,
                 trailingIcon = IconPack.Medium.Thin.Outline.FolderSearch,
                 onClick = onLocationClick,
@@ -415,9 +422,8 @@ private fun FileInfoDetails(
             NodeDescriptionField(
                 description = uiState.descriptionText,
                 isEditable = uiState.canEditDescription,
-                // TODO extract to localized string resources
-                label = "Description",
-                placeholder = "Add description",
+                label = stringResource(sharedR.string.file_info_information_description_label),
+                placeholder = stringResource(sharedR.string.file_info_information_description_placeholder),
                 onDescriptionChange = onDescriptionChange,
                 modifier = Modifier.testTag(FILE_INFO_DESCRIPTION_TAG),
             )

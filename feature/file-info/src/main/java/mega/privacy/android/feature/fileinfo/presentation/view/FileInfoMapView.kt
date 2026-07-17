@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -38,6 +39,7 @@ import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 import timber.log.Timber
 
 /**
@@ -60,8 +62,7 @@ internal fun FileInfoMapView(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         MegaText(
-            // TODO extract to a localized string resource
-            text = "Map",
+            text = stringResource(sharedR.string.file_info_information_map_label),
             textColor = TextColor.Primary,
             style = AppTheme.typography.bodyLarge,
         )
@@ -133,8 +134,7 @@ private fun NoLocationRow() {
             contentDescription = null,
         )
         MegaText(
-            // TODO extract to a localized string resource
-            text = "No location information",
+            text = stringResource(sharedR.string.file_info_information_no_location),
             textColor = TextColor.Secondary,
             style = AppTheme.typography.bodyLarge,
         )

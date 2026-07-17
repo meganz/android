@@ -12,7 +12,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.devicetype.DeviceType
@@ -24,6 +27,7 @@ import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.feature.fileinfo.presentation.view.FILE_INFO_NO_LOCATION_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
+import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.TagsNavKey
 import mega.privacy.android.navigation.destination.VersionsFileNavKey
@@ -83,7 +87,10 @@ class FileInfoScreenTest {
         setContent(uiState = folderState)
 
         composeRule.onNodeWithText("New folder").assertIsDisplayed()
-        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains("Folder", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains(
+            getString(sharedR.string.file_info_information_type_folder),
+            substring = true,
+        )
     }
 
     @Test
@@ -98,7 +105,10 @@ class FileInfoScreenTest {
         composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
             .assertTextContains("21 MB", substring = true)
         composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
-            .assertTextContains("2 files", substring = true)
+            .assertTextContains(
+                getQuantityString(sharedR.plurals.num_of_files_with_parameter, 2),
+                substring = true,
+            )
     }
 
     @Test
@@ -111,16 +121,23 @@ class FileInfoScreenTest {
         )
 
         composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
-            .assertTextContains("3 folders", substring = true)
+            .assertTextContains(
+                getQuantityString(sharedR.plurals.num_of_folders_num_of_files, 3),
+                substring = true,
+            )
         composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
-            .assertTextContains("24 files", substring = true)
+            .assertTextContains(
+                getQuantityString(sharedR.plurals.num_of_files_with_parameter, 24),
+                substring = true,
+            )
     }
 
     @Test
     fun `test that the subtitle has no content count for an empty folder`() {
         setContent(uiState = folderState.copy(numberOfFiles = 0, numberOfFolders = 0))
 
-        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextEquals("Folder")
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextEquals(getString(sharedR.string.file_info_information_type_folder))
     }
 
     @Test
@@ -230,7 +247,8 @@ class FileInfoScreenTest {
     fun `test that the subtitle shows Outgoing share instead of Folder for a shared folder`() {
         setContent(uiState = folderState.copy(sharedContactCount = 3))
 
-        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextEquals("Outgoing share")
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextEquals(getString(sharedR.string.file_info_information_outgoing_share))
     }
 
     @Test
@@ -238,7 +256,10 @@ class FileInfoScreenTest {
         setContent(uiState = folderState.copy(sharedContactCount = 3))
 
         composeRule.onNodeWithTag(FILE_INFO_SHARED_WITH_TAG).assertExists()
-        composeRule.onNodeWithText("3 contacts", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithText(
+            getQuantityString(sharedR.plurals.file_info_information_num_contacts, 3),
+            useUnmergedTree = true,
+        ).assertExists()
     }
 
     @Test
@@ -259,7 +280,10 @@ class FileInfoScreenTest {
         composeRule.onNodeWithTag(FILE_INFO_SHARED_WITH_TAG).performScrollTo().performClick()
 
         assertThat(navKey).isEqualTo(
-            FileContactInfoNavKey(folderHandle = NODE_HANDLE, folderName = "Shared with")
+            FileContactInfoNavKey(
+                folderHandle = NODE_HANDLE,
+                folderName = getString(sharedR.string.file_info_information_shared_with_label),
+            )
         )
     }
 
@@ -274,7 +298,10 @@ class FileInfoScreenTest {
         )
 
         composeRule.onNodeWithTag(FILE_INFO_VERSIONS_TAG).assertExists()
-        composeRule.onNodeWithText("91 Versioned files", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithText(
+            getQuantityString(sharedR.plurals.file_info_information_num_versioned_files, 91),
+            useUnmergedTree = true,
+        ).assertExists()
         composeRule.onNodeWithTag(FILE_INFO_CURRENT_VERSIONS_TAG).assertExists()
         composeRule.onNodeWithTag(FILE_INFO_PREVIOUS_VERSIONS_TAG).assertExists()
     }
@@ -321,7 +348,10 @@ class FileInfoScreenTest {
         setContent(uiState = fileState.copy(versionCount = 2))
 
         composeRule.onNodeWithTag(FILE_INFO_VERSIONS_TAG).assertExists()
-        composeRule.onNodeWithText("2 versions", useUnmergedTree = true).assertExists()
+        composeRule.onNodeWithText(
+            getQuantityString(sharedR.plurals.file_info_information_num_versions, 2),
+            useUnmergedTree = true,
+        ).assertExists()
     }
 
     @Test
@@ -425,7 +455,10 @@ class FileInfoScreenTest {
         )
 
         composeRule.onNodeWithTag(FILE_INFO_HEADER_TAG).assertIsDisplayed()
-        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains("2 files", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains(
+            getQuantityString(sharedR.plurals.num_of_files_with_parameter, 2),
+            substring = true,
+        )
         composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).performScrollTo().assertExists()
     }
 
@@ -466,6 +499,13 @@ class FileInfoScreenTest {
 
     private fun detailsPaneWidth(): Float = composeRule.onNodeWithTag(FILE_INFO_DETAILS_TAG)
         .getUnclippedBoundsInRoot().let { (it.right - it.left).value }
+
+    private fun getString(@StringRes resId: Int): String =
+        InstrumentationRegistry.getInstrumentation().targetContext.getString(resId)
+
+    private fun getQuantityString(@PluralsRes resId: Int, quantity: Int): String =
+        InstrumentationRegistry.getInstrumentation().targetContext.resources
+            .getQuantityString(resId, quantity, quantity)
 
     private fun setContent(
         uiState: FileInfoUiState,
