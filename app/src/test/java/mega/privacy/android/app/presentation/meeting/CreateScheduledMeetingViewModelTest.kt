@@ -55,10 +55,10 @@ class CreateScheduledMeetingViewModelTest {
     private val accountDetailFlow = MutableStateFlow(AccountDetail())
     private val connectivityFlow = MutableStateFlow(false)
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
-        onBlocking { invoke() }.thenReturn(accountDetailFlow)
+        on { invoke() }.thenReturn(accountDetailFlow)
     }
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() }.thenReturn(connectivityFlow)
+        on { invoke() }.thenReturn(connectivityFlow)
     }
 
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()

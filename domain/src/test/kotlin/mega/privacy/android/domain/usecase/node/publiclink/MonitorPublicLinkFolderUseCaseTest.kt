@@ -41,7 +41,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
     internal fun `test that children are returned`() = runTest {
         val children = listOf<FileNode>(mock(), mock())
         val parent = mock<FolderNode> {
-            onBlocking { fetchChildren }.thenReturn { children }
+            on { fetchChildren }.thenReturn { children }
         }
 
 
@@ -56,7 +56,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
         runTest {
             val children = listOf<FileNode>(mock(), mock())
             val parent = mock<FolderNode> {
-                onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
+                on { fetchChildren }.thenReturn({ emptyList() }, { children })
             }
             val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
             nodeRepository.stub {
@@ -77,7 +77,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
         runTest {
             val children = listOf<FileNode>(mock(), mock())
             val parent = mock<FolderNode> {
-                onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
+                on { fetchChildren }.thenReturn({ emptyList() }, { children })
                 on { id }.thenReturn(NodeId(1))
             }
             val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
@@ -99,7 +99,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             val nodeId = NodeId(42)
             val children = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
             val parent = mock<FolderNode> {
-                onBlocking { fetchChildren }.thenReturn({ children }, { emptyList() })
+                on { fetchChildren }.thenReturn({ children }, { emptyList() })
             }
             val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
             nodeRepository.stub {
@@ -130,7 +130,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
             val nodeId = NodeId(42)
             val children = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
             val parent = mock<FolderNode> {
-                onBlocking { fetchChildren }.thenReturn({ children }, { emptyList() })
+                on { fetchChildren }.thenReturn({ children }, { emptyList() })
             }
             val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()
             nodeRepository.stub {
@@ -161,7 +161,7 @@ internal class MonitorPublicLinkFolderUseCaseTest {
         runTest {
             val children = listOf<FileNode>(mock(), mock())
             val parent = mock<FolderNode> {
-                onBlocking { fetchChildren }.thenReturn({ emptyList() }, { children })
+                on { fetchChildren }.thenReturn({ emptyList() }, { children })
                 on { id }.thenReturn(NodeId(1))
             }
             val nodeUpdateFlow = MutableSharedFlow<NodeUpdate>()

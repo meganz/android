@@ -43,11 +43,11 @@ internal class LogoutViewModelTest {
         )
 
         hasOfflineFilesUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
 
         ongoingTransfersExistUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
     }
 
@@ -73,7 +73,7 @@ internal class LogoutViewModelTest {
     @Test
     internal fun `test that has offline files is true if use case returns true`() = runTest {
         hasOfflineFilesUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
+            on { invoke() }.thenReturn(true)
         }
 
         initialiseUnderTest()
@@ -87,7 +87,7 @@ internal class LogoutViewModelTest {
     @Test
     internal fun `test that ongoing transfer is true if the use case returns true`() = runTest {
         ongoingTransfersExistUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
+            on { invoke() }.thenReturn(true)
         }
 
         initialiseUnderTest()
@@ -102,10 +102,10 @@ internal class LogoutViewModelTest {
     internal fun `test that has offline files is false if offline file use case throws an exception`() =
         runTest {
             ongoingTransfersExistUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             hasOfflineFilesUseCase.stub {
-                onBlocking { invoke() }.thenAnswer { throw Exception("'Tis bad") }
+                on { invoke() }.thenAnswer { throw Exception("'Tis bad") }
             }
 
             initialiseUnderTest()
@@ -120,10 +120,10 @@ internal class LogoutViewModelTest {
     internal fun `test that ongoing transfer is false if the transfer use case throws an exception`() =
         runTest {
             hasOfflineFilesUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             ongoingTransfersExistUseCase.stub {
-                onBlocking { invoke() }.thenAnswer { throw Exception("Ashes") }
+                on { invoke() }.thenAnswer { throw Exception("Ashes") }
             }
 
             initialiseUnderTest()
@@ -137,11 +137,11 @@ internal class LogoutViewModelTest {
     @Test
     internal fun `test that logout is called if both values are false`() = runTest {
         hasOfflineFilesUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
 
         ongoingTransfersExistUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
 
         initialiseUnderTest()
@@ -156,7 +156,7 @@ internal class LogoutViewModelTest {
     fun `test that logout succeeds normally when network is good`() = runTest {
         // Given
         logoutUseCase.stub {
-            onBlocking { invoke() }.thenAnswer { Unit }
+            on { invoke() }.thenAnswer { Unit }
         }
 
         // When
@@ -184,7 +184,7 @@ internal class LogoutViewModelTest {
     fun `test that logout falls back to chat logout handler when network logout fails`() = runTest {
         // Given
         logoutUseCase.stub {
-            onBlocking { invoke() }.thenThrow(RuntimeException("Network error"))
+            on { invoke() }.thenThrow(RuntimeException("Network error"))
         }
         whenever(chatLogoutHandler.handleChatLogout(any())).thenAnswer { Unit }
 
@@ -213,7 +213,7 @@ internal class LogoutViewModelTest {
     fun `test that logout shows error when both network and chat logout handler fail`() = runTest {
         // Given
         logoutUseCase.stub {
-            onBlocking { invoke() }.thenThrow(RuntimeException("Network error"))
+            on { invoke() }.thenThrow(RuntimeException("Network error"))
         }
         whenever(chatLogoutHandler.handleChatLogout(any())).thenThrow(RuntimeException("Chat logout error"))
 

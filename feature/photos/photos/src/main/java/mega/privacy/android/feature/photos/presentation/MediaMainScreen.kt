@@ -686,6 +686,7 @@ fun MediaMainScreen(
                         addTextTabWithScrollableContent(
                             tabItem = getTabItem(),
                             content = { _, modifier ->
+                                @SuppressLint("ComposeViewModelForwarding")
                                 MediaContent(
                                     modifier = modifier,
                                     timelineContentPadding = paddingValues,
@@ -943,6 +944,7 @@ private fun MediaScreen.MediaContent(
         }
 
         MediaScreen.Albums -> {
+            @SuppressLint("ComposeViewModelForwarding")
             AlbumsTabRoute(
                 modifier = Modifier.fillMaxSize(),
                 showNewAlbumDialogEvent = uiState.newAlbumDialogEvent,

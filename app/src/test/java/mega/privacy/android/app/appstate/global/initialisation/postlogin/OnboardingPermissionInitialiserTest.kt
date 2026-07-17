@@ -43,10 +43,10 @@ class OnboardingPermissionInitialiserTest {
             )
 
             isFirstLaunchUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             checkOnboardingPermissionsUseCase.stub {
-                onBlocking { invoke() }.thenReturn(expectedPermissionsResult)
+                on { invoke() }.thenReturn(expectedPermissionsResult)
             }
 
             underTest("session", true)
@@ -65,10 +65,10 @@ class OnboardingPermissionInitialiserTest {
             )
 
             isFirstLaunchUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             checkOnboardingPermissionsUseCase.stub {
-                onBlocking { invoke() }.thenReturn(expectedPermissionsResult)
+                on { invoke() }.thenReturn(expectedPermissionsResult)
             }
 
             underTest("session", true)
@@ -79,10 +79,10 @@ class OnboardingPermissionInitialiserTest {
     fun `test that nav event is emitted if shouldShowNotificationReminder is true on subsequent launch`() =
         runTest {
             isFirstLaunchUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
             shouldShowNotificationReminderUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
 
             underTest("session", true)
@@ -96,10 +96,10 @@ class OnboardingPermissionInitialiserTest {
     fun `test that no event is emitted if shouldShowNotificationReminder is false on subsequent launch`() =
         runTest {
             isFirstLaunchUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
             shouldShowNotificationReminderUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             underTest("session", true)

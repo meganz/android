@@ -72,7 +72,7 @@ class DefaultMonitorBackupFolderTest {
     fun `test that current backup folder id is returned`() = runTest {
         val expected = Result.success(NodeId(1L))
         nodeRepository.stub {
-            onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow())
+            on { getBackupFolderId() }.thenReturn(expected.getOrThrow())
         }
         whenever(monitorUserUpdates()).thenReturn(emptyFlow())
         whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
@@ -93,7 +93,7 @@ class DefaultMonitorBackupFolderTest {
                 List(updates.size) { index -> Result.success(NodeId(index.toLong())) }
 
             nodeRepository.stub {
-                onBlocking { getBackupFolderId() }.thenReturn(
+                on { getBackupFolderId() }.thenReturn(
                     expected.getOrThrow(),
                     *expectedUpdates.map { it.getOrThrow() }.toTypedArray()
                 )
@@ -121,7 +121,7 @@ class DefaultMonitorBackupFolderTest {
                 List(events.size) { index -> Result.success(NodeId(index.toLong())) }
 
             nodeRepository.stub {
-                onBlocking { getBackupFolderId() }.thenReturn(
+                on { getBackupFolderId() }.thenReturn(
                     expected.getOrThrow(),
                     *expectedUpdates.map { it.getOrThrow() }.toTypedArray()
                 )
@@ -144,7 +144,7 @@ class DefaultMonitorBackupFolderTest {
         runTest {
             val expected = Result.success(NodeId(1L))
             nodeRepository.stub {
-                onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow())
+                on { getBackupFolderId() }.thenReturn(expected.getOrThrow())
             }
             whenever(monitorUserUpdates()).thenReturn(emptyFlow())
             whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
@@ -200,7 +200,7 @@ class DefaultMonitorBackupFolderTest {
             val expected = Result.success(NodeId(1L))
             val notExpected = NodeId(2L)
             nodeRepository.stub {
-                onBlocking { getBackupFolderId() }.thenReturn(expected.getOrThrow(), notExpected)
+                on { getBackupFolderId() }.thenReturn(expected.getOrThrow(), notExpected)
             }
             whenever(monitorUserUpdates()).thenReturn(updates.asFlow())
             whenever(monitorFetchNodesFinishUseCase()).thenReturn(emptyFlow())
@@ -217,7 +217,7 @@ class DefaultMonitorBackupFolderTest {
     fun `test that an error from the repository returns a failed result`() = runTest {
 
         nodeRepository.stub {
-            onBlocking { getBackupFolderId() }.thenAnswer {
+            on { getBackupFolderId() }.thenAnswer {
                 throw Throwable()
             }
         }
@@ -239,7 +239,7 @@ class DefaultMonitorBackupFolderTest {
             List(updates.size) { index -> Result.success(NodeId((index * 10).toLong())) }
 
         nodeRepository.stub {
-            onBlocking { getBackupFolderId() }.thenReturn(
+            on { getBackupFolderId() }.thenReturn(
                 expected.getOrThrow(),
                 *expectedUpdates.map { it.getOrThrow() }.toTypedArray()
             )

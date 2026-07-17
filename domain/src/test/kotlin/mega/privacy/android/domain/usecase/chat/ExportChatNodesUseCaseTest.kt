@@ -22,7 +22,7 @@ internal class ExportChatNodesUseCaseTest {
     private val nodeRepository: NodeRepository = mock()
     private val chatFolderId = NodeId(1L)
     private val getOrCreateMyChatsFilesFolderIdUseCase: GetOrCreateMyChatsFilesFolderIdUseCase = mock {
-        onBlocking { invoke() }.thenReturn(chatFolderId)
+        on { invoke() }.thenReturn(chatFolderId)
     }
     private val copyTypedNodeUseCase: CopyTypedNodeUseCase = mock()
     private val exportNodeUseCase: ExportNodeUseCase = mock()

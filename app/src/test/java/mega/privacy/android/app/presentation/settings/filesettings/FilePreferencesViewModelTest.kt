@@ -52,7 +52,7 @@ internal class FilePreferencesViewModelTest {
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock {
-        onBlocking { invoke(any()) }.thenReturn(false)
+        on { invoke(any()) }.thenReturn(false)
     }
     private val fakeMonitorUserUpdates = MutableSharedFlow<UserChanges>()
     private val monitorUserUpdates: MonitorUserUpdates = mock {

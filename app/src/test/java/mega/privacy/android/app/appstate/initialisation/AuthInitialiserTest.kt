@@ -26,8 +26,8 @@ class AuthInitialiserTest {
         val appStartInitialiser2 = mock<AppStartInitialiserAction>()
 
         // Setup initializers to return Unit
-        appStartInitialiser1.stub { onBlocking { invoke() }.thenReturn(Unit) }
-        appStartInitialiser2.stub { onBlocking { invoke() }.thenReturn(Unit) }
+        appStartInitialiser1.stub { on { invoke() }.thenReturn(Unit) }
+        appStartInitialiser2.stub { on { invoke() }.thenReturn(Unit) }
 
         // Create ViewModel with initializers
         initUnderTest(
@@ -53,8 +53,8 @@ class AuthInitialiserTest {
         val postLoginInitialiser2 = mock<PostLoginInitialiserAction>()
 
         // Setup initializers to return Unit
-        postLoginInitialiser1.stub { onBlocking { invoke(any(), eq(true)) }.thenReturn(Unit) }
-        postLoginInitialiser2.stub { onBlocking { invoke(any(), eq(true)) }.thenReturn(Unit) }
+        postLoginInitialiser1.stub { on { invoke(any(), eq(true)) }.thenReturn(Unit) }
+        postLoginInitialiser2.stub { on { invoke(any(), eq(true)) }.thenReturn(Unit) }
 
         // Create ViewModel with initializers
         initUnderTest(
@@ -79,8 +79,8 @@ class AuthInitialiserTest {
         val postLoginInitialiser1 = mock<PostLoginInitialiserAction>()
 
         // Setup initializers to throw exceptions
-        appStartInitialiser1.stub { onBlocking { invoke() }.thenThrow(RuntimeException("App start error")) }
-        postLoginInitialiser1.stub { onBlocking { invoke(any(), eq(true)) }.thenThrow(RuntimeException("Post login error")) }
+        appStartInitialiser1.stub { on { invoke() }.thenThrow(RuntimeException("App start error")) }
+        postLoginInitialiser1.stub { on { invoke(any(), eq(true)) }.thenThrow(RuntimeException("Post login error")) }
 
         // Create ViewModel with initializers
         initUnderTest(

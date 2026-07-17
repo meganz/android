@@ -898,7 +898,7 @@ class ChatRepositoryImplTest {
     @Test
     fun `test that null messages are returned from monitor messages function`() = runTest {
         val chatMessage = mock<ChatMessage>()
-        chatMessageMapper.stub { onBlocking { invoke(any()) }.thenReturn(chatMessage) }
+        chatMessageMapper.stub { on { invoke(any()) }.thenReturn(chatMessage) }
 
         whenever(megaChatApiGateway.openChatRoom(any())).thenReturn(flow {
             emit(ChatRoomUpdate.OnMessageLoaded(mock()))
@@ -1092,7 +1092,7 @@ class ChatRepositoryImplTest {
         runTest {
             val sdkMessage = mock<MegaChatMessage>()
             val chatMessage = mock<ChatMessage>()
-            chatMessageMapper.stub { onBlocking { invoke(sdkMessage) }.thenReturn(chatMessage) }
+            chatMessageMapper.stub { on { invoke(sdkMessage) }.thenReturn(chatMessage) }
 
             val chatId = 1L
             megaChatApiGateway.stub {
@@ -1169,7 +1169,7 @@ class ChatRepositoryImplTest {
         }
         val chatMessage = mock<ChatMessage>()
         chatMessageMapper.stub {
-            onBlocking { invoke(any()) } doReturn chatMessage
+            on { invoke(any()) } doReturn chatMessage
         }
 
         underTest.monitorMessageUpdates(123L).test {

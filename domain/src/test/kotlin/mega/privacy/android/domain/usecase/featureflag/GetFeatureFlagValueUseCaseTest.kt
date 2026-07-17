@@ -24,7 +24,7 @@ class GetFeatureFlagValueUseCaseTest {
     @Test
     fun `test that false is returned if no value found`() = runTest{
         featureFlagRepository.stub {
-            onBlocking { getFeatureValue(any()) }.thenReturn(null)
+            on { getFeatureValue(any()) }.thenReturn(null)
         }
         assertThat(underTest(mock())).isFalse()
     }
@@ -32,7 +32,7 @@ class GetFeatureFlagValueUseCaseTest {
     @Test
     fun `test that value is returned if found`() = runTest{
         featureFlagRepository.stub {
-            onBlocking { getFeatureValue(any()) }.thenReturn(true)
+            on { getFeatureValue(any()) }.thenReturn(true)
         }
         assertThat(underTest(mock())).isTrue()
     }

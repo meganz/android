@@ -29,7 +29,7 @@ class MonitorConnectivityUseCaseTest {
     fun `test that subsequent states have their connected property returned`() = runTest {
         val connectivityFlow = MutableStateFlow(ConnectivityState.Disconnected)
         networkRepository.stub {
-            onBlocking { getCurrentConnectivityState() }.thenReturn(
+            on { getCurrentConnectivityState() }.thenReturn(
                 ConnectivityState.Connected(true)
             )
             on { monitorConnectivityChanges() }.thenReturn(connectivityFlow)
@@ -45,7 +45,7 @@ class MonitorConnectivityUseCaseTest {
     fun `test that connectivity state is updated if it changes`() = runTest {
         val connectivityFlow = MutableStateFlow<ConnectivityState>(ConnectivityState.Disconnected)
         networkRepository.stub {
-            onBlocking { getCurrentConnectivityState() }.thenReturn(
+            on { getCurrentConnectivityState() }.thenReturn(
                 ConnectivityState.Connected(
                     false
                 )

@@ -89,7 +89,7 @@ class DefaultPhotosRepositoryTest {
 
     private val nodeRepository = mock<NodeRepository>()
     private val megaApiGateway = mock<MegaApiGateway> {
-        onBlocking { isSensitiveInherited(any()) }.thenReturn(false)
+        on { isSensitiveInherited(any()) }.thenReturn(false)
     }
     private val megaApiFolder = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
@@ -113,7 +113,7 @@ class DefaultPhotosRepositoryTest {
     private val megaSearchFilterMapper = mock<MegaSearchFilterMapper>()
     private val megaSearchPageMapper = mock<MegaSearchPageMapper>()
     private val monitorFetchNodesFinishUseCase = mock<MonitorFetchNodesFinishUseCase> {
-        onBlocking { invoke() }.thenReturn(emptyFlow())
+        on { invoke() }.thenReturn(emptyFlow())
     }
     private val uiPreferencesGateway = mock<UIPreferencesGateway>()
     private val mediaTimelinePreferencesGateway = mock<MediaTimelinePreferencesGateway>()

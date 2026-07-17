@@ -46,8 +46,8 @@ class SetDefaultPrimaryFolderPathUseCaseTest {
     fun `test that the default primary folder path is set`() = runTest {
         val testDefaultPath = "test/default/path"
         fileSystemRepository.stub {
-            onBlocking { doesExternalStorageDirectoryExists() }.thenReturn(true)
-            onBlocking { localDCIMFolderPath }.thenReturn(testDefaultPath)
+            on { doesExternalStorageDirectoryExists() }.thenReturn(true)
+            on { localDCIMFolderPath }.thenReturn(testDefaultPath)
         }
         underTest()
 

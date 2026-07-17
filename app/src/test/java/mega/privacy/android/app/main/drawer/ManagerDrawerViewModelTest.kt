@@ -50,7 +50,7 @@ internal class ManagerDrawerViewModelTest {
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase = mock()
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase = mock()
     private val getCurrentUserChatStatusUseCase: GetCurrentUserStatusUseCase = mock {
-        onBlocking { invoke() }.thenReturn(UserChatStatus.Invalid)
+        on { invoke() }.thenReturn(UserChatStatus.Invalid)
     }
     private val hasBackupsChildren: HasBackupsChildren = mock()
     private val getBackupsNodeUseCase: GetBackupsNodeUseCase = mock()
@@ -91,7 +91,7 @@ internal class ManagerDrawerViewModelTest {
             )
         }
         getCurrentUserChatStatusUseCase.stub {
-            onBlocking { invoke() }.thenReturn(UserChatStatus.Invalid)
+            on { invoke() }.thenReturn(UserChatStatus.Invalid)
         }
     }
 

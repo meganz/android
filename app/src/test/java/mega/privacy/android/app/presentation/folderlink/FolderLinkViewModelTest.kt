@@ -864,26 +864,26 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that openFile is triggered with correct pdf intent when updatePdfIntent is invoked`() =
         runTest {
-            val uriMock = Mockito.mockStatic(Uri::class.java)
-            val intent = mock<Intent>()
-            val contentUriMock: Uri = mock()
-            val path = "/path"
-            val handle = 1234L
-            val fileNode = mock<FileNode> {
-                on { id.longValue }.thenReturn(handle)
-            }
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                val intent = mock<Intent>()
+                val contentUriMock: Uri = mock()
+                val path = "/path"
+                val handle = 1234L
+                val fileNode = mock<FileNode> {
+                    on { id.longValue }.thenReturn(handle)
+                }
 
-            whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
-            whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
-            whenever(getLocalFolderLinkFromMegaApiFolderUseCase(handle)).thenReturn(path)
-            whenever(Uri.parse(path)).thenReturn(contentUriMock)
+                whenever(megaApiFolderHttpServerIsRunningUseCase()).thenReturn(0)
+                whenever(getLocalFileForNodeUseCase(any())).thenReturn(null)
+                whenever(getLocalFolderLinkFromMegaApiFolderUseCase(handle)).thenReturn(path)
+                whenever(Uri.parse(path)).thenReturn(contentUriMock)
 
-            underTest.updatePdfIntent(intent, fileNode, "pdf")
-            underTest.state.test {
-                val res = awaitItem()
-                assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+                underTest.updatePdfIntent(intent, fileNode, "pdf")
+                underTest.state.test {
+                    val res = awaitItem()
+                    assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+                }
             }
-            uriMock.close()
         }
 
     @Test

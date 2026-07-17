@@ -100,7 +100,7 @@ class DocumentSectionViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private var accountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }

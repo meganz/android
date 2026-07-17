@@ -58,7 +58,7 @@ class Enable2FAInitialiserTest {
     fun `test that nav event is emitted when fast login and requireTwoFactorAuthenticationUseCase returns true`() =
         runTest {
             requireTwoFactorAuthenticationUseCase.stub {
-                onBlocking { invoke(newAccount = false, firstLogin = false) }.thenReturn(true)
+                on { invoke(newAccount = false, firstLogin = false) }.thenReturn(true)
             }
 
             underTest("session", true)
@@ -75,7 +75,7 @@ class Enable2FAInitialiserTest {
     fun `test that no nav event is emitted when fast login and requireTwoFactorAuthenticationUseCase returns false`() =
         runTest {
             requireTwoFactorAuthenticationUseCase.stub {
-                onBlocking { invoke(newAccount = false, firstLogin = false) }.thenReturn(false)
+                on { invoke(newAccount = false, firstLogin = false) }.thenReturn(false)
             }
 
             underTest("session", true)
@@ -92,7 +92,7 @@ class Enable2FAInitialiserTest {
     fun `test that no nav event is emitted when fast login and requireTwoFactorAuthenticationUseCase throws exception`() =
         runTest {
             requireTwoFactorAuthenticationUseCase.stub {
-                onBlocking { invoke(newAccount = false, firstLogin = false) }
+                on { invoke(newAccount = false, firstLogin = false) }
                     .thenThrow(RuntimeException("Test error"))
             }
 
@@ -112,13 +112,13 @@ class Enable2FAInitialiserTest {
             val email = "test@example.com"
 
             getCurrentUserEmail.stub {
-                onBlocking { invoke() }.thenReturn(email)
+                on { invoke() }.thenReturn(email)
             }
             getLastRegisteredEmailUseCase.stub {
-                onBlocking { invoke() }.thenReturn(email)
+                on { invoke() }.thenReturn(email)
             }
             requireTwoFactorAuthenticationUseCase.stub {
-                onBlocking { invoke(newAccount = true, firstLogin = true) }.thenReturn(false)
+                on { invoke(newAccount = true, firstLogin = true) }.thenReturn(false)
             }
 
             underTest("session", false)
@@ -140,13 +140,13 @@ class Enable2FAInitialiserTest {
             val lastRegisteredEmail = "registered@example.com"
 
             getCurrentUserEmail.stub {
-                onBlocking { invoke() }.thenReturn(currentEmail)
+                on { invoke() }.thenReturn(currentEmail)
             }
             getLastRegisteredEmailUseCase.stub {
-                onBlocking { invoke() }.thenReturn(lastRegisteredEmail)
+                on { invoke() }.thenReturn(lastRegisteredEmail)
             }
             requireTwoFactorAuthenticationUseCase.stub {
-                onBlocking { invoke(newAccount = false, firstLogin = true) }.thenReturn(false)
+                on { invoke(newAccount = false, firstLogin = true) }.thenReturn(false)
             }
 
             underTest("session", false)
@@ -167,13 +167,13 @@ class Enable2FAInitialiserTest {
             val email = "test@example.com"
 
             getCurrentUserEmail.stub {
-                onBlocking { invoke() }.thenReturn(email)
+                on { invoke() }.thenReturn(email)
             }
             getLastRegisteredEmailUseCase.stub {
-                onBlocking { invoke() }.thenReturn(email)
+                on { invoke() }.thenReturn(email)
             }
             requireTwoFactorAuthenticationUseCase.stub {
-                onBlocking { invoke(newAccount = true, firstLogin = true) }
+                on { invoke(newAccount = true, firstLogin = true) }
                     .thenThrow(RuntimeException("Test error"))
             }
 
@@ -193,7 +193,7 @@ class Enable2FAInitialiserTest {
     fun `test that no nav event is emitted when non-fast login and getCurrentUserEmail throws exception`() =
         runTest {
             getCurrentUserEmail.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+                on { invoke() }.thenThrow(RuntimeException("Test error"))
             }
 
             underTest("session", false)
@@ -209,10 +209,10 @@ class Enable2FAInitialiserTest {
     fun `test that no nav event is emitted when non-fast login and getLastRegisteredEmailUseCase throws exception`() =
         runTest {
             getCurrentUserEmail.stub {
-                onBlocking { invoke() }.thenReturn("test@example.com")
+                on { invoke() }.thenReturn("test@example.com")
             }
             getLastRegisteredEmailUseCase.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+                on { invoke() }.thenThrow(RuntimeException("Test error"))
             }
 
             underTest("session", false)

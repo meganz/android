@@ -234,7 +234,7 @@ class LegacyContactInfoViewModelTest {
             on { name }.thenReturn("Node name")
             on { id }.thenReturn(NodeId(123456L))
         }
-        getInSharesUseCase.stub { onBlocking { invoke(any()) }.thenReturn(listOf(node)) }
+        getInSharesUseCase.stub { on { invoke(any()) }.thenReturn(listOf(node)) }
         whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true)).thenReturn(
             contactItem
         )

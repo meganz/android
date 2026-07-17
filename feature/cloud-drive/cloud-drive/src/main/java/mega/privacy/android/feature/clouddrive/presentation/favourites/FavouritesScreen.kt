@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.favourites
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -113,6 +114,7 @@ fun FavouritesScreen(
             }
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
@@ -123,6 +125,7 @@ fun FavouritesScreen(
             )
         },
         content = { innerPadding ->
+            @SuppressLint("ComposeViewModelForwarding")
             FavouritesContent(
                 navigationHandler = navigationHandler,
                 uiState = uiState,

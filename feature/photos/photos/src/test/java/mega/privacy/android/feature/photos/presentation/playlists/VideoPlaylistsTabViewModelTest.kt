@@ -808,7 +808,7 @@ class VideoPlaylistsTabViewModelTest {
         )
 
         setCloudSortOrderUseCase.stub {
-            onBlocking { invoke(any()) }.thenAnswer { invocation -> sortOrderFlow.tryEmit(invocation.arguments[0] as SortOrder) }
+            on { invoke(any()) }.thenAnswer { invocation -> sortOrderFlow.tryEmit(invocation.arguments[0] as SortOrder) }
         }
 
         whenever(monitorSortCloudOrderUseCase()).thenReturn(

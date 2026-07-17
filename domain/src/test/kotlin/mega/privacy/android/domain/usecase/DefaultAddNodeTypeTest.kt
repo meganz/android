@@ -19,7 +19,7 @@ class DefaultAddNodeTypeTest {
     private lateinit var underTest: AddNodeType
 
     private val getFolderType =
-        mock<GetFolderType> { onBlocking { invoke(any()) }.thenReturn(FolderType.Default) }
+        mock<GetFolderType> { on { invoke(any()) }.thenReturn(FolderType.Default) }
 
     @Before
     fun setUp() {
@@ -44,7 +44,7 @@ class DefaultAddNodeTypeTest {
     fun `test that folder type is the type returned from get folder type use case`() = runTest {
         val expected = FolderType.ChatFilesFolder
         getFolderType.stub {
-            onBlocking { invoke(any()) }.thenReturn(expected)
+            on { invoke(any()) }.thenReturn(expected)
         }
 
         val actual = underTest(mock<FolderNode>()) as TypedFolderNode

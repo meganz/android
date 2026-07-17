@@ -61,8 +61,8 @@ internal class CopyViewModelTest {
     fun `test that uiState emits Data with root and empty path when there is no last target`() =
         runTest(testDispatcher) {
             val root = NodeId(1L)
-            getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getCopyLatestTargetUseCase.stub { onBlocking { invoke() } doReturn null }
+            getRootNodeIdUseCase.stub { on { invoke() } doReturn root }
+            getCopyLatestTargetUseCase.stub { on { invoke() } doReturn null }
             initUnderTest()
 
             underTest.uiState.test {
@@ -75,8 +75,8 @@ internal class CopyViewModelTest {
     @Test
     fun `test that uiState falls back to NodeId minus one when root use case returns null`() =
         runTest(testDispatcher) {
-            getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn null }
-            getCopyLatestTargetUseCase.stub { onBlocking { invoke() } doReturn null }
+            getRootNodeIdUseCase.stub { on { invoke() } doReturn null }
+            getCopyLatestTargetUseCase.stub { on { invoke() } doReturn null }
             initUnderTest()
 
             underTest.uiState.test {
@@ -92,10 +92,10 @@ internal class CopyViewModelTest {
             val root = NodeId(1L)
             val parent = NodeId(3L)
             val target = NodeId(4L)
-            getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getCopyLatestTargetUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
+            getRootNodeIdUseCase.stub { on { invoke() } doReturn root }
+            getCopyLatestTargetUseCase.stub { on { invoke() } doReturn target.longValue }
             getNodeNavigationStackUseCase.stub {
-                onBlocking { invoke(target) } doReturn NodeNavigationStack(
+                on { invoke(target) } doReturn NodeNavigationStack(
                     stack = listOf(parent, target),
                     isUnderRootNode = true,
                 )
@@ -115,10 +115,10 @@ internal class CopyViewModelTest {
             val root = NodeId(1L)
             val shareRoot = NodeId(99L)
             val target = NodeId(4L)
-            getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getCopyLatestTargetUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
+            getRootNodeIdUseCase.stub { on { invoke() } doReturn root }
+            getCopyLatestTargetUseCase.stub { on { invoke() } doReturn target.longValue }
             getNodeNavigationStackUseCase.stub {
-                onBlocking { invoke(target) } doReturn NodeNavigationStack(
+                on { invoke(target) } doReturn NodeNavigationStack(
                     stack = listOf(shareRoot, target),
                     isUnderRootNode = false,
                 )
@@ -137,9 +137,9 @@ internal class CopyViewModelTest {
         runTest(testDispatcher) {
             val root = NodeId(1L)
             val target = NodeId(4L)
-            getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getCopyLatestTargetUseCase.stub { onBlocking { invoke() } doReturn target.longValue }
-            getNodeNavigationStackUseCase.stub { onBlocking { invoke(any()) } doReturn NodeNavigationStack() }
+            getRootNodeIdUseCase.stub { on { invoke() } doReturn root }
+            getCopyLatestTargetUseCase.stub { on { invoke() } doReturn target.longValue }
+            getNodeNavigationStackUseCase.stub { on { invoke(any()) } doReturn NodeNavigationStack() }
             initUnderTest()
 
             underTest.uiState.test {
@@ -151,8 +151,8 @@ internal class CopyViewModelTest {
     fun `test that uiState returns empty path when the last target equals root`() =
         runTest(testDispatcher) {
             val root = NodeId(1L)
-            getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
-            getCopyLatestTargetUseCase.stub { onBlocking { invoke() } doReturn root.longValue }
+            getRootNodeIdUseCase.stub { on { invoke() } doReturn root }
+            getCopyLatestTargetUseCase.stub { on { invoke() } doReturn root.longValue }
             initUnderTest()
 
             underTest.uiState.test {
@@ -164,9 +164,9 @@ internal class CopyViewModelTest {
     fun `test that uiState resolves root even when the last target use case throws`() =
         runTest(testDispatcher) {
             val root = NodeId(1L)
-            getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn root }
+            getRootNodeIdUseCase.stub { on { invoke() } doReturn root }
             getCopyLatestTargetUseCase.stub {
-                onBlocking { invoke() } doAnswer { throw RuntimeException("boom") }
+                on { invoke() } doAnswer { throw RuntimeException("boom") }
             }
             initUnderTest()
 

@@ -16,10 +16,10 @@ class SendStatisticsMediaDiscoveryUseCaseTest {
     private val defaultMediaHandle = 1234L
 
     private val statisticsRepository = mock<StatisticsRepository> {
-        onBlocking {
+        on {
             getMediaDiscoveryClickCount()
         }.thenReturn(1)
-        onBlocking {
+        on {
             getMediaDiscoveryClickCountFolder(defaultMediaHandle)
         }.thenReturn(1)
     }

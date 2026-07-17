@@ -39,16 +39,16 @@ class NodeMapperTest {
     val offline = mock<Offline>()
 
     private val megaApiGateway = mock<MegaApiGateway> {
-        onBlocking { getNumChildFolders(any()) }.thenReturn(0)
-        onBlocking { getNumChildFiles(any()) }.thenReturn(0)
-        onBlocking { isInRubbish(any()) }.thenReturn(false)
-        onBlocking { isPendingShare(any()) }.thenReturn(false)
-        onBlocking { getNumVersions(any()) }.thenReturn(2)
-        onBlocking { isSensitiveInherited(any()) }.thenReturn(false)
+        on { getNumChildFolders(any()) }.thenReturn(0)
+        on { getNumChildFiles(any()) }.thenReturn(0)
+        on { isInRubbish(any()) }.thenReturn(false)
+        on { isPendingShare(any()) }.thenReturn(false)
+        on { getNumVersions(any()) }.thenReturn(2)
+        on { isSensitiveInherited(any()) }.thenReturn(false)
     }
     private val megaApiFolderGateway = mock<MegaApiFolderGateway> {
-        onBlocking { getNumChildFolders(any()) }.thenReturn(0)
-        onBlocking { getNumChildFiles(any()) }.thenReturn(0)
+        on { getNumChildFolders(any()) }.thenReturn(0)
+        on { getNumChildFiles(any()) }.thenReturn(0)
     }
 
     private val expectedName = "testName"

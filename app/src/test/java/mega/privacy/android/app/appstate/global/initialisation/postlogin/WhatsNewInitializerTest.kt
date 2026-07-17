@@ -44,10 +44,10 @@ class WhatsNewInitializerTest {
     fun `test that whats new event is emitted when feature flag is enabled and should display returns true`() =
         runTest {
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn true
+                on { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn true
             }
             shouldDisplayNewFeatureUseCase.stub {
-                onBlocking { invoke() } doReturn true
+                on { invoke() } doReturn true
             }
 
             underTest.invoke("test-session", false)
@@ -61,10 +61,10 @@ class WhatsNewInitializerTest {
     @Test
     fun `test that whats new event is not emitted when should display returns false`() = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn true
+            on { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn true
         }
         shouldDisplayNewFeatureUseCase.stub {
-            onBlocking { invoke() } doReturn false
+            on { invoke() } doReturn false
         }
 
         underTest.invoke("test-session", false)
@@ -75,10 +75,10 @@ class WhatsNewInitializerTest {
     @Test
     fun `test that whats new event is not emitted when feature flag is disabled`() = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn false
+            on { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn false
         }
         shouldDisplayNewFeatureUseCase.stub {
-            onBlocking { invoke() } doReturn true
+            on { invoke() } doReturn true
         }
 
         underTest.invoke("test-session", false)
@@ -90,10 +90,10 @@ class WhatsNewInitializerTest {
     fun `test that whats new event is not emitted when should display throws exception`() =
         runTest {
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn true
+                on { invoke(ApiFeatures.WhatsNewFeatureDialog) } doReturn true
             }
             shouldDisplayNewFeatureUseCase.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+                on { invoke() }.thenThrow(RuntimeException("Test error"))
             }
 
             underTest.invoke("test-session", false)

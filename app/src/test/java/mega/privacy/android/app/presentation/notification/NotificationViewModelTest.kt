@@ -42,7 +42,7 @@ class NotificationViewModelTest {
     private lateinit var underTest: NotificationViewModel
 
     private val monitorUserAlertsUseCase = mock<MonitorUserAlertsUseCase> {
-        onBlocking { invoke() }.thenReturn(
+        on { invoke() }.thenReturn(
             emptyFlow()
         )
     }

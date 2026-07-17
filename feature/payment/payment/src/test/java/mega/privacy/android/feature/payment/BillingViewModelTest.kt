@@ -30,7 +30,7 @@ internal class BillingViewModelTest {
     private val launchPurchaseFlowUseCase = mock<LaunchPurchaseFlowUseCase>()
     private val eventFlow = MutableSharedFlow<BillingEvent>()
     private val monitorBillingEventUseCase = mock<MonitorBillingEventUseCase> {
-        onBlocking { invoke() }.thenReturn(eventFlow)
+        on { invoke() }.thenReturn(eventFlow)
     }
 
     @BeforeEach

@@ -39,7 +39,7 @@ class SSLErrorViewModelTest {
         initUnderTest(this)
         val domainName = "https://example.com/"
         getDomainNameUseCase.stub {
-            onBlocking { invoke() }.thenReturn("example.com")
+            on { invoke() }.thenReturn("example.com")
         }
         underTest.state.test {
             val actual = awaitItem()

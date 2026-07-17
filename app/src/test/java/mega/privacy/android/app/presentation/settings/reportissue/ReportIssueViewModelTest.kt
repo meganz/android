@@ -213,10 +213,10 @@ class ReportIssueViewModelTest {
         withCoroutineExceptions {
             runTest {
                 submitIssueUseCase.stub {
-                    onBlocking { invoke(any(), any()) }.thenAnswer { throw Exception() }
+                    on { invoke(any(), any()) }.thenAnswer { throw Exception() }
                 }
                 getSupportEmail.stub {
-                    onBlocking { invoke() } doReturn supportEmail
+                    on { invoke() } doReturn supportEmail
                 }
 
                 initViewModel()

@@ -44,21 +44,21 @@ class DefaultCreateSupportTicketUseCaseTest {
     @Before
     fun setUp() {
         deviceRepository.stub {
-            onBlocking { getDeviceInfo() }.thenReturn(
+            on { getDeviceInfo() }.thenReturn(
                 DeviceInfo(
                     device = device,
                     language = languageCode
                 )
             )
 
-            onBlocking { getAppInfo() }.thenReturn(
+            on { getAppInfo() }.thenReturn(
                 AppInfo(
                     appVersion = appVersion,
                     sdkVersion = sdkVersion
                 )
             )
-            onBlocking { getDeviceSdkVersionInt() }.thenReturn(deviceSdkVersionInt)
-            onBlocking { getDeviceSdkVersionName() }.thenReturn(deviceSdkVersionName)
+            on { getDeviceSdkVersionInt() }.thenReturn(deviceSdkVersionInt)
+            on { getDeviceSdkVersionName() }.thenReturn(deviceSdkVersionName)
         }
 
         underTest = CreateSupportTicketUseCase(

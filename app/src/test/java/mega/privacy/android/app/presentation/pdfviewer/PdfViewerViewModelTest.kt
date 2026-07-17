@@ -94,12 +94,12 @@ internal class PdfViewerViewModelTest {
         }.thenReturn(flowOf(AccountDetail()))
     }
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }
     private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>() {
-        onBlocking {
+        on {
             invoke(any())
         }.thenReturn(false)
     }

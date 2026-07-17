@@ -21,7 +21,7 @@ class IsFirstLaunchUseCaseTest {
     @Test
     fun `test that true is returned if repository returns true`() = runTest {
         settingsRepository.stub {
-            onBlocking { getIsFirstLaunch() }.thenReturn(true)
+            on { getIsFirstLaunch() }.thenReturn(true)
         }
 
         Truth.assertThat(underTest()).isTrue()
@@ -30,7 +30,7 @@ class IsFirstLaunchUseCaseTest {
     @Test
     fun `test that false is returned if repository returns false`() = runTest {
         settingsRepository.stub {
-            onBlocking { getIsFirstLaunch() }.thenReturn(false)
+            on { getIsFirstLaunch() }.thenReturn(false)
         }
 
         Truth.assertThat(underTest()).isFalse()
@@ -39,7 +39,7 @@ class IsFirstLaunchUseCaseTest {
     @Test
     fun `test that true is returned if repository returns null`() = runTest {
         settingsRepository.stub {
-            onBlocking { getIsFirstLaunch() }.thenReturn(null)
+            on { getIsFirstLaunch() }.thenReturn(null)
         }
 
         Truth.assertThat(underTest()).isTrue()

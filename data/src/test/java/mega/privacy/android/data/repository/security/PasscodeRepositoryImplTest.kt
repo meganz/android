@@ -118,7 +118,7 @@ internal class PasscodeRepositoryImplTest {
         runTest(dispatcher) {
             val expected = "a passcode"
             passcodeStoreGateway.stub {
-                onBlocking { getPasscode() }.thenReturn(expected)
+                on { getPasscode() }.thenReturn(expected)
             }
             val actual = underTest.getPasscode()
 

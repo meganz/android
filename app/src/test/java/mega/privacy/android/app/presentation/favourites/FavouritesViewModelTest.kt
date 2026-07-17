@@ -76,18 +76,18 @@ class FavouritesViewModelTest {
             }
     }
     private val getFavouriteSortOrderUseCase = mock<GetFavouriteSortOrderUseCase> {
-        onBlocking { invoke() }.thenReturn(FavouriteSortOrder.ModifiedDate(false))
+        on { invoke() }.thenReturn(FavouriteSortOrder.ModifiedDate(false))
     }
 
     private val megaNode = mock<MegaNode>()
 
     private val fetchNodeWrapper =
-        mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
+        mock<FetchNodeWrapper> { on { invoke(any()) }.thenReturn(megaNode) }
 
     private val mapFavouriteSortOrderUseCase = mock<MapFavouriteSortOrderUseCase>()
 
     private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase> {
-        onBlocking { invoke(any()) }.thenReturn(false)
+        on { invoke(any()) }.thenReturn(false)
     }
 
     private val evenString = "Even"
@@ -118,7 +118,7 @@ class FavouritesViewModelTest {
     }
 
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }
@@ -130,7 +130,7 @@ class FavouritesViewModelTest {
     }
 
     private val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-        onBlocking {
+        on {
             invoke(NodeId(any()))
         }.thenReturn(false)
     }

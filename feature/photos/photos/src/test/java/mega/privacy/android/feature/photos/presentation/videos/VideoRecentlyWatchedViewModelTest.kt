@@ -89,19 +89,19 @@ class VideoRecentlyWatchedViewModelTest {
     @Test
     fun `test that the initial state is loading`() = runTest {
         monitorNodeUpdatesUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         monitorOfflineNodeUpdatesUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         monitorHiddenNodesEnabledUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         monitorShowHiddenItemsUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         monitorVideoRecentlyWatchedUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         underTest.uiState.test {
             assertThat(awaitItem()).isInstanceOf(VideoRecentlyWatchedUiState.Loading::class.java)

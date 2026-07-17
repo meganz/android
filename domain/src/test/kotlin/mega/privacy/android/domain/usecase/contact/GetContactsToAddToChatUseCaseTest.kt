@@ -68,7 +68,7 @@ class GetContactsToAddToChatUseCaseTest {
     fun `test that all contacts are returned when the chat room is null`() = runTest {
         val alice = contactItem(handle = 1L, email = "alice@example.com")
         whenever(getContactsUseCase()).thenReturn(flowOf(listOf(alice)))
-        getChatRoomUseCase.stub { onBlocking { invoke(chatId) }.doReturn(null) }
+        getChatRoomUseCase.stub { on { invoke(chatId) }.doReturn(null) }
 
         underTest(chatId).test {
             assertThat(awaitItem()).containsExactly(alice)
@@ -85,7 +85,7 @@ class GetContactsToAddToChatUseCaseTest {
         val chatRoom = mock<ChatRoom> {
             on { peerHandlesList } doReturn emptyList() doReturn listOf(2L)
         }
-        getChatRoomUseCase.stub { onBlocking { invoke(chatId) }.doReturn(chatRoom) }
+        getChatRoomUseCase.stub { on { invoke(chatId) }.doReturn(chatRoom) }
 
         underTest(chatId).test {
             assertThat(awaitItem()).containsExactly(alice, bob)
@@ -96,7 +96,7 @@ class GetContactsToAddToChatUseCaseTest {
 
     private fun stubChatRoom(peerHandles: List<Long>) {
         val chatRoom = mock<ChatRoom> { on { peerHandlesList } doReturn peerHandles }
-        getChatRoomUseCase.stub { onBlocking { invoke(chatId) }.doReturn(chatRoom) }
+        getChatRoomUseCase.stub { on { invoke(chatId) }.doReturn(chatRoom) }
     }
 
     private fun contactItem(handle: Long, email: String) = ContactItem(

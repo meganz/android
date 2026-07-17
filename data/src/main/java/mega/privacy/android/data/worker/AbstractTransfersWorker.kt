@@ -117,7 +117,9 @@ abstract class AbstractTransfersWorker(
                 it.monitorOngoingActiveTransfersResult.activeTransferTotals,
                 areTransfersPausedUseCase()
             )
-            foregroundSetter?.setForeground(foregroundInfo) ?: run {
+            if (foregroundSetter != null) {
+                foregroundSetter.setForeground(foregroundInfo)
+            } else {
                 val simpleName = this@AbstractTransfersWorker::class.java.simpleName
                 Timber.d("$simpleName start foreground")
                 crashReporter.log("$simpleName start foreground")

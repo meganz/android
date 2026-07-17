@@ -95,14 +95,14 @@ class HomeViewModelTest {
 
         val dynamicWidget = stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
+            on { getWidgets() } doReturn setOf(
                 dynamicWidget,
             )
         }
 
         val staticWidget = stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
+            on { getWidgets() } doReturn setOf(
                 staticWidget,
             )
         }
@@ -140,14 +140,14 @@ class HomeViewModelTest {
 
         val dynamicWidget = stubWidget(identifier = dynamicIdentifier, defaultOrder = HomeWidgetOrder.Shortcuts)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
+            on { getWidgets() } doReturn setOf(
                 dynamicWidget,
             )
         }
 
         val staticWidget = stubWidget(identifier = staticIdentifier, defaultOrder = HomeWidgetOrder.Banner)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
+            on { getWidgets() } doReturn setOf(
                 staticWidget,
             )
         }
@@ -185,14 +185,14 @@ class HomeViewModelTest {
 
         val dynamicWidget = stubWidget(identifier = dynamicIdentifier, defaultOrder = HomeWidgetOrder.Shortcuts)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
+            on { getWidgets() } doReturn setOf(
                 dynamicWidget,
             )
         }
 
         val staticWidget = stubWidget(identifier = staticIdentifier, defaultOrder = HomeWidgetOrder.Banner)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn setOf(
+            on { getWidgets() } doReturn setOf(
                 staticWidget,
             )
         }
@@ -263,7 +263,7 @@ class HomeViewModelTest {
         runTest {
             stubConnectivity(connected = false)
             hasOfflineFilesUseCase.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException("Test exception"))
+                on { invoke() }.thenThrow(RuntimeException("Test exception"))
             }
             stubWidgetProviders()
             monitorHomeWidgetConfigurationUseCase.stub {
@@ -298,16 +298,16 @@ class HomeViewModelTest {
 
     private fun stubHasOfflineFiles(hasOfflineFiles: Boolean) {
         hasOfflineFilesUseCase.stub {
-            onBlocking { invoke() } doReturn hasOfflineFiles
+            on { invoke() } doReturn hasOfflineFiles
         }
     }
 
     private fun stubWidgetProviders() {
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn emptySet()
+            on { getWidgets() } doReturn emptySet()
         }
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn emptySet()
+            on { getWidgets() } doReturn emptySet()
         }
     }
 
@@ -323,13 +323,13 @@ class HomeViewModelTest {
 
     private fun stubFeatureFlag(enabled: Boolean = false) {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.HomeConfiguration) } doReturn enabled
+            on { invoke(ApiFeatures.HomeConfiguration) } doReturn enabled
         }
     }
 
     private fun stubTooltipShown(shown: Boolean) {
         monitorHomeConfigurationTooltipShownUseCase.stub {
-            onBlocking { invoke() } doReturn flowOf(shown)
+            on { invoke() } doReturn flowOf(shown)
         }
     }
 
@@ -433,7 +433,7 @@ class HomeViewModelTest {
                 on { invoke() } doReturn tooltipShownFlow
             }
             setHomeConfigurationTooltipShownUseCase.stub {
-                onBlocking { invoke() } doAnswer {
+                on { invoke() } doAnswer {
                     tooltipShownFlow.value = true
                     Unit
                 }
@@ -497,7 +497,7 @@ class HomeViewModelTest {
             }
             var currentFlagValue = false
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.HomeConfiguration) } doAnswer { currentFlagValue }
+                on { invoke(ApiFeatures.HomeConfiguration) } doAnswer { currentFlagValue }
             }
             stubHasOfflineFiles(hasOfflineFiles = false)
             stubTooltipShown(shown = true)

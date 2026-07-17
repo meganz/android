@@ -132,7 +132,7 @@ class CloudDriveViewModelTest {
         whenever(monitorSortCloudOrderUseCase()).thenReturn(flowOf(SortOrder.ORDER_DEFAULT_ASC))
         whenever(nodeSortConfigurationUiMapper(SortOrder.ORDER_DEFAULT_ASC))
             .thenReturn(NodeSortConfiguration.default)
-        handleToBase64UseCase.stub { onBlocking { invoke(any()) } doReturn folderKey }
+        handleToBase64UseCase.stub { on { invoke(any()) } doReturn folderKey }
         whenever(monitorFolderViewTypeUseCase(any(), any()))
             .thenAnswer { it.getArgument<Flow<ViewType>>(1) }
         whenever(monitorFolderSortOrderUseCase(any(), any()))
@@ -302,7 +302,7 @@ class CloudDriveViewModelTest {
         val underTest = createViewModel()
 
         fetchNodesByIdInChunkUseCase.stub {
-            onBlocking { invoke(any(), any(), any(), anyOrNull()) } doReturn flow { awaitCancellation() }
+            on { invoke(any(), any(), any(), anyOrNull()) } doReturn flow { awaitCancellation() }
         }
 
         underTest.uiState.test {

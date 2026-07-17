@@ -43,7 +43,7 @@ class FastLoginUseCaseTest {
     private val loginRepository = mock<LoginRepository>()
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val chatLogoutUseCase = mock<ChatLogoutUseCase> {
-        onBlocking { invoke(disableChatApiUseCase) }.thenReturn(Unit)
+        on { invoke(disableChatApiUseCase) }.thenReturn(Unit)
     }
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
     private val disableChatApiUseCase = mock<DisableChatApiUseCase>()

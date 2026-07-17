@@ -47,7 +47,7 @@ class GetPrimaryFolderPathUseCaseTest {
         newPath: String,
     ) = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimaryFolderLocalPath() }.thenReturn(originalPath)
+            on { getPrimaryFolderLocalPath() }.thenReturn(originalPath)
         }
 
         val expectedPath = underTest()

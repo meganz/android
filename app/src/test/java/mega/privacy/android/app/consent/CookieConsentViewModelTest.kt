@@ -50,7 +50,7 @@ class CookieConsentViewModelTest {
     fun `test that data state contains url`() = runTest {
         val expected = "https://mega.nz/cookie"
         getCookieUrlUseCase.stub {
-            onBlocking { invoke() }.thenReturn(expected)
+            on { invoke() }.thenReturn(expected)
         }
 
         underTest.state.test {
