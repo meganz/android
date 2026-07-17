@@ -1,8 +1,12 @@
 package mega.privacy.android.feature.fileinfo.presentation
 
+import android.content.res.Configuration
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -11,6 +15,8 @@ import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.android.core.ui.theme.devicetype.DeviceType
+import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import androidx.navigation3.runtime.NavKey
@@ -406,24 +412,91 @@ class FileInfoScreenTest {
         composeRule.onNodeWithTag(FILE_INFO_NO_LOCATION_TAG).assertDoesNotExist()
     }
 
+    @Test
+    fun `test that the header and details are shown side by side in landscape`() {
+        setContent(
+            uiState = folderState.copy(
+                sizeInBytes = 21L * 1024 * 1024,
+                numberOfFiles = 2,
+                accessPermission = AccessPermission.OWNER,
+                tags = listOf("marketing"),
+            ),
+            orientation = Configuration.ORIENTATION_LANDSCAPE,
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_HEADER_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains("2 files", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).performScrollTo().assertExists()
+    }
+
+    @Test
+    fun `test that the header and details split evenly on a phone in landscape`() {
+        setContent(
+            uiState = folderState,
+            orientation = Configuration.ORIENTATION_LANDSCAPE,
+            deviceType = DeviceType.Phone,
+        )
+
+        assertThat(detailsPaneWidth()).isWithin(1f).of(headerWidth())
+    }
+
+    @Test
+    fun `test that the tablet landscape panes split evenly within a constrained width`() {
+        setContent(
+            uiState = folderState,
+            orientation = Configuration.ORIENTATION_LANDSCAPE,
+            deviceType = DeviceType.Tablet,
+        )
+
+        val screenWidth = composeRule.onNodeWithTag(FILE_INFO_SCREEN_TAG)
+            .getUnclippedBoundsInRoot().let { (it.right - it.left).value }
+        val header = composeRule.onNodeWithTag(FILE_INFO_HEADER_TAG).getUnclippedBoundsInRoot()
+        val details = composeRule.onNodeWithTag(FILE_INFO_DETAILS_TAG).getUnclippedBoundsInRoot()
+
+        // 50/50 split between header and details.
+        assertThat((details.right - details.left).value)
+            .isWithin(1f).of((header.right - header.left).value)
+        // The two panes plus the row's 16dp side padding span ~70% of the screen, centered.
+        val contentWidth = (details.right - header.left).value + 32f
+        assertThat(contentWidth / screenWidth).isWithin(0.05f).of(0.7f)
+    }
+
+    private fun headerWidth(): Float = composeRule.onNodeWithTag(FILE_INFO_HEADER_TAG)
+        .getUnclippedBoundsInRoot().let { (it.right - it.left).value }
+
+    private fun detailsPaneWidth(): Float = composeRule.onNodeWithTag(FILE_INFO_DETAILS_TAG)
+        .getUnclippedBoundsInRoot().let { (it.right - it.left).value }
+
     private fun setContent(
         uiState: FileInfoUiState,
         nodeHandle: Long = NODE_HANDLE,
+        orientation: Int = Configuration.ORIENTATION_PORTRAIT,
+        deviceType: DeviceType = DeviceType.Phone,
         onBack: () -> Unit = {},
         onLocationClick: () -> Unit = {},
         onNavigate: (NavKey) -> Unit = {},
         onDescriptionChange: (String) -> Unit = {},
     ) {
         composeRule.setContent {
+            val configuration = Configuration(LocalConfiguration.current).apply {
+                this.orientation = orientation
+            }
             AndroidThemeForPreviews {
-                FileInfoScreen(
-                    uiState = uiState,
-                    nodeHandle = nodeHandle,
-                    onBack = onBack,
-                    onLocationClick = onLocationClick,
-                    onNavigate = onNavigate,
-                    onDescriptionChange = onDescriptionChange,
-                )
+                // Provide inside the theme so these win over the theme's own defaults
+                // (the theme sets LocalDeviceType based on the preview window).
+                CompositionLocalProvider(
+                    LocalConfiguration provides configuration,
+                    LocalDeviceType provides deviceType,
+                ) {
+                    FileInfoScreen(
+                        uiState = uiState,
+                        nodeHandle = nodeHandle,
+                        onBack = onBack,
+                        onLocationClick = onLocationClick,
+                        onNavigate = onNavigate,
+                        onDescriptionChange = onDescriptionChange,
+                    )
+                }
             }
         }
     }

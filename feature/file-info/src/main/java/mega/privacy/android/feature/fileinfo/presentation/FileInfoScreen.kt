@@ -1,11 +1,15 @@
 package mega.privacy.android.feature.fileinfo.presentation
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,15 +18,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
@@ -35,6 +42,8 @@ import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.devicetype.DeviceType
+import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
@@ -121,6 +130,125 @@ private fun FileInfoContent(
     onDescriptionChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isLandscape =
+        LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isTablet = LocalDeviceType.current == DeviceType.Tablet
+
+    if (isLandscape) {
+        // On wide tablet screens the two panes are constrained to a fraction of the width and
+        // centered, so neither the header nor the map stretches across the whole screen.
+        val contentWidthFraction = if (isTablet) TABLET_LANDSCAPE_WIDTH_FRACTION else 1f
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(contentWidthFraction)
+                    .fillMaxHeight()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.Top,
+            ) {
+                FileInfoHeader(
+                    uiState = uiState,
+                    // Fill the available height on phones (matches the design) but cap it so the
+                    // header doesn't stretch to the full screen height on taller tablet screens.
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(max = LANDSCAPE_HEADER_MAX_HEIGHT)
+                        .fillMaxHeight(),
+                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .imePadding()
+                        .verticalScroll(rememberScrollState())
+                        .testTag(FILE_INFO_DETAILS_TAG),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    FileInfoDetails(
+                        uiState = uiState,
+                        nodeHandle = nodeHandle,
+                        onLocationClick = onLocationClick,
+                        onNavigate = onNavigate,
+                        onDescriptionChange = onDescriptionChange,
+                    )
+                }
+            }
+        }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .imePadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            FileInfoHeader(
+                uiState = uiState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+            )
+            FileInfoDetails(
+                uiState = uiState,
+                nodeHandle = nodeHandle,
+                onLocationClick = onLocationClick,
+                onNavigate = onNavigate,
+                onDescriptionChange = onDescriptionChange,
+            )
+        }
+    }
+}
+
+private val LANDSCAPE_HEADER_MAX_HEIGHT = 264.dp
+private const val TABLET_LANDSCAPE_WIDTH_FRACTION = 0.7f
+
+@Composable
+private fun FileInfoHeader(
+    uiState: FileInfoUiState,
+    modifier: Modifier = Modifier,
+) {
+    BoxSurface(
+        surfaceColor = SurfaceColor.Surface1,
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .testTag(FILE_INFO_HEADER_TAG),
+    ) {
+        uiState.iconRes?.let { iconRes ->
+            NodeThumbnailView(
+                modifier = Modifier.align(Alignment.Center),
+                data = uiState.thumbnailData,
+                defaultImage = iconRes,
+                contentDescription = uiState.title,
+                contentScale = ContentScale.Crop,
+                layoutType = ThumbnailLayoutType.FullSize,
+            )
+        }
+        uiState.durationText?.let { duration ->
+            DurationBadge(
+                text = duration,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .testTag(FILE_INFO_DURATION_BADGE_TAG),
+            )
+        }
+    }
+}
+
+@Composable
+private fun FileInfoDetails(
+    uiState: FileInfoUiState,
+    nodeHandle: Long,
+    onLocationClick: () -> Unit,
+    onNavigate: (NavKey) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+) {
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val folderContent = if (!uiState.isFile &&
@@ -148,44 +276,7 @@ private fun FileInfoContent(
         folderContent?.let { add(it) }
     }.joinToString(separator = " ⋅ ")
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            .padding(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        BoxSurface(
-            surfaceColor = SurfaceColor.Surface1,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .testTag(FILE_INFO_HEADER_TAG),
-        ) {
-            uiState.iconRes?.let { iconRes ->
-                NodeThumbnailView(
-                    modifier = Modifier.align(Alignment.Center),
-                    data = uiState.thumbnailData,
-                    defaultImage = iconRes,
-                    contentDescription = uiState.title,
-                    contentScale = ContentScale.Crop,
-                    layoutType = ThumbnailLayoutType.FullSize,
-                )
-            }
-            uiState.durationText?.let { duration ->
-                DurationBadge(
-                    text = duration,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                        .testTag(FILE_INFO_DURATION_BADGE_TAG),
-                )
-            }
-        }
-
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             MegaText(
                 modifier = Modifier.testTag(FILE_INFO_NAME_TAG),
@@ -466,6 +557,76 @@ private fun FileInfoScreenFolderPreview() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview(
+    name = "Landscape",
+    device = "spec:width=880dp,height=400dp,orientation=landscape",
+    showBackground = true,
+)
+@Composable
+private fun FileInfoScreenLandscapePreview() {
+    AndroidThemeForPreviews {
+        FileInfoScreen(
+            uiState = FileInfoUiState(
+                isLoading = false,
+                title = "New folder(1)",
+                isFile = false,
+                iconRes = iconPackR.drawable.ic_folder_medium_solid,
+                creationTime = 1_749_000_000L,
+                nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                locationFolders = listOf("Documents", "Marketing", "2026"),
+                sizeInBytes = 21L * 1024 * 1024,
+                numberOfFiles = 2,
+                accessPermission = AccessPermission.OWNER,
+                descriptionText = "A collection of related files and assets organized for easy " +
+                        "access and collaboration.",
+                tags = listOf("marketing", "2026", "documentation"),
+            ),
+            nodeHandle = 0L,
+            onBack = {},
+            onLocationClick = {},
+            onNavigate = {},
+            onDescriptionChange = {},
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(
+    name = "Tablet landscape",
+    device = "spec:width=1280dp,height=800dp,orientation=landscape",
+    showBackground = true,
+)
+@Composable
+private fun FileInfoScreenTabletLandscapePreview() {
+    AndroidThemeForPreviews {
+        CompositionLocalProvider(LocalDeviceType provides DeviceType.Tablet) {
+            FileInfoScreen(
+                uiState = FileInfoUiState(
+                    isLoading = false,
+                    title = "New folder(1)",
+                    isFile = false,
+                    iconRes = iconPackR.drawable.ic_folder_medium_solid,
+                    creationTime = 1_749_000_000L,
+                    nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+                    locationFolders = listOf("Documents", "Marketing", "2026"),
+                    sizeInBytes = 21L * 1024 * 1024,
+                    numberOfFiles = 2,
+                    accessPermission = AccessPermission.OWNER,
+                    descriptionText = "A collection of related files and assets organized for easy " +
+                            "access and collaboration.",
+                    tags = listOf("marketing", "2026", "documentation"),
+                ),
+                nodeHandle = 0L,
+                onBack = {},
+                onLocationClick = {},
+                onNavigate = {},
+                onDescriptionChange = {},
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
 @Composable
 private fun FileInfoScreenIncomingShareFolderPreview() {
@@ -513,6 +674,7 @@ private fun FileInfoScreenLoadingPreview() {
 internal const val FILE_INFO_SCREEN_TAG = "file_info_screen:scaffold"
 internal const val FILE_INFO_APP_BAR_TAG = "file_info_screen:app_bar"
 internal const val FILE_INFO_HEADER_TAG = "file_info_screen:header"
+internal const val FILE_INFO_DETAILS_TAG = "file_info_screen:details"
 internal const val FILE_INFO_DURATION_BADGE_TAG = "file_info_screen:duration_badge"
 internal const val FILE_INFO_NAME_TAG = "file_info_screen:name"
 internal const val FILE_INFO_SUBTITLE_TAG = "file_info_screen:subtitle"
