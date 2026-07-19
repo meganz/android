@@ -6,6 +6,8 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -92,6 +94,42 @@ class DoMoreWithMegaWidgetViewModelTest {
                 .inOrder()
         }
     }
+
+    @Test
+    fun `test that uiState excludes items whose visible flow emits false`() = runTest {
+        val items = setOf(
+            fakeItem(DoMoreWithMegaItem.Identifier.CameraUploads, visible = flowOf(false)),
+            fakeItem(DoMoreWithMegaItem.Identifier.AddSync, visible = flowOf(true)),
+        )
+        initViewModel(items)
+
+        underTest.uiState.test {
+            assertThat(awaitItem().items.map { it.identifier })
+                .containsExactly(DoMoreWithMegaItem.Identifier.AddSync)
+        }
+    }
+
+    @Test
+    fun `test that uiState updates item visibility when the visible flow emits a new value`() =
+        runTest {
+            val cameraUploadsVisible = MutableStateFlow(false)
+            val items = setOf(
+                fakeItem(
+                    DoMoreWithMegaItem.Identifier.CameraUploads,
+                    visible = cameraUploadsVisible,
+                ),
+            )
+            initViewModel(items)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().items).isEmpty()
+
+                cameraUploadsVisible.value = true
+
+                assertThat(awaitItem().items.map { it.identifier })
+                    .containsExactly(DoMoreWithMegaItem.Identifier.CameraUploads)
+            }
+        }
 
     @Test
     fun `test that uiState emits empty items when no items are provided`() = runTest {
@@ -265,9 +303,13 @@ class DoMoreWithMegaWidgetViewModelTest {
         cover = null,
     )
 
-    private fun fakeItem(identifier: DoMoreWithMegaItem.Identifier) = object : DoMoreWithMegaItem {
+    private fun fakeItem(
+        identifier: DoMoreWithMegaItem.Identifier,
+        visible: Flow<Boolean> = flowOf(true),
+    ) = object : DoMoreWithMegaItem {
         override val identifier: DoMoreWithMegaItem.Identifier = identifier
         override val icon: ImageVector = IconPack.Medium.Thin.Outline.Camera
         override val labelRes: Int = 0
+        override val monitorVisibility: Flow<Boolean> = visible
     }
 }

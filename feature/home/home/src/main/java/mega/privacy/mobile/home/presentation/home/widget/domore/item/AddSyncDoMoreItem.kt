@@ -1,6 +1,8 @@
 package mega.privacy.mobile.home.presentation.home.widget.domore.item
 
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.home.presentation.home.widget.domore.DoMoreWithMegaItem
@@ -13,4 +15,5 @@ class AddSyncDoMoreItem @Inject constructor() : DoMoreWithMegaItem {
     override val identifier: DoMoreWithMegaItem.Identifier = DoMoreWithMegaItem.Identifier.AddSync
     override val icon: ImageVector = IconPack.Medium.Thin.Outline.Sync01
     override val labelRes: Int = sharedR.string.home_do_more_with_mega_add_sync
+    override val monitorVisibility: Flow<Boolean> = flowOf(true)
 }
