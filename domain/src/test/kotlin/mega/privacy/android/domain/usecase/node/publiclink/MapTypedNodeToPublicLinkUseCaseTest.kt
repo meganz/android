@@ -30,8 +30,8 @@ internal class MapTypedNodeToPublicLinkUseCaseTest {
     private val typedFileNode = mock<TypedFileNode>()
 
     private val addNodeType = mock<AddNodeType> {
-        onBlocking { invoke(argWhere { it is FileNode }) }.thenReturn(typedFileNode)
-        onBlocking { invoke(argWhere { it is FolderNode }) }.thenReturn(typedFolderNode)
+        on { invoke(argWhere { it is FileNode }) }.thenReturn(typedFileNode)
+        on { invoke(argWhere { it is FolderNode }) }.thenReturn(typedFolderNode)
     }
 
     private val monitorPublicLinkFolderUseCase = mock<MonitorPublicLinkFolderUseCase>()

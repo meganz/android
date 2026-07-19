@@ -14,7 +14,7 @@ class DownloadActionClickHandler @Inject constructor() : SingleNodeAction, Multi
 
     override fun handle(action: MenuAction, node: TypedNode, provider: SingleNodeActionProvider) {
         val nodeSourceType = provider.viewModel.getNodeSourceType()
-        if (nodeSourceType == NodeSourceType.VIDEO_PLAYER_ZIP_FILE && node is ZipFileTypedNode) {
+        if (nodeSourceType == NodeSourceType.MEDIA_PLAYER_ZIP_FILE && node is ZipFileTypedNode) {
             provider.viewModel.downloadZipFile(node = node, withStartMessage = false)
         } else {
             provider.viewModel.downloadNode(withStartMessage = false)

@@ -43,7 +43,7 @@ class GetAllowedSharingPermissionsUseCaseTest {
 
     @Test
     fun `test that NodeNotFoundException is thrown when node is not found`() = runTest {
-        getNodeByIdUseCase.stub { onBlocking { invoke(any()) }.thenReturn(null) }
+        getNodeByIdUseCase.stub { on { invoke(any()) }.thenReturn(null) }
         assertThrows<NodeDoesNotExistsException> {
             underTest(nodeId = NodeId(1L))
         }
@@ -51,8 +51,8 @@ class GetAllowedSharingPermissionsUseCaseTest {
 
     @Test
     fun `test that all permissions are returned for non backup nodes`() = runTest {
-        getNodeByIdUseCase.stub { onBlocking { invoke(any()) }.thenReturn(mock()) }
-        checkBackupNodeTypeUseCase.stub { onBlocking { invoke(any()) }.thenReturn(BackupNodeType.NonBackupNode) }
+        getNodeByIdUseCase.stub { on { invoke(any()) }.thenReturn(mock()) }
+        checkBackupNodeTypeUseCase.stub { on { invoke(any()) }.thenReturn(BackupNodeType.NonBackupNode) }
         val result = underTest(nodeId = NodeId(1L))
         assertThat(result).containsExactlyElementsIn(AccessPermission.entries)
     }
@@ -65,8 +65,8 @@ class GetAllowedSharingPermissionsUseCaseTest {
     )
     fun `test that only read permission is returned for backup node`(backupType: BackupNodeType) =
         runTest {
-            getNodeByIdUseCase.stub { onBlocking { invoke(any()) }.thenReturn(mock()) }
-            checkBackupNodeTypeUseCase.stub { onBlocking { invoke(any()) }.thenReturn(backupType) }
+            getNodeByIdUseCase.stub { on { invoke(any()) }.thenReturn(mock()) }
+            checkBackupNodeTypeUseCase.stub { on { invoke(any()) }.thenReturn(backupType) }
             val result = underTest(nodeId = NodeId(1L))
             assertThat(result).containsExactly(AccessPermission.READ)
         }

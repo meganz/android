@@ -180,6 +180,14 @@ internal class DefaultLoginRepository @Inject constructor(
         }
     }
 
+    override suspend fun chatLocalLogout() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getChatRequestListener("chatLocalLogout") { }
+
+            megaChatApiGateway.localLogout(listener)
+        }
+    }
+
     override fun monitorFinishActivity() = appEventGateway.monitorFinishActivity()
 
     override suspend fun broadcastFinishActivity() = appEventGateway.broadcastFinishActivity()

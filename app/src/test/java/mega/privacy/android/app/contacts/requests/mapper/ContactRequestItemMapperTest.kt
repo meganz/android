@@ -28,8 +28,8 @@ class ContactRequestItemMapperTest {
     @BeforeEach
     internal fun setUp() {
         avatarRepository.stub {
-            onBlocking { getAvatarColor(any()) }.thenReturn(1)
-            onBlocking { getAvatarFile(any<String>(), any()) }.thenReturn(avatarFile)
+            on { getAvatarColor(any()) }.thenReturn(1)
+            on { getAvatarFile(any<String>(), any()) }.thenReturn(avatarFile)
         }
 
         underTest = ContactRequestItemMapper(

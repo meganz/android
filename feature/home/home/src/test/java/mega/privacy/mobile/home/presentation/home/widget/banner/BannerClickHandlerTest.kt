@@ -2,6 +2,7 @@ package mega.privacy.mobile.home.presentation.home.widget.banner
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.WebSiteNavKey
@@ -15,11 +16,14 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.stream.Stream
 
 /**
@@ -185,22 +189,28 @@ class BannerClickHandlerTest {
 
     @Test
     fun `test that handleBannerClick for VPN URL`() {
-        val vpnUrl = "https://vpn.mega.nz"
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            whenever(Uri.parse(any())) doReturn mock()
+            val vpnUrl = "https://vpn.mega.nz"
 
-        BannerClickHandler.handleBannerClick(context, navigationHandler, vpnUrl)
+            BannerClickHandler.handleBannerClick(context, navigationHandler, vpnUrl)
 
-        assertTrue(analyticsExtension.events.contains(VpnSmartBannerItemSelectedEvent))
-        verify(context).startActivity(any<Intent>())
+            assertTrue(analyticsExtension.events.contains(VpnSmartBannerItemSelectedEvent))
+            verify(context).startActivity(any<Intent>())
+        }
     }
 
     @Test
     fun `test that handleBannerClick for PWM URL`() {
-        val pwmUrl = "https://pwm.mega.nz"
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            whenever(Uri.parse(any())) doReturn mock()
+            val pwmUrl = "https://pwm.mega.nz"
 
-        BannerClickHandler.handleBannerClick(context, navigationHandler, pwmUrl)
+            BannerClickHandler.handleBannerClick(context, navigationHandler, pwmUrl)
 
-        assertTrue(analyticsExtension.events.contains(PwmSmartBannerItemSelectedEvent))
-        verify(context).startActivity(any<Intent>())
+            assertTrue(analyticsExtension.events.contains(PwmSmartBannerItemSelectedEvent))
+            verify(context).startActivity(any<Intent>())
+        }
     }
 
     @Test
@@ -225,47 +235,53 @@ class BannerClickHandlerTest {
 
     @Test
     fun `test that VPN app opening fallback to Play Store when VPN app not installed`() {
-        val vpnUrl = "https://vpn.mega.nz"
-        var callCount = 0
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            whenever(Uri.parse(any())) doReturn mock()
+            val vpnUrl = "https://vpn.mega.nz"
+            var callCount = 0
 
-        doAnswer {
-            callCount++
-            when (callCount) {
-                1 -> throw RuntimeException("App not found")
-                2 -> throw RuntimeException("Market not found")
-                else -> Unit // Success on third call
-            }
-        }.`when`(context).startActivity(any<Intent>())
+            doAnswer {
+                callCount++
+                when (callCount) {
+                    1 -> throw RuntimeException("App not found")
+                    2 -> throw RuntimeException("Market not found")
+                    else -> Unit // Success on third call
+                }
+            }.`when`(context).startActivity(any<Intent>())
 
-        BannerClickHandler.handleBannerClick(context, navigationHandler, vpnUrl)
+            BannerClickHandler.handleBannerClick(context, navigationHandler, vpnUrl)
 
-        assertTrue(analyticsExtension.events.contains(VpnSmartBannerItemSelectedEvent))
+            assertTrue(analyticsExtension.events.contains(VpnSmartBannerItemSelectedEvent))
 
-        // Verify all three attempts were made: app -> market -> web store
-        verify(context, times(3)).startActivity(any<Intent>())
+            // Verify all three attempts were made: app -> market -> web store
+            verify(context, times(3)).startActivity(any<Intent>())
+        }
     }
 
     @Test
     fun `test that PWM app opening fallback to Play Store when PWM app not installed`() {
-        val pwmUrl = "https://pwm.mega.nz"
-        var callCount = 0
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            whenever(Uri.parse(any())) doReturn mock()
+            val pwmUrl = "https://pwm.mega.nz"
+            var callCount = 0
 
-        doAnswer {
-            callCount++
-            when (callCount) {
-                1 -> throw RuntimeException("App not found")
-                2 -> throw RuntimeException("Market not found")
-                else -> Unit // Success on third call
-            }
-        }.`when`(context).startActivity(any<Intent>())
+            doAnswer {
+                callCount++
+                when (callCount) {
+                    1 -> throw RuntimeException("App not found")
+                    2 -> throw RuntimeException("Market not found")
+                    else -> Unit // Success on third call
+                }
+            }.`when`(context).startActivity(any<Intent>())
 
-        BannerClickHandler.handleBannerClick(context, navigationHandler, pwmUrl)
+            BannerClickHandler.handleBannerClick(context, navigationHandler, pwmUrl)
 
 
-        assertTrue(analyticsExtension.events.contains(PwmSmartBannerItemSelectedEvent))
+            assertTrue(analyticsExtension.events.contains(PwmSmartBannerItemSelectedEvent))
 
-        // Verify all three attempts were made: app -> market -> web store
-        verify(context, times(3)).startActivity(any<Intent>())
+            // Verify all three attempts were made: app -> market -> web store
+            verify(context, times(3)).startActivity(any<Intent>())
+        }
     }
 
     @Test

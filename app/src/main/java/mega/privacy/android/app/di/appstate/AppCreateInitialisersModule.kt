@@ -10,7 +10,8 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.CoilIma
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.FcmTopicInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.GreeterInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.MiscFlagsInitialiser
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 
 /**
  * Provides the app-create initialisers as a single explicitly ordered list.
@@ -24,18 +25,23 @@ internal class AppCreateInitialisersModule {
 
     @Provides
     fun provideAppCreateInitialisers(
-        coilImageLoaderInitialiser: CoilImageLoaderInitialiser,
         miscFlagsInitialiser: MiscFlagsInitialiser,
         apiServerInitialiser: ApiServerInitialiser,
         accountDefaultsInitialiser: AccountDefaultsInitialiser,
         greeterInitialiser: GreeterInitialiser,
         fcmTopicInitialiser: FcmTopicInitialiser,
-    ): List<@JvmSuppressWildcards AppCreateInitialiser> = listOf(
-        coilImageLoaderInitialiser,
+    ): Set<@JvmSuppressWildcards AsyncAppCreateInitialiser> = setOf(
         miscFlagsInitialiser,
         apiServerInitialiser,
         accountDefaultsInitialiser,
         greeterInitialiser,
         fcmTopicInitialiser,
+    )
+
+    @Provides
+    fun provideSyncAppCreateInitialisers(
+        coilImageLoaderInitialiser: CoilImageLoaderInitialiser,
+    ): List<@JvmSuppressWildcards SynchronousAppCreateInitialiser> = listOf(
+        coilImageLoaderInitialiser,
     )
 }

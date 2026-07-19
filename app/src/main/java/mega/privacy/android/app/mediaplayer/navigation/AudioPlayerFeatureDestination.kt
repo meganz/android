@@ -15,10 +15,11 @@ internal class AudioPlayerFeatureDestination(
     private val launchSourceHolder: AudioPlayerLaunchSourceHolder,
 ) : FeatureDestination {
     override val navigationGraph: EntryProviderScope<NavKey>.(NavigationHandler, TransferHandler) -> Unit =
-        { navigationHandler, _ ->
+        { navigationHandler, transferHandler ->
             audioPlayerScreen(
                 navigationHandler = navigationHandler,
                 launchSourceHolder = launchSourceHolder,
+                onTransfer = transferHandler::setTransferEvent,
             )
         }
 }

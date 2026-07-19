@@ -57,7 +57,7 @@ class AdsConsentViewModelTest {
     fun `test that ad feature disabled event is triggered if feature flag is not enabled`() =
         runTest {
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn false
+                on { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn false
             }
 
             underTest.state.test {
@@ -71,7 +71,7 @@ class AdsConsentViewModelTest {
     @Test
     fun `test that adConsentHandled event is triggered if consent flow returns false`() = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
+            on { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
         }
         adConsentWrapper.stub {
             on { getCanRequestConsentFlow(any()) } doReturn flow {
@@ -93,7 +93,7 @@ class AdsConsentViewModelTest {
     @Test
     fun `test that showConsentForm event is triggered if consent flow returns true`() = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
+            on { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
         }
         adConsentWrapper.stub {
             on { getCanRequestConsentFlow(any()) } doReturn flow {
@@ -116,7 +116,7 @@ class AdsConsentViewModelTest {
     fun `test that showConsentForm event is consumed if onConsentFormDisplayed is called`() =
         runTest {
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
+                on { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
             }
             adConsentWrapper.stub {
                 on { getCanRequestConsentFlow(any()) } doReturn flow {
@@ -145,7 +145,7 @@ class AdsConsentViewModelTest {
     fun `test that adConsentHandled event is triggered if onConsentSelected is called`() =
         runTest {
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
+                on { invoke(ApiFeatures.GoogleAdsFeatureFlag) } doReturn true
             }
             adConsentWrapper.stub {
                 on { getCanRequestConsentFlow(any()) } doReturn flow {

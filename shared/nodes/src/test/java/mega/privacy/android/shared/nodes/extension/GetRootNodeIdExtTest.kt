@@ -26,21 +26,21 @@ internal class GetRootNodeIdExtTest {
     @Test
     fun `test that orInvalid returns the root node id when the use case succeeds`() = runTest {
         val expected = NodeId(42L)
-        getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn expected }
+        getRootNodeIdUseCase.stub { on { invoke() } doReturn expected }
 
         assertThat(getRootNodeIdUseCase.orInvalid()).isEqualTo(expected)
     }
 
     @Test
     fun `test that orInvalid falls back to invalid id when the use case returns null`() = runTest {
-        getRootNodeIdUseCase.stub { onBlocking { invoke() } doReturn null }
+        getRootNodeIdUseCase.stub { on { invoke() } doReturn null }
 
         assertThat(getRootNodeIdUseCase.orInvalid()).isEqualTo(NodeId(-1))
     }
 
     @Test
     fun `test that orInvalid falls back to invalid id when the use case throws`() = runTest {
-        getRootNodeIdUseCase.stub { onBlocking { invoke() } doAnswer { throw RuntimeException("boom") } }
+        getRootNodeIdUseCase.stub { on { invoke() } doAnswer { throw RuntimeException("boom") } }
 
         assertThat(getRootNodeIdUseCase.orInvalid()).isEqualTo(NodeId(-1))
     }

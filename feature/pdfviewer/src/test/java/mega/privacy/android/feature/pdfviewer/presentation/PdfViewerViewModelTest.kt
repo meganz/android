@@ -3,6 +3,7 @@ package mega.privacy.android.feature.pdfviewer.presentation
 import android.content.Context
 import android.content.res.Resources
 import android.graphics.RectF
+import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.shockwave.pdfium.PdfTextMatch
@@ -58,6 +59,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
+import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
@@ -616,18 +618,21 @@ class PdfViewerViewModelTest {
 
     @Test
     fun `test that retryLoad does not trigger loadPdfBytes for local content`() = runTest {
-        underTest = initViewModel(
-            args = defaultArgs.copy(
-                contentUri = "file:///sdcard/test.pdf",
-                isLocalContent = true,
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            whenever(Uri.parse(any())).thenReturn(mock<Uri>())
+            underTest = initViewModel(
+                args = defaultArgs.copy(
+                    contentUri = "file:///sdcard/test.pdf",
+                    isLocalContent = true,
+                )
             )
-        )
-        advanceUntilIdle()
+            advanceUntilIdle()
 
-        underTest.retryLoad()
-        advanceUntilIdle()
+            underTest.retryLoad()
+            advanceUntilIdle()
 
-        verifyNoInteractions(getDataBytesFromUrlUseCase)
+            verifyNoInteractions(getDataBytesFromUrlUseCase)
+        }
     }
 
     @Test

@@ -1,7 +1,11 @@
 package mega.privacy.android.app.presentation.changepassword
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -15,7 +19,9 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
-import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.app.fromId
+import mega.privacy.android.app.hasBackgroundColor
+import mega.privacy.android.app.onNodeWithText
 import mega.privacy.android.app.presentation.changepassword.extensions.toStrengthAttribute
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
@@ -42,12 +48,10 @@ import mega.privacy.android.shared.original.core.ui.theme.red_300
 import mega.privacy.android.shared.original.core.ui.theme.red_600
 import mega.privacy.android.shared.original.core.ui.theme.yellow_300
 import mega.privacy.android.shared.original.core.ui.theme.yellow_600
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import mega.privacy.android.app.fromId
-import mega.privacy.android.app.hasBackgroundColor
-import mega.privacy.android.app.onNodeWithText
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
@@ -240,6 +244,47 @@ class ChangePasswordComposeViewTest {
         )
 
         composeTestRule.onNodeWithTag(CHANGE_PASSWORD_BUTTON_TEST_TAG).assertIsEnabled()
+    }
+
+    @Test
+    fun `test that when click change password button with both fields empty should show password error when in park account mode`() {
+        var currentState by mutableStateOf(
+            ChangePasswordUIState(
+                isConnectedToNetwork = true,
+                isResetPasswordMode = true,
+                isParkAccountMode = true,
+            )
+        )
+
+        composeTestRule.setContent {
+            ChangePasswordView(
+                uiState = currentState,
+                onSnackBarShown = {},
+                onPasswordTextChanged = {},
+                onConfirmPasswordTextChanged = {},
+                onTnCLinkClickListener = {},
+                onTriggerChangePassword = {},
+                onTriggerResetPassword = {},
+                onValidatePassword = {},
+                onValidateOnSave = { _, _ ->
+                    currentState = currentState.copy(
+                        passwordError = R.string.error_enter_password,
+                        confirmPasswordError = R.string.error_enter_password
+                    )
+                },
+                onResetValidationState = {},
+                onAfterPasswordChanged = {},
+                onAfterPasswordReset = { _, _ -> },
+                onPromptedMultiFactorAuth = {},
+                onFinishActivity = {},
+                onShowAlert = {}
+            )
+        }
+
+        composeTestRule.onNodeWithTag(CHANGE_PASSWORD_BUTTON_TEST_TAG).performClick()
+
+        composeTestRule.onAllNodesWithText(fromId(R.string.error_enter_password))
+            .assertCountEquals(2)
     }
 
     @Test

@@ -59,7 +59,7 @@ internal class FetchChildrenMapperTest {
             whenever(megaSearchFilterMapper(NodeId(megaNode.handle))).thenReturn(filter)
             val child = mock<MegaNode>()
             megaApiGateway.stub {
-                onBlocking { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
+                on { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
             }
             val expected = mock<FileNode>()
             whenever(nodeMapper(child)).thenReturn(expected)

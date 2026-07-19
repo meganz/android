@@ -9,17 +9,26 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 /**
  * UI state for the Link settings editor screen.
  *
+ * @property isExpiryAlreadySet Whether the link already had an expiry date when the screen opened,
+ * so the expiry toggle starts on and Save only enables on an actual change or removal.
+ * @property initialExpiryDate The existing expiry date, in UTC milliseconds, used as the baseline
+ * for detecting an actual change; null when no expiry was set.
  * @property isPasswordAlreadySet Whether the link already had a password when the screen opened,
  * so the password toggle starts on and Save only enables on an actual change or removal.
  * @property initialPassword The existing plaintext password pre-filled for change/remove, used as
  * the baseline for detecting an actual change; null when no password was set.
+ * @property initialSeparateKeyEnabled The "separate link and key" preference when the screen
+ * opened, used as the baseline for detecting an actual change.
  */
 @Stable
 data class LinkSettingsUiState(
     val isLoading: Boolean = true,
     val isSeparateKeyEnabled: Boolean = false,
+    val initialSeparateKeyEnabled: Boolean = false,
     val isExpiryEnabled: Boolean = false,
     val expiryDate: Long? = null,
+    val isExpiryAlreadySet: Boolean = false,
+    val initialExpiryDate: Long? = null,
     val isPasswordEnabled: Boolean = false,
     val isPasswordAlreadySet: Boolean = false,
     val initialPassword: String? = null,
@@ -31,4 +40,10 @@ data class LinkSettingsUiState(
     val isSaving: Boolean = false,
     val savedEvent: StateEvent = consumed,
     val errorEvent: StateEvent = consumed,
-)
+) {
+    /**
+     * Whether the Pro-only rows (expiry, password) are locked for the current account — true for
+     * free/unknown accounts, driving the "Pro" badge and (later) the disabled state.
+     */
+    val isProFeatureLocked: Boolean get() = accountType?.isPaid != true
+}

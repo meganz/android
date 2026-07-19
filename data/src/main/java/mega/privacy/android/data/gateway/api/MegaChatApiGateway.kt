@@ -55,6 +55,11 @@ interface MegaChatApiGateway {
     fun logout(listener: MegaChatRequestListenerInterface?)
 
     /**
+     * Local logout API.
+     */
+    fun localLogout(listener: MegaChatRequestListenerInterface?)
+
+    /**
      * Set logger
      *
      * @param logger

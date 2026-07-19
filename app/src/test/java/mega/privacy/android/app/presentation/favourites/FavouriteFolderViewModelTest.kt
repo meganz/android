@@ -79,7 +79,7 @@ class FavouriteFolderViewModelTest {
     }
 
     private val fetchNodeWrapper = mock<FetchNodeWrapper> {
-        onBlocking { invoke(any()) }.thenReturn(megaNode)
+        on { invoke(any()) }.thenReturn(megaNode)
     }
 
     private val megaUtilWrapper = mock<MegaUtilWrapper>()

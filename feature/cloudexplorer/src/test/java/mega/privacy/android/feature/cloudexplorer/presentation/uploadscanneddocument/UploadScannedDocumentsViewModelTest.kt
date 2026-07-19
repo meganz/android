@@ -31,7 +31,7 @@ internal class UploadScannedDocumentsViewModelTest {
     fun setUp() {
         reset(getRootNodeIdUseCase)
         getRootNodeIdUseCase.stub {
-            onBlocking { invoke() } doReturn NodeId(100L)
+            on { invoke() } doReturn NodeId(100L)
         }
         viewModel = UploadScannedDocumentsViewModel(
             getRootNodeIdUseCase = getRootNodeIdUseCase,
@@ -48,7 +48,7 @@ internal class UploadScannedDocumentsViewModelTest {
     fun `test that ui state exposes root node id from use case`() = runTest(testDispatcher) {
         val expectedRoot = NodeId(42L)
         getRootNodeIdUseCase.stub {
-            onBlocking { invoke() } doReturn expectedRoot
+            on { invoke() } doReturn expectedRoot
         }
         viewModel = UploadScannedDocumentsViewModel(
             getRootNodeIdUseCase = getRootNodeIdUseCase,
@@ -70,7 +70,7 @@ internal class UploadScannedDocumentsViewModelTest {
     fun `test that ui state uses fallback root id when use case returns null`() =
         runTest(testDispatcher) {
             getRootNodeIdUseCase.stub {
-                onBlocking { invoke() } doReturn null
+                on { invoke() } doReturn null
             }
             viewModel = UploadScannedDocumentsViewModel(
                 getRootNodeIdUseCase = getRootNodeIdUseCase,

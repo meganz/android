@@ -53,7 +53,7 @@ class MonitorShareRecipientsUseCaseTest {
     @Test
     fun `test that a node without shares returns an empty list`() = runTest {
         nodeRepository.stub {
-            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(emptyList())
+            on { getNodeOutgoingShares(any()) }.thenReturn(emptyList())
         }
 
         underTest.invoke(NodeId(1)).test {
@@ -68,7 +68,7 @@ class MonitorShareRecipientsUseCaseTest {
         val isPending = true
         val access = AccessPermission.UNKNOWN
         nodeRepository.stub {
-            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
+            on { getNodeOutgoingShares(any()) }.thenReturn(
                 listOf(
                     ShareData(
                         user = nonContactEmail,
@@ -114,7 +114,7 @@ class MonitorShareRecipientsUseCaseTest {
         val avatarColour = 42
 
         nodeRepository.stub {
-            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
+            on { getNodeOutgoingShares(any()) }.thenReturn(
                 listOf(
                     ShareData(
                         user = contactEmail,
@@ -138,15 +138,15 @@ class MonitorShareRecipientsUseCaseTest {
                 )
                 awaitCancellation()
             })
-            onBlocking { getAvatarUri(contactEmail) }.thenReturn(null)
+            on { getAvatarUri(contactEmail) }.thenReturn(null)
             on { monitorOnlineStatusByHandle(userId) }.thenReturn(flow {
                 emit(UserChatStatus.Invalid)
                 awaitCancellation()
             })
-            onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
+            on { areCredentialsVerified(contactEmail) }.thenReturn(false)
         }
         avatarRepository.stub {
-            onBlocking { getAvatarColor(userId) }.thenReturn(avatarColour)
+            on { getAvatarColor(userId) }.thenReturn(avatarColour)
         }
 
         underTest(NodeId(1)).test {
@@ -182,7 +182,7 @@ class MonitorShareRecipientsUseCaseTest {
         val avatarColour = 42
 
         nodeRepository.stub {
-            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
+            on { getNodeOutgoingShares(any()) }.thenReturn(
                 listOf(
                     ShareData(
                         user = contactEmail,
@@ -202,15 +202,15 @@ class MonitorShareRecipientsUseCaseTest {
         val contactFlow = MutableStateFlow(getContact(userId, contactEmail, nickname))
         contactsRepository.stub {
             on { monitorContactByEmail(contactEmail) }.thenReturn(contactFlow)
-            onBlocking { getAvatarUri(contactEmail) }.thenReturn(null)
+            on { getAvatarUri(contactEmail) }.thenReturn(null)
             on { monitorOnlineStatusByHandle(userId) }.thenReturn(flow {
                 emit(UserChatStatus.Invalid)
                 awaitCancellation()
             })
-            onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
+            on { areCredentialsVerified(contactEmail) }.thenReturn(false)
         }
         avatarRepository.stub {
-            onBlocking { getAvatarColor(userId) }.thenReturn(avatarColour)
+            on { getAvatarColor(userId) }.thenReturn(avatarColour)
         }
 
         underTest(NodeId(1)).test {
@@ -262,7 +262,7 @@ class MonitorShareRecipientsUseCaseTest {
         val userId = 1L
 
         nodeRepository.stub {
-            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
+            on { getNodeOutgoingShares(any()) }.thenReturn(
                 listOf(
                     ShareData(
                         user = contactEmail,
@@ -290,13 +290,13 @@ class MonitorShareRecipientsUseCaseTest {
                 )
                 awaitCancellation()
             })
-            onBlocking { getAvatarUri(contactEmail) }.thenReturn(null)
+            on { getAvatarUri(contactEmail) }.thenReturn(null)
             on { monitorOnlineStatusByHandle(userId) }.thenReturn(statusFlow)
-            onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
+            on { areCredentialsVerified(contactEmail) }.thenReturn(false)
         }
 
         avatarRepository.stub {
-            onBlocking { getAvatarColor(userId) }.thenReturn(42)
+            on { getAvatarColor(userId) }.thenReturn(42)
         }
 
         underTest(NodeId(1)).map { it.filterIsInstance<ShareRecipient.Contact>().first().status }
@@ -320,7 +320,7 @@ class MonitorShareRecipientsUseCaseTest {
         val range = 1..9
 
         nodeRepository.stub {
-            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
+            on { getNodeOutgoingShares(any()) }.thenReturn(
                 range.map {
                     ShareData(
                         user = if (it.rem(2) == 0) "$it$contactEmail" else "$it$nonContactEmail",
@@ -355,15 +355,15 @@ class MonitorShareRecipientsUseCaseTest {
                     }
                 }
             }
-            onBlocking { getAvatarUri(contactEmail) }.thenReturn(null)
+            on { getAvatarUri(contactEmail) }.thenReturn(null)
             on { monitorOnlineStatusByHandle(any()) }.thenReturn(flow {
                 emit(UserChatStatus.Invalid)
                 awaitCancellation()
             })
-            onBlocking { areCredentialsVerified(any()) }.thenReturn(false)
+            on { areCredentialsVerified(any()) }.thenReturn(false)
         }
         avatarRepository.stub {
-            onBlocking { getAvatarColor(any()) }.thenReturn(avatarColour)
+            on { getAvatarColor(any()) }.thenReturn(avatarColour)
         }
 
         underTest(NodeId(1)).test {
@@ -411,7 +411,7 @@ class MonitorShareRecipientsUseCaseTest {
 
         val nodeUpdateFlow = MutableStateFlow<NodeUpdate>(NodeUpdate(emptyMap()))
         nodeRepository.stub {
-            onBlocking { getNodeOutgoingShares(any()) }.thenReturn(
+            on { getNodeOutgoingShares(any()) }.thenReturn(
                 listOf(
                     ShareData(
                         user = contactEmail,
@@ -450,15 +450,15 @@ class MonitorShareRecipientsUseCaseTest {
                 )
                 awaitCancellation()
             })
-            onBlocking { getAvatarUri(contactEmail) }.thenReturn(null)
+            on { getAvatarUri(contactEmail) }.thenReturn(null)
             on { monitorOnlineStatusByHandle(userId) }.thenReturn(flow {
                 emit(UserChatStatus.Invalid)
                 awaitCancellation()
             })
-            onBlocking { areCredentialsVerified(contactEmail) }.thenReturn(false)
+            on { areCredentialsVerified(contactEmail) }.thenReturn(false)
         }
         avatarRepository.stub {
-            onBlocking { getAvatarColor(userId) }.thenReturn(avatarColour)
+            on { getAvatarColor(userId) }.thenReturn(avatarColour)
         }
 
         underTest(sharedNodeId).test {

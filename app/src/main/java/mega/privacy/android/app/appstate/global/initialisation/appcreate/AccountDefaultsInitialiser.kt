@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -9,9 +9,8 @@ import javax.inject.Inject
  */
 class AccountDefaultsInitialiser @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
-) : AppCreateInitialiser {
+) : AsyncAppCreateInitialiser {
     override val name = "AccountDefaultsInitialiser"
-    override val isCritical = false
 
     override suspend operator fun invoke() {
         myAccountInfo.resetDefaults()

@@ -135,7 +135,7 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             shareFolderUseCase.stub {
-                onBlocking {
+                on {
                     invoke(
                         any(),
                         any(),
@@ -161,7 +161,7 @@ class ShareRecipientsViewModelTest {
         stubForData()
 
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -194,7 +194,7 @@ class ShareRecipientsViewModelTest {
     fun `test that when share removed event is handled it is set to consumed`() = runTest {
         stubForData()
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -228,7 +228,7 @@ class ShareRecipientsViewModelTest {
             stubForData()
             shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.SUCCESS_STRING) }
             shareFolderUseCase.stub {
-                onBlocking {
+                on {
                     invoke(
                         any(),
                         any(),
@@ -260,7 +260,7 @@ class ShareRecipientsViewModelTest {
         shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.SUCCESS_STRING) }
         val gate = CompletableDeferred<MoveRequestResult.ShareMovement>()
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -305,7 +305,7 @@ class ShareRecipientsViewModelTest {
             stubForData()
             shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.FAILURE_STRING) }
             shareFolderUseCase.stub {
-                onBlocking {
+                on {
                     invoke(
                         any(),
                         any(),
@@ -333,7 +333,7 @@ class ShareRecipientsViewModelTest {
         stubForData()
         shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.SUCCESS_STRING) }
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -369,7 +369,7 @@ class ShareRecipientsViewModelTest {
         stubForData()
         shareFolderRequestMapper.stub { on { invoke(any()) }.thenReturn(TestValues.FAILURE_STRING) }
         shareFolderUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     any(),
                     any(),
@@ -429,7 +429,7 @@ class ShareRecipientsViewModelTest {
             mock<ShareRecipient.NonContact>(),
         )
         getAllowedSharingPermissionsUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(expectedPermissions)
+            on { invoke(any()) }.thenReturn(expectedPermissions)
         }
         monitorShareRecipientsUseCase.stub {
             on { invoke(any()) }.thenReturn(
@@ -460,7 +460,7 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             getContactVerificationWarningUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
 
             initUnderTest()
@@ -477,7 +477,7 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn false
+                on { invoke(AppFeatures.ContactsComposeUI) } doReturn false
             }
             initUnderTest()
 
@@ -498,10 +498,10 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+                on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
             }
             getShareFolderSensitiveWarningUseCase.stub {
-                onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.None
+                on { invoke(any()) } doReturn SensitiveNodeShareWarning.None
             }
             initUnderTest()
 
@@ -521,10 +521,10 @@ class ShareRecipientsViewModelTest {
     fun `test that warning is shown when onAddContactClicked and folder is sensitive`() = runTest {
         stubForData()
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
         }
         getShareFolderSensitiveWarningUseCase.stub {
-            onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
+            on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
         }
         initUnderTest()
 
@@ -544,10 +544,10 @@ class ShareRecipientsViewModelTest {
         runTest {
             stubForData()
             getFeatureFlagValueUseCase.stub {
-                onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+                on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
             }
             getShareFolderSensitiveWarningUseCase.stub {
-                onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
+                on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folder
             }
             initUnderTest()
 
@@ -569,10 +569,10 @@ class ShareRecipientsViewModelTest {
     fun `test that dismissing the warning clears it without navigating`() = runTest {
         stubForData()
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
         }
         getShareFolderSensitiveWarningUseCase.stub {
-            onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.Folders
+            on { invoke(any()) } doReturn SensitiveNodeShareWarning.Folders
         }
         initUnderTest()
 
@@ -591,7 +591,7 @@ class ShareRecipientsViewModelTest {
 
     private fun stubForData() {
         getAllowedSharingPermissionsUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(setOf(AccessPermission.FULL))
+            on { invoke(any()) }.thenReturn(setOf(AccessPermission.FULL))
         }
         monitorShareRecipientsUseCase.stub {
             on { invoke(any()) }.thenReturn(
@@ -606,7 +606,7 @@ class ShareRecipientsViewModelTest {
                 }
             )
         }
-        getContactVerificationWarningUseCase.stub { onBlocking { invoke() } doReturn false }
+        getContactVerificationWarningUseCase.stub { on { invoke() } doReturn false }
     }
 
 

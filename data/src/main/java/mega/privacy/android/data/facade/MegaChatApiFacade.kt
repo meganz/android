@@ -61,6 +61,8 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun logout(listener: MegaChatRequestListenerInterface?) = chatApi.logout(listener)
 
+    override fun localLogout(listener: MegaChatRequestListenerInterface?) = chatApi.localLogout(listener)
+
     override fun setLogger(logger: MegaChatLoggerInterface) =
         MegaChatApiAndroid.setLoggerObject(logger)
 

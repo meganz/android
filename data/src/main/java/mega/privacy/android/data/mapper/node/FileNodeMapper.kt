@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper.node
 
+import mega.privacy.android.data.extensions.expirationTimeOrNull
 import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
@@ -82,7 +83,7 @@ internal class FileNodeMapper @Inject constructor(
             isMarkedSensitive = megaNode.isMarkedSensitive,
             isSensitiveInherited = megaApiGateway.isSensitiveInherited(megaNode),
             exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-                ExportedData(it.publicLink, it.publicLinkCreationTime)
+                ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTimeOrNull())
             },
             isTakenDown = megaNode.isTakenDown,
             isIncomingShare = megaNode.isInShare,

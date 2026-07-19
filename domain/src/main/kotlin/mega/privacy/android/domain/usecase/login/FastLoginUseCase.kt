@@ -34,13 +34,13 @@ class FastLoginUseCase @Inject constructor(
      *
      * @param session Account session.
      * @param refreshChatUrl True if should refresh chat api URL, false otherwise.
-     * @param disableChatApiUseCase [DisableChatApiUseCase]
+     * @param disableChatApi True if should call [DisableChatApiUseCase]
      * @return Flow of [LoginStatus].
      */
     operator fun invoke(
         session: String,
         refreshChatUrl: Boolean,
-        disableChatApiUseCase: DisableChatApiUseCase,
+        disableChatApi: Boolean
     ) = callbackFlow {
         // MegaChat::init() can run in parallel with fastLogin, but any call touching the
         // chat client (refreshMegaChatUrl, chatLogout) must wait for it to finish, and
@@ -55,7 +55,7 @@ class FastLoginUseCase @Inject constructor(
                     runCatching { initialiseMegaChatUseCase(session) }
                         .onFailure { exception ->
                             if (exception is ChatNotInitializedErrorStatus) {
-                                chatLogoutUseCase(disableChatApiUseCase)
+                                chatLogoutUseCase(disableChatApi)
                             }
                         }
 
@@ -71,7 +71,7 @@ class FastLoginUseCase @Inject constructor(
                 .catch {
                     initialiseChatJob.join()
                     if (it !is LoginLoggedOutFromOtherLocation) {
-                        chatLogoutUseCase(disableChatApiUseCase)
+                        chatLogoutUseCase(disableChatApi)
                         resetChatSettingsUseCase()
                     }
                     close(it)

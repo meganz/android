@@ -57,14 +57,14 @@ class PsaRepositoryImplTest {
             cache.clear()
 
             psaMapper.stub {
-                onBlocking { invoke(any()) }.thenReturn(expected)
+                on { invoke(any()) }.thenReturn(expected)
             }
 
             megaApiGateway.stub {
                 val megaError = mock<MegaError> {
                     on { errorCode }.thenReturn(MegaError.API_OK)
                 }
-                onBlocking { getPsa(any()) }.thenAnswer {
+                on { getPsa(any()) }.thenAnswer {
                     (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                         api = mock(),
                         request = mock(),

@@ -19,10 +19,10 @@ import mega.privacy.android.core.nodecomponents.menu.provider.OutgoingSharesMenu
 import mega.privacy.android.core.nodecomponents.menu.provider.RecentsBucketMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.RubbishBinMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.TimelineMenuOptionProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerDefaultMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerImageViewerMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerVersionsMenuOptionsProvider
-import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlayerZipFileMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerDefaultMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerImageViewerMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerVersionsMenuOptionsProvider
+import mega.privacy.android.core.nodecomponents.menu.provider.MediaPlayerZipFileMenuOptionsProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideoPlaylistOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideoRecentlyWatchedOptionProvider
 import mega.privacy.android.core.nodecomponents.menu.provider.VideosMenuOptionProvider
@@ -142,24 +142,24 @@ abstract class NodeOptionsModule {
     @Binds
     @IntoSet
     abstract fun bindVideoPlayerDefaultOptionsProvider(
-        provider: VideoPlayerDefaultMenuOptionsProvider,
+        provider: MediaPlayerDefaultMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 
     @Binds
     @IntoSet
     abstract fun bindVideoPlayerVersionsOptionsProvider(
-        provider: VideoPlayerVersionsMenuOptionsProvider,
+        provider: MediaPlayerVersionsMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 
     @Binds
     @IntoSet
     abstract fun bindVideoPlayerImageViewerOptionsProvider(
-        provider: VideoPlayerImageViewerMenuOptionsProvider,
+        provider: MediaPlayerImageViewerMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 
     @Binds
     @IntoSet
     abstract fun bindVideoPlayerZipFileOptionsProvider(
-        provider: VideoPlayerZipFileMenuOptionsProvider,
+        provider: MediaPlayerZipFileMenuOptionsProvider,
     ): NodeMenuOptionsProvider
 }

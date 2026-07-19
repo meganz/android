@@ -204,6 +204,7 @@ fun ChangePasswordView(
         var isTnCChecked by remember { mutableStateOf(false) }
         var showParkAccountConfirmation by remember { mutableStateOf(false) }
         var parkAccountPassword by remember { mutableStateOf("") }
+        var saveAttempted by remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
         val keyboardController = LocalSoftwareKeyboardController.current
         val noConnectionMessage = stringResource(id = R.string.error_server_connection_problem)
@@ -225,6 +226,7 @@ fun ChangePasswordView(
                 }
 
                 else -> {
+                    saveAttempted = true
                     onValidateOnSave(passwordText.orEmpty(), confirmPasswordText.orEmpty())
                 }
             }
@@ -289,7 +291,7 @@ fun ChangePasswordView(
                     onPasswordTextChanged(value)
                 },
                 text = passwordText.orEmpty(),
-                errorText = if (passwordText != null && (uiState.isCurrentPassword || uiState.passwordError != null)) {
+                errorText = if ((passwordText != null || saveAttempted) && (uiState.isCurrentPassword || uiState.passwordError != null)) {
                     uiState.passwordError?.let { res ->
                         stringResource(id = res)
                     }.takeIf {

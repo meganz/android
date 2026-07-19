@@ -118,7 +118,7 @@ class SettingsViewModelTest {
         }
 
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(false)
+            on { invoke(any()) }.thenReturn(false)
         }
 
         monitorContactLinksOptionUseCase.stub {
@@ -148,17 +148,17 @@ class SettingsViewModelTest {
             }
         }
 
-        getAccountDetailsUseCase.stub { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
+        getAccountDetailsUseCase.stub { on { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
 
         monitorConnectivityUseCase.stub { on { invoke() }.thenReturn(MutableStateFlow(true)) }
 
         isMultiFactorAuthAvailable.stub { on { invoke() }.thenReturn(true) }
 
-        isCameraUploadsEnabledUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
+        isCameraUploadsEnabledUseCase.stub { on { invoke() }.thenReturn(false) }
 
-        getSessionTransferURLUseCase.stub { onBlocking { invoke(any()) }.thenReturn(null) }
+        getSessionTransferURLUseCase.stub { on { invoke(any()) }.thenReturn(null) }
 
-        monitorShowHiddenItemsUseCase.stub { onBlocking { invoke() }.thenReturn(emptyFlow()) }
+        monitorShowHiddenItemsUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
 
         monitorAccountDetailUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
         monitorStartScreenPreferenceDestinationUseCase.stub { on { invoke() }.thenReturn(emptyFlow()) }
@@ -166,7 +166,7 @@ class SettingsViewModelTest {
 
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
         isMultiFactorAuthEnabledUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
 
     }
@@ -176,7 +176,7 @@ class SettingsViewModelTest {
             getAccountDetailsUseCase = getAccountDetailsUseCase,
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
-            rootNodeExistsUseCase = mock { onBlocking { invoke() }.thenReturn(true) },
+            rootNodeExistsUseCase = mock { on { invoke() }.thenReturn(true) },
             isMultiFactorAuthAvailable = isMultiFactorAuthAvailable,
             monitorContactLinksOptionUseCase = monitorContactLinksOptionUseCase,
             isMultiFactorAuthEnabledUseCase = isMultiFactorAuthEnabledUseCase,
@@ -253,7 +253,7 @@ class SettingsViewModelTest {
     fun `test that deleteAccount triggers deleteAccountEvent with false when requestAccountDeletion fails`() =
         runTest {
             requestAccountDeletion.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException())
+                on { invoke() }.thenThrow(RuntimeException())
             }
             underTest.deleteAccount()
             advanceUntilIdle()
@@ -288,7 +288,7 @@ class SettingsViewModelTest {
     fun `test that the subsequent value auto accept is returned from the use case`() = runTest {
         whenever(monitorPasscodeLockPreferenceUseCase()).thenReturn(emptyFlow())
         isMultiFactorAuthEnabledUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
         monitorContactLinksOptionUseCase.stub {
             on { invoke() }.thenReturn(
@@ -313,7 +313,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that logging out of chat disables chat settings`() = runTest {
         isMultiFactorAuthEnabledUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
         monitorHideRecentActivityUseCase.stub {
             on { invoke() }.thenReturn(false.asHotFlow())
@@ -378,7 +378,7 @@ class SettingsViewModelTest {
     fun `test that multi factor is enabled when fetching multi factor enabled returns true`() =
         runTest {
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             underTest.refreshMultiFactorAuthSetting()
             underTest.uiState
@@ -394,7 +394,7 @@ class SettingsViewModelTest {
     fun `test that multi factor is disabled when fetching multi factor enabled returns false`() =
         runTest {
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             underTest.refreshMultiFactorAuthSetting()
@@ -422,7 +422,7 @@ class SettingsViewModelTest {
             }
 
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             initViewModel()
@@ -453,7 +453,7 @@ class SettingsViewModelTest {
                 on { invoke() }.thenReturn(false.asHotFlow())
             }
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             monitorSubFolderMediaDiscoverySettingsUseCase.stub {
@@ -479,7 +479,7 @@ class SettingsViewModelTest {
                 on { invoke() }.thenReturn(false.asHotFlow())
             }
             isMultiFactorAuthEnabledUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             monitorMediaDiscoveryView.stub {
@@ -525,7 +525,7 @@ class SettingsViewModelTest {
     @Test
     fun `test that an exception from get account is not propagated`() = runTest {
         getAccountDetailsUseCase.stub {
-            onBlocking { invoke(any()) }.thenAnswer {
+            on { invoke(any()) }.thenAnswer {
                 throw MegaException(
                     1,
                     "It's broken"
@@ -577,7 +577,7 @@ class SettingsViewModelTest {
         initViewModel()
         whenever(getSessionTransferURLUseCase(any())).thenReturn(link)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(isEnabled)
+            on { invoke(any()) }.thenReturn(isEnabled)
         }
         advanceUntilIdle()
         assertThat(underTest.getCookiePolicyLink()).isEqualTo(expected)

@@ -50,4 +50,37 @@ class CurrentPlanCardTest {
         composeRule.onNodeWithTag(TEST_TAG_CURRENT_PLAN_HELP_TEXT, useUnmergedTree = true)
             .assertDoesNotExist()
     }
+
+    @Test
+    fun `test that CurrentPlanCard shows expiring badge when expiring label is set`() {
+        composeRule.setContent {
+            CurrentPlanCard(
+                modifier = Modifier.fillMaxWidth(),
+                currentPlanLabel = "Current plan",
+                planName = "Pro I",
+                cycleText = "12 months",
+                helpText = "Expires on 8 July 2027",
+                expiringLabel = "Expiring",
+            )
+        }
+        composeRule.onNodeWithTag(TEST_TAG_CURRENT_PLAN_EXPIRING_BADGE, useUnmergedTree = true)
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Expiring").assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that CurrentPlanCard hides expiring badge when expiring label is null`() {
+        composeRule.setContent {
+            CurrentPlanCard(
+                modifier = Modifier.fillMaxWidth(),
+                currentPlanLabel = "Current plan",
+                planName = "Pro I",
+                cycleText = "12 months",
+                helpText = "Expires on 8 July 2027",
+                expiringLabel = null,
+            )
+        }
+        composeRule.onNodeWithTag(TEST_TAG_CURRENT_PLAN_EXPIRING_BADGE, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
 }

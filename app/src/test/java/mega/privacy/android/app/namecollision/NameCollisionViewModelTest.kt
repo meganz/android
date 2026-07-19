@@ -113,7 +113,7 @@ internal class NameCollisionViewModelTest {
                 }
 
                 getFileVersionsOption.stub {
-                    onBlocking { invoke(true) }.thenAnswer { throw Exception("This test failed") }
+                    on { invoke(true) }.thenAnswer { throw Exception("This test failed") }
                 }
 
                 initUnderTest()

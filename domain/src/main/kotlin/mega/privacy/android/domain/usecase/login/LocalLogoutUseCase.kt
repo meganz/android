@@ -15,10 +15,10 @@ class LocalLogoutUseCase @Inject constructor(
     /**
      * Invoke.
      *
-     * @param disableChatApiUseCase Temporary param for disabling megaChatApi.
+     * @param disableChatApi True to disable MegaChat API listener after chat logout.
      */
-    suspend operator fun invoke(disableChatApiUseCase: DisableChatApiUseCase) {
-        chatLogoutUseCase(disableChatApiUseCase)
+    suspend operator fun invoke(disableChatApi: Boolean) {
+        chatLogoutUseCase(disableChatApi)
         runCatching { loginRepository.localLogout() }
             .onSuccess { localLogoutAppUseCase() }
     }

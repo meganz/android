@@ -364,7 +364,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                     setDisplayShowHomeEnabled(true)
                 }
 
-                cancelButton = findViewById<Button?>(R.id.cancel_button).apply {
+                cancelButton = findViewById<Button>(R.id.cancel_button).apply {
                     setOnClickListener { finish() }
                     text = getString(sharedR.string.general_dialog_cancel_button)
                     val cancelButtonParams = layoutParams as LinearLayout.LayoutParams
@@ -379,7 +379,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
 
                 //Left and Right margin
 
-                attachButton = findViewById<Button?>(R.id.attach_button).apply {
+                attachButton = findViewById<Button>(R.id.attach_button).apply {
                     setOnClickListener { onAttachClicked() }
                     text = getString(R.string.general_attach)
                 }
@@ -388,7 +388,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
 
                 //TABS section
                 tabLayoutProvider = findViewById(R.id.sliding_tabs_provider)
-                viewPagerProvider = findViewById<CustomViewPager?>(R.id.provider_tabs_pager).apply {
+                viewPagerProvider = findViewById<CustomViewPager>(R.id.provider_tabs_pager).apply {
                     if (mTabsAdapterProvider == null) {
                         Timber.d("mTabsAdapterProvider == null")
                         Timber.d("tabShown: %s", tabShown)
@@ -534,12 +534,12 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
     private fun checkLogin() {
         setContentView(R.layout.fragment_login)
         scrollView = findViewById(R.id.scroll_view_login)
-        loginTitle = findViewById<TextView?>(R.id.login_text_view).apply {
+        loginTitle = findViewById<TextView>(R.id.login_text_view).apply {
             text = getString(R.string.login_to_mega)
         }
         etUser = findViewById(R.id.login_email_text)
         etPasswordLayout = findViewById(R.id.login_password_text_layout)
-        etPassword = findViewById<AppCompatEditText?>(R.id.login_password_text).apply {
+        etPassword = findViewById<AppCompatEditText>(R.id.login_password_text).apply {
             setOnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     submitForm()
@@ -554,15 +554,15 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 )
             }
         }
-        bLoginLol = findViewById<Button?>(R.id.button_login).apply {
+        bLoginLol = findViewById<Button>(R.id.button_login).apply {
             text = getString(sharedR.string.login_text)
             setOnClickListener { submitForm() }
         }
-        loginCreateAccount = findViewById<LinearLayout?>(R.id.login_create_account_layout).apply {
+        loginCreateAccount = findViewById<LinearLayout>(R.id.login_create_account_layout).apply {
             visibility = View.INVISIBLE
         }
 
-        bRegisterLol = findViewById<TextView?>(R.id.button_create_account_login).apply {
+        bRegisterLol = findViewById<TextView>(R.id.button_create_account_login).apply {
             text = getString(R.string.create_account)
         }
 
@@ -578,21 +578,21 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
         prepareNodesText = findViewById(R.id.login_prepare_nodes_text)
         serversBusyText = findViewById(R.id.login_servers_busy_text)
         tB = findViewById(R.id.toolbar_login)
-        loginVerificationLayout = findViewById<LinearLayout?>(R.id.login_2fa).apply {
+        loginVerificationLayout = findViewById<LinearLayout>(R.id.login_2fa).apply {
             isVisible = false
         }
         lostYourDeviceButton =
-            findViewById<RelativeLayout?>(R.id.lost_authentication_device).apply {
+            findViewById<RelativeLayout>(R.id.lost_authentication_device).apply {
                 setOnClickListener {
                     this@FileProviderActivity.launchUrl(recoveryUrl(getDomainNameUseCase()))
                 }
             }
-        pinError = findViewById<TextView?>(R.id.pin_2fa_error_login).apply {
+        pinError = findViewById<TextView>(R.id.pin_2fa_error_login).apply {
             isVisible = false
         }
         verify2faProgressBar = findViewById(R.id.progressbar_verify_2fa)
         imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        firstPin = findViewById<EditTextPIN?>(R.id.pin_first_login).apply {
+        firstPin = findViewById<EditTextPIN>(R.id.pin_first_login).apply {
             setOnLongClickListener {
                 pinLongClick = true
                 requestFocus()
@@ -636,7 +636,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 }
             })
         }
-        secondPin = findViewById<EditTextPIN?>(R.id.pin_second_login).apply {
+        secondPin = findViewById<EditTextPIN>(R.id.pin_second_login).apply {
             setOnLongClickListener {
                 pinLongClick = true
                 requestFocus()
@@ -679,7 +679,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 }
             })
         }
-        thirdPin = findViewById<EditTextPIN?>(R.id.pin_third_login).apply {
+        thirdPin = findViewById<EditTextPIN>(R.id.pin_third_login).apply {
             setOnLongClickListener {
                 pinLongClick = true
                 requestFocus()
@@ -720,7 +720,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 }
             })
         }
-        fourthPin = findViewById<EditTextPIN?>(R.id.pin_fourth_login).apply {
+        fourthPin = findViewById<EditTextPIN>(R.id.pin_fourth_login).apply {
             setOnLongClickListener {
                 pinLongClick = true
                 requestFocus()
@@ -760,7 +760,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 }
             })
         }
-        fifthPin = findViewById<EditTextPIN?>(R.id.pin_fifth_login).apply {
+        fifthPin = findViewById<EditTextPIN>(R.id.pin_fifth_login).apply {
             setOnLongClickListener {
                 pinLongClick = true
                 requestFocus()
@@ -799,7 +799,7 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
                 }
             })
         }
-        sixthPin = findViewById<EditTextPIN?>(R.id.pin_sixth_login).apply {
+        sixthPin = findViewById<EditTextPIN>(R.id.pin_sixth_login).apply {
             setOnLongClickListener {
                 pinLongClick = true
                 requestFocus()
@@ -1435,17 +1435,17 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
         val params = tB?.layoutParams as AppBarLayout.LayoutParams
         params.setMargins(0, 0, 0, 0)
         showAB(tB)
-        cancelButton = findViewById<Button?>(R.id.cancel_button).apply {
+        cancelButton = findViewById<Button>(R.id.cancel_button).apply {
             setOnClickListener { finish() }
         }
-        attachButton = findViewById<Button?>(R.id.attach_button).apply {
+        attachButton = findViewById<Button>(R.id.attach_button).apply {
             setOnClickListener { onAttachClicked() }
         }
         activateButton(false)
 
         //TABS section
         tabLayoutProvider = findViewById(R.id.sliding_tabs_provider)
-        viewPagerProvider = findViewById<CustomViewPager?>(R.id.provider_tabs_pager).apply {
+        viewPagerProvider = findViewById<CustomViewPager>(R.id.provider_tabs_pager).apply {
             if (mTabsAdapterProvider == null) {
                 mTabsAdapterProvider =
                     ProviderPageAdapter(supportFragmentManager, this@FileProviderActivity)

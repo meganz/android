@@ -32,10 +32,10 @@ class MonitorContactRequestsUseCaseTest {
         val incomingContactRequests = listOf(mock<ContactRequest>())
         val outgoingContactRequests = listOf(mock<ContactRequest>())
         getIncomingContactRequestsUseCase.stub {
-            onBlocking { invoke() } doReturn incomingContactRequests
+            on { invoke() } doReturn incomingContactRequests
         }
         getOutgoingContactRequestsUseCase.stub {
-            onBlocking { invoke() } doReturn outgoingContactRequests
+            on { invoke() } doReturn outgoingContactRequests
         }
         monitorContactRequestUpdatesUseCase.stub {
             on { invoke() } doReturn flow { awaitCancellation() }
@@ -56,10 +56,10 @@ class MonitorContactRequestsUseCaseTest {
         val incomingContactRequests = listOf(mock<ContactRequest>())
         val outgoingContactRequests = listOf(mock<ContactRequest>())
         getIncomingContactRequestsUseCase.stub {
-            onBlocking { invoke() }.thenReturn(emptyList(), incomingContactRequests)
+            on { invoke() }.thenReturn(emptyList(), incomingContactRequests)
         }
         getOutgoingContactRequestsUseCase.stub {
-            onBlocking { invoke() }.thenReturn(emptyList(), outgoingContactRequests)
+            on { invoke() }.thenReturn(emptyList(), outgoingContactRequests)
         }
         val update = mock<ContactRequest>()
         monitorContactRequestUpdatesUseCase.stub {

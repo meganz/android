@@ -130,7 +130,7 @@ class AudioViewModelTest {
         )
 
         setCloudSortOrderUseCase.stub {
-            onBlocking { invoke(any()) }.thenAnswer { invocation -> sortOrderFlow.tryEmit(invocation.arguments[0] as SortOrder) }
+            on { invoke(any()) }.thenAnswer { invocation -> sortOrderFlow.tryEmit(invocation.arguments[0] as SortOrder) }
         }
 
         whenever(monitorSortCloudOrderUseCase()).thenReturn(
@@ -142,7 +142,7 @@ class AudioViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flowOf(hiddenNodesEnabled))
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flowOf(showHiddenItems))
         searchUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     parentHandle = any(),
                     nodeSourceType = any(),
@@ -151,7 +151,7 @@ class AudioViewModelTest {
             } doReturn domainNodes
         }
         nodeViewItemMapper.stub {
-            onBlocking {
+            on {
                 invoke(
                     nodeList = domainNodes,
                     nodeSourceType = NodeSourceType.AUDIO,

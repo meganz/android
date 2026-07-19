@@ -62,7 +62,7 @@ class AchievementsInfoViewModelTest {
         ),
     ) {
         getAccountAchievementsOverviewUseCase.stub {
-            onBlocking { invoke() }.thenReturn(achievementsOverview)
+            on { invoke() }.thenReturn(achievementsOverview)
         }
 
         underTest = AchievementsInfoViewModel(

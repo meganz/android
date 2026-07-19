@@ -48,7 +48,7 @@ class ReferralBonusesViewModelTest {
     )
 
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock {
-        onBlocking { invoke(emails[0], false) }.thenReturn(
+        on { invoke(emails[0], false) }.thenReturn(
             ContactItem(
                 handle = 1L,
                 email = emails.get(0),
@@ -66,7 +66,7 @@ class ReferralBonusesViewModelTest {
         )
     }
     private val getAccountAchievementsOverview: GetAccountAchievementsOverviewUseCase = mock {
-        onBlocking { invoke() }.thenReturn(
+        on { invoke() }.thenReturn(
             AchievementsOverview(
                 allAchievements = emptyList(),
                 awardedAchievements = listOf(

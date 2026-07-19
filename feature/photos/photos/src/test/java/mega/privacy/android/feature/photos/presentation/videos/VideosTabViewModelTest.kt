@@ -126,25 +126,25 @@ class VideosTabViewModelTest {
     @Test
     fun `test that the initial state is loading`() = runTest {
         monitorNodeUpdatesUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         monitorOfflineNodeUpdatesUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         monitorSortCloudOrderUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         getAllVideosUseCase.stub {
-            onBlocking { invoke() } doReturn emptyList()
+            on { invoke() } doReturn emptyList()
         }
         monitorHiddenNodesEnabledUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         monitorShowHiddenItemsUseCase.stub {
-            onBlocking { invoke() } doReturn flow { awaitCancellation() }
+            on { invoke() } doReturn flow { awaitCancellation() }
         }
         getSyncUploadsFolderIdsUseCase.stub {
-            onBlocking { invoke() } doReturn emptyList()
+            on { invoke() } doReturn emptyList()
         }
         underTest.uiState.test {
             assertThat(awaitItem()).isInstanceOf(VideosTabUiState.Loading::class.java)
@@ -599,7 +599,7 @@ class VideosTabViewModelTest {
         )
 
         setCloudSortOrderUseCase.stub {
-            onBlocking { invoke(any()) }.thenAnswer { invocation -> sortOrderFlow.tryEmit(invocation.arguments[0] as SortOrder) }
+            on { invoke(any()) }.thenAnswer { invocation -> sortOrderFlow.tryEmit(invocation.arguments[0] as SortOrder) }
         }
 
         whenever(monitorSortCloudOrderUseCase()).thenReturn(

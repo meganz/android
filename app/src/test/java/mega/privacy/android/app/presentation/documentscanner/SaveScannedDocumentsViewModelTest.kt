@@ -510,40 +510,38 @@ internal class SaveScannedDocumentsViewModelTest {
 
     @Test
     fun `test that the scans with the correct filename are uploaded`() = runTest {
-        val uriMock = Mockito.mockStatic(Uri::class.java)
-        val newFilename = "new_filename.pdf"
-        val fileToUploadUri = mock<Uri> {
-            on { toString() } doReturn "/data/user/0/app_location/cache/renamed_test_scan.pdf"
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            val newFilename = "new_filename.pdf"
+            val fileToUploadUri = mock<Uri> {
+                on { toString() } doReturn "/data/user/0/app_location/cache/renamed_test_scan.pdf"
+            }
+            val fileToUpload = mock<File>()
+            whenever(Uri.fromFile(fileToUpload)).thenReturn(fileToUploadUri)
+            // Initialize the PDF and Solo Image URIs
+            savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] = false
+            savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
+                cloudDriveParentHandle
+            savedStateHandle[EXTRA_SCAN_PDF_URI] = pdfUri
+            savedStateHandle[EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
+            whenever(
+                renameFileAndDeleteOriginalUseCase(
+                    originalUriPath = UriPath(pdfUriPath),
+                    newFilename = newFilename,
+                )
+            ).thenReturn(fileToUpload)
+
+            initViewModel()
+
+            underTest.onFilenameChanged(newFilename)
+            underTest.onScanFileTypeSelected(ScanFileType.Pdf)
+            underTest.onScanDestinationSelected(ScanDestination.CloudDrive)
+            // Trigger the scan uploading process
+            underTest.onSaveButtonClicked()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().uploadScansEvent).isEqualTo(triggered(fileToUploadUri))
+            }
         }
-        val fileToUpload = mock<File> {
-            on { toUri() }.thenReturn(fileToUploadUri)
-        }
-        // Initialize the PDF and Solo Image URIs
-        savedStateHandle[EXTRA_ORIGINATED_FROM_CHAT] = false
-        savedStateHandle[EXTRA_CLOUD_DRIVE_PARENT_HANDLE] =
-            cloudDriveParentHandle
-        savedStateHandle[EXTRA_SCAN_PDF_URI] = pdfUri
-        savedStateHandle[EXTRA_SCAN_SOLO_IMAGE_URI] = soloImageUri
-        whenever(
-            renameFileAndDeleteOriginalUseCase(
-                originalUriPath = UriPath(pdfUriPath),
-                newFilename = newFilename,
-            )
-        ).thenReturn(fileToUpload)
-
-        initViewModel()
-
-        underTest.onFilenameChanged(newFilename)
-        underTest.onScanFileTypeSelected(ScanFileType.Pdf)
-        underTest.onScanDestinationSelected(ScanDestination.CloudDrive)
-        // Trigger the scan uploading process
-        underTest.onSaveButtonClicked()
-
-        underTest.uiState.test {
-            assertThat(awaitItem().uploadScansEvent).isEqualTo(triggered(fileToUploadUri))
-        }
-
-        uriMock.close()
     }
 
     @Test

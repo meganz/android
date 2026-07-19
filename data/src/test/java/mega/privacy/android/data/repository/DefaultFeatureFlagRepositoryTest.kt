@@ -76,7 +76,7 @@ class DefaultFeatureFlagRepositoryTest {
     private var persistedSnapshot: Map<Feature, Boolean> = emptyMap()
 
     private val persistedFeatureFlagSnapshotGateway: PersistedFeatureFlagSnapshotGateway = mock {
-        onBlocking { currentSnapshot() } doAnswer { persistedSnapshot }
+        on { currentSnapshot() } doAnswer { persistedSnapshot }
     }
 
     private val managedFeatures: Set<Feature> = setOf(TestFeature.A, TestFeature.B)

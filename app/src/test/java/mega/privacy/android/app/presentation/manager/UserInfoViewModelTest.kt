@@ -59,7 +59,7 @@ internal class UserInfoViewModelTest {
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
     private val avatarContentMapper: AvatarContentMapper = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock {
-        onBlocking { invoke() }.thenReturn(1)
+        on { invoke() }.thenReturn(1)
     }
     private val getMyAvatarFileUseCase: GetMyAvatarFileUseCase = mock()
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()

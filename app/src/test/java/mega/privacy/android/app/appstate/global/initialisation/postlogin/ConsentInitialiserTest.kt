@@ -58,8 +58,8 @@ class ConsentInitialiserTest {
                 awaitCancellation()
             }
         }
-        getCookieSettingsUseCase.stub { onBlocking { invoke() } doReturn emptySet() }
-        shouldShowGenericCookieDialogUseCase.stub { onBlocking { invoke(any()) } doReturn true }
+        getCookieSettingsUseCase.stub { on { invoke() } doReturn emptySet() }
+        shouldShowGenericCookieDialogUseCase.stub { on { invoke(any()) } doReturn true }
 
         underTest.invoke()
 
@@ -80,8 +80,8 @@ class ConsentInitialiserTest {
             }
 
 
-            getCookieSettingsUseCase.stub { onBlocking { invoke() } doReturn emptySet() }
-            shouldShowGenericCookieDialogUseCase.stub { onBlocking { invoke(any()) } doReturn false }
+            getCookieSettingsUseCase.stub { on { invoke() } doReturn emptySet() }
+            shouldShowGenericCookieDialogUseCase.stub { on { invoke(any()) } doReturn false }
 
             underTest.invoke()
 
@@ -91,8 +91,8 @@ class ConsentInitialiserTest {
 
     @Test
     fun `test that no values are emitted if misc flags are not set`() = runTest {
-        getCookieSettingsUseCase.stub { onBlocking { invoke() } doReturn emptySet() }
-        shouldShowGenericCookieDialogUseCase.stub { onBlocking { invoke(any()) } doReturn true }
+        getCookieSettingsUseCase.stub { on { invoke() } doReturn emptySet() }
+        shouldShowGenericCookieDialogUseCase.stub { on { invoke(any()) } doReturn true }
 
         monitorMiscLoadedUseCase.stub {
             on { invoke() } doReturn flow {

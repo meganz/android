@@ -43,8 +43,7 @@ internal fun PermissionsRow(
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             MegaText(
-                // TODO extract to a localized string resource
-                text = "Permissions",
+                text = stringResource(sharedR.string.file_info_information_permissions_label),
                 textColor = TextColor.Primary,
                 style = AppTheme.typography.bodyLarge,
             )

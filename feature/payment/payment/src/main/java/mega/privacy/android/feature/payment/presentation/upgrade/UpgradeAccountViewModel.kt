@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
@@ -25,10 +26,15 @@ import mega.privacy.android.domain.usecase.agesignal.AgeSignalUseCase
 import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
+import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
+import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountViewModel.Companion.EXPIRING_SOON_THRESHOLD
 import timber.log.Timber
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Choose account view model
@@ -50,6 +56,7 @@ class UpgradeAccountViewModel @AssistedInject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val ageSignalUseCase: AgeSignalUseCase,
+    private val getCurrentTimeInMillisUseCase: GetCurrentTimeInMillisUseCase,
     @Assisted val isUpgradeAccount: Boolean,
 ) : ViewModel() {
 
@@ -132,15 +139,23 @@ class UpgradeAccountViewModel @AssistedInject constructor(
                 .mapNotNull { it.levelDetail }
                 .distinctUntilChanged()
                 .collectLatest { levelDetail ->
+                    val proExpirationTime =
+                        levelDetail.proExpirationTime.takeIf { time -> time > 0 }
+                    val cycle = resolveCurrentPlanCycle(levelDetail)
                     _state.update {
                         it.copy(
-                            subscriptionCycle = resolveCurrentPlanCycle(levelDetail),
+                            subscriptionCycle = cycle,
                             currentSubscriptionPlan = levelDetail.accountType,
                             subscriptionStatus = levelDetail.subscriptionStatus,
                             subscriptionRenewTime = levelDetail.subscriptionRenewTime
                                 .takeIf { time -> time > 0 },
-                            proExpirationTime = levelDetail.proExpirationTime
-                                .takeIf { time -> time > 0 },
+                            proExpirationTime = proExpirationTime,
+                            proPlanStartTime = levelDetail.accountPlanDetail?.startTime
+                                ?.takeIf { time -> time > 0 },
+                            isCurrentPlanExpiring = isPlanExpiringSoon(
+                                cycle = cycle,
+                                proExpirationTime = proExpirationTime,
+                            ),
                         )
                     }
                     refreshRecommendedSubscription()
@@ -189,6 +204,20 @@ class UpgradeAccountViewModel @AssistedInject constructor(
     }
 
     /**
+     * Whether the current plan is expiring soon: a one-off (non-recurring) plan — identified by an
+     * unknown billing cycle, which excludes renewing subscriptions — whose expiry is within the next
+     * [EXPIRING_SOON_THRESHOLD]. Drives the "Expiring" badge on the current plan card.
+     */
+    private fun isPlanExpiringSoon(
+        proExpirationTime: Long?,
+        cycle: AccountSubscriptionCycle,
+    ): Boolean {
+        if (proExpirationTime == null || cycle != AccountSubscriptionCycle.UNKNOWN) return false
+        val remaining = (proExpirationTime - getCurrentTimeInMillisUseCase() / 1000).seconds
+        return remaining > Duration.ZERO && remaining <= EXPIRING_SOON_THRESHOLD
+    }
+
+    /**
      * Asks for pricing if needed.
      */
     fun refreshPricing() {
@@ -213,5 +242,10 @@ class UpgradeAccountViewModel @AssistedInject constructor(
          * Extra key to indicate if the activity is for upgrading an account.
          */
         const val EXTRA_IS_UPGRADE_ACCOUNT = "EXTRA_IS_UPGRADE_ACCOUNT"
+
+        /**
+         * Remaining time below which an expiring plan shows the "Expiring" badge.
+         */
+        private val EXPIRING_SOON_THRESHOLD = 30.days
     }
 }

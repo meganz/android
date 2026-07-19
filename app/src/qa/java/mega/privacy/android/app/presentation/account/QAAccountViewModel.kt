@@ -20,10 +20,9 @@ import mega.privacy.android.app.presentation.account.model.SimulateLastActiveDat
 import mega.privacy.android.data.gateway.QAAccountCacheGateway
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
-import mega.privacy.android.domain.usecase.login.ChatLogoutUseCase
-import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.FastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.LocalLogoutChatAppUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -36,7 +35,7 @@ class QAAccountViewModel @Inject constructor(
     private val qaAccountCacheGateway: QAAccountCacheGateway,
     private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
     private val fastLoginUseCase: FastLoginUseCase,
-    private val chatLogoutUseCase: ChatLogoutUseCase,
+    private val localLogoutChatAppUseCase: LocalLogoutChatAppUseCase,
     private val simulateUserLastActiveDateUseCase: SimulateUserLastActiveDateUseCase,
     private val getPreviousSimulatedLastActiveDateUseCase: GetPreviousSimulatedLastActiveDateUseCase,
 ) : ViewModel() {
@@ -87,18 +86,15 @@ class QAAccountViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSwitchingAccount = true) }
             runCatching {
-                // First, clean up chat resources to avoid crashes when switching accounts
+                // First, local logout chat and app when switching accounts
                 // This is similar to what happens in normal logout, but without invalidating the session
-                val disableChatApiUseCase = DisableChatApiUseCase {
-                    MegaApplication.getInstance().disableMegaChatApi()
-                }
-                Timber.d("Cleaning up chat resources before switching to account: ${credentials.email}")
-                chatLogoutUseCase(disableChatApiUseCase)
+                Timber.d("Local logout chat and app to switching to account: ${credentials.email}")
+                localLogoutChatAppUseCase(disableChatApi = true)
                 // Now perform fast login with the new account
                 fastLoginUseCase(
                     session = session,
                     refreshChatUrl = false,
-                    disableChatApiUseCase = disableChatApiUseCase
+                    disableChatApi = true
                 ).catch { exception ->
                     Timber.e(exception, "Error switching account: ${credentials.email}")
                     _uiState.update {

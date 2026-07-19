@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
 import mega.privacy.android.app.presentation.extensions.error
@@ -207,9 +206,9 @@ class FetchNodesViewModel @AssistedInject constructor(
             runCatching {
                 fastLoginUseCase(
                     session,
-                    refreshChatUrl
-                ) { MegaApplication.getInstance()::disableMegaChatApi }
-                    .collectLatest { status -> status.checkStatus(isFastLogin = true) }
+                    refreshChatUrl,
+                    disableChatApi = true
+                ).collectLatest { status -> status.checkStatus(isFastLogin = true) }
             }.onFailure { exception ->
                 if (exception !is LoginException) return@onFailure
                 exception.loginFailed()

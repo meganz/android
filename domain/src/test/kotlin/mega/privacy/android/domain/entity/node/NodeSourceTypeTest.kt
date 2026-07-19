@@ -50,10 +50,10 @@ class NodeSourceTypeTest {
             Arguments.of(NodeSourceType.VIDEOS),
             Arguments.of(NodeSourceType.SEARCH),
             Arguments.of(NodeSourceType.CHAT),
-            Arguments.of(NodeSourceType.VIDEO_PLAYER_DEFAULT),
-            Arguments.of(NodeSourceType.VIDEO_PLAYER_VERSIONS),
-            Arguments.of(NodeSourceType.VIDEO_PLAYER_IMAGE_VIEWER),
-            Arguments.of(NodeSourceType.VIDEO_PLAYER_ZIP_FILE),
+            Arguments.of(NodeSourceType.MEDIA_PLAYER_DEFAULT),
+            Arguments.of(NodeSourceType.MEDIA_PLAYER_VERSIONS),
+            Arguments.of(NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER),
+            Arguments.of(NodeSourceType.MEDIA_PLAYER_ZIP_FILE),
         )
     }
 }

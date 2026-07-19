@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.rubbishbin
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.layout.Column
@@ -200,6 +201,7 @@ internal fun RubbishBinScreen(
             }
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
                 modifier = Modifier.testTag(RUBBISH_BIN_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeActionState.availableActions,

@@ -50,8 +50,8 @@ internal class InitializeBackupsUseCaseTest {
         val localPath = "/path/to/CU"
         val syncHandle = 1234L
         cameraUploadsRepository.stub {
-            onBlocking { getPrimaryFolderLocalPath() }.thenReturn(localPath)
-            onBlocking { getPrimarySyncHandle() }.thenReturn(syncHandle)
+            on { getPrimaryFolderLocalPath() }.thenReturn(localPath)
+            on { getPrimarySyncHandle() }.thenReturn(syncHandle)
         }
         underTest()
         verify(setupOrUpdateCameraUploadsBackupUseCase).invoke(
@@ -65,8 +65,8 @@ internal class InitializeBackupsUseCaseTest {
         val localPath = "/path/to/MU"
         val syncHandle = 1234L
         cameraUploadsRepository.stub {
-            onBlocking { getSecondaryFolderLocalPath() }.thenReturn(localPath)
-            onBlocking { getSecondarySyncHandle() }.thenReturn(syncHandle)
+            on { getSecondaryFolderLocalPath() }.thenReturn(localPath)
+            on { getSecondarySyncHandle() }.thenReturn(syncHandle)
         }
         underTest()
         verify(setupOrUpdateMediaUploadsBackupUseCase).invoke(

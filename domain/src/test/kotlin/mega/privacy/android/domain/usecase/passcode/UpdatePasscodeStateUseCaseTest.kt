@@ -36,7 +36,7 @@ internal class UpdatePasscodeStateUseCaseTest {
                 on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.Immediate))
                 on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
                 on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
-                onBlocking { getLastPausedTime() }.thenReturn(33L)
+                on { getLastPausedTime() }.thenReturn(33L)
             }
 
             underTest(34L)
@@ -69,7 +69,7 @@ internal class UpdatePasscodeStateUseCaseTest {
             passcodeRepository.stub {
                 on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.TimeSpan(timeout)))
                 on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
-                onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
+                on { getLastPausedTime() }.thenReturn(lastLockedTime)
                 on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
             }
 
@@ -88,7 +88,7 @@ internal class UpdatePasscodeStateUseCaseTest {
         passcodeRepository.stub {
             on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.TimeSpan(timeout)))
             on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
-            onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
+            on { getLastPausedTime() }.thenReturn(lastLockedTime)
             on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
         }
 
@@ -108,7 +108,7 @@ internal class UpdatePasscodeStateUseCaseTest {
             passcodeRepository.stub {
                 on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.TimeSpan(timeout)))
                 on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
-                onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
+                on { getLastPausedTime() }.thenReturn(lastLockedTime)
                 on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(false))
             }
 
@@ -127,7 +127,7 @@ internal class UpdatePasscodeStateUseCaseTest {
             passcodeRepository.stub {
                 on { monitorPasscodeTimeOut() }.thenReturn(hotFlow(PasscodeTimeout.Immediate))
                 on { monitorIsPasscodeEnabled() }.thenReturn(hotFlow(true))
-                onBlocking { getLastPausedTime() }.thenReturn(lastLockedTime)
+                on { getLastPausedTime() }.thenReturn(lastLockedTime)
                 on { monitorConfigurationChangedStatus() }.thenReturn(hotFlow(true))
             }
 

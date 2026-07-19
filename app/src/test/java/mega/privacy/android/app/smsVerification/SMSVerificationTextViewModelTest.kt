@@ -68,7 +68,7 @@ internal class SMSVerificationTextViewModelTest {
         }
 
         verifyPhoneNumber.stub {
-            onBlocking { invoke(any()) }.thenAnswer { throw Throwable() }
+            on { invoke(any()) }.thenAnswer { throw Throwable() }
         }
 
         underTest.state

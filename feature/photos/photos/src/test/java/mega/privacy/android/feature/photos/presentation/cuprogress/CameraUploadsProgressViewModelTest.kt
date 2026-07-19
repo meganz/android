@@ -1,6 +1,6 @@
 package mega.privacy.android.feature.photos.presentation.cuprogress
 
-import androidx.core.net.toUri
+import android.net.Uri
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.Mockito
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -142,28 +143,32 @@ class CameraUploadsProgressViewModelTest {
     @Test
     fun `test that the local preview uri is successfully set when adding an upload transfer`() =
         runTest {
-            val fileName = "image.jpg"
-            val localPath = "/local/path/image.jpg"
-            val transfer = InProgressTransfer.Upload(
-                tag = 1,
-                fileName = fileName,
-                localPath = localPath,
-                priority = BigInteger.ZERO,
-                uniqueId = 1L,
-                totalBytes = 10L * 1024 * 1024,
-                isPaused = false,
-                speed = 4L * 1024 * 1024,
-                state = TransferState.STATE_ACTIVE,
-                progress = Progress(0.6f),
-            )
-            whenever(fileTypeIconMapper(fileExtension = "jpg")) doReturn 123
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                val fileName = "image.jpg"
+                val localPath = "/local/path/image.jpg"
+                val localUri = mock<Uri>()
+                whenever(Uri.parse(localPath)) doReturn localUri
+                val transfer = InProgressTransfer.Upload(
+                    tag = 1,
+                    fileName = fileName,
+                    localPath = localPath,
+                    priority = BigInteger.ZERO,
+                    uniqueId = 1L,
+                    totalBytes = 10L * 1024 * 1024,
+                    isPaused = false,
+                    speed = 4L * 1024 * 1024,
+                    state = TransferState.STATE_ACTIVE,
+                    progress = Progress(0.6f),
+                )
+                whenever(fileTypeIconMapper(fileExtension = "jpg")) doReturn 123
 
-            underTest.addTransfer(transfer)
+                underTest.addTransfer(transfer)
 
-            underTest.getTransferItemUiState(id = 1).test {
-                val item = expectMostRecentItem()
-                assertThat(item.fileTypeResId).isEqualTo(123)
-                assertThat(item.previewUri).isEqualTo(localPath.toUri())
+                underTest.getTransferItemUiState(id = 1).test {
+                    val item = expectMostRecentItem()
+                    assertThat(item.fileTypeResId).isEqualTo(123)
+                    assertThat(item.previewUri).isEqualTo(localUri)
+                }
             }
         }
 
@@ -194,26 +199,32 @@ class CameraUploadsProgressViewModelTest {
 
     @Test
     fun `test that the thumbnail is successfully set when adding a download transfer`() = runTest {
-        val transfer = InProgressTransfer.Download(
-            tag = 2,
-            fileName = "image.png",
-            nodeId = NodeId(123),
-            priority = BigInteger.ZERO,
-            uniqueId = 2L,
-            totalBytes = 100,
-            isPaused = false,
-            speed = 100,
-            state = TransferState.STATE_ACTIVE,
-            progress = Progress(0.5F),
-        )
-        whenever(fileTypeIconMapper(fileExtension = "png")) doReturn 123
-        val file = mock<File>()
-        whenever(getThumbnailUseCase(nodeId = 123, allowThrow = true)) doReturn file
+        Mockito.mockStatic(Uri::class.java).use { _ ->
+            val transfer = InProgressTransfer.Download(
+                tag = 2,
+                fileName = "image.png",
+                nodeId = NodeId(123),
+                priority = BigInteger.ZERO,
+                uniqueId = 2L,
+                totalBytes = 100,
+                isPaused = false,
+                speed = 100,
+                state = TransferState.STATE_ACTIVE,
+                progress = Progress(0.5F),
+            )
+            whenever(fileTypeIconMapper(fileExtension = "png")) doReturn 123
+            val file = mock<File>()
+            val thumbnailUri = mock<Uri>()
+            whenever(Uri.fromFile(file)) doReturn thumbnailUri
+            whenever(getThumbnailUseCase(nodeId = 123, allowThrow = true)) doReturn file
 
-        underTest.addTransfer(transfer)
+            underTest.addTransfer(transfer)
 
-        underTest.getTransferItemUiState(id = 2).test {
-            assertThat(expectMostRecentItem().fileTypeResId).isEqualTo(123)
+            underTest.getTransferItemUiState(id = 2).test {
+                val item = expectMostRecentItem()
+                assertThat(item.fileTypeResId).isEqualTo(123)
+                assertThat(item.previewUri).isEqualTo(thumbnailUri)
+            }
         }
     }
 

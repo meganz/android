@@ -60,4 +60,30 @@ class AudioNodeToMediaItemMapperTest {
 
         assertThat(result.localConfiguration?.uri).isEqualTo(uri)
     }
+
+    @Test
+    fun `test that invoke with node sets media metadata title to node name`() {
+        val node = mock<TypedAudioNode>().also {
+            whenever(it.id).thenReturn(NodeId(1L))
+            whenever(it.name).thenReturn("my song.mp3")
+        }
+
+        val result = underTest(node, uri)
+
+        assertThat(result.mediaMetadata.title.toString()).isEqualTo("my song.mp3")
+    }
+
+    @Test
+    fun `test that invoke with display name sets media metadata title`() {
+        val result = underTest(handle = 1L, uri = uri, displayName = "audio.mp3")
+
+        assertThat(result.mediaMetadata.title.toString()).isEqualTo("audio.mp3")
+    }
+
+    @Test
+    fun `test that invoke without display name does not set media metadata title`() {
+        val result = underTest(handle = 1L, uri = uri, displayName = null)
+
+        assertThat(result.mediaMetadata.title).isNull()
+    }
 }

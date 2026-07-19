@@ -52,10 +52,10 @@ class GetSecondaryFolderPathUseCaseTest {
     @ValueSource(strings = ["", " ", "test/path/"])
     fun `test that the local secondary folder path is returned`(path: String) = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getSecondaryFolderLocalPath() }.thenReturn(path)
+            on { getSecondaryFolderLocalPath() }.thenReturn(path)
         }
         fileSystemRepository.stub {
-            onBlocking { doesFolderExists(any()) }.thenReturn(true)
+            on { doesFolderExists(any()) }.thenReturn(true)
         }
 
         assertThat(underTest()).isEqualTo(path)
@@ -67,10 +67,10 @@ class GetSecondaryFolderPathUseCaseTest {
             val testPath = "test/path/"
 
             cameraUploadsRepository.stub {
-                onBlocking { getSecondaryFolderLocalPath() }.thenReturn(testPath)
+                on { getSecondaryFolderLocalPath() }.thenReturn(testPath)
             }
             fileSystemRepository.stub {
-                onBlocking { doesFolderExists(any()) }.thenReturn(false)
+                on { doesFolderExists(any()) }.thenReturn(false)
             }
 
             val expected = underTest()
@@ -86,10 +86,10 @@ class GetSecondaryFolderPathUseCaseTest {
         newPath: String,
     ) = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getSecondaryFolderLocalPath() }.thenReturn(originalPath)
+            on { getSecondaryFolderLocalPath() }.thenReturn(originalPath)
         }
         fileSystemRepository.stub {
-            onBlocking { doesFolderExists(any()) }.thenReturn(true)
+            on { doesFolderExists(any()) }.thenReturn(true)
         }
         val expectedPath = underTest()
         assertThat(expectedPath).isEqualTo(newPath)

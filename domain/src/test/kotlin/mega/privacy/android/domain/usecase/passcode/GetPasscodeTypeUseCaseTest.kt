@@ -17,7 +17,7 @@ import org.mockito.kotlin.stub
 class GetPasscodeTypeUseCaseTest {
     private lateinit var underTest: GetPasscodeTypeUseCase
 
-    private val passcodeRepository = mock<PasscodeRepository?>()
+    private val passcodeRepository = mock<PasscodeRepository>()
 
     @BeforeEach
     internal fun setUp() {

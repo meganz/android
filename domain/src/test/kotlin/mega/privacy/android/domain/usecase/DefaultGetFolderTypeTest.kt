@@ -32,7 +32,7 @@ class DefaultGetFolderTypeTest {
     private val backupFolderId = Result.success(NodeId(folderId.longValue + 1))
 
     private val monitorBackupFolder = mock<MonitorBackupFolder> {
-        onBlocking { invoke() }.thenReturn(flow {
+        on { invoke() }.thenReturn(flow {
             emit(backupFolderId)
             awaitCancellation()
         }
@@ -40,10 +40,10 @@ class DefaultGetFolderTypeTest {
     }
     private val cameraUploadsRepository = mock<CameraUploadsRepository>()
     private val hasAncestor = mock<HasAncestor> {
-        onBlocking { invoke(folderId, backupFolderId.getOrThrow()) }.thenReturn(false)
+        on { invoke(folderId, backupFolderId.getOrThrow()) }.thenReturn(false)
     }
     private val getDeviceType =
-        mock<GetDeviceType> { onBlocking { invoke(any()) }.thenReturn(DeviceType.Unknown) }
+        mock<GetDeviceType> { on { invoke(any()) }.thenReturn(DeviceType.Unknown) }
     private val nodeRepository = mock<NodeRepository>()
 
     @Before
@@ -60,7 +60,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that normal folders are marked as default`() = runTest {
         nodeRepository.stub {
-            onBlocking { isNodeSynced(testFolder.id) }.thenReturn(false)
+            on { isNodeSynced(testFolder.id) }.thenReturn(false)
         }
         val actual = underTest(testFolder)
 
@@ -70,7 +70,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that the primary sync folder is marked as a mediaFolder`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getPrimarySyncHandle() }.thenReturn(folderId.longValue)
+            on { getPrimarySyncHandle() }.thenReturn(folderId.longValue)
         }
         val actual = underTest(testFolder)
 
@@ -80,7 +80,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `tet that the secondary sync folder is marked as a media folder`() = runTest {
         cameraUploadsRepository.stub {
-            onBlocking { getSecondarySyncHandle() }.thenReturn(folderId.longValue)
+            on { getSecondarySyncHandle() }.thenReturn(folderId.longValue)
         }
         val actual = underTest(testFolder)
 
@@ -90,7 +90,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that chat files folder is marked as chat files folder`() = runTest {
         chatRepository.stub {
-            onBlocking { getChatFilesFolderId() }.thenReturn(folderId)
+            on { getChatFilesFolderId() }.thenReturn(folderId)
         }
         val actual = underTest(testFolder)
 
@@ -100,7 +100,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that backup folder is marked as root backup type`() = runTest {
         monitorBackupFolder.stub {
-            onBlocking { invoke() }.thenReturn(flow {
+            on { invoke() }.thenReturn(flow {
                 emit(Result.success(folderId))
                 awaitCancellation()
             }
@@ -115,7 +115,7 @@ class DefaultGetFolderTypeTest {
     @Test
     fun `test that a child of the backup folder is marked as child backup type`() = runTest {
         hasAncestor.stub {
-            onBlocking { invoke(folderId, backupFolderId.getOrThrow()) }.thenReturn(true)
+            on { invoke(folderId, backupFolderId.getOrThrow()) }.thenReturn(true)
         }
 
         val actual = underTest(testFolder)
@@ -141,7 +141,7 @@ class DefaultGetFolderTypeTest {
             on { device }.thenReturn("deviceId")
         }
         getDeviceType.stub {
-            onBlocking { invoke(any()) }.thenReturn(expected)
+            on { invoke(any()) }.thenReturn(expected)
         }
 
         val actual = underTest(testFolder)
@@ -153,10 +153,10 @@ class DefaultGetFolderTypeTest {
     fun `test that default folder with failed backup folder result still returns default folder result`() =
         runTest {
             nodeRepository.stub {
-                onBlocking { isNodeSynced(testFolder.id) }.thenReturn(false)
+                on { isNodeSynced(testFolder.id) }.thenReturn(false)
             }
             monitorBackupFolder.stub {
-                onBlocking { invoke() }.thenReturn(flow {
+                on { invoke() }.thenReturn(flow {
                     emit(Result.failure(Throwable()))
                     awaitCancellation()
                 }

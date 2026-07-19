@@ -238,8 +238,8 @@ class AmIAloneOnAnyCallUseCaseTest {
         }
 
         chatRepository.stub {
-            onBlocking { getChatRoom(any()) } doReturn chatRoom
-            onBlocking { getMyUserHandle() } doReturn myHandle
+            on { getChatRoom(any()) } doReturn chatRoom
+            on { getMyUserHandle() } doReturn myHandle
         }
 
         monitorChatCallUpdatesUseCase.stub {
@@ -279,8 +279,8 @@ class AmIAloneOnAnyCallUseCaseTest {
         }
 
         chatRepository.stub {
-            onBlocking { getChatRoom(any()) } doReturn chatRoom
-            onBlocking { getMyUserHandle() } doReturn myHandle
+            on { getChatRoom(any()) } doReturn chatRoom
+            on { getMyUserHandle() } doReturn myHandle
         }
     }
 }

@@ -5,7 +5,6 @@ import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import coil3.annotation.DelicateCoilApi
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.fetcher.MegaImageLoaderFactory
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +30,7 @@ class CoilImageLoaderInitialiserTest {
     }
 
     @Test
-    fun `test that invoke installs the factory as the singleton image loader factory`() = runTest {
+    fun `test that invoke installs the factory as the singleton image loader factory`() {
         val imageLoader = mock<ImageLoader>()
         val context = mock<Context>()
         whenever(context.applicationContext).thenReturn(context)
@@ -40,10 +39,5 @@ class CoilImageLoaderInitialiserTest {
         underTest()
 
         assertThat(SingletonImageLoader.get(context)).isSameInstanceAs(imageLoader)
-    }
-
-    @Test
-    fun `test that initialiser is critical so it completes before any image load`() {
-        assertThat(underTest.isCritical).isTrue()
     }
 }

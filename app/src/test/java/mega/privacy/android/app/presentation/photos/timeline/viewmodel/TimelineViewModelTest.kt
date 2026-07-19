@@ -90,22 +90,22 @@ internal class TimelineViewModelTest {
     private lateinit var underTest: TimelineViewModel
 
     private val isCameraUploadsEnabledUseCase =
-        mock<IsCameraUploadsEnabledUseCase> { onBlocking { invoke() }.thenReturn(true) }
+        mock<IsCameraUploadsEnabledUseCase> { on { invoke() }.thenReturn(true) }
 
     private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
 
     private val filterCameraUploadPhotos =
-        mock<FilterCameraUploadPhotos> { onBlocking { invoke(any()) }.thenAnswer { it.arguments[0] } }
+        mock<FilterCameraUploadPhotos> { on { invoke(any()) }.thenAnswer { it.arguments[0] } }
 
     private val filterCloudDrivePhotos =
-        mock<FilterCloudDrivePhotos> { onBlocking { invoke(any()) }.thenAnswer { it.arguments[0] } }
+        mock<FilterCloudDrivePhotos> { on { invoke(any()) }.thenAnswer { it.arguments[0] } }
 
     private val setInitialCUPreferences = mock<SetInitialCUPreferences>()
 
     private val enableCameraUploadsInPhotosUseCase = mock<EnableCameraUploadsInPhotosUseCase>()
 
     private val getNodeListByIds = mock<GetNodeListByIds> {
-        onBlocking { invoke(any()) }.thenReturn(
+        on { invoke(any()) }.thenReturn(
             emptyList()
         )
     }
@@ -164,16 +164,16 @@ internal class TimelineViewModelTest {
             on { invoke() }.thenReturn(emptyFlow())
         }
         monitorCameraUploadsStatusInfoUseCase.stub {
-            onBlocking { invoke() }.thenReturn(cameraUploadsStatusInfoFlow)
+            on { invoke() }.thenReturn(cameraUploadsStatusInfoFlow)
         }
         monitorShowHiddenItemsUseCase.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(false))
+            on { invoke() }.thenReturn(flowOf(false))
         }
         monitorAccountDetailUseCase.stub {
-            onBlocking { invoke() }.thenReturn(flowOf(accountDetail))
+            on { invoke() }.thenReturn(flowOf(accountDetail))
         }
         isHiddenNodesOnboardedUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
         reset(
             enableCameraUploadsInPhotosUseCase
@@ -222,14 +222,14 @@ internal class TimelineViewModelTest {
     private fun initViewModelWithDefaultFlags() {
         // Set up default feature flags (legacy behavior)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         initViewModel()
     }
 
     private fun setupUIDrivenPhotoMonitoring(enabled: Boolean) {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
     }
@@ -238,7 +238,7 @@ internal class TimelineViewModelTest {
         val mockPhoto =
             mock<Photo.Image> { on { modificationTime }.thenReturn(LocalDateTime.now()) }
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(enabled)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(mockPhoto)))
     }
@@ -326,7 +326,7 @@ internal class TimelineViewModelTest {
 
         // Set up default feature flags
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
 
         initViewModel()
@@ -792,7 +792,7 @@ internal class TimelineViewModelTest {
 
         // Set up default feature flags
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
 
         initViewModel()
@@ -839,7 +839,7 @@ internal class TimelineViewModelTest {
         isEnabled: Boolean,
     ) = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsTransferScreen))
             .thenReturn(isEnabled)
@@ -859,7 +859,7 @@ internal class TimelineViewModelTest {
         isEnabled: Boolean,
     ) = runTest {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(false)
         }
         whenever(getFeatureFlagValueUseCase(AppFeatures.CameraUploadsPausedWarningBanner))
             .thenReturn(isEnabled)
@@ -1026,7 +1026,7 @@ internal class TimelineViewModelTest {
     fun `test that feature flag exception defaults to enabled behavior`() = runTest {
         // Given: Feature flag throws exception (simulating network/API error)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenThrow(RuntimeException("Network error"))
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenThrow(RuntimeException("Network error"))
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
         initViewModel()
@@ -1050,7 +1050,7 @@ internal class TimelineViewModelTest {
     fun `test that feature flag null result defaults to enabled behavior`() = runTest {
         // Given: Feature flag returns null (simulating missing config)
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(null)
+            on { invoke(AppFeatures.UIDrivenPhotoMonitoring) }.thenReturn(null)
         }
         whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf()))
         initViewModel()

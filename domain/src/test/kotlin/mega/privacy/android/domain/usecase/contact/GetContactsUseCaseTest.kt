@@ -55,7 +55,7 @@ class GetContactsUseCaseTest {
         }
 
         contactsRepository.stub {
-            onBlocking { getVisibleContacts() } doReturn emptyList()
+            on { getVisibleContacts() } doReturn emptyList()
             on { monitorChatPresenceLastGreenUpdates() } doReturn flow { awaitCancellation() }
             on { monitorChatOnlineStatusUpdates() } doReturn flow { awaitCancellation() }
             on { monitorChatConnectionStateUpdates() } doReturn flow { awaitCancellation() }
@@ -83,7 +83,7 @@ class GetContactsUseCaseTest {
     @Test
     fun `test that an empty list is returned if no contacts`() = runTest {
         contactsRepository.stub {
-            onBlocking { getVisibleContacts() } doReturn emptyList()
+            on { getVisibleContacts() } doReturn emptyList()
         }
 
         initUnderTest()
@@ -159,7 +159,7 @@ class GetContactsUseCaseTest {
         }
 
         contactsRepository.stub {
-            onBlocking { getContactData(any()) } doReturn expected
+            on { getContactData(any()) } doReturn expected
         }
 
         initUnderTest()
@@ -208,7 +208,7 @@ class GetContactsUseCaseTest {
         }
 
         contactsRepository.stub {
-            onBlocking { getContactData(any()) } doReturn expected
+            on { getContactData(any()) } doReturn expected
         }
 
         initUnderTest()
@@ -258,7 +258,7 @@ class GetContactsUseCaseTest {
             on { monitorUserUpdates() } doReturn updatesFlow
         }
         contactsRepository.stub {
-            onBlocking { getContactData(any()) }.doReturn(expected)
+            on { getContactData(any()) }.doReturn(expected)
         }
 
         initUnderTest()
@@ -303,7 +303,7 @@ class GetContactsUseCaseTest {
             userVisibility = UserVisibility.Unknown,
         )
         contactsRepository.stub {
-            onBlocking { getContactData(any()) } doReturn newAlias
+            on { getContactData(any()) } doReturn newAlias
         }
         initUnderTest()
 
@@ -392,7 +392,7 @@ class GetContactsUseCaseTest {
             on { chatId } doReturn expectedChatId
         }
         chatRepository.stub {
-            onBlocking { getChatRoomByUser(userHandle.toLong()) } doReturn chatRoom
+            on { getChatRoomByUser(userHandle.toLong()) } doReturn chatRoom
         }
 
         stubChatConnectionUpdate(expectedChatId, expectedState)
@@ -541,7 +541,7 @@ class GetContactsUseCaseTest {
 
     private fun stubContactsList(list: List<ContactItem>, vararg lists: List<ContactItem>) {
         contactsRepository.stub {
-            onBlocking { getVisibleContacts() }.doReturn(list, *lists)
+            on { getVisibleContacts() }.doReturn(list, *lists)
         }
     }
 
@@ -571,7 +571,7 @@ class GetContactsUseCaseTest {
             chatroomId = null,
         )
         contactsRepository.stub {
-            onBlocking { getVisibleContacts() } doReturn listOf(domainContact)
+            on { getVisibleContacts() } doReturn listOf(domainContact)
         }
 
         return domainContact

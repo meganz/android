@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCa
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,10 +32,14 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class LinkSettingsViewModelTest {
 
@@ -44,6 +49,7 @@ class LinkSettingsViewModelTest {
     private val getPasswordStrengthUseCase = mock<GetPasswordStrengthUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val passwordCache = mock<ShareLinkPasswordCache>()
+    private val separateKeyCache = mock<ShareLinkSeparateKeyCache>()
 
     @BeforeEach
     fun setUp() {
@@ -59,6 +65,7 @@ class LinkSettingsViewModelTest {
             getPasswordStrengthUseCase,
             monitorAccountDetailUseCase,
             passwordCache,
+            separateKeyCache,
         )
     }
 
@@ -76,8 +83,19 @@ class LinkSettingsViewModelTest {
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
     }
 
+    private suspend fun stubNodeWithExpiry(expirationSeconds: Long) {
+        val node = mock<TypedFileNode> {
+            on { exportedData } doReturn ExportedData(PUBLIC_LINK, 0L, expirationSeconds)
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+    }
+
     private fun stubExistingPassword(password: String = OLD_PASSWORD) {
         whenever(passwordCache.get(NODE_HANDLE)).thenReturn(LinkPassword(password, PUBLIC_LINK))
+    }
+
+    private fun stubCachedSeparateKey() {
+        whenever(separateKeyCache.get(NODE_HANDLE)).thenReturn(true)
     }
 
     private fun createUnderTest() = LinkSettingsViewModel(
@@ -88,6 +106,7 @@ class LinkSettingsViewModelTest {
         getPasswordStrengthUseCase = getPasswordStrengthUseCase,
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         passwordCache = passwordCache,
+        separateKeyCache = separateKeyCache,
     )
 
     private suspend fun ReceiveTurbine<LinkSettingsUiState>.awaitUntil(
@@ -238,7 +257,7 @@ class LinkSettingsViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), EXPIRY_TIME, CALLER_NAME)
+            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), EXPIRY_TIME_SECONDS, CALLER_NAME)
         }
 
     @Test
@@ -469,14 +488,264 @@ class LinkSettingsViewModelTest {
             }
         }
 
+    @Test
+    fun `test that opening with an existing expiry pre-fills it without marking it dirty`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitUntil { it.isExpiryAlreadySet }
+                assertThat(state.isExpiryEnabled).isTrue()
+                assertThat(state.expiryDate).isEqualTo(EXPIRY_TIME)
+                assertThat(state.initialExpiryDate).isEqualTo(EXPIRY_TIME)
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that removing an existing expiry enables Save and re-exports without an expiry`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitUntil { it.isExpiryAlreadySet }
+                underTest.onExpiryEnabled(false)
+                val dirty = awaitUntil { !it.isExpiryEnabled }
+                assertThat(dirty.isSaveEnabled).isTrue()
+
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(exportNodeUseCase).invoke(NodeId(NODE_HANDLE), null, CALLER_NAME)
+        }
+
+    @Test
+    fun `test that changing an existing expiry re-exports with the new date in seconds`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+            val newMillis = EXPIRY_TIME + MILLIS_PER_DAY
+
+            underTest.uiState.test {
+                awaitUntil { it.isExpiryAlreadySet }
+                underTest.onExpiryDateChanged(newMillis)
+                awaitUntil { it.expiryDate == newMillis && it.isSaveEnabled }
+
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(exportNodeUseCase)
+                .invoke(NodeId(NODE_HANDLE), newMillis.milliseconds.inWholeSeconds, CALLER_NAME)
+        }
+
+    @Test
+    fun `test that changing an existing expiry back to the original keeps Save disabled`() =
+        runTest(extension.testDispatcher) {
+            stubNodeWithExpiry(EXPIRY_TIME_SECONDS)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+            val newMillis = EXPIRY_TIME + MILLIS_PER_DAY
+
+            underTest.uiState.test {
+                awaitUntil { it.isExpiryAlreadySet }
+                underTest.onExpiryDateChanged(newMillis)
+                awaitUntil { it.isSaveEnabled }
+
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                val state = awaitUntil { it.expiryDate == EXPIRY_TIME }
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that disabling expiry clears the chosen date`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                awaitUntil { it.expiryDate == EXPIRY_TIME }
+
+                underTest.onExpiryEnabled(false)
+                val state = awaitUntil { !it.isExpiryEnabled }
+                assertThat(state.expiryDate).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave does not export the node when only the password changed`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that onSave does not touch the password cache when only the expiry changed`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(exportNodeUseCase(any(), anyOrNull(), any())).thenReturn(PUBLIC_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onExpiryEnabled(true)
+                underTest.onExpiryDateChanged(EXPIRY_TIME)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(passwordCache, never()).set(any(), anyOrNull())
+            verifyNoInteractions(encryptLinkWithPasswordUseCase)
+        }
+
+    @Test
+    fun `test that opening with a cached separate-key preference pre-fills it without marking it dirty`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubCachedSeparateKey()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSeparateKeyEnabled).isTrue()
+                assertThat(state.initialSeparateKeyEnabled).isTrue()
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that toggling separate key back to the initial keeps Save disabled`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                awaitUntil { it.isSaveEnabled }
+
+                underTest.onSeparateKeyEnabled(false)
+                val state = awaitUntil { !it.isSeparateKeyEnabled }
+                assertThat(state.hasUnsavedChanges).isFalse()
+                assertThat(state.isSaveEnabled).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that onSave persists the enabled separate-key preference and does not export`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache).set(NODE_HANDLE, true)
+            verifyNoInteractions(exportNodeUseCase)
+        }
+
+    @Test
+    fun `test that onSave persists both the separate key and the password when both change`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache).set(NODE_HANDLE, true)
+            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+        }
+
+    @Test
+    fun `test that disabling a cached separate key onSave clears it in the cache`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            stubCachedSeparateKey()
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(false)
+                awaitUntil { it.isSaveEnabled }
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache).set(NODE_HANDLE, false)
+        }
+
     private companion object {
         const val NODE_HANDLE = 123L
         const val PUBLIC_LINK = "https://mega.nz/file/abc"
         const val ENCRYPTED_LINK = "https://mega.nz/#P!encrypted"
         const val PASSWORD = "Str0ngP@ss"
         const val OLD_PASSWORD = "0ldP@ssw0rd"
-        const val EXPIRY_TIME = 1_800_000_000L
         const val CALLER_NAME = "LinkSettingsViewModel"
+
+        // A fixed, far-future instant (~2027) used as the expiry across the expiry tests.
+        val EXPIRY_TIME_SECONDS = 1_800_000_000L
+        val EXPIRY_TIME = EXPIRY_TIME_SECONDS.seconds.inWholeMilliseconds
+        val MILLIS_PER_DAY = 1.days.inWholeMilliseconds
 
         @JvmField
         @RegisterExtension

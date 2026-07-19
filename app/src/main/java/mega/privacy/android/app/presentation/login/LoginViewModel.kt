@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.analytics.Analytics
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.appstate.content.navigation.FetchNodeProvider
 import mega.privacy.android.app.middlelayer.installreferrer.InstallReferrerHandler
@@ -72,7 +71,6 @@ import mega.privacy.android.domain.usecase.environment.GetHistoricalProcessExitR
 import mega.privacy.android.domain.usecase.featureflag.ClearPersistedFeatureFlagsUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.DecodeGoogleIdTokenUseCase
-import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
@@ -351,9 +349,7 @@ class LoginViewModel @Inject constructor(
         if (isPerformLocalLogOut) {
             viewModelScope.launch {
                 runCatching {
-                    localLogoutUseCase(
-                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
-                    )
+                    localLogoutUseCase(disableChatApi = true)
                 }.onFailure {
                     Timber.w(it, "Exception in local logout.")
                 }
@@ -400,7 +396,7 @@ class LoginViewModel @Inject constructor(
             loginUseCase(
                 result.email,
                 result.megaPassword,
-                DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+                disableChatApi = true
             ).collectLatest { status -> status.checkStatus(email = result.email) }
         }.onFailure { exception ->
             if (exception !is LoginException) return@onFailure
@@ -696,7 +692,7 @@ class LoginViewModel @Inject constructor(
                     loginUseCase(
                         email,
                         password,
-                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+                        disableChatApi = true
                     ).collectLatest { status -> status.checkStatus(email = email) }
                 }.onFailure { exception ->
                     if (exception !is LoginException) return@onFailure
@@ -739,7 +735,7 @@ class LoginViewModel @Inject constructor(
                         email,
                         password ?: return@launch,
                         pin2FA,
-                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
+                        disableChatApi = true
                     ).collectLatest { status ->
                         status.checkStatus(email = email)
                         if (status == LoginStatus.LoginSucceed) {

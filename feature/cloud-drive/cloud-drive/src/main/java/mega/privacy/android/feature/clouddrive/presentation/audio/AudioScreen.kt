@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.audio
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -136,6 +137,7 @@ fun AudioScreen(
             }
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
                 availableActions = nodeOptionsActionUiState.availableActions,
                 visibleActions = nodeOptionsActionUiState.visibleActions,
@@ -147,6 +149,7 @@ fun AudioScreen(
             )
         },
         content = { innerPadding ->
+            @SuppressLint("ComposeViewModelForwarding")
             AudioContent(
                 navigationHandler = navigationHandler,
                 uiState = uiState,

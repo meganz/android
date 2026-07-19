@@ -47,16 +47,16 @@ class MonitorModalStateUseCaseTest {
     }
 
     private val monitorStorageState = mock<MonitorStorageStateEventUseCase> {
-        onBlocking { invoke() }.thenReturn(
+        on { invoke() }.thenReturn(
             MutableStateFlow(storageStateEvent)
         )
     }
 
     private val isFirstLaunchUseCase =
-        mock<IsFirstLaunchUseCase> { onBlocking { invoke() }.thenReturn(false) }
+        mock<IsFirstLaunchUseCase> { on { invoke() }.thenReturn(false) }
 
     private val requiresTwoFactorAuthentication = mock<RequireTwoFactorAuthenticationUseCase> {
-        onBlocking { invoke(any(), any()) }.thenReturn(false)
+        on { invoke(any(), any()) }.thenReturn(false)
     }
 
     private val firsLoginState = MutableStateFlow(false)
@@ -82,7 +82,7 @@ class MonitorModalStateUseCaseTest {
         runTest {
             setSavedStateVariables(firstLogin = true)
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
             verificationFlow.emit(
                 UnVerified(
@@ -109,7 +109,7 @@ class MonitorModalStateUseCaseTest {
     internal fun `test that modal state is not VerifyPhoneNumber if a phone number has already been verified`() =
         runTest {
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -168,7 +168,7 @@ class MonitorModalStateUseCaseTest {
             )
 
             monitorStorageState.stub {
-                onBlocking { invoke() }.thenReturn(
+                on { invoke() }.thenReturn(
                     MutableStateFlow(
                         StorageStateEvent(
                             0L,
@@ -199,7 +199,7 @@ class MonitorModalStateUseCaseTest {
         runTest {
             setSavedStateVariables()
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(true)
+                on { invoke(any(), any()) }.thenReturn(true)
             }
 
             underTest(
@@ -220,9 +220,9 @@ class MonitorModalStateUseCaseTest {
     internal fun `test that verify phone number modal is returned for a non new account on first launch `() =
         runTest {
             setSavedStateVariables(newAccount = false)
-            isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(true) }
+            isFirstLaunchUseCase.stub { on { invoke() }.thenReturn(true) }
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -253,9 +253,9 @@ class MonitorModalStateUseCaseTest {
                 newAccount = false,
                 firstLogin = true
             )
-            isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
+            isFirstLaunchUseCase.stub { on { invoke() }.thenReturn(false) }
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -286,9 +286,9 @@ class MonitorModalStateUseCaseTest {
                 newAccount = false,
                 askPermission = true
             )
-            isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
+            isFirstLaunchUseCase.stub { on { invoke() }.thenReturn(false) }
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -319,9 +319,9 @@ class MonitorModalStateUseCaseTest {
                 newAccount = false,
                 askPermission = false
             )
-            isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(true) }
+            isFirstLaunchUseCase.stub { on { invoke() }.thenReturn(true) }
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -353,9 +353,9 @@ class MonitorModalStateUseCaseTest {
                 newAccount = true,
                 askPermission = false
             )
-            isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(true) }
+            isFirstLaunchUseCase.stub { on { invoke() }.thenReturn(true) }
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -387,9 +387,9 @@ class MonitorModalStateUseCaseTest {
                 newAccount = true,
                 askPermission = true
             )
-            isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
+            isFirstLaunchUseCase.stub { on { invoke() }.thenReturn(false) }
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -420,9 +420,9 @@ class MonitorModalStateUseCaseTest {
             setSavedStateVariables(
                 firstLogin = true,
             )
-            isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(false) }
+            isFirstLaunchUseCase.stub { on { invoke() }.thenReturn(false) }
             requiresTwoFactorAuthentication.stub {
-                onBlocking { invoke(any(), any()) }.thenReturn(false)
+                on { invoke(any(), any()) }.thenReturn(false)
             }
 
             verificationFlow.emit(
@@ -451,7 +451,7 @@ class MonitorModalStateUseCaseTest {
     internal fun `test that expired business status is returned on first login if business account status is expired`() =
         runTest {
             businessRepository.stub {
-                onBlocking { getBusinessStatus() }.thenReturn(BusinessAccountStatus.Expired)
+                on { getBusinessStatus() }.thenReturn(BusinessAccountStatus.Expired)
             }
             setSavedStateVariables(firstLogin = true)
             underTest(
@@ -473,8 +473,8 @@ class MonitorModalStateUseCaseTest {
     internal fun `test that expired business account grace period status is returned on first login if status is grace period and account is master business account`() =
         runTest {
             businessRepository.stub {
-                onBlocking { getBusinessStatus() }.thenReturn(BusinessAccountStatus.GracePeriod)
-                onBlocking { isMasterBusinessAccount() }.thenReturn(true)
+                on { getBusinessStatus() }.thenReturn(BusinessAccountStatus.GracePeriod)
+                on { isMasterBusinessAccount() }.thenReturn(true)
             }
             setSavedStateVariables(firstLogin = true)
             underTest(
@@ -496,8 +496,8 @@ class MonitorModalStateUseCaseTest {
     internal fun `test that expired business account grace period status is NOT returned if account is not master business account`() =
         runTest {
             businessRepository.stub {
-                onBlocking { getBusinessStatus() }.thenReturn(BusinessAccountStatus.GracePeriod)
-                onBlocking { isMasterBusinessAccount() }.thenReturn(false)
+                on { getBusinessStatus() }.thenReturn(BusinessAccountStatus.GracePeriod)
+                on { isMasterBusinessAccount() }.thenReturn(false)
             }
             setSavedStateVariables(firstLogin = true)
             underTest(
@@ -515,7 +515,7 @@ class MonitorModalStateUseCaseTest {
     @Test
     internal fun `test that exception when checking 2FA is not propagated`() = runTest {
         requiresTwoFactorAuthentication.stub {
-            onBlocking { invoke(any(), any()) }
+            on { invoke(any(), any()) }
                 .thenAnswer { throw MegaException(-1, "It's broken") }
         }
 

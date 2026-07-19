@@ -17,7 +17,7 @@ import org.mockito.kotlin.mock
 class ShareFolderSelectionMenuItemTest {
 
     private val isOutShareUseCase = mock<IsOutShareUseCase> {
-        onBlocking { invoke(any()) } doReturn false
+        on { invoke(any()) } doReturn false
     }
 
     private val underTest = ShareFolderSelectionMenuItem(
