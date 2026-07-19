@@ -2,7 +2,7 @@ package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.utils.greeter.Greeter
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import javax.inject.Inject
 import javax.inject.Provider
 
@@ -12,9 +12,8 @@ import javax.inject.Provider
  */
 class GreeterInitialiser @Inject constructor(
     private val greeter: Provider<Greeter>,
-) : AppCreateInitialiser {
+) : AsyncAppCreateInitialiser {
     override val name = "GreeterInitialiser"
-    override val isCritical = false
 
     override suspend operator fun invoke() {
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()

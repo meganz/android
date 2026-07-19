@@ -9,7 +9,8 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.ApiServ
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.FcmTopicInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.GreeterInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.MiscFlagsInitialiser
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 
 /**
  * Provides the app-create initialisers as a single explicitly ordered list.
@@ -28,11 +29,15 @@ class AppCreateInitialisersModule {
         accountDefaultsInitialiser: AccountDefaultsInitialiser,
         greeterInitialiser: GreeterInitialiser,
         fcmTopicInitialiser: FcmTopicInitialiser,
-    ): List<@JvmSuppressWildcards AppCreateInitialiser> = listOf(
+    ): Set<@JvmSuppressWildcards AsyncAppCreateInitialiser> = setOf(
         miscFlagsInitialiser,
         apiServerInitialiser,
         accountDefaultsInitialiser,
         greeterInitialiser,
         fcmTopicInitialiser,
     )
+
+    @Provides
+    fun provideSyncAppCreateInitialisers(): List<@JvmSuppressWildcards SynchronousAppCreateInitialiser> =
+        listOf()
 }

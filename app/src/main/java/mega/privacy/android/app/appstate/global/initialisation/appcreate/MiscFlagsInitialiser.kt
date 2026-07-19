@@ -2,7 +2,7 @@ package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.setting.GetMiscFlagsUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -12,9 +12,8 @@ import javax.inject.Inject
 class MiscFlagsInitialiser @Inject constructor(
     private val isUserLoggedInUseCase: IsUserLoggedInUseCase,
     private val getMiscFlagsUseCase: GetMiscFlagsUseCase,
-) : AppCreateInitialiser {
+) : AsyncAppCreateInitialiser {
     override val name = "MiscFlagsInitialiser"
-    override val isCritical = false
 
     override suspend operator fun invoke() {
         val isUserLoggedOut = isUserLoggedInUseCase().not()

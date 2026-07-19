@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.app.fcm.FcmManager
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -9,9 +9,8 @@ import javax.inject.Inject
  */
 class FcmTopicInitialiser @Inject constructor(
     private val fcmManager: FcmManager,
-) : AppCreateInitialiser {
+) : AsyncAppCreateInitialiser {
     override val name = "FcmTopicInitialiser"
-    override val isCritical = false
 
     override suspend operator fun invoke() {
         fcmManager.subscribeToAllUsersTopic()
