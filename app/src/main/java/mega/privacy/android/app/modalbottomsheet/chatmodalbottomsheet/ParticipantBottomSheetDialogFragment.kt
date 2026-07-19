@@ -51,7 +51,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
         savedInstanceState: Bundle?,
     ): View? {
         contentView = View.inflate(context, R.layout.bottom_sheet_group_participant, null)
-        itemsLayout = contentView.findViewById<View?>(R.id.items_layout)
+        itemsLayout = contentView.findViewById<View>(R.id.items_layout)
         titleNameContactChatPanel =
             contentView.findViewById<EmojiTextView>(R.id.group_participants_chat_name_text)
 
@@ -88,7 +88,7 @@ class ParticipantBottomSheetDialogFragment : BaseBottomSheetDialogFragment(), Vi
         val titleMailContactChatPanel =
             contentView.findViewById<TextView>(R.id.group_participants_chat_mail_text)
         contactImageView =
-            contentView.findViewById<RoundedImageView?>(R.id.sliding_group_participants_chat_list_thumbnail)
+            contentView.findViewById<RoundedImageView>(R.id.sliding_group_participants_chat_list_thumbnail)
 
         val optionContactInfoChat =
             contentView.findViewById<TextView>(R.id.contact_info_group_participants_chat)

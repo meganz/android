@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.badge.Badge
+import mega.android.core.ui.components.badge.BadgeType
 import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.datepicker.MegaDatePickerDialog
 import mega.android.core.ui.components.dialogs.BasicDialog
@@ -235,6 +237,9 @@ private fun LinkSettingsContent(
             modifier = Modifier.testTag(LINK_SETTINGS_EXPIRY_ROW_TAG),
             title = stringResource(sharedR.string.share_link_set_expiry_date),
             subtitle = stringResource(sharedR.string.share_link_expiry_subtitle),
+            titleTrailingElement = if (uiState.isProFeatureLocked) {
+                { ProBadge(Modifier.testTag(LINK_SETTINGS_EXPIRY_PRO_BADGE_TAG)) }
+            } else null,
             enableClick = true,
             onClickListener = { onExpiryEnabled(!uiState.isExpiryEnabled) },
             trailingElement = {
@@ -258,6 +263,9 @@ private fun LinkSettingsContent(
             modifier = Modifier.testTag(LINK_SETTINGS_PASSWORD_ROW_TAG),
             title = stringResource(sharedR.string.share_link_set_password),
             subtitle = stringResource(sharedR.string.share_link_password_subtitle),
+            titleTrailingElement = if (uiState.isProFeatureLocked) {
+                { ProBadge(Modifier.testTag(LINK_SETTINGS_PASSWORD_PRO_BADGE_TAG)) }
+            } else null,
             enableClick = true,
             onClickListener = { onPasswordEnabled(!uiState.isPasswordEnabled) },
             trailingElement = {
@@ -323,6 +331,15 @@ private fun todayStartUtcMillis(): Long =
         set(Calendar.SECOND, 0)
         set(Calendar.MILLISECOND, 0)
     }.timeInMillis
+
+@Composable
+private fun ProBadge(modifier: Modifier = Modifier) {
+    Badge(
+        modifier = modifier,
+        badgeType = BadgeType.MegaSecondary,
+        text = stringResource(sharedR.string.general_pro_label),
+    )
+}
 
 @Composable
 private fun ExpiryDateField(
@@ -505,6 +522,8 @@ internal const val LINK_SETTINGS_SEPARATE_KEY_LEARN_MORE_TAG = "link_settings_sc
 private const val LEARN_MORE_ANNOTATION = "learn_more"
 internal const val LINK_SETTINGS_EXPIRY_ROW_TAG = "link_settings_screen:row_expiry"
 internal const val LINK_SETTINGS_EXPIRY_TOGGLE_TAG = "link_settings_screen:toggle_expiry"
+internal const val LINK_SETTINGS_EXPIRY_PRO_BADGE_TAG = "link_settings_screen:pro_badge_expiry"
+internal const val LINK_SETTINGS_PASSWORD_PRO_BADGE_TAG = "link_settings_screen:pro_badge_password"
 internal const val LINK_SETTINGS_EXPIRY_FIELD_TAG = "link_settings_screen:field_expiry"
 internal const val LINK_SETTINGS_PASSWORD_ROW_TAG = "link_settings_screen:row_password"
 internal const val LINK_SETTINGS_PASSWORD_TOGGLE_TAG = "link_settings_screen:toggle_password"

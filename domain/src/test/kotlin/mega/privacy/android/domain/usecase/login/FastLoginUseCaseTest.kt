@@ -43,7 +43,7 @@ class FastLoginUseCaseTest {
     private val loginRepository = mock<LoginRepository>()
     private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val chatLogoutUseCase = mock<ChatLogoutUseCase> {
-        onBlocking { invoke(disableChatApiUseCase) }.thenReturn(Unit)
+        on { invoke(true) }.thenReturn(Unit)
     }
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
     private val disableChatApiUseCase = mock<DisableChatApiUseCase>()
@@ -85,13 +85,13 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest.invoke(session, false, disableChatApiUseCase).test {
+            underTest.invoke(session, false, disableChatApi = true).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }
 
             verify(initialiseMegaChatUseCase).invoke(session)
-            verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+            verify(chatLogoutUseCase).invoke(disableChatApi = true)
             verify(saveAccountCredentialsUseCase).invoke()
             val inOrder = inOrder(loginMutex)
             inOrder.verify(loginMutex).lock()
@@ -104,12 +104,12 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flow { throw LoginRequireValidation() })
 
-            underTest.invoke(session, false, disableChatApiUseCase).test {
+            underTest.invoke(session, false, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
             }
 
             verify(initialiseMegaChatUseCase).invoke(session)
-            verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+            verify(chatLogoutUseCase).invoke(disableChatApi = true)
             verify(resetChatSettingsUseCase).invoke()
             val inOrder = inOrder(loginMutex)
             inOrder.verify(loginMutex).lock()
@@ -122,7 +122,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flow { throw LoginLoggedOutFromOtherLocation() })
 
-            underTest.invoke(session, false, disableChatApiUseCase).test {
+            underTest.invoke(session, false, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
             }
 
@@ -140,7 +140,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest.invoke(session, true, disableChatApiUseCase).test {
+            underTest.invoke(session, true, disableChatApi = true).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -158,7 +158,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest.invoke(session, true, disableChatApiUseCase).test {
+            underTest.invoke(session, true, disableChatApi = true).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -175,7 +175,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest.invoke(session, false, disableChatApiUseCase).test {
+            underTest.invoke(session, false, disableChatApi = true).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -191,7 +191,7 @@ class FastLoginUseCaseTest {
         whenever(loginRepository.fastLoginFlow(session))
             .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-        underTest.invoke(session, false, disableChatApiUseCase).test {
+        underTest.invoke(session, false, disableChatApi = true).test {
             assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
             cancelAndIgnoreRemainingEvents()
         }
@@ -206,7 +206,7 @@ class FastLoginUseCaseTest {
         whenever(loginRepository.fastLoginFlow(session))
             .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-        underTest.invoke(session, false, disableChatApiUseCase).test {
+        underTest.invoke(session, false, disableChatApi = true).test {
             assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
             cancelAndIgnoreRemainingEvents()
         }
@@ -221,7 +221,7 @@ class FastLoginUseCaseTest {
         whenever(loginRepository.fastLoginFlow(session))
             .thenReturn(flow { throw LoginRequireValidation() })
 
-        underTest.invoke(session, false, disableChatApiUseCase).test {
+        underTest.invoke(session, false, disableChatApi = true).test {
             assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
         }
         val inOrder = inOrder(loginMutex)
@@ -241,7 +241,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session)).thenReturn(hotFlow())
 
             val collectJob = launch {
-                underTest.invoke(session, false, disableChatApiUseCase).collect { }
+                underTest.invoke(session, false, disableChatApi = true).collect { }
             }
             advanceUntilIdle()
             collectJob.cancel()
@@ -258,7 +258,7 @@ class FastLoginUseCaseTest {
         whenever(initialiseMegaChatUseCase(session))
             .thenThrow(CancellationException("Coroutine scope cancelled"))
 
-        underTest.invoke(session, false, disableChatApiUseCase).catch {
+        underTest.invoke(session, false, disableChatApi = true).catch {
             assertThat(it).isEqualTo(CancellationException::class.java)
         }.test {
             cancelAndIgnoreRemainingEvents()
@@ -273,11 +273,11 @@ class FastLoginUseCaseTest {
     fun `test that fast login closes with error when chatLogoutUseCase throws`() = runTest {
         val exception = RuntimeException("chatLogout failed")
         whenever(initialiseMegaChatUseCase(session)).thenThrow(ChatNotInitializedErrorStatus())
-        whenever(chatLogoutUseCase.invoke(disableChatApiUseCase)).thenThrow(exception)
+        whenever(chatLogoutUseCase.invoke(true)).thenThrow(exception)
         whenever(loginRepository.fastLoginFlow(session))
             .thenReturn(hotFlow())
 
-        underTest.invoke(session, false, disableChatApiUseCase).test {
+        underTest.invoke(session, false, disableChatApi = true).test {
             assertThat(awaitError()).isInstanceOf(RuntimeException::class.java)
         }
 
@@ -296,7 +296,7 @@ class FastLoginUseCaseTest {
         whenever(loginRepository.fastLoginFlow(session))
             .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-        underTest.invoke(session, false, disableChatApiUseCase).test {
+        underTest.invoke(session, false, disableChatApi = true).test {
             advanceUntilIdle()
             expectNoEvents()
             chatInitialised.complete(Unit)
@@ -314,7 +314,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest.invoke(session, true, disableChatApiUseCase).test {
+            underTest.invoke(session, true, disableChatApi = true).test {
                 assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
                 cancelAndIgnoreRemainingEvents()
             }
@@ -333,7 +333,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flow { throw LoginLoggedOutFromOtherLocation() })
 
-            underTest.invoke(session, false, disableChatApiUseCase).test {
+            underTest.invoke(session, false, disableChatApi = true).test {
                 advanceUntilIdle()
                 expectNoEvents()
                 chatInitialised.complete(Unit)
@@ -356,14 +356,14 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flow { throw LoginRequireValidation() })
 
-            underTest.invoke(session, false, disableChatApiUseCase).test {
+            underTest.invoke(session, false, disableChatApi = true).test {
                 advanceUntilIdle()
                 verifyNoInteractions(chatLogoutUseCase)
                 chatInitialised.complete(Unit)
                 assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
             }
 
-            verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+            verify(chatLogoutUseCase).invoke(disableChatApi = true)
             verify(resetChatSettingsUseCase).invoke()
         }
 
@@ -373,12 +373,12 @@ class FastLoginUseCaseTest {
         whenever(loginRepository.fastLoginFlow(session))
             .thenReturn(flow { throw LoginRequireValidation() })
 
-        underTest.invoke(session, false, disableChatApiUseCase).test {
+        underTest.invoke(session, false, disableChatApi = true).test {
             assertThat(awaitError()).isInstanceOf(ChatNotInitializedErrorStatus::class.java)
         }
 
         verify(initialiseMegaChatUseCase).invoke(session)
-        verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+        verify(chatLogoutUseCase).invoke(disableChatApi = true)
         val inOrder = inOrder(loginMutex)
         inOrder.verify(loginMutex).lock()
         inOrder.verify(loginMutex).unlock()
@@ -392,7 +392,7 @@ class FastLoginUseCaseTest {
             whenever(loginRepository.fastLoginFlow(session))
                 .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-            underTest.invoke(session, false, disableChatApiUseCase).test {
+            underTest.invoke(session, false, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(RuntimeException::class.java)
             }
 

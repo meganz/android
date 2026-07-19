@@ -24,12 +24,12 @@ class ChatPreferencesViewModelTest {
     //Mocks
     private val monitorUpdatePushNotificationSettingsUseCase =
         mock<MonitorUpdatePushNotificationSettingsUseCase> {
-            onBlocking { invoke() }.thenReturn(flowOf(true))
+            on { invoke() }.thenReturn(flowOf(true))
         }
 
     private val monitorChatSignalPresenceUseCase =
         mock<MonitorChatSignalPresenceUseCase> {
-            onBlocking { invoke() }.thenReturn(flowOf(Unit))
+            on { invoke() }.thenReturn(flowOf(Unit))
         }
 
     @BeforeEach

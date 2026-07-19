@@ -80,26 +80,26 @@ class MyAccountHomeViewModelTest {
     private val getExtendedAccountDetail: GetExtendedAccountDetail = mock()
     private val getUsedTransferStatusUseCase: GetUsedTransferStatusUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
-        onBlocking { invoke() }.thenReturn(accountDetailFlow)
+        on { invoke() }.thenReturn(accountDetailFlow)
     }
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock {
-        onBlocking { invoke() }.thenReturn(myAvatarFileFlow)
+        on { invoke() }.thenReturn(myAvatarFileFlow)
     }
     private val monitorVerificationStatusUseCase: MonitorVerificationStatusUseCase = mock {
-        onBlocking { invoke() }.thenReturn(verifiedPhoneNumberFlow)
+        on { invoke() }.thenReturn(verifiedPhoneNumberFlow)
     }
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() }.thenReturn(connectivityFlow)
+        on { invoke() }.thenReturn(connectivityFlow)
     }
     private val monitorUserUpdates: MonitorUserUpdates = mock {
-        onBlocking { invoke() }.thenReturn(userUpdatesFlow)
+        on { invoke() }.thenReturn(userUpdatesFlow)
     }
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase = mock {
-        onBlocking { invoke() }.thenReturn(emptyList())
+        on { invoke() }.thenReturn(emptyList())
     }
     private val getBusinessStatusUseCase: GetBusinessStatusUseCase = mock()
     private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock {
-        onBlocking { invoke() }.thenReturn(1)
+        on { invoke() }.thenReturn(1)
     }
     private val getInSharesUseCase: GetInSharesUseCase = mock()
     private val getCurrentUserEmail: GetCurrentUserEmail = mock()
@@ -115,11 +115,11 @@ class MyAccountHomeViewModelTest {
 
     private fun initViewModel(accountDetailsValue: UserAccount = TEST_USER_ACCOUNT) {
         getAccountDetailsUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(accountDetailsValue)
+            on { invoke(any()) }.thenReturn(accountDetailsValue)
         }
 
         getUserFullNameUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT.fullName)
+            on { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT.fullName)
         }
 
         underTest = MyAccountHomeViewModel(

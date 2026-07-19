@@ -22,7 +22,7 @@ class CreateSdkLogEntryTest {
     private val traceString = "Trace string"
 
     private val createTraceString = mock<CreateTraceString> {
-        onBlocking { invoke(any(), any()) }.thenReturn(
+        on { invoke(any(), any()) }.thenReturn(
             traceString
         )
     }
@@ -30,7 +30,7 @@ class CreateSdkLogEntryTest {
     private val appVersion = "v1"
 
     private val environmentRepository = mock<EnvironmentRepository> {
-        onBlocking { getAppInfo() }.thenReturn(AppInfo(appVersion, null))
+        on { getAppInfo() }.thenReturn(AppInfo(appVersion, null))
     }
 
     @Before

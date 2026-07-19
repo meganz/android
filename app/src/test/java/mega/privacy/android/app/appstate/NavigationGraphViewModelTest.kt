@@ -90,7 +90,7 @@ class NavigationGraphViewModelTest {
             }
             val featureDestinations = setOf(expected, notExpected as FeatureDestination)
             getEnabledFlaggedItemsUseCase.stub {
-                onBlocking { invoke(featureDestinations) }.thenReturn(flow { emit(setOf(expected)) })
+                on { invoke(featureDestinations) }.thenReturn(flow { emit(setOf(expected)) })
             }
 
             initUnderTest(featureDestinations)
@@ -114,7 +114,7 @@ class NavigationGraphViewModelTest {
         }
         val featureDestinations = setOf(expected, alsoExpected as FeatureDestination)
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(featureDestinations) }.thenReturn(flow {
+            on { invoke(featureDestinations) }.thenReturn(flow {
                 emit(
                     setOf(
                         expected,

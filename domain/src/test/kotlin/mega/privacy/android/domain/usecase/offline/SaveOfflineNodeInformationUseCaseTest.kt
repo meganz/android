@@ -60,7 +60,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
             monitorBackupFolder,
         )
         nodeRepository.stub {
-            onBlocking {
+            on {
                 saveOfflineNodeInformation(
                     eq(nodeOfflineInformation),
                     anyOrNull()
@@ -69,7 +69,7 @@ internal class SaveOfflineNodeInformationUseCaseTest {
                 nodeOfflineInformationId
             )
 
-            onBlocking {
+            on {
                 saveOfflineNodeInformation(
                     eq(parentOfflineInformation),
                     anyOrNull()

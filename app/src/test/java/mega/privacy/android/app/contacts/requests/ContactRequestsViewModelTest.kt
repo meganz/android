@@ -44,7 +44,7 @@ class ContactRequestsViewModelTest {
         )
 
         monitorContactRequestsUseCase.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flow {
                     awaitCancellation()
                 }
@@ -53,7 +53,7 @@ class ContactRequestsViewModelTest {
 
         val placeholder = mock<Drawable>()
         contactRequestItemMapper.stub {
-            onBlocking { invoke(any()) }.thenAnswer { invocation ->
+            on { invoke(any()) }.thenAnswer { invocation ->
                 val request = invocation.arguments[0] as ContactRequest
                 ContactRequestItem(
                     handle = request.handle,

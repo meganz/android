@@ -1,7 +1,6 @@
 package mega.privacy.android.app.mediaplayer.navigation
 
 import android.os.Parcelable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -30,7 +29,12 @@ import mega.privacy.android.navigation.contract.NavigationHandler
  */
 @Serializable
 @Parcelize
-data class AudioPlayerScreenNavKey(val launchId: String) : NavKey, Parcelable
+data class AudioPlayerScreenNavKey(val launchId: String) : NavKey, Parcelable {
+    companion object {
+        /** Sentinel [launchId] used when resuming a running player without starting new playback. */
+        const val RESUME_LAUNCH_ID = "audio_player_resume"
+    }
+}
 
 internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
     navigationHandler: NavigationHandler,
@@ -43,15 +47,6 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
         LaunchedEffect(navKey.launchId) {
             val intent = launchSourceHolder.consume(navKey.launchId) ?: return@LaunchedEffect
             viewModel.startPlayback(intent)
-        }
-
-        // onDispose fires only when this entry is removed from the Navigation3 back stack
-        // (i.e. the user navigates away). Activity re-creation on configuration change does NOT
-        // remove the entry, so stopPlayer() is NOT called during rotation or other config changes.
-        DisposableEffect(navKey.launchId) {
-            onDispose {
-                viewModel.stopPlayer()
-            }
         }
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -75,6 +70,7 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             nodeActionHandler = nodeActionHandler,
             onTransfer = onTransfer,
         )
+
 
         AudioPlayerScreen(
             uiState = uiState,

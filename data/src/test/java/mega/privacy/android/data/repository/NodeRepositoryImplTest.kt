@@ -429,7 +429,7 @@ internal class NodeRepositoryImplTest {
     ) = runTest {
         val nodeHandle = 123456L
         megaApiGateway.stub {
-            onBlocking { getNodePathByHandle(nodeHandle) }.thenReturn(nodePath)
+            on { getNodePathByHandle(nodeHandle) }.thenReturn(nodePath)
         }
         val actualNodePath = underTest.getNodePathById(NodeId(nodeHandle))
         assertThat(actualNodePath).isEqualTo(expectedNodePath)

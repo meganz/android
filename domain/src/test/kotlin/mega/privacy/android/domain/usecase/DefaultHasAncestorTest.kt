@@ -33,7 +33,7 @@ class DefaultHasAncestorTest {
         val ancestor = NodeId(targetNode.longValue + 1)
 
         nodeRepository.stub {
-            onBlocking { getParentNodeId(targetNode) }.thenReturn(ancestor)
+            on { getParentNodeId(targetNode) }.thenReturn(ancestor)
         }
         val actual = underTest(targetNode, ancestor)
         assertThat(actual).isTrue()
@@ -42,7 +42,7 @@ class DefaultHasAncestorTest {
     @Test
     fun `test that false is returned if the target node is null`() = runTest {
         nodeRepository.stub {
-            onBlocking { getParentNodeId(targetNode) }.thenReturn(null)
+            on { getParentNodeId(targetNode) }.thenReturn(null)
         }
         val actual = underTest(targetNode, NodeId(13L))
         assertThat(actual).isFalse()
@@ -55,8 +55,8 @@ class DefaultHasAncestorTest {
             val directParentId = NodeId(ancestor.longValue + 1)
 
             nodeRepository.stub {
-                onBlocking { getParentNodeId(targetNode) }.thenReturn(directParentId)
-                onBlocking { getParentNodeId(directParentId) }.thenReturn(ancestor)
+                on { getParentNodeId(targetNode) }.thenReturn(directParentId)
+                on { getParentNodeId(directParentId) }.thenReturn(ancestor)
             }
             val actual = underTest(targetNode, ancestor)
             assertThat(actual).isTrue()
@@ -68,8 +68,8 @@ class DefaultHasAncestorTest {
         val directParentId = NodeId(ancestor.longValue + 1)
 
         nodeRepository.stub {
-            onBlocking { getParentNodeId(targetNode) }.thenReturn(directParentId)
-            onBlocking { getParentNodeId(directParentId) }
+            on { getParentNodeId(targetNode) }.thenReturn(directParentId)
+            on { getParentNodeId(directParentId) }
                 .thenReturn(directParentId)
                 .thenReturn(directParentId)
                 .thenReturn(directParentId)

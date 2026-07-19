@@ -150,14 +150,14 @@ internal class FileInfoViewModel @AssistedInject constructor(
                 }
             }
 
-            _uiState.update {
-                it.copy(
+            _uiState.update { state ->
+                state.copy(
                     isLoading = false,
                     title = node.name,
                     isFile = isFile,
                     iconRes = node.getIcon(fileTypeIconMapper),
                     thumbnailData = thumbnailData,
-                    durationText = durationText,
+                    durationText = durationText?.takeIf { it.isNotBlank() },
                     fileTypeExtension = fileTypeExtension,
                     sizeInBytes = sizeInBytes,
                     creationTime = node.creationTime,

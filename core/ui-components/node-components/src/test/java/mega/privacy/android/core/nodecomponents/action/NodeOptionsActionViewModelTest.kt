@@ -293,13 +293,13 @@ class NodeOptionsActionViewModelTest {
             )
         )
         getRubbishNodeUseCase.stub {
-            onBlocking { invoke() } doReturn mockRubbishNode
+            on { invoke() } doReturn mockRubbishNode
         }
         monitorUserCredentialsUseCase.stub {
             on { invoke() } doReturn flowOf(fakeUserCredentials)
         }
         nodeSelectionModeActionMapper.stub {
-            onBlocking {
+            on {
                 invoke(
                     options = any(),
                     hasNodeAccessPermission = any(),
@@ -310,14 +310,14 @@ class NodeOptionsActionViewModelTest {
                 )
             } doReturn listOf(mockNodeSelectionModeMenuItem)
         }
-        isNodeInBackupsUseCase.stub { onBlocking { invoke(any()) } doReturn false }
-        getNodeAccessPermission.stub { onBlocking { invoke(any()) } doReturn AccessPermission.FULL }
-        checkNodeCanBeMovedToTargetNode.stub { onBlocking { invoke(any(), any()) } doReturn true }
+        isNodeInBackupsUseCase.stub { on { invoke(any()) } doReturn false }
+        getNodeAccessPermission.stub { on { invoke(any()) } doReturn AccessPermission.FULL }
+        checkNodeCanBeMovedToTargetNode.stub { on { invoke(any(), any()) } doReturn true }
         getShareFolderSensitiveWarningUseCase.stub {
-            onBlocking { invoke(any()) } doReturn SensitiveNodeShareWarning.None
+            on { invoke(any()) } doReturn SensitiveNodeShareWarning.None
         }
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(AppFeatures.ContactsComposeUI) } doReturn true
+            on { invoke(AppFeatures.ContactsComposeUI) } doReturn true
         }
     }
 

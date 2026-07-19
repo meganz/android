@@ -8,17 +8,20 @@ import javax.inject.Inject
  */
 class ChatLogoutUseCase @Inject constructor(
     private val loginRepository: LoginRepository,
+    private val disableChatApiUseCase: DisableChatApiUseCase,
 ) {
 
     /**
      * Invoke.
      *
-     * @param disableChatApiUseCase Temporary param for disabling megaChatApi.
+     * @param disableChatApi True to disable MegaChat API listener after chat logout.
      */
-    suspend operator fun invoke(disableChatApiUseCase: DisableChatApiUseCase? = null) {
+    suspend operator fun invoke(disableChatApi: Boolean) {
         runCatching { loginRepository.chatLogout() }
             .onSuccess {
-                disableChatApiUseCase?.invoke()
+                if (disableChatApi) {
+                    disableChatApiUseCase()
+                }
             }
     }
 }

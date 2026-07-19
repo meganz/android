@@ -46,10 +46,10 @@ class TransfersSettingsViewModelTest {
             getMaxTransferConnectionsRangeUseCase,
         )
         getMaxDownloadConnectionsUseCase.stub {
-            onBlocking { invoke() } doReturn INITIAL_DOWNLOAD_CONNECTIONS
+            on { invoke() } doReturn INITIAL_DOWNLOAD_CONNECTIONS
         }
         getMaxUploadConnectionsUseCase.stub {
-            onBlocking { invoke() } doReturn INITIAL_UPLOAD_CONNECTIONS
+            on { invoke() } doReturn INITIAL_UPLOAD_CONNECTIONS
         }
         getMaxTransferConnectionsRangeUseCase.stub {
             on { invoke() } doReturn INITIAL_TRANSFER_CONNECTIONS_RANGE
@@ -123,7 +123,7 @@ class TransfersSettingsViewModelTest {
         runTest(testDispatcher) {
             val newDownloadConnections = 6
             setMaxDownloadConnectionsUseCase.stub {
-                onBlocking { invoke(newDownloadConnections) }.thenThrow(RuntimeException())
+                on { invoke(newDownloadConnections) }.thenThrow(RuntimeException())
             }
 
             underTest.uiState.test {
@@ -142,7 +142,7 @@ class TransfersSettingsViewModelTest {
         runTest(testDispatcher) {
             val newUploadConnections = 8
             setMaxUploadConnectionsUseCase.stub {
-                onBlocking { invoke(newUploadConnections) }.thenThrow(RuntimeException())
+                on { invoke(newUploadConnections) }.thenThrow(RuntimeException())
             }
 
             underTest.uiState.test {

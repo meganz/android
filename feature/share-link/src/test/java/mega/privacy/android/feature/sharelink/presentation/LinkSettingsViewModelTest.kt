@@ -692,6 +692,29 @@ class LinkSettingsViewModelTest {
         }
 
     @Test
+    fun `test that onSave persists both the separate key and the password when both change`() =
+        runTest(extension.testDispatcher) {
+            stubNode()
+            whenever(getPasswordStrengthUseCase(PASSWORD)).thenReturn(PasswordStrength.STRONG)
+            whenever(encryptLinkWithPasswordUseCase(PUBLIC_LINK, PASSWORD)).thenReturn(ENCRYPTED_LINK)
+            val underTest = createUnderTest()
+            advanceUntilIdle()
+
+            underTest.uiState.test {
+                awaitItem()
+                underTest.onSeparateKeyEnabled(true)
+                underTest.onPasswordEnabled(true)
+                underTest.onPasswordChanged(PASSWORD)
+                underTest.onSave()
+                awaitUntil { it.savedEvent == triggered }
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(separateKeyCache).set(NODE_HANDLE, true)
+            verify(passwordCache).set(NODE_HANDLE, LinkPassword(PASSWORD, ENCRYPTED_LINK))
+        }
+
+    @Test
     fun `test that disabling a cached separate key onSave clears it in the cache`() =
         runTest(extension.testDispatcher) {
             stubNode()

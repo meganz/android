@@ -50,17 +50,17 @@ class CallRecordingViewModelTest {
     private val callFlow = MutableSharedFlow<ChatCall?>()
 
     private val monitorRecordedChatsUseCase: MonitorRecordedChatsUseCase = mock {
-        onBlocking { invoke() } doReturn recordingFlow
+        on { invoke() } doReturn recordingFlow
     }
     private val hangChatCallByChatIdUseCase = mock<HangChatCallByChatIdUseCase>()
     private val broadcastCallRecordingConsentEventUseCase =
         mock<BroadcastCallRecordingConsentEventUseCase>()
     private val monitorCallRecordingConsentEventUseCase: MonitorCallRecordingConsentEventUseCase =
         mock {
-            onBlocking { invoke() } doReturn consentFlow
+            on { invoke() } doReturn consentFlow
         }
     private val monitorCallInChatUseCase = mock<MonitorCallInChatUseCase> {
-        onBlocking { invoke(chatId) } doReturn callFlow
+        on { invoke(chatId) } doReturn callFlow
     }
     private val savedStateHandle: SavedStateHandle = mock {
         on { get<Long>(ChatNavKey.Companion.LEGACY_CHAT_ID) } doReturn chatId

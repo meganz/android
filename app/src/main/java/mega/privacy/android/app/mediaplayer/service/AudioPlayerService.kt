@@ -1,7 +1,9 @@
 package mega.privacy.android.app.mediaplayer.service
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.annotation.OptIn
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.Lifecycle
@@ -10,12 +12,17 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.AudioAttributes
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ShuffleOrder
+import androidx.media3.session.CommandButton
+import androidx.media3.session.DefaultMediaNotificationProvider
+import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
+import com.google.common.collect.ImmutableList
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.catch
@@ -30,6 +37,7 @@ import mega.privacy.android.app.mediaplayer.mapper.ExoPlayerRepeatModeMapper
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
+import mega.privacy.android.app.mediaplayer.navigation.AudioPlayerScreenNavKey
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.domain.entity.mediaplayer.MediaPlaybackInfo
 import mega.privacy.android.domain.entity.mediaplayer.MediaType
@@ -89,6 +97,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
 
+    private var isNotificationDismissed = false
     private var needPlayWhenGoForeground = false
     private var isBackgroundPlayEnabled = true
     private var needStopStreamingServer = false
@@ -100,6 +109,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         super.onCreate()
         Analytics.tracker.trackEvent(AudioPlayerIsActivatedEvent)
         initializePlayer()
+        initializeMediaNotificationProvider()
         initializeSession()
         observePreferences()
         observeHiddenNodeSettingChanges()
@@ -129,15 +139,54 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             }
     }
 
+    /**
+     * Replaces the default Media3 notification provider with one that sets a custom
+     * [android.app.Notification.deleteIntent] when the player is paused.
+     *
+     * Without this, swiping the notification while paused causes Media3 to re-post it
+     * immediately (the default deleteIntent triggers an internal update cycle that re-posts
+     * the notification). Our deleteIntent sends ACTION_DISMISS directly to [onStartCommand],
+     * which removes the notification and sets the dismissed flag — keeping the service alive
+     * in a paused state without re-posting the notification.
+     */
+    private fun initializeMediaNotificationProvider() {
+        val dismissDeleteIntent = PendingIntent.getService(
+            this, 0,
+            Intent(this, AudioPlayerService::class.java).setAction(ACTION_DISMISS),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+        )
+        val defaultProvider = DefaultMediaNotificationProvider(this)
+        setMediaNotificationProvider(object : MediaNotification.Provider {
+            override fun createNotification(
+                session: MediaSession,
+                customLayout: ImmutableList<CommandButton>,
+                actionFactory: MediaNotification.ActionFactory,
+                onNotificationChangedCallback: MediaNotification.Provider.Callback,
+            ): MediaNotification {
+                val notification = defaultProvider.createNotification(
+                    session, customLayout, actionFactory, onNotificationChangedCallback
+                )
+                if (!session.player.isPlaying) {
+                    notification.notification.deleteIntent = dismissDeleteIntent
+                }
+                return notification
+            }
+
+            override fun handleCustomCommand(
+                session: MediaSession,
+                action: String,
+                extras: Bundle,
+            ): Boolean = defaultProvider.handleCustomCommand(session, action, extras)
+
+            override fun getNotificationChannelInfo(): MediaNotification.Provider.NotificationChannelInfo =
+                defaultProvider.notificationChannelInfo
+        })
+    }
+
     private fun initializeSession() {
-        val sessionActivityIntent = Intent(this, MegaActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-        }
-        val pendingIntent = PendingIntent.getActivity(
+        val pendingIntent = MegaActivity.getPendingIntentWithExtraDestination(
             this,
-            0,
-            sessionActivityIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            AudioPlayerScreenNavKey(AudioPlayerScreenNavKey.RESUME_LAUNCH_ID)
         )
         val currentPlayer = player ?: return
         mediaSession = MediaSession.Builder(this, currentPlayer)
@@ -147,7 +196,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     private fun observePreferences() {
         lifecycleScope.launch {
-            monitorAudioBackgroundPlayEnabledUseCase().collect { isBackgroundPlayEnabled = it }
+            monitorAudioBackgroundPlayEnabledUseCase()
+                .catch { Timber.e(it, "Failed to monitor background play preference") }
+                .collect { isBackgroundPlayEnabled = it }
         }
     }
 
@@ -158,6 +209,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                 monitorAccountDetailUseCase(),
             ) { showHidden, accountDetail -> showHidden to accountDetail }
                 .drop(1) // Skip the initial emission — play queue already built on first load.
+                .catch { Timber.e(it, "Failed to monitor hidden node settings") }
                 .collect { lastPlayQueueParams?.let { params -> rebuildPlayQueue(params) } }
         }
     }
@@ -173,8 +225,15 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             }
         }
 
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            isNotificationDismissed = false
+        }
+
         override fun onIsPlayingChanged(isPlaying: Boolean) {
-            if (!isPlaying) {
+            if (isPlaying) {
+                isNotificationDismissed = false
+                MiniAudioPlayerController.notifyV2NotificationDismissed(false)
+            } else {
                 // Remove the foreground lock so the notification can be swiped away when
                 // the player is paused. MediaSessionService will re-enter foreground
                 // automatically if playback resumes.
@@ -190,10 +249,32 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         }
     }
 
+    override fun onUpdateNotification(session: MediaSession, startInForeground: Boolean) {
+        if (isNotificationDismissed && !session.player.isPlaying) return
+        if (session.player.isPlaying) isNotificationDismissed = false
+        super.onUpdateNotification(session, startInForeground)
+    }
+
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
         mediaSession
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Handle our custom actions before calling super to prevent MediaSessionService from
+        // triggering onUpdateNotification internally, which can cause unexpected player state
+        // changes (e.g. brief STATE_BUFFERING) as a side-effect of its startForeground logic.
+        when (intent?.action) {
+            ACTION_STOP -> {
+                stopPlayerAndSelf()
+                return START_NOT_STICKY
+            }
+
+            ACTION_DISMISS -> {
+                isNotificationDismissed = true
+                MiniAudioPlayerController.notifyV2NotificationDismissed(true)
+                ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+                return START_NOT_STICKY
+            }
+        }
         super.onStartCommand(intent, flags, startId)
         val safeIntent = intent ?: return START_STICKY
         if (!safeIntent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)) {
@@ -204,7 +285,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         needStopStreamingServer = needStopStreamingServer || params.needStopHttpServer
         lastPlayQueueParams = params
         rebuildPlayQueue(params)
-        MiniAudioPlayerController.notifyAudioPlayerPlaying(playing = true)
+        MiniAudioPlayerController.notifyV2AudioPlayerPlaying(true)
         trackPlaybackInfoJob?.cancel()
         trackPlaybackInfoJob = lifecycleScope.launch {
             player?.let { exoPlayer ->
@@ -298,8 +379,15 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     private fun stopPlayerAndSelf() {
-        MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
+        MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        // Release the session before stopSelf() so that all bound MediaController clients
+        // (including the Audio Player screen) disconnect immediately. Without this, stopSelf()
+        // cannot stop the service while clients are still bound, which causes MediaSessionService
+        // to re-post the notification before the service actually dies.
+        runCatching { mediaSession?.release() }
+            .onFailure { Timber.e(it, "Failed to release MediaSession") }
+        mediaSession = null
         stopSelf()
     }
 
@@ -315,7 +403,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
                     .onFailure { Timber.e(it, "Failed to stop folder HTTP server") }
             }
         }
-        MiniAudioPlayerController.notifyAudioPlayerPlaying(false)
+        MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
         runCatching { mediaSession?.release() }
             .onFailure { Timber.e(it, "Failed to release MediaSession") }
         mediaSession = null
@@ -323,5 +411,29 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
             .onFailure { Timber.e(it, "Failed to release ExoPlayer") }
         player = null
         super.onDestroy()
+    }
+
+    companion object {
+        private const val ACTION_STOP = "mega.privacy.android.app.mediaplayer.AudioPlayerService.STOP"
+        private const val ACTION_DISMISS = "mega.privacy.android.app.mediaplayer.AudioPlayerService.DISMISS"
+
+        /**
+         * Stops the audio player service from outside a bound component.
+         *
+         * Uses a start-service intent with ACTION_STOP so the service can run
+         * stopPlayerAndSelf() internally: this first calls
+         * MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false) (which releases the mini
+         * player's MediaController binding), then calls stopSelf(). Once all bindings are
+         * released the service is destroyed. Calling stopService() directly would deadlock
+         * because a started+bound service is not destroyed until all clients unbind — and the
+         * mini player's MediaController only unbinds after receiving the notification.
+         */
+        fun stopAudioPlayer(context: Context) {
+            context.startService(
+                Intent(context, AudioPlayerService::class.java).apply {
+                    action = ACTION_STOP
+                }
+            )
+        }
     }
 }

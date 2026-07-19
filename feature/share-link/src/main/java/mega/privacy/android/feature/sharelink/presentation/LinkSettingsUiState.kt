@@ -40,4 +40,10 @@ data class LinkSettingsUiState(
     val isSaving: Boolean = false,
     val savedEvent: StateEvent = consumed,
     val errorEvent: StateEvent = consumed,
-)
+) {
+    /**
+     * Whether the Pro-only rows (expiry, password) are locked for the current account — true for
+     * free/unknown accounts, driving the "Pro" badge and (later) the disabled state.
+     */
+    val isProFeatureLocked: Boolean get() = accountType?.isPaid != true
+}

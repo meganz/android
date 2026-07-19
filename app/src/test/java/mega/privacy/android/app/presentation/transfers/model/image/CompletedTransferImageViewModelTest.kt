@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.model.image
 
-import androidx.core.net.toUri
+import android.net.Uri
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.any
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -125,27 +127,31 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer adds a new completed download transfer to the UI state`() =
         runTest {
-            val state = TransferState.STATE_COMPLETED
-            val type = TransferType.GENERAL_UPLOAD
-            val file = File("file")
+            mockStatic(Uri::class.java).use { _ ->
+                val state = TransferState.STATE_COMPLETED
+                val type = TransferType.GENERAL_UPLOAD
+                val file = File("file")
+                val previewUri = mock<Uri>()
+                whenever(Uri.fromFile(file)).thenReturn(previewUri)
 
-            whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
-            whenever(getThumbnailUseCase(nodeHandle, true)).thenReturn(file)
+                whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
+                whenever(getThumbnailUseCase(nodeHandle, true)).thenReturn(file)
 
-            initTestClass()
+                initTestClass()
 
-            underTest.addTransfer(
-                getCompletedTransfer(
-                    type = type,
-                    state = state,
+                underTest.addTransfer(
+                    getCompletedTransfer(
+                        type = type,
+                        state = state,
+                    )
                 )
-            )
-            testScheduler.advanceUntilIdle()
+                testScheduler.advanceUntilIdle()
 
-            underTest.getUiStateFlow(id).test {
-                (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
-                    assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
-                    assertThat(it.previewUri).isEqualTo(file.toUri())
+                underTest.getUiStateFlow(id).test {
+                    (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
+                        assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
+                        assertThat(it.previewUri).isEqualTo(previewUri)
+                    }
                 }
             }
         }
@@ -172,63 +178,75 @@ class CompletedTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and does not invoke GetThumbnailUseCase when adds a new cancelled upload`() =
         runTest {
-            val state = TransferState.STATE_CANCELLED
-            val type = TransferType.GENERAL_UPLOAD
+            mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock<Uri>())
+                val state = TransferState.STATE_CANCELLED
+                val type = TransferType.GENERAL_UPLOAD
 
-            initTestClass()
+                initTestClass()
 
-            underTest.addTransfer(
-                getCompletedTransfer(
-                    type = type,
-                    state = state,
+                underTest.addTransfer(
+                    getCompletedTransfer(
+                        type = type,
+                        state = state,
+                    )
                 )
-            )
 
-            verify(fileTypeIconMapper).invoke(extension)
-            verifyNoInteractions(getThumbnailUseCase)
+                verify(fileTypeIconMapper).invoke(extension)
+                verifyNoInteractions(getThumbnailUseCase)
+            }
         }
 
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and does not invoke GetThumbnailUseCase when adds a new failed upload`() =
         runTest {
-            val state = TransferState.STATE_FAILED
-            val type = TransferType.GENERAL_UPLOAD
+            mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock<Uri>())
+                val state = TransferState.STATE_FAILED
+                val type = TransferType.GENERAL_UPLOAD
 
-            initTestClass()
+                initTestClass()
 
-            underTest.addTransfer(
-                getCompletedTransfer(
-                    type = type,
-                    state = state,
+                underTest.addTransfer(
+                    getCompletedTransfer(
+                        type = type,
+                        state = state,
+                    )
                 )
-            )
 
-            verify(fileTypeIconMapper).invoke(extension)
-            verifyNoInteractions(getThumbnailUseCase)
+                verify(fileTypeIconMapper).invoke(extension)
+                verifyNoInteractions(getThumbnailUseCase)
+            }
         }
 
     @Test
     fun `test that addTransfer adds a new completed upload transfer to the UI state`() =
         runTest {
-            val state = TransferState.STATE_COMPLETED
-            val type = TransferType.DOWNLOAD
+            mockStatic(Uri::class.java).use { _ ->
+                val state = TransferState.STATE_COMPLETED
+                val type = TransferType.DOWNLOAD
+                val file = File("file")
+                val previewUri = mock<Uri>()
+                whenever(Uri.fromFile(file)).thenReturn(previewUri)
+                whenever(getThumbnailUseCase(nodeHandle, true)).thenReturn(file)
 
-            whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
+                whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
 
-            initTestClass()
+                initTestClass()
 
-            underTest.addTransfer(
-                getCompletedTransfer(
-                    type = type,
-                    state = state,
+                underTest.addTransfer(
+                    getCompletedTransfer(
+                        type = type,
+                        state = state,
+                    )
                 )
-            )
-            advanceUntilIdle()
+                advanceUntilIdle()
 
-            underTest.getUiStateFlow(id).test {
-                (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
-                    assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
-                    assertThat(it.previewUri).isEqualTo(localPath.toUri())
+                underTest.getUiStateFlow(id).test {
+                    (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
+                        assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
+                        assertThat(it.previewUri).isEqualTo(previewUri)
+                    }
                 }
             }
         }

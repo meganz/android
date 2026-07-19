@@ -76,7 +76,7 @@ class MonitorParticipantsLimitWarningUseCaseTest {
     @Test
     fun `test that warning is false when there is no active call`() = runTest {
         stubFlag(true)
-        getChatCallUseCase.stub { onBlocking { invoke(chatId) }.doReturn(null) }
+        getChatCallUseCase.stub { on { invoke(chatId) }.doReturn(null) }
 
         underTest(chatId).test {
             assertThat(expectMostRecentItem()).isFalse()
@@ -128,12 +128,12 @@ class MonitorParticipantsLimitWarningUseCaseTest {
 
     private fun stubFlag(enabled: Boolean) {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(ApiFeatures.CallUnlimitedProPlan) }.doReturn(enabled)
+            on { invoke(ApiFeatures.CallUnlimitedProPlan) }.doReturn(enabled)
         }
     }
 
     private fun stubInitialCall(chatCall: ChatCall) {
-        getChatCallUseCase.stub { onBlocking { invoke(chatId) }.doReturn(chatCall) }
+        getChatCallUseCase.stub { on { invoke(chatId) }.doReturn(chatCall) }
     }
 
     private fun call(

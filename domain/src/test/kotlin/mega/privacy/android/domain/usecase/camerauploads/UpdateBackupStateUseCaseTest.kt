@@ -57,13 +57,13 @@ internal class UpdateBackupStateUseCaseTest {
         )
 
         cameraUploadsRepository.stub {
-            onBlocking {
+            on {
                 updateRemoteBackupState(
                     backupId = backupId,
                     backupState = newBackupState,
                 )
             }.thenReturn(newBackupState)
-            onBlocking { getBackupById(backupId) }.thenReturn(backup)
+            on { getBackupById(backupId) }.thenReturn(backup)
         }
 
         underTest(
@@ -79,13 +79,13 @@ internal class UpdateBackupStateUseCaseTest {
         val newBackupState = BackupState.ACTIVE
 
         cameraUploadsRepository.stub {
-            onBlocking {
+            on {
                 updateRemoteBackupState(
                     backupId = backupId,
                     backupState = newBackupState,
                 )
             }.thenReturn(newBackupState)
-            onBlocking { getBackupById(backupId) }.thenReturn(null)
+            on { getBackupById(backupId) }.thenReturn(null)
         }
 
         underTest(

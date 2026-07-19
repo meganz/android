@@ -69,7 +69,7 @@ class PsaViewModelTest {
         val expectedCount = 5
         val monitorFlow = MutableStateFlow(createPsa(99))
         monitorPsaUseCase.stub {
-            onBlocking { invoke() }.thenReturn(monitorFlow)
+            on { invoke() }.thenReturn(monitorFlow)
         }
 
         initViewModel()

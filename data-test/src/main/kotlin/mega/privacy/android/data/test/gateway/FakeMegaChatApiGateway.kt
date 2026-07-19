@@ -231,6 +231,13 @@ class FakeMegaChatApiGateway(
         MegaChatRequest.TYPE_LOGOUT,
     )
 
+    override fun localLogout(listener: MegaChatRequestListenerInterface?) = completeChatRequest(
+        MegaChatApiGateway::localLogout,
+        listOf(listener),
+        listener,
+        MegaChatRequest.TYPE_LOGOUT,
+    )
+
     override fun setLogger(logger: MegaChatLoggerInterface) {
         engine.dispatchBlocking(MegaChatApiGateway::setLogger, listOf(logger)) {}
     }

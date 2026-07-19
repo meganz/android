@@ -25,7 +25,7 @@ internal class CheckPasscodeUseCaseTest {
     @Test
     internal fun `test that error is thrown if current passcode is null`() = runTest {
         passcodeRepository.stub {
-            onBlocking { getPasscode() }.thenReturn(null)
+            on { getPasscode() }.thenReturn(null)
         }
 
         assertThrows<NoPasscodeSetException> { underTest("") }
@@ -35,7 +35,7 @@ internal class CheckPasscodeUseCaseTest {
     internal fun `test that true is returned if passcode matches current`() = runTest {
         val passcode = "Matching"
         passcodeRepository.stub {
-            onBlocking { getPasscode() }.thenReturn(passcode)
+            on { getPasscode() }.thenReturn(passcode)
         }
 
         assertThat(underTest(passcode)).isTrue()
@@ -45,7 +45,7 @@ internal class CheckPasscodeUseCaseTest {
     internal fun `test that false is returned if passcode does not match current`() = runTest{
         val passcode = "Matching"
         passcodeRepository.stub {
-            onBlocking { getPasscode() }.thenReturn(passcode)
+            on { getPasscode() }.thenReturn(passcode)
         }
 
         assertThat(underTest(passcode.uppercase())).isFalse()

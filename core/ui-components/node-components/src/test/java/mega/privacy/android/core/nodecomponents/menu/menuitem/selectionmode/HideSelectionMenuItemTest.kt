@@ -122,7 +122,7 @@ class HideSelectionMenuItemTest {
     @Test
     fun `test shouldDisplay returns false when hiding action is not allowed for node`() = runTest {
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn false
+            on { invoke(any()) } doReturn false
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase>()
@@ -148,7 +148,7 @@ class HideSelectionMenuItemTest {
     @Test
     fun `test shouldDisplay returns true for free account with non-sensitive nodes`() = runTest {
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn false
@@ -160,10 +160,10 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+            on { invoke() } doReturn BusinessAccountStatus.Active
         }
 
         val hideMenuItem = HideSelectionMenuItem(
@@ -187,7 +187,7 @@ class HideSelectionMenuItemTest {
     @Test
     fun `test shouldDisplay returns true for paid account with non-sensitive nodes`() = runTest {
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn true
@@ -199,10 +199,10 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+            on { invoke() } doReturn BusinessAccountStatus.Active
         }
 
         val hideMenuItem = HideSelectionMenuItem(
@@ -226,7 +226,7 @@ class HideSelectionMenuItemTest {
     @Test
     fun `test shouldDisplay returns true for expired business account`() = runTest {
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn true
@@ -238,10 +238,10 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Expired
+            on { invoke() } doReturn BusinessAccountStatus.Expired
         }
 
         val hideMenuItem = HideSelectionMenuItem(
@@ -266,7 +266,7 @@ class HideSelectionMenuItemTest {
     fun `test shouldDisplay returns false when all nodes are sensitive for paid account`() =
         runTest {
             val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-                onBlocking { invoke(any()) } doReturn true
+                on { invoke(any()) } doReturn true
             }
             val accountType = mock<AccountType> {
                 on { isPaid } doReturn true
@@ -278,10 +278,10 @@ class HideSelectionMenuItemTest {
                 on { levelDetail } doReturn accountLevelDetail
             }
             val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-                onBlocking { invoke() } doReturn flowOf(accountDetail)
+                on { invoke() } doReturn flowOf(accountDetail)
             }
             val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-                onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+                on { invoke() } doReturn BusinessAccountStatus.Active
             }
 
             val hideMenuItem = HideSelectionMenuItem(
@@ -307,7 +307,7 @@ class HideSelectionMenuItemTest {
     fun `test shouldDisplay returns false when any node has inherited sensitivity for paid account`() =
         runTest {
             val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-                onBlocking { invoke(any()) } doReturn true
+                on { invoke(any()) } doReturn true
             }
             val accountType = mock<AccountType> {
                 on { isPaid } doReturn true
@@ -319,10 +319,10 @@ class HideSelectionMenuItemTest {
                 on { levelDetail } doReturn accountLevelDetail
             }
             val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-                onBlocking { invoke() } doReturn flowOf(accountDetail)
+                on { invoke() } doReturn flowOf(accountDetail)
             }
             val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-                onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+                on { invoke() } doReturn BusinessAccountStatus.Active
             }
 
             val hideMenuItem = HideSelectionMenuItem(
@@ -347,7 +347,7 @@ class HideSelectionMenuItemTest {
     @Test
     fun `test shouldDisplay ignores canBeMovedToTarget parameter`() = runTest {
         val isHidingActionAllowedUseCase = mock<IsHidingActionAllowedUseCase> {
-            onBlocking { invoke(any()) } doReturn true
+            on { invoke(any()) } doReturn true
         }
         val accountType = mock<AccountType> {
             on { isPaid } doReturn true
@@ -359,10 +359,10 @@ class HideSelectionMenuItemTest {
             on { levelDetail } doReturn accountLevelDetail
         }
         val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase> {
-            onBlocking { invoke() } doReturn flowOf(accountDetail)
+            on { invoke() } doReturn flowOf(accountDetail)
         }
         val getBusinessStatusUseCase = mock<GetBusinessStatusUseCase> {
-            onBlocking { invoke() } doReturn BusinessAccountStatus.Active
+            on { invoke() } doReturn BusinessAccountStatus.Active
         }
 
         val hideMenuItem = HideSelectionMenuItem(

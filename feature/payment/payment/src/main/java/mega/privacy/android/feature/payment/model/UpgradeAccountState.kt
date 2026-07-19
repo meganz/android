@@ -5,6 +5,10 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Upgrade Account state
@@ -17,6 +21,10 @@ import mega.privacy.android.domain.entity.agesignal.UserAgeComplianceStatus
  * @property subscriptionStatus current subscription status (VALID/INVALID/NONE), null if unknown
  * @property subscriptionRenewTime renewal timestamp of the current subscription in seconds, null if unknown
  * @property proExpirationTime expiration timestamp of the current Pro plan in seconds, null if unknown
+ * @property proPlanStartTime start timestamp of the current Pro plan in seconds (uq "ts" field), null if unknown.
+ * A plan that has both a start and an expiry time is a one-off (non-recurring) purchase.
+ * @property isCurrentPlanExpiring whether the current plan expires within the next 30 days, driving the
+ * "Expiring" badge on the current plan card
  * @property offerValidUntil expiry timestamp of the active discount offer in seconds, null when there is no
  * time-limited offer. Drives the offer countdown; currently always null until surfaced from the SDK/backend.
  * @constructor Create default Upgrade Account state
@@ -30,6 +38,8 @@ data class UpgradeAccountState(
     val subscriptionStatus: SubscriptionStatus? = null,
     val subscriptionRenewTime: Long? = null,
     val proExpirationTime: Long? = null,
+    val proPlanStartTime: Long? = null,
+    val isCurrentPlanExpiring: Boolean = false,
     val userAgeComplianceStatus: UserAgeComplianceStatus = UserAgeComplianceStatus.AdultVerified,
     val isSubscriptionFeatureAvailable: Boolean? = null,
     val offerValidUntil: Long? = null,
@@ -40,6 +50,40 @@ data class UpgradeAccountState(
      */
     val isCurrentSubscriptionRenewing: Boolean
         get() = subscriptionStatus == SubscriptionStatus.VALID
+
+    /**
+     * Period of a one-off (non-recurring) plan, derived from its start and expiry timestamps and
+     * expressed in the largest unit that fits its duration, or null when either timestamp is
+     * unavailable (i.e. not a one-off plan).
+     *
+     * Whole months are counted with calendar arithmetic (their length varies by month and leap year),
+     * mirroring how the backend derives the expiry by adding calendar months to the start; shorter
+     * periods use fixed-length days/hours/minutes.
+     */
+    val currentPlanPeriod: PlanPeriod?
+        get() {
+            val start = proPlanStartTime ?: return null
+            val end = proExpirationTime ?: return null
+            val duration = (end - start).seconds
+            val months = ChronoUnit.MONTHS.between(
+                Instant.ofEpochSecond(start).atZone(ZoneOffset.UTC),
+                Instant.ofEpochSecond(end).atZone(ZoneOffset.UTC),
+            )
+            return when {
+                months >= 1 -> PlanPeriod(months.toInt(), ChronoUnit.MONTHS)
+                duration.inWholeDays >= 1 -> PlanPeriod(
+                    duration.inWholeDays.toInt(),
+                    ChronoUnit.DAYS
+                )
+
+                duration.inWholeHours >= 1 -> PlanPeriod(
+                    duration.inWholeHours.toInt(),
+                    ChronoUnit.HOURS
+                )
+
+                else -> PlanPeriod(duration.inWholeMinutes.toInt(), ChronoUnit.MINUTES)
+            }
+        }
 
     /**
      * Is PRO_III plan

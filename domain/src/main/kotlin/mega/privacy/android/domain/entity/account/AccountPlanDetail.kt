@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.AccountType
  * @property accountType
  * @property isProPlan             True if the plan is Pro (including Flexi), Low-tier or Business, False if plan is VPN or PWM standalone/trial
  * @property expirationTime        Timestamp when the plan will expire
+ * @property startTime             Timestamp when the plan started (uq "ts" field), null if unknown
  * @property subscriptionId        String ID for active recurring subscription if there is one for this plan
  * @property featuresList          List of features available for this plan (e.g. "vpn", "pwm")
  * @property isFreeTrial           True if plan is a trial one
@@ -19,4 +20,5 @@ class AccountPlanDetail(
     val subscriptionId: String?,
     val featuresList: List<String>,
     val isFreeTrial: Boolean,
+    val startTime: Long? = null,
 )

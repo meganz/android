@@ -105,7 +105,7 @@ class GetUserFirstNameUseCaseTest {
     @Test
     fun `test that email prefix is returned when first name throws exception`() = runTest {
         contactsRepository.stub {
-            onBlocking { getCurrentUserFirstName(any()) }.thenAnswer {
+            on { getCurrentUserFirstName(any()) }.thenAnswer {
                 throw MegaException(1, "First Name threw exception")
             }
         }
@@ -118,7 +118,7 @@ class GetUserFirstNameUseCaseTest {
     fun `test that null is returned when first name throws exception and email is null`() =
         runTest {
             contactsRepository.stub {
-                onBlocking { getCurrentUserFirstName(any()) }.thenAnswer {
+                on { getCurrentUserFirstName(any()) }.thenAnswer {
                     throw MegaException(1, "First Name threw exception")
                 }
             }

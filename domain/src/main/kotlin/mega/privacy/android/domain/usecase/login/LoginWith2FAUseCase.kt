@@ -30,14 +30,14 @@ class LoginWith2FAUseCase @Inject constructor(
      * @param email Account email.
      * @param password Account password.
      * @param pin2FA 2FA code.
-     * @param disableChatApiUseCase [DisableChatApiUseCase].
+     * @param disableChatApi True if should call [DisableChatApiUseCase]
      * @return Flow of [LoginStatus]
      */
     operator fun invoke(
         email: String,
         password: String,
         pin2FA: String,
-        disableChatApiUseCase: DisableChatApiUseCase,
+        disableChatApi: Boolean
     ) = callbackFlow {
         runCatching {
             loginMutex.lock()
@@ -46,7 +46,7 @@ class LoginWith2FAUseCase @Inject constructor(
                     if (it !is LoginLoggedOutFromOtherLocation
                         && it !is LoginWrongMultiFactorAuth
                     ) {
-                        chatLogoutUseCase(disableChatApiUseCase)
+                        chatLogoutUseCase(disableChatApi)
                         resetChatSettingsUseCase()
                     }
                     close(it)

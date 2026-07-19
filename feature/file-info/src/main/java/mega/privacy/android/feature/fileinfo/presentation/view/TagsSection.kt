@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.chip.DefaultChipStyle
@@ -23,6 +24,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as sharedR
 
 /**
  * The tags section: a "Tags" header with an edit chevron (when [canEdit]) and a wrapped list of tag
@@ -55,8 +57,7 @@ internal fun TagsSection(
         ) {
             MegaText(
                 modifier = Modifier.weight(1f),
-                // TODO extract to a localized string resource
-                text = "Tags",
+                text = stringResource(sharedR.string.file_info_information_tags_label),
                 textColor = TextColor.Primary,
                 style = AppTheme.typography.bodyLarge,
             )

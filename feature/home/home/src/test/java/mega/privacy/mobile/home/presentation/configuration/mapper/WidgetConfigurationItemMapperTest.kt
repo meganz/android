@@ -94,6 +94,6 @@ class WidgetConfigurationItemMapperTest {
         on { this.defaultOrder } doReturn defaultOrder
         on { this.isConfigurable } doReturn isConfigurable
         on { this.isDraggable } doReturn isDraggable
-        onBlocking { getWidgetName() } doReturn name
+        on { getWidgetName() } doReturn name
     }
 }

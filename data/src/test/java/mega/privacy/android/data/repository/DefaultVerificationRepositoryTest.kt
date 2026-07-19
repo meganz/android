@@ -195,7 +195,7 @@ class DefaultVerificationRepositoryTest {
     fun `test that initial value is returned when monitoring verified phone number`() = runTest {
         val verifiedPhoneNumber = "123"
         megaApiGateway.stub {
-            onBlocking { getVerifiedPhoneNumber() }.thenReturn(verifiedPhoneNumber)
+            on { getVerifiedPhoneNumber() }.thenReturn(verifiedPhoneNumber)
         }
         underTest.monitorVerifiedPhoneNumber().test {
             assertThat(awaitItem()).isEqualTo(VerifiedPhoneNumber.PhoneNumber(verifiedPhoneNumber))
@@ -207,7 +207,7 @@ class DefaultVerificationRepositoryTest {
         val verifiedPhoneNumber = "123"
         val okResponse = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
         megaApiGateway.stub {
-            onBlocking { getVerifiedPhoneNumber() }.thenReturn(verifiedPhoneNumber, null)
+            on { getVerifiedPhoneNumber() }.thenReturn(verifiedPhoneNumber, null)
             on { resetSmsVerifiedPhoneNumber(any()) }.thenAnswer {
                 (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                     mock(),
@@ -230,7 +230,7 @@ class DefaultVerificationRepositoryTest {
             val verifiedPhoneNumber = "123"
             val okResponse = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_ENOENT) }
             megaApiGateway.stub {
-                onBlocking { getVerifiedPhoneNumber() }.thenReturn(verifiedPhoneNumber, null)
+                on { getVerifiedPhoneNumber() }.thenReturn(verifiedPhoneNumber, null)
                 on { resetSmsVerifiedPhoneNumber(any()) }.thenAnswer {
                     (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                         mock(),
@@ -257,7 +257,7 @@ class DefaultVerificationRepositoryTest {
             val verifiedPhoneNumber = "123"
             val okResponse = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
             megaApiGateway.stub {
-                onBlocking { getVerifiedPhoneNumber() }.thenReturn(null, verifiedPhoneNumber)
+                on { getVerifiedPhoneNumber() }.thenReturn(null, verifiedPhoneNumber)
                 on { verifyPhoneNumber(any(), any()) }.thenAnswer {
                     (it.arguments[1] as MegaRequestListenerInterface).onRequestFinish(
                         mock(),
@@ -387,7 +387,7 @@ class DefaultVerificationRepositoryTest {
     fun `test that latest verified phone number is supplied to each caller`() = runTest {
         val okResponse = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
         megaApiGateway.stub {
-            onBlocking { getVerifiedPhoneNumber() }.thenReturn("12345", null)
+            on { getVerifiedPhoneNumber() }.thenReturn("12345", null)
             on { resetSmsVerifiedPhoneNumber(any()) }.thenAnswer {
                 (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
                     mock(),

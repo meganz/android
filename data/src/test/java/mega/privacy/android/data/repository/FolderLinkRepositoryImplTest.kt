@@ -285,7 +285,7 @@ class FolderLinkRepositoryImplTest {
             whenever(megaSearchFilterMapper(NodeId(megaNode.handle))).thenReturn(filter)
             val child = mock<MegaNode>()
             megaApiFolderGateway.stub {
-                onBlocking { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
+                on { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
             }
             whenever(nodeMapper(child, fromFolderLink = true, requireSerializedData = false, offline = null, syncedNodeIds = null)).thenReturn(untypedNode)
             val id = 1L
@@ -313,8 +313,8 @@ class FolderLinkRepositoryImplTest {
                 on { duration }.thenReturn(0)
             }
             megaApiFolderGateway.stub {
-                onBlocking { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
-                onBlocking { authorizeNode(child.handle) }.thenReturn(child)
+                on { getChildren(filter, expectedOrder, token) }.thenReturn(listOf(child))
+                on { authorizeNode(child.handle) }.thenReturn(child)
             }
             whenever(
                 fileTypeInfoMapper(

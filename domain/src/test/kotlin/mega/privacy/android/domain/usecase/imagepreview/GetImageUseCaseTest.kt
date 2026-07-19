@@ -63,10 +63,10 @@ internal class GetImageUseCaseTest {
     @BeforeEach
     fun recreateMocks() {
         fetchThumbnailLambda = mock {
-            onBlocking { invoke() }.thenReturn(thumbnailFilePath)
+            on { invoke() }.thenReturn(thumbnailFilePath)
         }
         fetchPreviewLambda = mock {
-            onBlocking { invoke() }.thenReturn(previewFilePath)
+            on { invoke() }.thenReturn(previewFilePath)
         }
     }
 
@@ -79,6 +79,7 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that imageResult isVideo is true when node type is video`() = runTest {
         whenever(imageNode.type).thenReturn(mock<VideoFileTypeInfo>())
+        whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(false)
         underTest.invoke(imageNode, false, highPriority = false, resetDownloads = {}).test {
             assertThat(awaitItem().isVideo).isTrue()
             cancelAndIgnoreRemainingEvents()
@@ -88,6 +89,7 @@ internal class GetImageUseCaseTest {
     @Test
     internal fun `test that imageResult isVideo is false when node type is image`() = runTest {
         whenever(imageNode.type).thenReturn(mock<StaticImageFileTypeInfo>())
+        whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(false)
         underTest.invoke(imageNode, false, highPriority = false, resetDownloads = {}).test {
             assertThat(awaitItem().isVideo).isFalse()
             cancelAndIgnoreRemainingEvents()
@@ -207,7 +209,7 @@ internal class GetImageUseCaseTest {
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(true)
 
             val fetchFullImageLambda: (Boolean, () -> Unit) -> Flow<ImageProgress> = mock {
-                onBlocking { invoke(any(), any()) }.thenReturn(flow {
+                on { invoke(any(), any()) }.thenReturn(flow {
                     ImageProgress.Completed(
                         fullSizeFilePath
                     )
@@ -252,7 +254,7 @@ internal class GetImageUseCaseTest {
             whenever(isFullSizeRequiredUseCase(any(), any())).thenReturn(false)
 
             val fetchFullImageLambda: (Boolean, () -> Unit) -> Flow<ImageProgress> = mock {
-                onBlocking { invoke(any(), any()) }.thenReturn(flow {
+                on { invoke(any(), any()) }.thenReturn(flow {
                     ImageProgress.Completed(
                         fullSizeFilePath
                     )

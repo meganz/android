@@ -77,10 +77,10 @@ class MediaPlayerIntentMapper @Inject constructor(
     ): Intent {
         // VideoPlayerRevampPublicLink is enabled for all users (anonymous and authenticated) in
         // this version, so it is used as the single condition for opening the revamped player.
-        val useRevamp = runCatching {
+        val useVideoRevamp = runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerRevampPublicLink)
         }.getOrDefault(false)
-        val intent = getIntent(context, fileTypeInfo, useRevamp).apply {
+        val intent = getIntent(context, fileTypeInfo, useVideoRevamp).apply {
             putExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN, sortOrder)
             putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, name)
@@ -141,15 +141,16 @@ class MediaPlayerIntentMapper @Inject constructor(
         return intent
     }
 
-    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo, useRevamp: Boolean) = when {
-        fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
-            if (useRevamp) Intent(context, VideoPlayerActivity::class.java)
-            else Intent(context, LegacyVideoPlayerActivity::class.java)
+    private fun getIntent(context: Context, fileTypeInfo: FileTypeInfo, useVideoRevamp: Boolean) =
+        when {
+            fileTypeInfo.isSupported && fileTypeInfo is VideoFileTypeInfo ->
+                if (useVideoRevamp) Intent(context, VideoPlayerActivity::class.java)
+                else Intent(context, LegacyVideoPlayerActivity::class.java)
 
-        fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
-            Intent(context, AudioPlayerActivity::class.java)
+            fileTypeInfo.isSupported && fileTypeInfo is AudioFileTypeInfo ->
+                Intent(context, AudioPlayerActivity::class.java)
 
-        else -> Intent(Intent.ACTION_VIEW)
-    }
+            else -> Intent(Intent.ACTION_VIEW)
+        }
 }
 

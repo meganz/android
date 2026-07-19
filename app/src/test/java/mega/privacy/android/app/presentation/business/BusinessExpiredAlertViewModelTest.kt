@@ -36,7 +36,7 @@ class BusinessExpiredAlertViewModelTest {
             on { invoke() } doReturn AccountType.UNKNOWN
         }
         isMasterBusinessAccountUseCase.stub {
-            onBlocking { invoke() } doReturn false
+            on { invoke() } doReturn false
         }
         underTest = BusinessExpiredAlertViewModel(
             getAccountTypeUseCase = getAccountTypeUseCase,
@@ -79,7 +79,7 @@ class BusinessExpiredAlertViewModelTest {
         isMaster: Boolean,
     ) = runTest {
         isMasterBusinessAccountUseCase.stub {
-            onBlocking { invoke() } doReturn isMaster
+            on { invoke() } doReturn isMaster
         }
 
         underTest.uiState.test {
@@ -104,7 +104,7 @@ class BusinessExpiredAlertViewModelTest {
     fun `test that isMasterBusinessAccount is false when isMasterBusinessAccountUseCase throws`() =
         runTest {
             isMasterBusinessAccountUseCase.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException())
+                on { invoke() }.thenThrow(RuntimeException())
             }
 
             underTest.uiState.test {

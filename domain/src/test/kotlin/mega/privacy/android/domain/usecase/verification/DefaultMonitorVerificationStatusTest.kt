@@ -38,7 +38,7 @@ class DefaultMonitorVerificationStatusTest {
     }
 
     private val verificationRepository = mock<VerificationRepository> {
-        onBlocking { getSmsPermissions() }.thenReturn(
+        on { getSmsPermissions() }.thenReturn(
             emptyList()
         )
     }
@@ -129,7 +129,7 @@ class DefaultMonitorVerificationStatusTest {
         }
 
         verificationRepository.stub {
-            onBlocking { getSmsPermissions() }.thenReturn(listOf(Unblock))
+            on { getSmsPermissions() }.thenReturn(listOf(Unblock))
         }
 
         underTest().test {
@@ -151,7 +151,7 @@ class DefaultMonitorVerificationStatusTest {
             }
 
             verificationRepository.stub {
-                onBlocking { getSmsPermissions() }.thenReturn(emptyList())
+                on { getSmsPermissions() }.thenReturn(emptyList())
             }
 
             underTest().test {
@@ -172,7 +172,7 @@ class DefaultMonitorVerificationStatusTest {
             }
 
             verificationRepository.stub {
-                onBlocking { getSmsPermissions() }.thenReturn(listOf(OptInVerification))
+                on { getSmsPermissions() }.thenReturn(listOf(OptInVerification))
             }
 
             underTest().test {
@@ -193,7 +193,7 @@ class DefaultMonitorVerificationStatusTest {
             }
 
             verificationRepository.stub {
-                onBlocking { getSmsPermissions() }.thenReturn(emptyList())
+                on { getSmsPermissions() }.thenReturn(emptyList())
             }
 
             underTest().test {

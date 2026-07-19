@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.search
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -114,6 +115,7 @@ fun SearchScreen(
             }
         } else null,
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
                 availableActions = nodeActionState.availableActions,
                 visibleActions = nodeActionState.visibleActions,

@@ -60,7 +60,7 @@ class OnboardingPaymentInitialiserTest {
     fun `test that no event is emitted when shouldShowUpgradeAccountUseCase returns false`() =
         runTest {
             shouldShowUpgradeAccountUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             underTest("session", false)
@@ -76,13 +76,13 @@ class OnboardingPaymentInitialiserTest {
         val email = "test@example.com"
 
         shouldShowUpgradeAccountUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
+            on { invoke() }.thenReturn(true)
         }
         getCurrentUserEmail.stub {
-            onBlocking { invoke() }.thenReturn(email)
+            on { invoke() }.thenReturn(email)
         }
         getLastRegisteredEmailUseCase.stub {
-            onBlocking { invoke() }.thenReturn(email)
+            on { invoke() }.thenReturn(email)
         }
 
         underTest("session", false)
@@ -106,13 +106,13 @@ class OnboardingPaymentInitialiserTest {
             val lastRegisteredEmail = "registered@example.com"
 
             shouldShowUpgradeAccountUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             getCurrentUserEmail.stub {
-                onBlocking { invoke() }.thenReturn(currentEmail)
+                on { invoke() }.thenReturn(currentEmail)
             }
             getLastRegisteredEmailUseCase.stub {
-                onBlocking { invoke() }.thenReturn(lastRegisteredEmail)
+                on { invoke() }.thenReturn(lastRegisteredEmail)
             }
 
             underTest("session", false)
@@ -133,7 +133,7 @@ class OnboardingPaymentInitialiserTest {
     fun `test that no event is emitted when shouldShowUpgradeAccountUseCase throws exception`() =
         runTest {
             shouldShowUpgradeAccountUseCase.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+                on { invoke() }.thenThrow(RuntimeException("Test error"))
             }
 
             underTest("session", false)
@@ -147,10 +147,10 @@ class OnboardingPaymentInitialiserTest {
     @Test
     fun `test that no event is emitted when getCurrentUserEmail throws exception`() = runTest {
         shouldShowUpgradeAccountUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
+            on { invoke() }.thenReturn(true)
         }
         getCurrentUserEmail.stub {
-            onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+            on { invoke() }.thenThrow(RuntimeException("Test error"))
         }
 
         underTest("session", false)
@@ -165,13 +165,13 @@ class OnboardingPaymentInitialiserTest {
     fun `test that no event is emitted when getLastRegisteredEmailUseCase throws exception`() =
         runTest {
             shouldShowUpgradeAccountUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             getCurrentUserEmail.stub {
-                onBlocking { invoke() }.thenReturn("test@example.com")
+                on { invoke() }.thenReturn("test@example.com")
             }
             getLastRegisteredEmailUseCase.stub {
-                onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+                on { invoke() }.thenThrow(RuntimeException("Test error"))
             }
 
             underTest("session", false)

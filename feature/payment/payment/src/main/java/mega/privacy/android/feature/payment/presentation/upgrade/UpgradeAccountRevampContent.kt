@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.payment.presentation.upgrade
 
+import androidx.annotation.PluralsRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
@@ -34,6 +36,7 @@ import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
 import mega.privacy.android.shared.resources.R as sharedR
 import java.text.DateFormat
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
 
@@ -200,13 +203,23 @@ internal fun LazyListScope.currentPlanItem(
         uiState.currentSubscriptionPlan == AccountType.FREE
     ) return
     item("revamp_current_plan") {
-        val cycleText = stringResource(
-            if (uiState.subscriptionCycle == AccountSubscriptionCycle.MONTHLY) {
-                sharedR.string.subscription_revamp_current_plan_cycle_monthly
+        val period = uiState.currentPlanPeriod
+        val cycleText =
+            if (period != null && uiState.subscriptionCycle == AccountSubscriptionCycle.UNKNOWN) {
+                pluralStringResource(
+                    period.unit.toPlanPeriodPluralRes(),
+                    period.value,
+                    period.value
+                )
             } else {
-                sharedR.string.subscription_revamp_current_plan_cycle_yearly
+                stringResource(
+                    if (uiState.subscriptionCycle == AccountSubscriptionCycle.MONTHLY) {
+                        sharedR.string.subscription_revamp_current_plan_cycle_monthly
+                    } else {
+                        sharedR.string.subscription_revamp_current_plan_cycle_yearly
+                    }
+                )
             }
-        )
         val date = currentPlanDate(uiState, locale)
         val helpText = date?.let {
             if (uiState.isCurrentSubscriptionRenewing) {
@@ -221,6 +234,8 @@ internal fun LazyListScope.currentPlanItem(
                 planName = stringResource(uiState.currentSubscriptionPlan.toUIAccountType().textValue),
                 cycleText = cycleText,
                 helpText = helpText,
+                expiringLabel = stringResource(sharedR.string.subscription_revamp_current_plan_expiring_badge)
+                    .takeIf { uiState.isCurrentPlanExpiring },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
             if (uiState.isHighestPlan()) {
@@ -297,6 +312,18 @@ internal fun currentPlanDate(uiState: UpgradeAccountState, locale: Locale): Stri
         uiState.proExpirationTime
     } ?: return null
     return DateFormat.getDateInstance(DateFormat.LONG, locale).format(Date(timeInSeconds * 1000))
+}
+
+/**
+ * Maps a one-off plan period [ChronoUnit] to the plural string resource used to render its period on
+ * the current plan card (e.g. "12 months", "5 days").
+ */
+@PluralsRes
+private fun ChronoUnit.toPlanPeriodPluralRes(): Int = when (this) {
+    ChronoUnit.MONTHS -> sharedR.plurals.subscription_revamp_current_plan_period_months
+    ChronoUnit.DAYS -> sharedR.plurals.subscription_revamp_current_plan_period_days
+    ChronoUnit.HOURS -> sharedR.plurals.subscription_revamp_current_plan_period_hours
+    else -> sharedR.plurals.subscription_revamp_current_plan_period_minutes
 }
 
 /**

@@ -97,10 +97,10 @@ class SelectVideosForPlaylistViewModelTest {
     @BeforeEach
     fun setUp() {
         monitorNodeUpdatesUseCase.stub {
-            onBlocking { invoke() }.thenReturn(flow { awaitCancellation() })
+            on { invoke() }.thenReturn(flow { awaitCancellation() })
         }
         monitorSortCloudOrderUseCase.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flow {
                     emit(SortOrder.ORDER_DEFAULT_ASC)
                     awaitCancellation()
@@ -108,7 +108,7 @@ class SelectVideosForPlaylistViewModelTest {
             )
         }
         monitorViewTypeUseCase.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flow {
                     emit(ViewType.LIST)
                     awaitCancellation()

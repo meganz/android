@@ -32,7 +32,7 @@ class NodeBottomSheetActionMapperTest {
             on { menuAction }.thenReturn(getMenuAction(10))
             on { groupId }.thenReturn(expectedGroup)
             on { buildComposeControl(any()) }.thenReturn(mockBuildComposeControl)
-            onBlocking { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
+            on { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val actual = underTest(
             toolbarOptions = setOf(
@@ -56,7 +56,7 @@ class NodeBottomSheetActionMapperTest {
             on { menuAction }.thenReturn(getMenuAction(expectedOrderInGroup))
             on { groupId }.thenReturn(10)
             on { buildComposeControl(any()) }.thenReturn(mockBuildComposeControl)
-            onBlocking { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
+            on { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val actual = underTest(
             toolbarOptions = setOf(
@@ -79,7 +79,7 @@ class NodeBottomSheetActionMapperTest {
             on { menuAction }.thenReturn(getMenuAction(10))
             on { groupId }.thenReturn(10)
             on { buildComposeControl(any()) }.thenReturn(mockBuildComposeControl)
-            onBlocking { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
+            on { shouldDisplay(any(), any(), any(), any(), any()) }.thenReturn(true)
         }
         val selectedNode = mock<TypedFileNode>()
         underTest(

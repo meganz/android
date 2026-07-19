@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
+import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
 import mega.privacy.android.app.presentation.contact.AddContactsComposeActivity
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
@@ -50,6 +51,7 @@ class MegaNavigatorImplAddContactsForResultTest {
         getDomainNameUseCase = mock<GetDomainNameUseCase>(),
         mediaPlayerIntentMapper = mock<MediaPlayerIntentMapper>(),
         nav3VideoPlayerRouteLauncher = mock<Nav3VideoPlayerRouteLauncher>(),
+        nav3AudioPlayerRouteLauncher = mock<Nav3AudioPlayerRouteLauncher>(),
         getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         navigationQueue = mock<NavigationEventQueue>(),
         activityLifecycleHandler = mock<ActivityLifecycleHandler>(),

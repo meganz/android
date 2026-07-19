@@ -36,7 +36,7 @@ internal class MonitorLinksUseCaseTest {
 
     private val shareRepository = mock<ShareRepository>()
     private val mapNodeToPublicLinkUseCase = mock<MapNodeToPublicLinkUseCase> {
-        onBlocking { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
+        on { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
     }
     private val nodeRepository = mock<NodeRepository> {
         on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
@@ -65,7 +65,7 @@ internal class MonitorLinksUseCaseTest {
             on { monitorNodeUpdates() }.thenReturn(flow { awaitCancellation() })
         }
         mapNodeToPublicLinkUseCase.stub {
-            onBlocking { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
+            on { invoke(any(), anyOrNull()) }.thenReturn(mock<PublicLinkFolder>())
         }
     }
 
@@ -73,7 +73,7 @@ internal class MonitorLinksUseCaseTest {
     internal fun `test that folder link nodes are returned`() = runTest {
         val untypedNodes = listOf<FolderNode>(mock(), mock())
         shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(untypedNodes)
+            on { getPublicLinks(any()) }.thenReturn(untypedNodes)
         }
         whenever(monitorOfflineNodeUpdatesUseCase()).thenReturn(flowOf(emptyList()))
 
@@ -88,7 +88,7 @@ internal class MonitorLinksUseCaseTest {
         runTest {
             val untypedNodes = listOf<FolderNode>(mock(), mock())
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(
+                on { getPublicLinks(any()) }.thenReturn(
                     emptyList(),
                     untypedNodes
                 )
@@ -112,7 +112,7 @@ internal class MonitorLinksUseCaseTest {
         runTest {
             val untypedNodes = listOf<FolderNode>(mock(), mock())
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(
+                on { getPublicLinks(any()) }.thenReturn(
                     emptyList(),
                     untypedNodes
                 )
@@ -136,7 +136,7 @@ internal class MonitorLinksUseCaseTest {
             val nodeId = NodeId(42)
             val untypedNodes = listOf<FolderNode>(mock(), mock { on { id }.thenReturn(nodeId) })
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(
+                on { getPublicLinks(any()) }.thenReturn(
                     untypedNodes,
                     emptyList(),
                 )
@@ -169,7 +169,7 @@ internal class MonitorLinksUseCaseTest {
             val nodeId = NodeId(123L)
             val untypedNodes = listOf<FolderNode>(mock { on { id }.thenReturn(nodeId) })
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(
+                on { getPublicLinks(any()) }.thenReturn(
                     untypedNodes,
                     untypedNodes
                 )
@@ -205,7 +205,7 @@ internal class MonitorLinksUseCaseTest {
             val nodeId = NodeId(123L)
             val untypedNodes = listOf<FolderNode>(mock { on { id }.thenReturn(nodeId) })
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(
+                on { getPublicLinks(any()) }.thenReturn(
                     untypedNodes,
                     untypedNodes
                 )
@@ -243,7 +243,7 @@ internal class MonitorLinksUseCaseTest {
             val nodeId = NodeId(123L)
             val untypedNodes = listOf<FolderNode>(mock { on { id }.thenReturn(nodeId) })
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(untypedNodes)
+                on { getPublicLinks(any()) }.thenReturn(untypedNodes)
             }
             val nonMatchingOfflineNode = Offline(
                 id = 1,
@@ -274,7 +274,7 @@ internal class MonitorLinksUseCaseTest {
     internal fun `test that offline node updates are skipped when no public links exist`() =
         runTest {
             shareRepository.stub {
-                onBlocking { getPublicLinks(any()) }.thenReturn(emptyList())
+                on { getPublicLinks(any()) }.thenReturn(emptyList())
             }
             val offlineNode = Offline(
                 id = 1,
@@ -306,7 +306,7 @@ internal class MonitorLinksUseCaseTest {
         val nodeId = NodeId(123L)
         val untypedNodes = listOf<FolderNode>(mock { on { id }.thenReturn(nodeId) })
         shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(untypedNodes)
+            on { getPublicLinks(any()) }.thenReturn(untypedNodes)
         }
         val offlineNode = Offline(
             id = 1,
@@ -338,7 +338,7 @@ internal class MonitorLinksUseCaseTest {
         val nodeId = NodeId(123L)
         val untypedNodes = listOf<FolderNode>(mock { on { id }.thenReturn(nodeId) })
         shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(untypedNodes)
+            on { getPublicLinks(any()) }.thenReturn(untypedNodes)
         }
         val offlineNode = Offline(
             id = 1,
@@ -372,7 +372,7 @@ internal class MonitorLinksUseCaseTest {
         val nodeId = NodeId(123L)
         val untypedNodes = listOf<FolderNode>(mock { on { id }.thenReturn(nodeId) })
         shareRepository.stub {
-            onBlocking { getPublicLinks(any()) }.thenReturn(
+            on { getPublicLinks(any()) }.thenReturn(
                 untypedNodes,
                 untypedNodes,
                 untypedNodes

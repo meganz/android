@@ -61,7 +61,7 @@ class SubmitIssueUseCaseTest {
     @BeforeEach
     fun setUp() {
         getZippedLogsUseCase.stub {
-            onBlocking { invoke() }.thenReturn(compressedLogs)
+            on { invoke() }.thenReturn(compressedLogs)
         }
 
         supportRepository.stub {
@@ -69,13 +69,13 @@ class SubmitIssueUseCaseTest {
         }
 
         getAccountDetailsUseCase.stub {
-            onBlocking {
+            on {
                 invoke(false)
             }.thenReturn(userAccount)
         }
 
         createSupportTicketUseCase.stub {
-            onBlocking {
+            on {
                 invoke(
                     eq(supportTicket.description),
                     eq(supportTicket.logFileName),

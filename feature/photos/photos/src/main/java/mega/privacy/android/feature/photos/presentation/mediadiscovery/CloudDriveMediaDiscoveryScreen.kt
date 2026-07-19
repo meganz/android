@@ -211,6 +211,7 @@ fun CloudDriveMediaDiscoveryRoute(
         viewModel.clearSelectedPhotos()
     }
 
+    @SuppressLint("ComposeViewModelForwarding")
     CloudDriveMediaDiscoveryScreen(
         uiState = uiState,
         actionUiState = actionUiState,

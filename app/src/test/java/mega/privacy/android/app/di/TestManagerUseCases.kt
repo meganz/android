@@ -20,11 +20,11 @@ object TestManagerUseCases {
 
     @Provides
     fun provideHasBackupsChildren() = mock<HasBackupsChildren> {
-        onBlocking { invoke() }.thenReturn(false)
+        on { invoke() }.thenReturn(false)
     }
 
     @Provides
     fun provideMonitorUserAlertUpdates() = mock<MonitorUserAlertUpdates> {
-        onBlocking { invoke() }.thenReturn(flowOf(emptyList()))
+        on { invoke() }.thenReturn(flowOf(emptyList()))
     }
 }

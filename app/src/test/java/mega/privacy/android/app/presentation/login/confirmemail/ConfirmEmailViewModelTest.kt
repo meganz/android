@@ -52,7 +52,7 @@ class ConfirmEmailViewModelTest {
     private val saveLastRegisteredEmailUseCase: SaveLastRegisteredEmailUseCase = mock()
     private val monitorEphemeralCredentialsUseCase: MonitorEphemeralCredentialsUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
 
     private val resendSignUpLinkErrorMapper = ResendSignUpLinkErrorMapper()

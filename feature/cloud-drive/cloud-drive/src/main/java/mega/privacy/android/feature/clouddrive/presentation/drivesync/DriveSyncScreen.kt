@@ -218,6 +218,7 @@ internal fun DriveSyncScreen(
 
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
                 modifier = Modifier.testTag(DRIVE_SYNCS_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeOptionsActionUiState.availableActions,
@@ -263,6 +264,7 @@ internal fun DriveSyncScreen(
                         testTag = DRIVE_SYNCS_CLOUD_DRIVE_TAB_TAG
                     ),
                 ) { _, modifier ->
+                    @SuppressLint("ComposeViewModelForwarding")
                     CloudDriveContent(
                         isTabContent = true,
                         navigationHandler = navigationHandler,

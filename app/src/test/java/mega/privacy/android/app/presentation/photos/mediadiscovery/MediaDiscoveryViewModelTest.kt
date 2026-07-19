@@ -123,7 +123,7 @@ class MediaDiscoveryViewModelTest {
         }.thenReturn(flowOf(AccountDetail()))
     }
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }
@@ -183,7 +183,7 @@ class MediaDiscoveryViewModelTest {
     }
 
     private fun commonStub() {
-        getCameraSortOrder.stub { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) }
+        getCameraSortOrder.stub { on { invoke() }.thenReturn(SortOrder.ORDER_DEFAULT_ASC) }
         whenever(monitorConnectivityUseCase()).thenReturn(flow { awaitCancellation() })
         whenever(monitorMediaDiscoveryView()).thenReturn(flow { awaitCancellation() })
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(flow { awaitCancellation() })
@@ -191,10 +191,10 @@ class MediaDiscoveryViewModelTest {
         whenever(monitorStorageStateUseCase()).thenReturn(
             StorageState.Green.asHotFlow()
         )
-        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Green) }
+        getCurrentStorageStateUseCase.stub { on { invoke() }.thenReturn(StorageState.Green) }
 
         setAlmostFullStorageBannerClosingTimestampUseCase.stub {
-            onBlocking { invoke() }.thenReturn(Unit)
+            on { invoke() }.thenReturn(Unit)
         }
         whenever(monitorAlmostFullStorageBannerClosingTimestampUseCase()).thenReturn(flowOf(true))
         whenever(

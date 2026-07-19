@@ -25,7 +25,7 @@ class JoinMeetingAsGuestUseCase @Inject constructor(
      */
     suspend operator fun invoke(meetingLink: String, firstName: String, lastName: String) {
         openChatPreviewUseCase(meetingLink)
-        chatLogoutUseCase()
+        chatLogoutUseCase(disableChatApi = false)
         initGuestChatSessionUseCase(anonymousMode = false)
         createEphemeralAccountUseCase(firstName, lastName)
         openChatPreviewUseCase(meetingLink)

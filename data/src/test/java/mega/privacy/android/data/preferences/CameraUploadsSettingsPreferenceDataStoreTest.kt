@@ -84,7 +84,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the camera uploads enabled state is decrypted when retrieved`(
         isCameraUploadsEnabled: Boolean,
     ) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(isCameraUploadsEnabled.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(isCameraUploadsEnabled.toString()) }
 
         assertThat(underTest.isCameraUploadsEnabled()).isEqualTo(isCameraUploadsEnabled)
     }
@@ -104,7 +104,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the media uploads enabled state is decrypted when retrieved`(
         isMediaUploadsEnabled: Boolean,
     ) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(isMediaUploadsEnabled.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(isMediaUploadsEnabled.toString()) }
 
         assertThat(underTest.isMediaUploadsEnabled()).isEqualTo(isMediaUploadsEnabled)
     }
@@ -122,7 +122,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the camera uploads handle is decrypted when retrieved`() = runTest {
         val expected = 1L
 
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(expected.toString()) }
 
         assertThat(underTest.getCameraUploadsHandle()).isEqualTo(expected)
     }
@@ -140,7 +140,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the media uploads handle is decrypted when retrieved`() = runTest {
         val expected = 2L
 
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(expected.toString()) }
 
         assertThat(underTest.getMediaUploadsHandle()).isEqualTo(expected)
     }
@@ -158,7 +158,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the camera uploads local path is decrypted when retrieved`() = runTest {
         val expected = "/path/to/CU"
 
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(expected) }
 
         assertThat(underTest.getCameraUploadsLocalPath()).isEqualTo(expected)
     }
@@ -176,7 +176,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the media uploads local path is decrypted when retrieved`() = runTest {
         val expected = "/path/to/MU"
 
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(expected) }
 
         assertThat(underTest.getMediaUploadsLocalPath()).isEqualTo(expected)
     }
@@ -196,7 +196,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the location tags enabled state is decrypted when retrieved`(
         areLocationTagsEnabled: Boolean,
     ) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(areLocationTagsEnabled.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(areLocationTagsEnabled.toString()) }
 
         assertThat(underTest.areLocationTagsEnabled()).isEqualTo(areLocationTagsEnabled)
     }
@@ -214,7 +214,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the video quality is decrypted when retrieved`() = runTest {
         val expected = 1
 
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(expected.toString()) }
 
         assertThat(underTest.getUploadVideoQuality()).isEqualTo(expected)
     }
@@ -234,7 +234,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the upload file names kept state is decrypted when retrieved`(
         areUploadFileNamesKept: Boolean,
     ) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(areUploadFileNamesKept.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(areUploadFileNamesKept.toString()) }
 
         assertThat(underTest.areUploadFileNamesKept()).isEqualTo(areUploadFileNamesKept)
     }
@@ -254,7 +254,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the charging required for video compression state is decrypted when retrieved`(
         chargingRequired: Boolean,
     ) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(chargingRequired.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(chargingRequired.toString()) }
 
         assertThat(underTest.isChargingRequiredForVideoCompression()).isEqualTo(chargingRequired)
     }
@@ -274,7 +274,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
         runTest {
             val expected = 100
 
-            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+            decryptData.stub { on { invoke(any()) }.thenReturn(expected.toString()) }
 
             assertThat(underTest.getVideoCompressionSizeLimit()).isEqualTo(expected)
         }
@@ -294,7 +294,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
         runTest {
             val expected = 1
 
-            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(expected.toString()) }
+            decryptData.stub { on { invoke(any()) }.thenReturn(expected.toString()) }
 
             assertThat(underTest.getFileUploadOption()).isEqualTo(expected)
         }
@@ -312,7 +312,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     @ValueSource(booleans = [true, false])
     internal fun `test that the upload by wifi state is decrypted when retrieved`(shouldUploadByWifi: Boolean) =
         runTest {
-            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(shouldUploadByWifi.toString()) }
+            decryptData.stub { on { invoke(any()) }.thenReturn(shouldUploadByWifi.toString()) }
 
             assertThat(underTest.isUploadByWifi()).isEqualTo(shouldUploadByWifi)
         }
@@ -321,7 +321,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the charging required to upload content state is monitored and decrypted`() =
         runTest {
             val chargingRequired = true
-            decryptData.stub { onBlocking { invoke(any()) }.thenReturn(chargingRequired.toString()) }
+            decryptData.stub { on { invoke(any()) }.thenReturn(chargingRequired.toString()) }
 
             underTest.monitorIsChargingRequiredToUploadContent().test {
                 assertThat(awaitItem()).isEqualTo(chargingRequired)
@@ -332,7 +332,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     @Test
     internal fun `test that the charging required to upload content state is monitored and decrypted as null when it is not a boolean`() =
         runTest {
-            decryptData.stub { onBlocking { invoke(any()) }.thenReturn("12345") }
+            decryptData.stub { on { invoke(any()) }.thenReturn("12345") }
 
             underTest.monitorIsChargingRequiredToUploadContent().test {
                 assertThat(awaitItem()).isNull()
@@ -355,7 +355,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the charging required to upload content state is decrypted when retrieved`(
         chargingRequired: Boolean,
     ) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) }.thenReturn(chargingRequired.toString()) }
+        decryptData.stub { on { invoke(any()) }.thenReturn(chargingRequired.toString()) }
 
         assertThat(underTest.isChargingRequiredToUploadContent()).isEqualTo(chargingRequired)
     }
@@ -365,7 +365,7 @@ internal class CameraUploadsSettingsPreferenceDataStoreTest {
     internal fun `test that the camera uploads enabled state is decrypted when retrieved via flow`(
         isCameraUploadsEnabled: Boolean,
     ) = runTest {
-        decryptData.stub { onBlocking { invoke(any()) } doReturn isCameraUploadsEnabled.toString() }
+        decryptData.stub { on { invoke(any()) } doReturn isCameraUploadsEnabled.toString() }
 
         underTest.monitorCameraUploadsEnabled.test {
             assertThat(expectMostRecentItem()).isEqualTo(isCameraUploadsEnabled)

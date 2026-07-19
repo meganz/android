@@ -28,7 +28,7 @@ class GetAllFavoritesUseCaseTest {
 
     private val addNodeType = mock<AddNodeType> {
         val typedNode = mock<TypedFolderNode>()
-        onBlocking { invoke(any()) }.thenReturn(typedNode)
+        on { invoke(any()) }.thenReturn(typedNode)
     }
 
     private val nodeRepository = mock<NodeRepository> {

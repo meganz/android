@@ -282,6 +282,8 @@
     <string name="hidden_items">Hidden items</string>
     <!-- Label to indicate that is a Pro only feature -->
     <string name="general_pro_only_label">Pro only</string>
+    <!-- Compact badge text marking a feature as available only on Pro (paid) plans -->
+    <string name="general_pro_label">Pro</string>
     <!-- Label for the file info information screen tags field -->
     <string name="file_info_information_tags_label">Tags</string>
     <!-- label for tags page tag description -->
@@ -1739,14 +1741,12 @@
     <string name="campaign_name_cyber_monday">Cyber Monday deal: %1$d%% off</string>
     <!-- campaign name for Special offer -->
     <string name="campaign_name_special_offer">Special offer: %1$d%% off</string>
-    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months.
-    is a line break. -->
+    <!-- Label for first time period in months full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of months. is a line break. -->
     <plurals name="label_first_time_in_months_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first month</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d months</item>
     </plurals>
-    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years.
-    is a line break. -->
+    <!-- Label for first time period in years full format. [B] and [/B] are span tags for bold styling. %1$s is the discounted price, %2$d is the number of years. is a line break. -->
     <plurals name="label_first_time_in_years_full">
         <item quantity="one">[B]%1$s[/B]\nFor the first year</item>
         <item quantity="other">[B]%1$s[/B]\nFor the first %2$d years</item>
@@ -1783,11 +1783,9 @@
         <item quantity="one">Bonus expires in %1$d day</item>
         <item quantity="other">Bonus expires in %1$d days</item>
     </plurals>
-    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
-    is a line break before "For the first month". -->
+    <!-- Discount label for first month singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first month". -->
     <string name="label_first_time_in_months_full_singular">[B]%1$s[/B]\nFor the first month</string>
-    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price.
-    is a line break before "For the first year". -->
+    <!-- Discount label for first year singular. [B] and [/B] are span tags for bold styling. %1$s is the discounted price. is a line break before "For the first year". -->
     <string name="label_first_time_in_years_full_singular">[B]%1$s[/B]\nFor the first year</string>
     <!-- Hidden nodes description: control visibility feature with tag -->
     <string name="hidden_nodes_description_control_visibility_tag">Only you can reveal hidden files, either individually or by temporarily displaying hidden items from the [A]settings[/A].</string>
@@ -2896,8 +2894,6 @@
     <string name="video_player_subtitles_add_subtitles_button">Add subtitle</string>
     <!-- Campaign name format with a localised label from the SDK. %1$s is the localised campaign label provided by the API, %2$d is the discount percentage. -->
     <string name="campaign_name_with_discount">%1$s: %2$d%% off</string>
-    <!-- Aggregate campaign name shown in the header when several plans are discounted at once. %1$s is the campaign label (the localised label from the SDK, or the default "Special offer" when none is provided), %2$d is the highest discount percentage across the discounted plans. -->
-    <string name="campaign_name_with_discount_up_to">%1$s: Up to %2$d%% off</string>
     <!-- Title text shown on document scanner dialog to discard scan -->
     <string name="scan_dialog_discard_confirmation_title">Discard scan?</string>
     <!-- Body text shown on document scanner dialog to discard scan -->
@@ -3070,11 +3066,6 @@
         <item quantity="one">Anyone with this link can view and download your data</item>
         <item quantity="other">Anyone with these links can view and download your data</item>
     </plurals>
-    <!-- Share link revamp: body of the "Link access" info banner when the link and decryption key are shared separately -->
-    <plurals name="share_link_access_banner_description_with_key">
-        <item quantity="one">Anyone with this link and key can view and download your data</item>
-        <item quantity="other">Anyone with these links and keys can view and download your data</item>
-    </plurals>
     <!-- Share link revamp: snackbar shown after the link(s) are created and copied to the clipboard -->
     <plurals name="share_link_created_and_copied_snackbar">
         <item quantity="one">Link created and copied to your clipboard</item>
@@ -3126,8 +3117,6 @@
     <string name="subscription_revamp_price_per_month">%1$s/month</string>
     <!-- Total amount charged yearly on a plan card on the redesigned subscription page. Placeholder is the total price, e.g. "€29.94". -->
     <string name="subscription_revamp_charged_yearly">%1$s charged yearly</string>
-    <!-- Discounted yearly price shown on a discount offer card. Placeholder is the discounted yearly total, e.g. "€59.88". Shown as "€59.88/year" to avoid looking like a recurring price. -->
-    <string name="subscription_revamp_price_per_year">%1$s/year</string>
     <!-- Savings label shown on the Yearly option of the billing period selector on the redesigned subscription page -->
     <string name="subscription_revamp_save_label">Save up to 16%</string>
     <!-- Buy button label on a plan card on the redesigned subscription page. Placeholder is the plan name, e.g. "Pro I". -->
@@ -3142,10 +3131,6 @@
     <string name="document_scanner_capture_button">Capture</string>
     <!-- Share link revamp: title of the Link settings screen -->
     <string name="share_link_settings_title">Link settings</string>
-    <!-- Share link revamp: title of the row that toggles sharing the link without its decryption key -->
-    <string name="share_link_separate_key_title">Separate link and key</string>
-    <!-- Share link revamp: subtitle explaining the "Separate link and key" row -->
-    <string name="share_link_separate_key_subtitle">The link will not include the decryption key. Share the key through a different channel for extra security.</string>
     <!-- Share link revamp: title of the row that toggles setting an expiry date on the link -->
     <string name="share_link_set_expiry_date">Set expiry date</string>
     <!-- Share link revamp: subtitle explaining the "Set expiry date" row -->
@@ -3168,6 +3153,18 @@
     <string name="settings_preference_option_per_folder">Per folder</string>
     <!-- Settings: preference option that uses the same sorting order or view mode for all folders -->
     <string name="settings_preference_option_all_folders">Same for all</string>
+    <!-- Title of the screen where the user reviews the pages they have scanned -->
+    <string name="document_scanner_review_title">Review scan</string>
+    <!-- Message shown on the scan review screen when no pages have been captured yet -->
+    <string name="document_scanner_review_empty">No pages scanned yet</string>
+    <!-- Accessibility description for the button that deletes a scanned page from the review grid -->
+    <string name="document_scanner_review_delete_page">Delete page</string>
+    <!-- Label for the action that re-captures (retakes) a scanned page, replacing it in place -->
+    <string name="document_scanner_review_retake_page">Retake</string>
+    <!-- Hint shown under the current plan card when the user is already on the highest plan, pointing them to the web pricing page to upgrade. [A] and [/A] wrap the "pricing page" link. -->
+    <string name="subscription_revamp_current_plan_upgrade_on_web">Upgrade your current subscription on our [A]pricing page[/A]</string>
+    <!-- placeholder shown inside the add-tags text field, hinting that tags start with a # -->
+    <string name="add_tags_placeholder_label">#Add tags</string>
     <!-- Badge shown above the featured plan on the subscription page when a single discount offer is active -->
     <string name="subscription_offer_special_offer_badge">Special offer</string>
     <!-- Buy button label on the featured offer card. %1$s is the plan name (e.g. "Pro I"), %2$s is the discounted price (e.g. "€4.99/month"). -->
@@ -3183,26 +3180,6 @@
     <plurals name="subscription_offer_discount_period_year">
         <item quantity="one">Discount price for the first year</item>
         <item quantity="other">Discount price for the first %1$d years</item>
-    </plurals>
-    <!-- Discount explanation on a discounted YEARLY plan card when the offer lasts a number of months. %1$d is the number of months, %2$s is the discounted yearly price (e.g. "€59.88"), %3$s is the original yearly price (e.g. "€120"). -->
-    <plurals name="subscription_offer_billed_yearly_months">
-        <item quantity="one">Billed at %2$s for the first month, %3$s charged yearly after</item>
-        <item quantity="other">Billed at %2$s for the first %1$d months, %3$s charged yearly after</item>
-    </plurals>
-    <!-- Discount explanation on a discounted YEARLY plan card when the offer lasts a number of years. %1$d is the number of years, %2$s is the discounted yearly price (e.g. "€59.88"), %3$s is the original yearly price (e.g. "€120"). -->
-    <plurals name="subscription_offer_billed_yearly_years">
-        <item quantity="one">Billed at %2$s for the first year, %3$s charged yearly after</item>
-        <item quantity="other">Billed at %2$s for the first %1$d years, %3$s charged yearly after</item>
-    </plurals>
-    <!-- Discount explanation on a discounted MONTHLY plan card when the offer lasts a number of months. %1$d is the number of months, %2$s is the discounted per-month price (e.g. "€4.99/month"), %3$s is the original per-month price (e.g. "€9.99/month"). -->
-    <plurals name="subscription_offer_billed_monthly_months">
-        <item quantity="one">Billed at %2$s for the first month, %3$s after</item>
-        <item quantity="other">Billed at %2$s for the first %1$d months, %3$s after</item>
-    </plurals>
-    <!-- Discount explanation on a discounted MONTHLY plan card when the offer lasts a number of years. %1$d is the number of years, %2$s is the discounted per-month price (e.g. "€4.99/month"), %3$s is the original per-month price (e.g. "€9.99/month"). -->
-    <plurals name="subscription_offer_billed_monthly_years">
-        <item quantity="one">Billed at %2$s for the first year, %3$s after</item>
-        <item quantity="other">Billed at %2$s for the first %1$d years, %3$s after</item>
     </plurals>
     <!-- Days unit label on the offer countdown timer. %1$d is the number of days shown above the label. -->
     <plurals name="subscription_offer_countdown_days">
@@ -3239,23 +3216,35 @@
     <string name="home_do_more_with_mega_album_created_message">Album “%1$s” created</string>
     <!-- Snackbar action that opens the newly created album -->
     <string name="home_do_more_with_mega_see_album_action">See album</string>
+    <!-- Aggregate campaign name shown in the header when several plans are discounted at once. %1$s is the campaign label (the localised label from the SDK, or the default "Special offer" when none is provided), %2$d is the highest discount percentage across the discounted plans. -->
+    <string name="campaign_name_with_discount_up_to">%1$s: Up to %2$d%% off</string>
+    <!-- Discounted yearly price shown on a discount offer card. Placeholder is the discounted yearly total, e.g. "€59.88". Shown as "€59.88/year" to avoid looking like a recurring price. -->
+    <string name="subscription_revamp_price_per_year">%1$s/year</string>
+    <!-- Discount explanation on a discounted YEARLY plan card when the offer lasts a number of months. %1$d is the number of months, %2$s is the discounted yearly price (e.g. "€59.88"), %3$s is the original yearly price (e.g. "€120"). -->
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="one">Billed at %2$s for the first month, %3$s charged yearly after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d months, %3$s charged yearly after</item>
+    </plurals>
+    <!-- Discount explanation on a discounted YEARLY plan card when the offer lasts a number of years. %1$d is the number of years, %2$s is the discounted yearly price (e.g. "€59.88"), %3$s is the original yearly price (e.g. "€120"). -->
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="one">Billed at %2$s for the first year, %3$s charged yearly after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d years, %3$s charged yearly after</item>
+    </plurals>
+    <!-- Discount explanation on a discounted MONTHLY plan card when the offer lasts a number of months. %1$d is the number of months, %2$s is the discounted per-month price (e.g. "€4.99/month"), %3$s is the original per-month price (e.g. "€9.99/month"). -->
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="one">Billed at %2$s for the first month, %3$s after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d months, %3$s after</item>
+    </plurals>
+    <!-- Discount explanation on a discounted MONTHLY plan card when the offer lasts a number of years. %1$d is the number of years, %2$s is the discounted per-month price (e.g. "€4.99/month"), %3$s is the original per-month price (e.g. "€9.99/month"). -->
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="one">Billed at %2$s for the first year, %3$s after</item>
+        <item quantity="other">Billed at %2$s for the first %1$d years, %3$s after</item>
+    </plurals>
     <!-- Title shown in the Android system share sheet preview when sharing several links at once, telling the user how many links are being shared. %1$d is the number of links -->
     <plurals name="general_share_link_count_title">
         <item quantity="one">%1$d link</item>
         <item quantity="other">%1$d links</item>
     </plurals>
-    <!-- Title of the screen where the user reviews the pages they have scanned -->
-    <string name="document_scanner_review_title">Review scan</string>
-    <!-- Message shown on the scan review screen when no pages have been captured yet -->
-    <string name="document_scanner_review_empty">No pages scanned yet</string>
-    <!-- Accessibility description for the button that deletes a scanned page from the review grid -->
-    <string name="document_scanner_review_delete_page">Delete page</string>
-    <!-- Label for the action that re-captures (retakes) a scanned page, replacing it in place -->
-    <string name="document_scanner_review_retake_page">Retake</string>
-    <!-- Hint shown under the current plan card when the user is already on the highest plan, pointing them to the web pricing page to upgrade. [A] and [/A] wrap the "pricing page" link. -->
-    <string name="subscription_revamp_current_plan_upgrade_on_web">Upgrade your current subscription on our [A]pricing page[/A]</string>
-    <!-- placeholder shown inside the add-tags text field, hinting that tags start with a # -->
-    <string name="add_tags_placeholder_label">#Add tags</string>
     <!-- Title of the dialog shown when an invitation cannot be sent after scanning a contact QR code -->
     <string name="contacts_qr_invitation_not_sent_dialog_title">Invitation not sent</string>
     <!-- Body of the dialog shown when the scanned contact QR code belongs to someone who is already in the user's contact list. %1$s is the contact's email address. -->
@@ -3266,4 +3255,70 @@
     <string name="contacts_qr_scanner_not_ready_dialog_title">QR scanner not ready</string>
     <!-- Body of the dialog shown when the QR scanner is still downloading, prompting the user to retry shortly -->
     <string name="contacts_qr_scanner_not_ready_dialog_body">The QR scanner is still downloading. Try again in a few seconds.</string>
+    <!-- Share link revamp: title of the row that toggles sharing the link without its decryption key -->
+    <string name="share_link_separate_key_title">Separate link and key</string>
+    <!-- Share link revamp: subtitle explaining the "Separate link and key" row -->
+    <string name="share_link_separate_key_subtitle">The link will not include the decryption key. Share the key through a different channel for extra security.</string>
+    <!-- Share link revamp: body of the "Link access" info banner when the link and decryption key are shared separately -->
+    <plurals name="share_link_access_banner_description_with_key">
+        <item quantity="one">Anyone with this link and key can view and download your data</item>
+        <item quantity="other">Anyone with these links and keys can view and download your data</item>
+    </plurals>
+    <!-- Badge shown next to the "Current Plan" label when the plan expires within 30 days -->
+    <string name="subscription_revamp_current_plan_expiring_badge">Expiring</string>
+    <!-- Plan period label on the current plan card for a one-off (non-recurring) subscription. Placeholder is the number of months, e.g. "12 months". -->
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <!-- Plan period label on the current plan card for a short one-off (non-recurring) subscription. Placeholder is the number of days, e.g. "5 days". -->
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <!-- Plan period label on the current plan card for a short one-off (non-recurring) subscription. Placeholder is the number of hours, e.g. "3 hours". -->
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <!-- Plan period label on the current plan card for a short one-off (non-recurring) subscription. Placeholder is the number of minutes, e.g. "30 minutes". -->
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <!-- Label for the file info screen row showing the owner of an incoming shared folder -->
+    <string name="file_info_information_owner_label">Owner</string>
+    <!-- Label for the file info screen row showing the current user's access level to an incoming shared folder -->
+    <string name="file_info_information_permissions_label">Permissions</string>
+    <!-- Title of the file info screen section that shows a photo or video's location on a map -->
+    <string name="file_info_information_map_label">Map</string>
+    <!-- Message shown in the file info screen map section when a photo or video has no location data -->
+    <string name="file_info_information_no_location">No location information</string>
+    <!-- Label for the file info screen row showing the total size of the current versions of files in a folder -->
+    <string name="file_info_information_current_versions_label">Current versions</string>
+    <!-- Label for the file info screen row showing the total size of the previous versions of files in a folder -->
+    <string name="file_info_information_previous_versions_label">Previous versions</string>
+    <!-- Label for the file info screen row that opens the list of contacts a folder is shared with -->
+    <string name="file_info_information_shared_with_label">Shared with</string>
+    <!-- Subtitle tag shown in the file info screen for a folder the user shares with others -->
+    <string name="file_info_information_outgoing_share">Outgoing share</string>
+    <!-- Subtitle tag shown in the file info screen for a folder shared with the user by someone else -->
+    <string name="file_info_information_incoming_share">Incoming share</string>
+    <!-- Subtitle label shown in the file info screen indicating the node is a folder -->
+    <string name="file_info_information_type_folder">Folder</string>
+    <!-- Number of contacts a folder is shared with, shown in the file info screen. %d is the count -->
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="one">%d contact</item>
+        <item quantity="other">%d contacts</item>
+    </plurals>
+    <!-- Number of versioned files inside a folder, shown in the file info screen. %d is the count -->
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="one">%d versioned file</item>
+        <item quantity="other">%d versioned files</item>
+    </plurals>
+    <!-- Number of versions a file has, shown in the file info screen. %d is the count -->
+    <plurals name="file_info_information_num_versions">
+        <item quantity="one">%d version</item>
+        <item quantity="other">%d versions</item>
+    </plurals>
 </resources>

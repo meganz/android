@@ -57,6 +57,11 @@ interface LoginRepository {
     suspend fun chatLogout()
 
     /**
+     * Chat local log out.
+     */
+    suspend fun chatLocalLogout()
+
+    /**
      * Monitor Finish Activity
      *
      * @return Flow of Boolean.

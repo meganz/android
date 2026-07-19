@@ -23,7 +23,7 @@ class CameraSettingViewModelTest {
 
     private val enableGeoTaggingUseCase = mock<EnableGeoTaggingUseCase>()
     private val monitorGeoTaggingStatusUseCase = mock<MonitorGeoTaggingStatusUseCase>() {
-        onBlocking { invoke() }.thenReturn(flowOf(true))
+        on { invoke() }.thenReturn(flowOf(true))
     }
 
     @BeforeAll

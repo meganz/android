@@ -1,6 +1,6 @@
 package mega.privacy.android.app.presentation.transfers.model.image
 
-import androidx.core.net.toUri
+import android.net.Uri
 import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.mockStatic
+import org.mockito.kotlin.any
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -91,33 +93,37 @@ class ActiveTransferImageViewModelTest {
     @Test
     fun `test that addTransfer adds a new in progress download transfer to the UI state`() =
         runTest {
-            val file = File("file")
+            mockStatic(Uri::class.java).use { _ ->
+                val file = File("file")
+                val previewUri = mock<Uri>()
+                whenever(Uri.fromFile(file)).thenReturn(previewUri)
 
-            whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
-            whenever(getThumbnailUseCase(nodeHandle, true)).thenReturn(file)
+                whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
+                whenever(getThumbnailUseCase(nodeHandle, true)).thenReturn(file)
 
-            initTestClass()
+                initTestClass()
 
-            underTest.addTransfer(
-                InProgressTransfer.Download(
-                    uniqueId = uniqueId,
-                    tag = tag,
-                    totalBytes = 100,
-                    isPaused = false,
-                    fileName = name,
-                    speed = 100,
-                    state = TransferState.STATE_ACTIVE,
-                    priority = 1.toBigInteger(),
-                    progress = Progress(0.5f),
-                    nodeId = NodeId(nodeHandle),
+                underTest.addTransfer(
+                    InProgressTransfer.Download(
+                        uniqueId = uniqueId,
+                        tag = tag,
+                        totalBytes = 100,
+                        isPaused = false,
+                        fileName = name,
+                        speed = 100,
+                        state = TransferState.STATE_ACTIVE,
+                        priority = 1.toBigInteger(),
+                        progress = Progress(0.5f),
+                        nodeId = NodeId(nodeHandle),
+                    )
                 )
-            )
-            testScheduler.advanceUntilIdle()
+                testScheduler.advanceUntilIdle()
 
-            underTest.getUiStateFlow(tag).test {
-                (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
-                    assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
-                    assertThat(it.previewUri).isEqualTo(file.toUri())
+                underTest.getUiStateFlow(tag).test {
+                    (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
+                        assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
+                        assertThat(it.previewUri).isEqualTo(previewUri)
+                    }
                 }
             }
         }
@@ -125,54 +131,61 @@ class ActiveTransferImageViewModelTest {
     @Test
     fun `test that addTransfer invokes FileTypeIconMapper and does not invoke GetThumbnailUseCase when adds a new in progress upload`() =
         runTest {
-            initTestClass()
+            mockStatic(Uri::class.java).use { _ ->
+                whenever(Uri.parse(any())).thenReturn(mock<Uri>())
+                initTestClass()
 
-            underTest.addTransfer(
-                InProgressTransfer.Upload(
-                    uniqueId = uniqueId,
-                    tag = tag,
-                    totalBytes = 100,
-                    isPaused = false,
-                    fileName = name,
-                    speed = 100,
-                    state = TransferState.STATE_ACTIVE,
-                    priority = 1.toBigInteger(),
-                    progress = Progress(0.5f),
-                    localPath = localPath,
+                underTest.addTransfer(
+                    InProgressTransfer.Upload(
+                        uniqueId = uniqueId,
+                        tag = tag,
+                        totalBytes = 100,
+                        isPaused = false,
+                        fileName = name,
+                        speed = 100,
+                        state = TransferState.STATE_ACTIVE,
+                        priority = 1.toBigInteger(),
+                        progress = Progress(0.5f),
+                        localPath = localPath,
+                    )
                 )
-            )
 
-            verify(fileTypeIconMapper).invoke(extension)
-            verifyNoInteractions(getThumbnailUseCase)
+                verify(fileTypeIconMapper).invoke(extension)
+                verifyNoInteractions(getThumbnailUseCase)
+            }
         }
 
     @Test
     fun `test that addTransfer adds a new in progress upload transfer to the UI state`() =
         runTest {
-            whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
+            mockStatic(Uri::class.java).use { _ ->
+                val previewUri = mock<Uri>()
+                whenever(Uri.parse(localPath)).thenReturn(previewUri)
+                whenever(fileTypeIconMapper(extension)).thenReturn(fileTypeResId)
 
-            initTestClass()
+                initTestClass()
 
-            underTest.addTransfer(
-                InProgressTransfer.Upload(
-                    uniqueId = uniqueId,
-                    tag = tag,
-                    totalBytes = 100,
-                    isPaused = false,
-                    fileName = name,
-                    speed = 100,
-                    state = TransferState.STATE_ACTIVE,
-                    priority = 1.toBigInteger(),
-                    progress = Progress(0.5f),
-                    localPath = localPath,
+                underTest.addTransfer(
+                    InProgressTransfer.Upload(
+                        uniqueId = uniqueId,
+                        tag = tag,
+                        totalBytes = 100,
+                        isPaused = false,
+                        fileName = name,
+                        speed = 100,
+                        state = TransferState.STATE_ACTIVE,
+                        priority = 1.toBigInteger(),
+                        progress = Progress(0.5f),
+                        localPath = localPath,
+                    )
                 )
-            )
-            advanceUntilIdle()
+                advanceUntilIdle()
 
-            underTest.getUiStateFlow(tag).test {
-                (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
-                    assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
-                    assertThat(it.previewUri).isEqualTo(localPath.toUri())
+                underTest.getUiStateFlow(tag).test {
+                    (this.cancelAndConsumeRemainingEvents().last() as Event.Item).value.also {
+                        assertThat(it.fileTypeResId).isEqualTo(fileTypeResId)
+                        assertThat(it.previewUri).isEqualTo(previewUri)
+                    }
                 }
             }
         }

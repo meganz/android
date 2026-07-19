@@ -211,25 +211,25 @@ internal class ChatViewModelTest {
     private val getMyUserHandleUseCase: GetMyUserHandleUseCase = mock()
     private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
     private val monitorChatRoomUpdatesUseCase: MonitorChatRoomUpdatesUseCase = mock {
-        onBlocking { invoke(any()) } doReturn emptyFlow()
+        on { invoke(any()) } doReturn emptyFlow()
     }
     private val monitorUpdatePushNotificationSettingsUseCase
             : MonitorUpdatePushNotificationSettingsUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase = mock()
     private val monitorUserChatStatusByHandleUseCase: MonitorUserChatStatusByHandleUseCase = mock {
-        onBlocking { invoke(any()) } doReturn emptyFlow()
+        on { invoke(any()) } doReturn emptyFlow()
     }
     private val monitorParticipatingInACallInOtherChatsUseCase: MonitorParticipatingInACallInOtherChatsUseCase =
         mock {
-            onBlocking { invoke(any()) } doReturn emptyFlow()
+            on { invoke(any()) } doReturn emptyFlow()
         }
     private val monitorCallInChatUseCase: MonitorCallInChatUseCase = mock {
-        onBlocking { invoke(any()) } doReturn emptyFlow()
+        on { invoke(any()) } doReturn emptyFlow()
     }
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock {
-        onBlocking { invoke() } doReturn MutableStateFlow(
+        on { invoke() } doReturn MutableStateFlow(
             StorageStateEvent(
                 handle = 1L,
                 storageState = StorageState.Unknown
@@ -237,11 +237,11 @@ internal class ChatViewModelTest {
         )
     }
     private val monitorChatConnectionStateUseCase: MonitorChatConnectionStateUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val isChatStatusConnectedForCallUseCase: IsChatStatusConnectedForCallUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
 
     private val requestUserLastGreenUseCase = mock<RequestUserLastGreenUseCase>()
@@ -251,7 +251,7 @@ internal class ChatViewModelTest {
         }
     private val getScheduledMeetingByChatUseCase = mock<GetScheduledMeetingByChatUseCase>()
     private val monitorHasAnyContactUseCase = mock<MonitorHasAnyContactUseCase> {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val getCustomSubtitleListUseCase = mock<GetCustomSubtitleListUseCase>()
 

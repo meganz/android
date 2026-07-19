@@ -419,22 +419,22 @@ class LegacyFileLinkViewModelTest {
     @Test
     fun `test that openFile is triggered with correct pdf intent when updatePdfIntent is invoked`() =
         runTest {
-            val uriMock = Mockito.mockStatic(Uri::class.java)
-            val intent = mock<Intent>()
-            val contentUriMock: Uri = mock()
-            val path = "/path"
+            Mockito.mockStatic(Uri::class.java).use { _ ->
+                val intent = mock<Intent>()
+                val contentUriMock: Uri = mock()
+                val path = "/path"
 
 
-            whenever(httpServerIsRunning()).thenReturn(0)
-            whenever(getFileUrlByPublicLinkUseCase(any())).thenReturn(path)
-            whenever(Uri.parse(path)).thenReturn(contentUriMock)
+                whenever(httpServerIsRunning()).thenReturn(0)
+                whenever(getFileUrlByPublicLinkUseCase(any())).thenReturn(path)
+                whenever(Uri.parse(path)).thenReturn(contentUriMock)
 
-            underTest.updatePdfIntent(intent, "pdf")
-            underTest.state.test {
-                val res = awaitItem()
-                assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+                underTest.updatePdfIntent(intent, "pdf")
+                underTest.state.test {
+                    val res = awaitItem()
+                    assertThat(res.openFile).isInstanceOf(triggered(intent).javaClass)
+                }
             }
-            uriMock.close()
         }
 
     @Test

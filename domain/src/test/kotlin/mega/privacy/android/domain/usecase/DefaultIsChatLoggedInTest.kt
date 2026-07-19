@@ -26,7 +26,7 @@ class DefaultIsChatLoggedInTest {
     @Test
     fun `test that default initial value is true`() = runTest {
         chatRepository.stub {
-            onBlocking { notifyChatLogout() }.thenReturn(emptyFlow())
+            on { notifyChatLogout() }.thenReturn(emptyFlow())
         }
         underTest().test {
             assertThat(awaitItem()).isTrue()
@@ -37,7 +37,7 @@ class DefaultIsChatLoggedInTest {
     @Test
     fun `test that the logout notification returns false`() = runTest {
         chatRepository.stub {
-            onBlocking { notifyChatLogout() }.thenReturn(flowOf(true))
+            on { notifyChatLogout() }.thenReturn(flowOf(true))
         }
         underTest().test {
             assertThat(awaitItem()).isTrue()

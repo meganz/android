@@ -3,6 +3,7 @@ package mega.privacy.android.feature.sharelink.presentation
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -227,6 +228,50 @@ class ShareLinkViewModelTest {
             whenever(separateKeyCache.monitor(NODE_HANDLE)).thenReturn(flowOf(true))
 
             underTest.uiState.test {
+                val data = awaitData { it.isKeySeparate }
+                assertThat(data.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
+                assertThat(data.key).isEqualTo("key123")
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that the link and key are not separate by default`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { name } doReturn "report.pdf"
+                on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+                on { type } doReturn PdfFileTypeInfo
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(splitLinkAndKeyUseCase("https://mega.nz/file/abc#key123"))
+                .thenReturn(LinkAndKey("https://mega.nz/file/abc", "key123"))
+
+            underTest.uiState.test {
+                assertThat(awaitData().isKeySeparate).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that enabling the separate-key preference mid-session marks the link and key as separate`() =
+        runTest {
+            val node = mock<TypedFileNode> {
+                on { name } doReturn "report.pdf"
+                on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+                on { type } doReturn PdfFileTypeInfo
+            }
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(splitLinkAndKeyUseCase("https://mega.nz/file/abc#key123"))
+                .thenReturn(LinkAndKey("https://mega.nz/file/abc", "key123"))
+            val separateKeyFlow = MutableStateFlow(false)
+            whenever(separateKeyCache.monitor(NODE_HANDLE)).thenReturn(separateKeyFlow)
+
+            underTest.uiState.test {
+                assertThat(awaitData().isKeySeparate).isFalse()
+
+                separateKeyFlow.value = true
+
                 val data = awaitData { it.isKeySeparate }
                 assertThat(data.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
                 assertThat(data.key).isEqualTo("key123")
