@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -38,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.banner.TopWarningBanner
@@ -46,6 +49,7 @@ import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaSearchTopAppBar
+import mega.android.core.ui.extensions.showAutoDurationSnackbar
 import mega.android.core.ui.modifiers.applyScrollToHideFabBehavior
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -54,9 +58,16 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
 import mega.privacy.android.feature.contact.add.model.PhoneContactsSection
+import mega.privacy.android.feature.contact.add.model.ScannedContactDialog
+import mega.privacy.android.feature.contact.add.model.ScannedContactInviteFeedback
 import mega.privacy.android.feature.contact.components.ContactListLoadingView
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.contact.components.ContactItemView
+import mega.privacy.android.shared.contact.components.ScannedContactAlreadyAddedDialog
+import mega.privacy.android.shared.contact.components.ScannedContactFoundDialog
+import mega.privacy.android.shared.contact.components.ScannedContactInvalidCodeDialog
+import mega.privacy.android.shared.contact.components.ScannerModuleNotInstalledDialog
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import mega.privacy.android.shared.resources.R as sharedR
@@ -72,13 +83,25 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param state
  * @param onSearchQueryChange invoked with the new query text, or null when the search is cleared.
  * @param onConfirm invoked with the handles of the selected MEGA contacts and the emails of the
- * selected phone contacts.
+ * selected phone contacts plus any manually entered emails.
  * @param onBack invoked when the user navigates back without confirming.
  * @param modifier
  * @param onReadContactsPermissionGranted invoked once READ_CONTACTS is granted (pre-picker path).
  * @param onContactsPicked invoked with the session Uri returned by the OS picker (picker path).
  * @param onPhoneContactsPickedConsumed invoked once the picked-contacts event has been auto-selected.
+ * @param onScanQrClick invoked when the scan-QR toolbar action is clicked.
+ * @param onScannedContactDialogDismissed invoked when the shown scanned-contact dialog is dismissed.
+ * @param onInviteScannedContactConfirmed invoked when the invite action of the scanned-contact
+ * found dialog is confirmed.
+ * @param onScannedContactSelectConsumed invoked once the scanned contact has been auto-selected.
+ * @param onScannedContactInviteConsumed invoked once the invite feedback has been surfaced.
+ * @param allowManualEmailEntry whether to surface the free-text email entry (share flow only).
+ * @param isManualEmailValid returns whether a typed email is syntactically valid.
+ * @param megaContactHandleForEmail resolves a typed email to the handle of a loaded MEGA contact
+ * (case-insensitively), or null when no loaded contact has that email.
  * @param initialSelectedHandles handles to pre-select on first composition.
+ * @param initialSelectedManualEmails manual emails to pre-select on first composition. Primarily a
+ * hook for previews/tests.
  * @param titleRes toolbar title shown while nothing is selected; defaults to "Send contacts".
  * @param startPhoneSectionExpanded initial expanded state of the phone-contacts section; defaults
  * to collapsed. Primarily a hook for previews/tests.
@@ -88,17 +111,29 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun AddContactsScreen(
     state: AddContactUiState,
     onSearchQueryChange: (String?) -> Unit,
-    onConfirm: (selectedHandles: Set<Long>, selectedPhoneEmails: Set<String>) -> Unit,
+    onConfirm: (selectedHandles: Set<Long>, selectedEmails: Set<String>) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     onReadContactsPermissionGranted: () -> Unit = {},
     onContactsPicked: (UriPath) -> Unit = {},
     onPhoneContactsPickedConsumed: () -> Unit = {},
+    onScanQrClick: () -> Unit = {},
+    onScannedContactDialogDismissed: () -> Unit = {},
+    onInviteScannedContactConfirmed: () -> Unit = {},
+    onScannedContactSelectConsumed: () -> Unit = {},
+    onScannedContactInviteConsumed: () -> Unit = {},
+    allowManualEmailEntry: Boolean = false,
+    isManualEmailValid: (String) -> Boolean = { false },
+    megaContactHandleForEmail: (String) -> Long? = { null },
     initialSelectedHandles: Set<Long> = emptySet(),
+    initialSelectedManualEmails: Set<String> = emptySet(),
     @StringRes titleRes: Int = sharedR.string.send_contacts,
     startPhoneSectionExpanded: Boolean = false,
 ) {
-    val selectionState = rememberContactSelectionState(initialSelectedHandles)
+    val selectionState = rememberContactSelectionState(
+        initialSelectedHandles = initialSelectedHandles,
+        initialSelectedManualEmails = initialSelectedManualEmails,
+    )
     var searchActive by rememberSaveable { mutableStateOf(false) }
     var searchText by rememberSaveable { mutableStateOf("") }
     var phoneSectionExpanded by rememberSaveable { mutableStateOf(startPhoneSectionExpanded) }
@@ -117,6 +152,17 @@ internal fun AddContactsScreen(
         ) { addedEmails ->
             selectionState.selectPhoneEmails(addedEmails)
         }
+        EventEffect(
+            event = state.scannedContactSelectEvent,
+            onConsumed = onScannedContactSelectConsumed,
+        ) { handle ->
+            selectionState.selectHandle(handle)
+        }
+        ScannedContactDialogs(
+            dialog = state.scannedContactDialog,
+            onInviteConfirmed = onInviteScannedContactConfirmed,
+            onDismiss = onScannedContactDialogDismissed,
+        )
     }
 
     LaunchedEffect(searchActive) {
@@ -151,6 +197,19 @@ internal fun AddContactsScreen(
                 },
                 onSearchingModeChanged = { searchActive = it },
                 searchPlaceholder = stringResource(sharedR.string.contacts_search_hint),
+                trailingIcons = {
+                    IconButton(
+                        modifier = Modifier.testTag(ADD_CONTACTS_SCAN_QR_TAG),
+                        onClick = onScanQrClick,
+                    ) {
+                        MegaIcon(
+                            modifier = Modifier.size(24.dp),
+                            painter = painterResource(iconPackR.drawable.ic_qr_scan_medium_thin_outline),
+                            contentDescription = stringResource(sharedR.string.contacts_qr_scan_action),
+                            tint = IconColor.Primary,
+                        )
+                    }
+                },
             )
         },
         floatingActionButton = {
@@ -162,7 +221,7 @@ internal fun AddContactsScreen(
                     onClick = {
                         onConfirm(
                             selectionState.selectedHandles,
-                            selectionState.selectedPhoneEmails,
+                            selectionState.selectedPhoneEmails + selectionState.selectedManualEmails,
                         )
                     },
                     painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.SendHorizontal),
@@ -170,6 +229,22 @@ internal fun AddContactsScreen(
             }
         },
     ) { padding ->
+        if (state is AddContactUiState.Data) {
+            val snackbarHostState = LocalSnackBarHostState.current
+            val inviteSentMessage = stringResource(sharedR.string.contacts_invites_sent)
+            val inviteFailedMessage = stringResource(sharedR.string.general_text_error)
+            EventEffect(
+                event = state.scannedContactInviteEvent,
+                onConsumed = onScannedContactInviteConsumed,
+            ) { feedback ->
+                snackbarHostState?.showAutoDurationSnackbar(
+                    when (feedback) {
+                        ScannedContactInviteFeedback.Sent -> inviteSentMessage
+                        ScannedContactInviteFeedback.Failed -> inviteFailedMessage
+                    }
+                )
+            }
+        }
         when (state) {
             AddContactUiState.Loading -> ContactListLoadingView(
                 modifier = Modifier
@@ -191,6 +266,21 @@ internal fun AddContactsScreen(
                                 .testTag(ADD_CONTACTS_USER_LIMIT_WARNING_TAG),
                             body = stringResource(sharedR.string.meetings_add_participants_user_limit_warning),
                             showCancelButton = false,
+                        )
+                    }
+                    if (allowManualEmailEntry) {
+                        ManualEmailEntrySection(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                            manualEmails = selectionState.selectedManualEmails,
+                            onSubmitEmail = { email ->
+                                submitManualEmail(
+                                    email = email,
+                                    selectionState = selectionState,
+                                    isManualEmailValid = isManualEmailValid,
+                                    megaContactHandleForEmail = megaContactHandleForEmail,
+                                )
+                            },
+                            onRemoveEmail = selectionState::removeManualEmail,
                         )
                     }
                     val phoneSection = state.phoneContactsSection
@@ -255,6 +345,70 @@ internal fun AddContactsScreen(
                 }
             }
         }
+    }
+}
+
+/**
+ * Resolve a typed email into a selection update: auto-select the matching loaded MEGA contact when
+ * there is one, otherwise keep it as a free-text manual entry, rejecting invalid emails and emails
+ * that are already part of the selection in any form.
+ */
+private fun submitManualEmail(
+    email: String,
+    selectionState: ContactSelectionState,
+    isManualEmailValid: (String) -> Boolean,
+    megaContactHandleForEmail: (String) -> Long?,
+): ManualEmailSubmitResult {
+    if (!isManualEmailValid(email)) return ManualEmailSubmitResult.InvalidEmail
+    val matchedHandle = megaContactHandleForEmail(email)
+    return when {
+        matchedHandle != null && matchedHandle in selectionState.selectedHandles ->
+            ManualEmailSubmitResult.AlreadyAdded
+
+        matchedHandle != null -> {
+            selectionState.selectHandle(matchedHandle)
+            ManualEmailSubmitResult.Accepted
+        }
+
+        selectionState.isEmailSelected(email) -> ManualEmailSubmitResult.AlreadyAdded
+
+        else -> {
+            selectionState.selectManualEmail(email)
+            ManualEmailSubmitResult.Accepted
+        }
+    }
+}
+
+@Composable
+private fun ScannedContactDialogs(
+    dialog: ScannedContactDialog?,
+    onInviteConfirmed: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    when (dialog) {
+        null -> Unit
+
+        ScannedContactDialog.InvalidCode ->
+            ScannedContactInvalidCodeDialog(onDismiss = onDismiss)
+
+        ScannedContactDialog.ScannerNotInstalled ->
+            ScannerModuleNotInstalledDialog(onDismiss = onDismiss)
+
+        is ScannedContactDialog.AlreadyAdded ->
+            ScannedContactAlreadyAddedDialog(
+                contactEmail = dialog.email,
+                onDismiss = onDismiss,
+            )
+
+        is ScannedContactDialog.Found ->
+            ScannedContactFoundDialog(
+                contactName = dialog.contactName,
+                contactEmail = dialog.email,
+                avatar = dialog.avatar,
+                confirmActionText = stringResource(sharedR.string.invite_contacts_action_label),
+                onConfirm = onInviteConfirmed,
+                onDismiss = onDismiss,
+            )
     }
 }
 
@@ -407,6 +561,7 @@ internal const val ADD_CONTACTS_LIST_TAG = "add_contacts_screen:list"
 internal const val ADD_CONTACTS_EMPTY_TAG = "add_contacts_screen:empty"
 internal const val ADD_CONTACTS_FAB_TAG = "add_contacts_screen:fab"
 internal const val ADD_CONTACTS_USER_LIMIT_WARNING_TAG = "add_contacts_screen:user_limit_warning"
+internal const val ADD_CONTACTS_SCAN_QR_TAG = "add_contacts_screen:scan_qr"
 internal const val PHONE_SECTION_HEADER_TAG = "add_contacts_screen:phone_section_header"
 internal const val PHONE_SECTION_CHEVRON_TAG = "add_contacts_screen:phone_section_chevron"
 internal const val PHONE_SECTION_ALLOW_ACCESS_TAG = "add_contacts_screen:phone_section_allow_access"
@@ -427,6 +582,9 @@ private class AddContactUiStateProvider : PreviewParameterProvider<AddContactUiS
             showUserLimitWarning = false,
             phoneContactsSection = PhoneContactsSection.Hidden,
             phoneContactsPickedEvent = de.palm.composestateevents.consumed(),
+            scannedContactDialog = null,
+            scannedContactSelectEvent = de.palm.composestateevents.consumed(),
+            scannedContactInviteEvent = de.palm.composestateevents.consumed(),
         ),
         AddContactUiState.Data(
             contacts = listOf(
@@ -453,6 +611,9 @@ private class AddContactUiStateProvider : PreviewParameterProvider<AddContactUiS
             showUserLimitWarning = false,
             phoneContactsSection = PhoneContactsSection.Hidden,
             phoneContactsPickedEvent = de.palm.composestateevents.consumed(),
+            scannedContactDialog = null,
+            scannedContactSelectEvent = de.palm.composestateevents.consumed(),
+            scannedContactInviteEvent = de.palm.composestateevents.consumed(),
         ),
     )
 }

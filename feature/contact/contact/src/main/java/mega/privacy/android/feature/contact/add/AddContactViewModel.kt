@@ -22,21 +22,35 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.LocalContact
+import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.call.MonitorParticipantsLimitWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsFromUriUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
+import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.environment.GetDeviceSdkVersionUseCase
+import mega.privacy.android.domain.usecase.qrcode.ParseScannedContactLinkHandleUseCase
+import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
 import mega.privacy.android.feature.contact.add.model.PhoneContactsSection
+import mega.privacy.android.feature.contact.add.model.ScannedContactDialog
+import mega.privacy.android.feature.contact.add.model.ScannedContactInviteFeedback
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
+import mega.privacy.android.shared.contact.mapper.ScannedContactAvatarMapper
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import timber.log.Timber
@@ -66,6 +80,12 @@ import timber.log.Timber
  * @property getLocalContactsUseCase
  * @property getLocalContactsFromUriUseCase
  * @property contactItemUiStateMapper
+ * @property scannerHandler
+ * @property parseScannedContactLinkHandleUseCase
+ * @property queryScannedContactLinkUseCase
+ * @property inviteContactWithHandleUseCase
+ * @property scannedContactAvatarMapper
+ * @property isEmailValidUseCase
  */
 @HiltViewModel(assistedFactory = AddContactViewModel.Factory::class)
 class AddContactViewModel @AssistedInject constructor(
@@ -79,6 +99,12 @@ class AddContactViewModel @AssistedInject constructor(
     private val getLocalContactsUseCase: GetLocalContactsUseCase,
     private val getLocalContactsFromUriUseCase: GetLocalContactsFromUriUseCase,
     private val contactItemUiStateMapper: ContactItemUiStateMapper,
+    private val scannerHandler: ScannerHandler,
+    private val parseScannedContactLinkHandleUseCase: ParseScannedContactLinkHandleUseCase,
+    private val queryScannedContactLinkUseCase: QueryScannedContactLinkUseCase,
+    private val inviteContactWithHandleUseCase: InviteContactWithHandleUseCase,
+    private val scannedContactAvatarMapper: ScannedContactAvatarMapper,
+    private val isEmailValidUseCase: IsEmailValidUseCase,
 ) : ViewModel() {
 
     /**
@@ -114,6 +140,14 @@ class AddContactViewModel @AssistedInject constructor(
 
     private val pickedEvents =
         MutableStateFlow<StateEventWithContent<List<String>>>(consumed())
+
+    private val scanState = MutableStateFlow(
+        ScanState(
+            dialog = null,
+            selectContactEvent = consumed(),
+            inviteEvent = consumed(),
+        )
+    )
 
     private fun contactsSource(): Flow<List<ContactItem>> =
         chatId?.let { getContactsToAddToChatUseCase(it) } ?: getContactsUseCase()
@@ -151,8 +185,8 @@ class AddContactViewModel @AssistedInject constructor(
             },
             userLimitWarningSource(),
             phoneContactsSource(),
-            pickedEvents,
-        ) { query, indexed: List<IndexedContact>, showUserLimitWarning, phoneSection, pickedEvent ->
+            combine(pickedEvents, scanState, ::Pair),
+        ) { query, indexed: List<IndexedContact>, showUserLimitWarning, phoneSection, (pickedEvent, scan) ->
             val visible =
                 if (query.isNullOrBlank()) indexed else indexed.filter { it.matches(query) }
             AddContactUiState.Data(
@@ -161,6 +195,9 @@ class AddContactViewModel @AssistedInject constructor(
                 showUserLimitWarning = showUserLimitWarning,
                 phoneContactsSection = phoneSection.filteredBy(query),
                 phoneContactsPickedEvent = pickedEvent,
+                scannedContactDialog = scan.dialog,
+                scannedContactSelectEvent = scan.selectContactEvent,
+                scannedContactInviteEvent = scan.inviteEvent,
             )
         }.catch { Timber.e(it) }
             .asUiStateFlow(viewModelScope, AddContactUiState.Loading)
@@ -228,6 +265,131 @@ class AddContactViewModel @AssistedInject constructor(
     }
 
     /**
+     * Launch the barcode scanner and resolve the scanned QR code into a picker outcome: auto-select
+     * the scanned user when they are already a selectable contact, or surface the appropriate
+     * dialog otherwise.
+     */
+    fun onScanQrClicked() {
+        viewModelScope.launch {
+            runCatching { scannerHandler.scanBarcode() }
+                .onSuccess { result ->
+                    when (result) {
+                        is BarcodeScanResult.Success -> handleScannedCode(result.rawValue)
+                        BarcodeScanResult.Cancelled -> Unit
+                    }
+                }
+                .onFailure { error ->
+                    Timber.e(error, "Failed to scan QR code")
+                    if (error is BarcodeScannerModuleIsNotInstalled) {
+                        showScannedContactDialog(ScannedContactDialog.ScannerNotInstalled)
+                    }
+                }
+        }
+    }
+
+    private suspend fun handleScannedCode(rawValue: String?) {
+        val scannedHandle = rawValue?.let { parseScannedContactLinkHandleUseCase(it) }
+        if (scannedHandle == null) {
+            showScannedContactDialog(ScannedContactDialog.InvalidCode)
+            return
+        }
+        runCatching { queryScannedContactLinkUseCase(scannedHandle) }
+            .onSuccess { result ->
+                when (result.qrCodeQueryResult) {
+                    QRCodeQueryResults.CONTACT_QUERY_OK -> handleQueriedContact(result)
+
+                    QRCodeQueryResults.CONTACT_QUERY_EEXIST ->
+                        showScannedContactDialog(ScannedContactDialog.AlreadyAdded(result.email))
+
+                    QRCodeQueryResults.CONTACT_QUERY_DEFAULT ->
+                        showScannedContactDialog(ScannedContactDialog.InvalidCode)
+                }
+            }
+            .onFailure {
+                Timber.e(it, "Failed to query scanned contact link")
+                showScannedContactDialog(ScannedContactDialog.InvalidCode)
+            }
+    }
+
+    private fun handleQueriedContact(result: ScannedContactLinkResult) {
+        when {
+            !result.isContact -> showScannedContactDialog(
+                ScannedContactDialog.Found(
+                    contactName = result.contactName,
+                    email = result.email,
+                    handle = result.handle,
+                    avatar = scannedContactAvatarMapper(result),
+                )
+            )
+
+            result.handle in handleToEmail ->
+                scanState.update { it.copy(selectContactEvent = triggered(result.handle)) }
+
+            // Already a contact but not selectable here (e.g. already a chat participant), so a
+            // silent auto-select is impossible; give feedback instead.
+            else -> showScannedContactDialog(ScannedContactDialog.AlreadyAdded(result.email))
+        }
+    }
+
+    /**
+     * Invite the scanned contact currently shown in the [ScannedContactDialog.Found] dialog.
+     */
+    fun onInviteScannedContactConfirmed() {
+        val found = scanState.value.dialog as? ScannedContactDialog.Found ?: return
+        scanState.update { it.copy(dialog = null) }
+        viewModelScope.launch {
+            runCatching { inviteContactWithHandleUseCase(found.email, found.handle, null) }
+                .onSuccess { request ->
+                    when (request) {
+                        InviteContactRequest.Sent,
+                        InviteContactRequest.Resent,
+                            -> scanState.update {
+                            it.copy(inviteEvent = triggered(ScannedContactInviteFeedback.Sent))
+                        }
+
+                        InviteContactRequest.AlreadyContact ->
+                            showScannedContactDialog(ScannedContactDialog.AlreadyAdded(found.email))
+
+                        else -> scanState.update {
+                            it.copy(inviteEvent = triggered(ScannedContactInviteFeedback.Failed))
+                        }
+                    }
+                }
+                .onFailure { error ->
+                    Timber.e(error, "Failed to invite scanned contact")
+                    scanState.update {
+                        it.copy(inviteEvent = triggered(ScannedContactInviteFeedback.Failed))
+                    }
+                }
+        }
+    }
+
+    /**
+     * Dismiss the currently shown scanned-contact dialog.
+     */
+    fun onScannedContactDialogDismissed() {
+        scanState.update { it.copy(dialog = null) }
+    }
+
+    /**
+     * Consume the select-scanned-contact event once the UI has auto-selected the contact.
+     */
+    fun onScannedContactSelectConsumed() {
+        scanState.update { it.copy(selectContactEvent = consumed()) }
+    }
+
+    /**
+     * Consume the invite-feedback event once the UI has surfaced it.
+     */
+    fun onScannedContactInviteConsumed() {
+        scanState.update { it.copy(inviteEvent = consumed()) }
+    }
+
+    private fun showScannedContactDialog(dialog: ScannedContactDialog) {
+        scanState.update { it.copy(dialog = dialog) }
+    }
+
+    /**
      * Set the current search query.
      *
      * @param query the query text, or null to clear the search.
@@ -254,6 +416,20 @@ class AddContactViewModel @AssistedInject constructor(
      */
     fun emailsForSelected(handles: Set<Long>, phoneEmails: Set<String>): List<String> =
         (emailsForSelected(handles) + phoneEmails).distinct()
+
+    /**
+     * Check whether [email] is a syntactically valid email address.
+     */
+    fun isEmailValid(email: String): Boolean = isEmailValidUseCase(email)
+
+    /**
+     * Resolve [email] to the handle of a loaded MEGA contact, comparing case-insensitively against
+     * the full (unfiltered) contact list.
+     *
+     * @return the matching contact's handle, or null when no loaded contact has that email.
+     */
+    fun handleForEmail(email: String): Long? =
+        handleToEmail.entries.firstOrNull { it.value.equals(email, ignoreCase = true) }?.key
 
     private fun LocalContact.toEmailableUiState(): ContactItemUiState? {
         val email = emails.firstOrNull()?.takeIf { it.isNotBlank() } ?: return null
@@ -306,6 +482,12 @@ class AddContactViewModel @AssistedInject constructor(
     private data class IndexedContact(
         val data: ContactItem,
         val ui: ContactItemUiState,
+    )
+
+    private data class ScanState(
+        val dialog: ScannedContactDialog?,
+        val selectContactEvent: StateEventWithContent<Long>,
+        val inviteEvent: StateEventWithContent<ScannedContactInviteFeedback>,
     )
 
     companion object {

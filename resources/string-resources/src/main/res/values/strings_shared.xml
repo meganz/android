@@ -3119,6 +3119,12 @@
     <string name="add_contacts_phone_contacts_select">Select phone contacts</string>
     <!-- Add contacts picker: header of the section that lists the user's MEGA contacts, shown to separate them from the phone contacts section -->
     <string name="add_contacts_mega_contacts_section_title">MEGA contacts</string>
+    <!-- Add contacts picker (share flow): placeholder of the free-text input used to type the email address of someone who is not yet a contact -->
+    <string name="add_contacts_manual_email_placeholder">Enter email address</string>
+    <!-- Add contacts picker (share flow): accessibility label of the button that adds the typed email address to the selection -->
+    <string name="add_contacts_manual_email_add_action">Add email address</string>
+    <!-- Add contacts picker (share flow): inline error shown under the email input when the typed email address is already part of the selection -->
+    <string name="add_contacts_manual_email_already_added_error">Email address already added</string>
     <!-- Create group chat: toolbar title of the group settings step where the group name and options are set -->
     <string name="create_group_chat_settings_title">New group</string>
     <!-- Create group chat: hint of the group name text field. The name is optional. -->
@@ -3371,4 +3377,6 @@
         <item quantity="one">%d version</item>
         <item quantity="other">%d versions</item>
     </plurals>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

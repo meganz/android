@@ -43,6 +43,9 @@ class AddContactsScreenScreenshotTest {
                     showUserLimitWarning = false,
                     phoneContactsSection = PhoneContactsSection.Hidden,
                     phoneContactsPickedEvent = consumed(),
+                    scannedContactDialog = null,
+                    scannedContactSelectEvent = consumed(),
+                    scannedContactInviteEvent = consumed(),
                 ),
                 onSearchQueryChange = {},
                 onConfirm = { _, _ -> },
@@ -164,6 +167,37 @@ class AddContactsScreenScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
+    fun AddContactToShareScreenEmailEntry() {
+        AndroidThemeForPreviews {
+            AddContactsScreen(
+                state = sampleData(),
+                onSearchQueryChange = {},
+                onConfirm = { _, _ -> },
+                onBack = {},
+                allowManualEmailEntry = true,
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun AddContactToShareScreenEmailEntryWithChips() {
+        AndroidThemeForPreviews {
+            AddContactsScreen(
+                state = sampleData(),
+                onSearchQueryChange = {},
+                onConfirm = { _, _ -> },
+                onBack = {},
+                allowManualEmailEntry = true,
+                initialSelectedManualEmails = setOf("guest@example.com", "partner@example.org"),
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
     fun AddChatParticipantsScreen() {
         AndroidThemeForPreviews {
             AddContactsScreen(
@@ -204,6 +238,9 @@ class AddContactsScreenScreenshotTest {
         showUserLimitWarning = showUserLimitWarning,
         phoneContactsSection = phoneSection,
         phoneContactsPickedEvent = consumed(),
+        scannedContactDialog = null,
+        scannedContactSelectEvent = consumed(),
+        scannedContactInviteEvent = consumed(),
     )
 
     private fun phoneContact(
