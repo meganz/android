@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -48,6 +49,7 @@ import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeNameMapper
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = FileInfoViewModel.Factory::class)
@@ -58,6 +60,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val fileTypeIconMapper: FileTypeIconMapper,
+    private val fileTypeNameMapper: FileTypeNameMapper,
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase,
     private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase,
     private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase,
@@ -123,7 +126,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
             val isFile: Boolean
             val sizeInBytes: Long
             val modificationTime: Long?
-            val fileTypeExtension: String?
+            val fileTypeName: LocalizedText?
             val thumbnailData: ThumbnailData?
             val durationText: String?
             val isMediaFile: Boolean
@@ -132,7 +135,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     isFile = true
                     sizeInBytes = node.size
                     modificationTime = node.modificationTime
-                    fileTypeExtension = node.type.extension
+                    fileTypeName = fileTypeNameMapper(node.type.extension)
                     thumbnailData = ThumbnailRequest(nodeId)
                     durationText = node.type.toDuration()
                         ?.let(durationInSecondsTextMapper::invoke)
@@ -143,7 +146,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     isFile = false
                     sizeInBytes = 0L
                     modificationTime = null
-                    fileTypeExtension = null
+                    fileTypeName = null
                     thumbnailData = null
                     durationText = null
                     isMediaFile = false
@@ -158,7 +161,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     iconRes = node.getIcon(fileTypeIconMapper),
                     thumbnailData = thumbnailData,
                     durationText = durationText?.takeIf { it.isNotBlank() },
-                    fileTypeExtension = fileTypeExtension,
+                    fileTypeName = fileTypeName,
                     sizeInBytes = sizeInBytes,
                     creationTime = node.creationTime,
                     modificationTime = modificationTime,

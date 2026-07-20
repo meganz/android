@@ -38,6 +38,7 @@ import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -282,7 +283,7 @@ private fun FileInfoDetails(
             uiState.isIncomingShare ->
                 add(stringResource(sharedR.string.file_info_information_incoming_share))
 
-            uiState.isFile -> uiState.fileTypeExtension?.uppercase()?.let(::add)
+            uiState.isFile -> uiState.fileTypeName?.text?.let(::add)
             else -> add(stringResource(sharedR.string.file_info_information_type_folder))
         }
         if (uiState.sizeInBytes > 0) {
@@ -477,7 +478,7 @@ private fun FileInfoScreenFilePreview() {
                 title = "Presentation.pdf",
                 isFile = true,
                 iconRes = iconPackR.drawable.ic_pdf_medium_solid,
-                fileTypeExtension = "pdf",
+                fileTypeName = LocalizedText.StringRes(sharedR.string.file_type_name_pdf_document),
                 sizeInBytes = 10L * 1024 * 1024,
                 creationTime = 1_749_000_000L,
                 modificationTime = 1_749_500_000L,
@@ -508,7 +509,7 @@ private fun FileInfoScreenVideoPreview() {
                 title = "housetour.mov",
                 isFile = true,
                 iconRes = iconPackR.drawable.ic_video_medium_solid,
-                fileTypeExtension = "mov",
+                fileTypeName = LocalizedText.StringRes(sharedR.string.file_type_name_video),
                 sizeInBytes = 4L * 1024 * 1024,
                 durationText = "1:24",
                 creationTime = 1_749_000_000L,
