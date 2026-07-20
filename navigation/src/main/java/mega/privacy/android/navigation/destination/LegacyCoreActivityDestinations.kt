@@ -11,6 +11,8 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.sync.SyncType
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 
 @Serializable
@@ -203,6 +205,13 @@ data class UpgradeAccountNavKey(
     val isUpgrade: Boolean = true,
     val isNewAccount: Boolean = false,
     val source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
+) : NavKey, Parcelable
+
+@Serializable
+@Parcelize
+data class QuotaWarningUpgradeNavKey(
+    val type: QuotaWarningType,
+    val trigger: QuotaWarningTrigger,
 ) : NavKey, Parcelable
 
 @Serializable

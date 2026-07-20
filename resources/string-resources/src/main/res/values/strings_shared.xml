@@ -1189,6 +1189,46 @@
     <string name="recovery_key_error_description">The recovery key you supplied is either invalid, or is not for this account. Check you’re using the correct key and try again.</string>
     <!-- Label for the current plan badge in the pro plan card -->
     <string name="account_upgrade_account_pro_plan_info_current_plan_label">Current plan</string>
+    <!-- Title of the quota-warning upsell screen when storage is nearly full. %1$d is the used percentage, e.g. 'Your storage is 80% full' -->
+    <string name="subscription_quota_storage_almost_full_title">Your storage is %1$d%% full</string>
+    <!-- Subtitle of the quota-warning upsell screen when storage is nearly full -->
+    <string name="subscription_quota_storage_almost_full_subtitle">Upgrade your plan before you run out of space</string>
+    <!-- Subtitle of the quota-warning upsell screen when storage is over the limit -->
+    <string name="subscription_quota_storage_over_subtitle">Upgrade your plan to get more storage and upload more files</string>
+    <!-- Subtitle of the quota-warning upsell screen when storage is over the limit and the user was trying to upload -->
+    <string name="subscription_quota_storage_over_upload_subtitle">You\'ve run out of storage space. Upgrade your plan to continue uploading</string>
+    <!-- Title of the quota-warning upsell screen when transfer quota is running low (free or logged-out users) -->
+    <string name="subscription_quota_transfer_low_title">Your transfer quota is running low</string>
+    <!-- Title of the quota-warning upsell screen when a Pro user's transfer quota is running low. %1$d is the used percentage, e.g. "You've used 80% of your transfer quota" -->
+    <string name="subscription_quota_transfer_percentage_used_title">You\'ve used %1$d%% of your transfer quota</string>
+    <!-- Title of the quota-warning upsell screen when transfer quota has been exceeded -->
+    <string name="subscription_quota_transfer_over_title">Transfer quota exceeded</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is running low during a download. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_download_subtitle">As a result, your download may be interrupted. Upgrade your plan to get more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is running low during media streaming. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_low_streaming_subtitle">As a result, media playback may be interrupted. Upgrade your plan to get more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is exceeded during a download. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_over_download_subtitle">To continue your download, upgrade your plan to get more transfer quota.</string>
+    <!-- Subtitle of the quota-warning upsell screen when transfer quota is exceeded during media streaming. Followed by a 'Learn more' link -->
+    <string name="subscription_quota_transfer_over_streaming_subtitle">To continue media playback, upgrade your plan to get more transfer quota.</string>
+    <!-- Storage usage on the current plan card. %1$s is the used amount, %2$s the total, e.g. '19 GB of 20 GB used' -->
+    <string name="subscription_quota_current_plan_storage_usage">%1$s of %2$s used</string>
+    <!-- Transfer usage on the current plan card for free or logged-out users, who have no fixed transfer quota. %1$s is the used amount, e.g. '1 GB used' -->
+    <string name="subscription_quota_current_plan_transfer_usage">%1$s used</string>
+    <!-- Transfer usage on the current plan card for Pro users, who have a fixed transfer quota. %1$s is the used amount, %2$s the total, e.g. '2.3 TB of 2.4 TB used' -->
+    <string name="subscription_quota_current_plan_transfer_usage_with_total">%1$s of %2$s used</string>
+    <!-- Storage usage on the recommended plan card. %1$s is the used amount, %2$s the recommended plan quota, e.g. '19 GB of 200 GB used' -->
+    <string name="subscription_quota_recommended_storage_usage">%1$s of %2$s used</string>
+    <!-- Transfer usage on the recommended plan card. %1$s is the used amount, %2$s the recommended plan quota, e.g. '1 GB of 2.4 TB used' -->
+    <string name="subscription_quota_recommended_transfer_usage">%1$s of %2$s used</string>
+    <!-- Badge highlighting the recommended plan on the quota-warning upsell screen -->
+    <string name="subscription_quota_best_for_you">Best for you</string>
+    <!-- Total yearly charge shown on the recommended plan card. %1$s is the price, e.g. '€40.01 charged yearly' -->
+    <string name="subscription_quota_charged_yearly">%1$s charged yearly</string>
+    <!-- Primary button on the quota-warning upsell screen. %1$s is the plan name, e.g. 'Upgrade to Essential' -->
+    <string name="subscription_quota_upgrade_button">Upgrade to %1$s</string>
+    <!-- Link on the quota-warning upsell screen that opens the full list of plans -->
+    <string name="subscription_quota_view_all_plans">View all plans</string>
     <!-- Error message when achievements status is unavailable -->
     <string name="achievement_status_unavailable">The status of your achievements is currently unavailable. Try again later.</string>
     <!-- Warning indicating that the transfer quota limit has been reached -->
