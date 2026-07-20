@@ -240,12 +240,13 @@ private fun LinkSettingsContent(
             titleTrailingElement = if (uiState.isProFeatureLocked) {
                 { ProBadge(Modifier.testTag(LINK_SETTINGS_EXPIRY_PRO_BADGE_TAG)) }
             } else null,
-            enableClick = true,
+            enableClick = !uiState.isProFeatureLocked,
             onClickListener = { onExpiryEnabled(!uiState.isExpiryEnabled) },
             trailingElement = {
                 Toggle(
                     modifier = Modifier.testTag(LINK_SETTINGS_EXPIRY_TOGGLE_TAG),
                     isChecked = uiState.isExpiryEnabled,
+                    isEnabled = !uiState.isProFeatureLocked,
                     onCheckedChange = onExpiryEnabled,
                 )
             },
@@ -266,12 +267,13 @@ private fun LinkSettingsContent(
             titleTrailingElement = if (uiState.isProFeatureLocked) {
                 { ProBadge(Modifier.testTag(LINK_SETTINGS_PASSWORD_PRO_BADGE_TAG)) }
             } else null,
-            enableClick = true,
+            enableClick = !uiState.isProFeatureLocked,
             onClickListener = { onPasswordEnabled(!uiState.isPasswordEnabled) },
             trailingElement = {
                 Toggle(
                     modifier = Modifier.testTag(LINK_SETTINGS_PASSWORD_TOGGLE_TAG),
                     isChecked = uiState.isPasswordEnabled,
+                    isEnabled = !uiState.isProFeatureLocked,
                     onCheckedChange = onPasswordEnabled,
                 )
             },

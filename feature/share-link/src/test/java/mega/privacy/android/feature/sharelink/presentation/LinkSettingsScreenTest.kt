@@ -1,6 +1,7 @@
 package mega.privacy.android.feature.sharelink.presentation
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -30,7 +31,7 @@ class LinkSettingsScreenTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private val loaded = LinkSettingsUiState(isLoading = false)
+    private val loaded = LinkSettingsUiState(isLoading = false, accountType = AccountType.PRO_I)
 
     @Test
     fun `test that the loading placeholder is displayed while loading`() {
@@ -245,6 +246,35 @@ class LinkSettingsScreenTest {
             .assertDoesNotExist()
         composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_PRO_BADGE_TAG, useUnmergedTree = true)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the expiry and password toggles are disabled for a free account`() {
+        setContent(uiState = loaded.copy(accountType = AccountType.FREE))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_TOGGLE_TAG).assertIsNotEnabled()
+        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_TOGGLE_TAG).assertIsNotEnabled()
+    }
+
+    @Test
+    fun `test that tapping a locked expiry row does not invoke onExpiryEnabled for a free account`() {
+        var enabled: Boolean? = null
+        setContent(
+            uiState = loaded.copy(accountType = AccountType.FREE),
+            onExpiryEnabled = { enabled = it },
+        )
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_ROW_TAG).performClick()
+
+        assertThat(enabled).isNull()
+    }
+
+    @Test
+    fun `test that the expiry and password toggles are enabled for a paid account`() {
+        setContent(uiState = loaded.copy(accountType = AccountType.PRO_I))
+
+        composeRule.onNodeWithTag(LINK_SETTINGS_EXPIRY_TOGGLE_TAG).assertIsEnabled()
+        composeRule.onNodeWithTag(LINK_SETTINGS_PASSWORD_TOGGLE_TAG).assertIsEnabled()
     }
 
     private fun setContent(
