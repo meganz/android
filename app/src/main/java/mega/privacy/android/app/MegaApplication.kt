@@ -15,7 +15,11 @@ import androidx.work.Configuration
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import dagger.Lazy
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -164,9 +168,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
 
     @Inject
     lateinit var globalNetworkStateHandler: GlobalNetworkStateHandler
-
-    @Inject
-    lateinit var workManagerConfigurationProvider: WorkManagerConfigurationProvider
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
@@ -458,8 +459,23 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     val currentActivity: Activity?
         get() = activityLifecycleHandler.getCurrentActivity()
 
+    /**
+     * WorkManager resolves this on-demand, which can happen before Hilt has injected this
+     * Application's fields (e.g. from an androidx.startup [androidx.startup.Initializer] that
+     * runs during the ContentProvider phase). Fetch [WorkManagerConfigurationProvider] through an
+     * entry point so it only depends on the Dagger component existing, not on field injection order.
+     */
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    internal interface WorkManagerConfigurationEntryPoint {
+        fun workManagerConfigurationProvider(): WorkManagerConfigurationProvider
+    }
+
     override val workManagerConfiguration: Configuration
-        get() = workManagerConfigurationProvider.workManagerConfiguration
+        get() = EntryPointAccessors.fromApplication(
+            this,
+            WorkManagerConfigurationEntryPoint::class.java
+        ).workManagerConfigurationProvider().workManagerConfiguration
 
     companion object {
         /**
