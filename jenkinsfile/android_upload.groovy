@@ -1,21 +1,13 @@
 /**
- * This script serves 2 purposes:
- * 1. Build and upload Android APK to Firebase AppDistribution
- * 2. Build SDK and publish to Artifactory
+ * This script builds and uploads the Android APK to Firebase AppDistribution.
  */
 
  @Library('jenkins-android-shared-lib') _
 
 BUILD_STEP = ''
 
-// Below values will be read from MR description and are used to decide SDK versions
-SDK_BRANCH = 'develop'
-MEGACHAT_BRANCH = 'develop'
-SDK_COMMIT = ""
-MEGACHAT_COMMIT = ""
-
 /**
- * Folder to contain build outputs, including APK, AAG and symbol files
+ * Folder to contain build outputs, including APK, AAB and symbol files
  */
 ARCHIVE_FOLDER = "archive"
 NATIVE_SYMBOLS_FILE = "symbols.zip"
@@ -24,11 +16,7 @@ NATIVE_SYMBOLS_FILE = "symbols.zip"
  * GitLab commands that can trigger this job.
  */
 DELIVER_QA_CMD = "deliver_qa"
-PUBLISH_SDK_CMD = "publish_sdk"
 UPLOAD_COVERAGE_REPORT_CMD = "upload_coverage"
-
-// The log file of publishing pre-built SDK to Artifactory
-ARTIFACTORY_PUBLISH_LOG = "artifactory_publish.log"
 
 /**
  * common.groovy file with common methods
@@ -56,13 +44,7 @@ pipeline {
 
         CONSOLE_LOG_FILE = 'console.txt'
 
-        BUILD_LIB_DOWNLOAD_FOLDER = '${WORKSPACE}/mega_build_download'
-
         APK_VERSION_CODE_FOR_CD = "${new Date().format('yyDDDHHmm', TimeZone.getTimeZone("GMT"))}"
-
-        // SDK build log. ${LOG_FILE} will be used by build.sh to export SDK build log.
-        SDK_LOG_FILE_NAME = "sdk_build_log.txt"
-        LOG_FILE = "${WORKSPACE}/${SDK_LOG_FILE_NAME}"
     }
     post {
         failure {
@@ -85,25 +67,6 @@ pipeline {
                     String jenkinsLog = common.uploadFileToArtifactory("android_upload", CONSOLE_LOG_FILE)
 
                     slackSend color: 'danger', message: firebaseUploadFailureMessage("\n", jenkinsLog, false)
-                } else if (triggerByPublishSdkCmd()) {
-                    String jenkinsLog = common.uploadFileToArtifactory("android_upload", CONSOLE_LOG_FILE)
-
-                    // upload SDK build log if SDK build fails
-                    String sdkBuildMessage = ""
-                    if (fileExists(SDK_LOG_FILE_NAME)) {
-                        def sdkLog = common.uploadFileToArtifactory(SDK_LOG_FILE_NAME)
-                        sdkBuildMessage = "<br/>SDK BuildLog:\t[SDK build log](${sdkLog})"
-                    } else {
-                        sdkBuildMessage = "<br/>SDK Build log not available."
-                    }
-
-                    String message = publishSdkFailureMessage("<br/>") +
-                            "<br/>Build Log:\t[$CONSOLE_LOG_FILE](${jenkinsLog})" +
-                            sdkBuildMessage
-
-                    common.sendToMR(message)
-
-                    slackSend color: 'danger', message: publishSdkFailureMessage("\n") + "Build Log: <${jenkinsLog}|${CONSOLE_LOG_FILE}>"
                 }
             }
         }
@@ -116,20 +79,6 @@ pipeline {
                     common.sendToMR(firebaseUploadSuccessMessage("<br/>", true))
                 } else if (triggerByPushToDevelop()) {
                     slackSend color: "good", message: firebaseUploadSuccessMessage("\n", false)
-                } else if (triggerByPublishSdkCmd()) {
-                    slackSend color: "good", message: publishSdkSuccessMessage("\n", true)
-
-                    // upload SDK build log if SDK build fails
-                    String sdkBuildMessage
-                    if (fileExists(SDK_LOG_FILE_NAME)) {
-                        def sdkLog = common.uploadFileToArtifactory(SDK_LOG_FILE_NAME)
-                        sdkBuildMessage = "<br/>SDK BuildLog:\t[SDK build log](${sdkLog})"
-                    } else {
-                        sdkBuildMessage = "<br/>SDK Build log not available."
-                    }
-
-                    String message = publishSdkSuccessMessage("<br/>", true) + sdkBuildMessage
-                    common.sendToMR(message)
                 }
             }
         }
@@ -157,7 +106,6 @@ pipeline {
             when {
                 expression {
                     triggerByDeliverQaCmd() ||
-                            triggerByPublishSdkCmd() ||
                             triggerByUploadCoverage() ||
                             triggerByPushToDevelop()
                 }
@@ -165,71 +113,11 @@ pipeline {
             steps {
                 script {
                     BUILD_STEP = 'Preparation'
-                    checkSDKVersion()
 
                     sh("rm -frv $ARCHIVE_FOLDER")
                     sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
                     sh("rm -fv ${CONSOLE_LOG_FILE}")
-                    sh("rm -fv ${LOG_FILE}")  // sdk log file
                     sh('set')
-                }
-            }
-        }
-        stage('Fetch SDK Submodules') {
-            when {
-                expression { triggerByPublishSdkCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Fetch SDK Submodules'
-
-                    common.fetchSdkSubmodules()
-                }
-            }
-        }
-        stage('Select SDK Version') {
-            when {
-                expression { triggerByPublishSdkCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Select SDK Version'
-                }
-                withCredentials([gitUsernamePassword(credentialsId: 'Gitlab-Access-Token', gitToolName: 'Default')]) {
-                    script {
-                        String sdkCommit = parseCommandParameter()["sdk-commit"]
-                        if (sdkCommit != null && sdkCommit.length() > 0) {
-                            common.checkoutSdkByCommit(sdkCommit)
-                            SDK_BRANCH = "N/A"
-                        }
-
-                        String chatCommit = parseCommandParameter()["chat-commit"]
-                        if (chatCommit != null && chatCommit.length() > 0) {
-                            common.checkoutMegaChatSdkByCommit(chatCommit)
-                            MEGACHAT_BRANCH = "N/A"
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Download Dependency Lib for SDK') {
-            when {
-                expression { triggerByPublishSdkCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Download Dependency Lib for SDK'
-
-                    sh """
-                            cd "${WORKSPACE}/jenkinsfile/"
-                            bash download_webrtc.sh
-    
-                            mkdir -p "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                            cd "${BUILD_LIB_DOWNLOAD_FOLDER}"
-                            pwd
-                            ls -lh
-                        """
                 }
             }
         }
@@ -249,94 +137,6 @@ pipeline {
                     script {
                         println("applying production google map api config... ")
                         sh "cp -fv ${ANDROID_GOOGLE_MAPS_API_FILE_QA} app/src/release/res/values/google_maps_api.xml"
-                    }
-                }
-            }
-        }
-
-        stage('Build SDK') {
-            when {
-                expression { triggerByPublishSdkCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Build SDK'
-                    String buildArchs = "x86 armeabi-v7a x86_64 arm64-v8a"
-                    withEnv(["BUILD_ARCHS=${buildArchs}"]) {
-                        sh """
-                                cd ${WORKSPACE}/sdk/src/main/jni
-                                echo CLEANING SDK
-                                bash build.sh clean
-
-                                echo "=== START SDK BUILD===="
-                                bash build.sh all
-                            """
-                    }
-                }
-            }
-        }
-
-        stage('Collect native symbol files') {
-            when {
-                expression { triggerByPublishSdkCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Collect native symbol files'
-
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/arm64-v8a",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/armeabi-v7a/",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/x86",
-                            "libmega.so")
-                    common.deleteAllFilesExcept(
-                            "${WORKSPACE}/sdk/src/main/obj/local/x86_64",
-                            "libmega.so")
-
-                    sh """
-                        cd ${WORKSPACE}/sdk/src/main/obj/local
-                        rm -fv */.DS_Store
-                        rm -fv .DS_Store
-                        zip -r ${NATIVE_SYMBOLS_FILE} .
-                        mv -v ${NATIVE_SYMBOLS_FILE} ${WORKSPACE}/${ARCHIVE_FOLDER}
-                    """
-                }
-            }
-        }
-
-        stage('Publish SDK to Artifactory') {
-            when {
-                expression { triggerByPublishSdkCmd() }
-            }
-            steps {
-                script {
-                    BUILD_STEP = 'Publish SDK to Artifactory'
-
-                    withCredentials([
-                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
-                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN'),
-                    ]) {
-                        String targetPath = "${env.ARTIFACTORY_BASE_URL}/artifactory/android-mega/cicd/native-symbol/"
-                        withEnv([
-                                "ARTIFACTORY_USER=${ARTIFACTORY_USER}",
-                                "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
-                                "SDK_PUBLISH_TYPE=${getSdkPublishType()}",
-                                "SDK_COMMIT=${getSdkGitHash()}",
-                                "CHAT_COMMIT=${getMegaChatSdkGitHash()}",
-                                "SDK_BRANCH=${SDK_BRANCH}",
-                                "MEGACHAT_BRANCH=${MEGACHAT_BRANCH}"
-                        ]) {
-                            sh """
-                                cd ${WORKSPACE}
-                                ./gradlew --no-daemon sdk:artifactoryPublish 2>&1  | tee ${ARTIFACTORY_PUBLISH_LOG}
-                            """
-                        }
-
-                        sh "curl -u${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN} -T \"${WORKSPACE}/${ARCHIVE_FOLDER}/${NATIVE_SYMBOLS_FILE}\" \"${targetPath}/${getSdkVersionText()}.zip\""
                     }
                 }
             }
@@ -525,50 +325,6 @@ private String firebaseUploadFailureMessage(String lineBreak, String logFile, bo
 }
 
 /**
- * Create the build report of failed prebuilt SDK build
- *
- * @param lineBreak the line break used between the lines. For GitLab and Slack, different line break
- * can be provided. GitLab accepts HTML "<BR/>", and Slack accepts "\n"
- * @return failure message
- */
-private String publishSdkFailureMessage(String lineBreak) {
-    String message = ":x: Prebuilt SDK Creation Failed!(BuildNumber: ${env.BUILD_NUMBER})" +
-            "${lineBreak}Author:\t${formattedCommentAuthor()}" +
-            "${lineBreak}Trigger Reason:\t${gitlabTriggerPhrase}"
-    return message
-}
-
-/**
- * Get the value from GitLab MR description by key
- * @param key the key to check and read
- * @return actual value of key if key is specified. null otherwise.
- */
-String getValueInMRDescriptionBy(String key) {
-    if (key == null || key.isEmpty()) return null
-    def description = env.gitlabMergeRequestDescription
-    if (description == null) return null
-    String[] lines = description.split('\n')
-    for (String line : lines) {
-        line = line.trim()
-        if (line.startsWith(key)) {
-            String value = line.substring(key.length() + 1)
-            print("getValueInMRDescriptionBy(): " + key + " ==> " + value)
-            return value
-        }
-    }
-    return null
-}
-
-/**
- * check if a certain value is defined by checking the tag value
- * @param value value of tag
- * @return true if tag has a value. false if tag is null or zero length
- */
-private boolean isDefined(String value) {
-    return value != null && !value.isEmpty()
-}
-
-/**
  * compose the success message, which might be used for Slack or GitLab MR.
  * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
  * while GitLab MR uses "<br/>".
@@ -585,25 +341,6 @@ private String firebaseUploadSuccessMessage(String lineBreak, boolean useComment
             "${lineBreak}Author:\t${author}" +
             "${lineBreak}Commit:\t${GIT_COMMIT}" +
             "${lineBreak}Trigger Reason: ${getTriggerReason()}"
-}
-
-/**
- * compose the success message, which might be used for Slack or GitLab MR.
- * @param lineBreak Slack and MR comment use different line breaks. Slack uses "/n"
- * while GitLab MR uses "<br/>".
- * @param useCommenterAsAuthor True if author should be the user name of who initiated the build by comment
- * @return The success message to be sent
- */
-private String publishSdkSuccessMessage(String lineBreak, boolean useCommenterAsAuthor) {
-    String author = useCommenterAsAuthor ? formattedCommentAuthor() : gitlabUserName
-    common = load('jenkinsfile/common.groovy')
-    return ":rocket: Prebuilt SDK is published to Artifactory Successfully!(${env.BUILD_NUMBER})" +
-            "${lineBreak}Author:\t${author}" +
-            "${lineBreak}SDK Commit:\t${getSdkGitHash()}" +
-            "${lineBreak}Chat SDK Commit:\t${getMegaChatSdkGitHash()}" +
-            "${lineBreak}Version:\tnz.mega.sdk:sdk:${getSdkVersionText()}" +
-            "${lineBreak}Trigger Reason:\t${gitlabTriggerPhrase}" +
-            "${lineBreak}AAR Download Link: [sdk-${getSdkVersionText()}.aar](${getSdkAarArtifactoryLink()})"
 }
 
 /**
@@ -624,16 +361,6 @@ private boolean triggerByUploadCoverage() {
     return env.gitlabActionType == "NOTE" &&
             env.gitlabTriggerPhrase != null &&
             env.gitlabTriggerPhrase.startsWith(UPLOAD_COVERAGE_REPORT_CMD)
-}
-
-/**
- * Check if this build is triggered by a publish_sdk command
- * @return
- */
-private boolean triggerByPublishSdkCmd() {
-    return env.gitlabActionType == "NOTE" &&
-            env.gitlabTriggerPhrase != null &&
-            env.gitlabTriggerPhrase.startsWith(PUBLISH_SDK_CMD)
 }
 
 /**
@@ -659,10 +386,9 @@ private String getTriggerReason() {
 }
 
 /**
- * Parse the parameter of command that triggers this build task. Both 'deliver_qa' and 'publish_sdk'
- * are supported. Command examples:
+ * Parse the parameter of command that triggers this build task. Both 'deliver_qa' and
+ * 'upload_coverage' are supported. Command example:
  * "deliver_qa --tester tester1@gmail.com,tester2@gmail.com --tester-group internal_dev,other_group --notes AND-99999 this build fixes the problem of layout in xxx page"
- * "publish_sdk --type rel --sdk-commit 12345 --chat-commit 0987656"
  *
  * @return a map of the parsed parameters and values. Below parameters should be included.
  * For 'deliver_qa' command
@@ -670,12 +396,6 @@ private String getTriggerReason() {
  *     key "notes" - developer specified release notes.
  *     key "tester-group" - developer specified tester group, separated by comma
  *     If deliver_qa command is issued without parameters, then values of above keys are empty.
- * For 'publish_sdk' command
- *    key "sdk-type" - sdk build type. Possible values: "dev" or "rel"
- *    key "sdk-commit" - MEGA SDK commit SHA-1. Can be short or long format.
- *    key "chat-commit" - MEGAChat SDK commit SHA-1. Can be short or long format.
- *    If publish_sdk command is issued without parameters, then "sdk-type" returns "dev"
- *    , "sdk-commit" and "chat-commit" are empty.
  */
 def parseCommandParameter() {
     // parameters in deliver_qa command
@@ -697,8 +417,6 @@ def parseCommandParameter() {
     String command
     if (triggerByDeliverQaCmd()) {
         command = DELIVER_QA_CMD
-    } else if (triggerByPublishSdkCmd()) {
-        command = PUBLISH_SDK_CMD
     } else if (triggerByUploadCoverage()) {
         command = UPLOAD_COVERAGE_REPORT_CMD
     } else {
@@ -777,24 +495,6 @@ String readReleaseNotes(boolean useCommenterAsAuthor) {
 }
 
 /**
- * Read SDK versions from MR description and assign the values into environment.
- */
-private void checkSDKVersion() {
-    SDK_COMMIT = getValueInMRDescriptionBy("SDK_COMMIT")
-    MEGACHAT_COMMIT = getValueInMRDescriptionBy("MEGACHAT_COMMIT")
-
-    SDK_BRANCH = parseCommandParameter()["sdk-branch"]
-    if (!isDefined(SDK_BRANCH)) {
-        SDK_BRANCH = "develop"
-    }
-
-    MEGACHAT_BRANCH = parseCommandParameter()["chat-branch"]
-    if (!isDefined(MEGACHAT_BRANCH)) {
-        MEGACHAT_BRANCH = "develop"
-    }
-}
-
-/**
  * read version name and version code from build.gradle.kts
  * @return version name plus version code. Example: "6.6(433)"
  */
@@ -810,69 +510,4 @@ private String readAppVersion() {
  */
 private String lastCommitMessage() {
     return sh(script: "git log --pretty=format:\"%x09%s\" -1", returnStdout: true).trim()
-}
-
-/**
- * Get publish type of SDK.
- * @return return value can be either "dev" or "rel"
- */
-private String getSdkPublishType() {
-    String type = parseCommandParameter()["lib-type"]
-    if (type == "rel") {
-        return "rel"
-    } else {
-        return "dev"
-    }
-}
-
-/**
- * Parse log file of publishing SDK to Artifactory maven repo
- * and return the new pre-built SDK version. For example:
- * "20221109.084452-rel"
- *
- * The version info is extracted from below line in the log:
- * "[pool-4-thread-1] Deploying artifact: ARTIFACTORY_BASE_URL/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/20221109.084452-rel/sdk-20221109.084452-rel.aar"
- *
- * @return the version text of the SDK that has just been published to Artifactory
- */
-private String getSdkVersionText() {
-    println("Entering getSdkVersionText()")
-
-    String content = sh(script: "grep 'Deploying artifact' ${ARTIFACTORY_PUBLISH_LOG}", returnStdout: true).trim()
-    String[] lines = content.split("\n")
-    for (line in lines) {
-        println("parsing line = $line")
-        if (line.endsWith("aar")) {
-            String version = line.substring(line.lastIndexOf("/sdk-") + 5, line.lastIndexOf("."))
-            println("SDK version = $version")
-            return version
-        }
-    }
-    return "Invalid Sdk Version"
-}
-
-/**
- * Get Sdk AAR download link
- *
- * @return download link
- */
-private String getSdkAarArtifactoryLink() {
-    String version = getSdkVersionText()
-    return "${env.ARTIFACTORY_BASE_URL}:443/artifactory/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar"
-}
-
-/**
- * Get the short commit ID of SDK
- * @return short git commit ID
- */
-String getSdkGitHash() {
-    return sh(script: "cd $WORKSPACE/sdk/src/main/jni/mega/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
-}
-
-/**
- * Get the short commit ID of mega chat SDK
- * @return short git commit ID
- */
-String getMegaChatSdkGitHash() {
-    return sh(script: "cd $WORKSPACE/sdk/src/main/jni/megachat/sdk && git rev-parse --short HEAD", returnStdout: true).trim()
 }
