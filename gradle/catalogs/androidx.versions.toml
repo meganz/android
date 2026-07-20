@@ -20,7 +20,6 @@ hilt-android = "1.3.0"
 lifecycle = "2.10.0"
 lifecycle-viewmodel-navigation3 = "2.10.0"
 legacy-support = "1.0.0"
-multidex = "2.0.1"
 navigation = "2.9.8"
 palette = "1.0.0"
 preferences = "1.2.1"
@@ -83,7 +82,6 @@ lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.r
 lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
 lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle-viewmodel-navigation3" }
-multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 navigation-runtime = { module = "androidx.navigation:navigation-runtime-ktx", version.ref = "navigation" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
