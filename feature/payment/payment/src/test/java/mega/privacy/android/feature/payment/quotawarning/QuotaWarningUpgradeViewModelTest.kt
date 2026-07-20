@@ -9,18 +9,20 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.formatter.mapper.FormattedSizeMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.account.AccountPlanDetail
 import mega.privacy.android.domain.entity.account.AccountStorageDetail
+import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
 import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
-import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
@@ -45,7 +47,6 @@ class QuotaWarningUpgradeViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
-    private val getRecommendedSubscriptionUseCase = mock<GetRecommendedSubscriptionUseCase>()
     private val getSubscriptionsUseCase = mock<GetSubscriptionsUseCase>()
     private val localisedPriceCurrencyCodeStringMapper =
         mock<LocalisedPriceCurrencyCodeStringMapper>()
@@ -59,7 +60,6 @@ class QuotaWarningUpgradeViewModelTest {
             monitorAccountDetailUseCase,
             monitorStorageStateUseCase,
             monitorTransferOverQuotaUseCase,
-            getRecommendedSubscriptionUseCase,
             getSubscriptionsUseCase,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
@@ -67,7 +67,6 @@ class QuotaWarningUpgradeViewModelTest {
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
         whenever(monitorStorageStateUseCase()).thenReturn(emptyFlow())
         whenever(monitorTransferOverQuotaUseCase()).thenReturn(emptyFlow())
-        wheneverBlocking { getRecommendedSubscriptionUseCase() }.thenReturn(null)
         wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(Subscriptions(emptyList(), emptyList()))
     }
 
@@ -76,7 +75,6 @@ class QuotaWarningUpgradeViewModelTest {
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
-            getRecommendedSubscriptionUseCase = getRecommendedSubscriptionUseCase,
             getSubscriptionsUseCase = getSubscriptionsUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
         )
@@ -120,28 +118,81 @@ class QuotaWarningUpgradeViewModelTest {
     }
 
     @Test
-    fun `test that recommended subscription is built from the subscriptions list`() = runTest {
-        val recommended = subscription(AccountType.ESSENTIAL, storage = 200, transfer = 2400)
-        val yearly = subscription(AccountType.ESSENTIAL, storage = 200, transfer = 2400)
-        wheneverBlocking { getRecommendedSubscriptionUseCase() }.thenReturn(recommended)
+    fun `test that recommended subscription is the smallest plan whose storage exceeds usage`() =
+        runTest {
+            val essential = subscription(AccountType.ESSENTIAL, storage = 100)
+            val proI = subscription(AccountType.PRO_I, storage = 400)
+            val proII = subscription(AccountType.PRO_II, storage = 2048)
+            val proIYearly = subscription(AccountType.PRO_I, storage = 400)
+            val detail = accountDetail(storageUsed = 250 * BYTES_IN_GB)
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+            wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+                Subscriptions(
+                    monthlySubscriptions = listOf(essential, proI, proII),
+                    yearlySubscriptions = listOf(proIYearly),
+                )
+            )
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isLoading).isFalse()
+                assertThat(state.recommendedSubscription?.accountType).isEqualTo(AccountType.PRO_I)
+                assertThat(state.recommendedSubscription?.monthlySubscription).isEqualTo(proI)
+                assertThat(state.recommendedSubscription?.yearlySubscription).isEqualTo(proIYearly)
+            }
+        }
+
+    @Test
+    fun `test that largest plan is recommended when usage exceeds every plan`() = runTest {
+        val essential = subscription(AccountType.ESSENTIAL, storage = 100)
+        val proII = subscription(AccountType.PRO_II, storage = 2048)
+        val detail = accountDetail(storageUsed = 5000 * BYTES_IN_GB)
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
         wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
-            Subscriptions(listOf(recommended), listOf(yearly))
+            Subscriptions(
+                monthlySubscriptions = listOf(essential, proII),
+                yearlySubscriptions = emptyList(),
+            )
         )
         initViewModel()
         advanceUntilIdle()
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.isLoading).isFalse()
-            assertThat(state.recommendedSubscription?.accountType).isEqualTo(AccountType.ESSENTIAL)
-            assertThat(state.recommendedSubscription?.monthlySubscription).isEqualTo(recommended)
-            assertThat(state.recommendedSubscription?.yearlySubscription).isEqualTo(yearly)
+            assertThat(state.recommendedSubscription?.accountType).isEqualTo(AccountType.PRO_II)
         }
     }
 
     @Test
-    fun `test that recommended subscription is null when no next tier is available`() = runTest {
-        wheneverBlocking { getRecommendedSubscriptionUseCase() }.thenReturn(null)
+    fun `test that a plan offered only yearly is still considered`() = runTest {
+        val essentialMonthly = subscription(AccountType.ESSENTIAL, storage = 100)
+        val proIYearly = subscription(AccountType.PRO_I, storage = 400)
+        val detail = accountDetail(storageUsed = 200 * BYTES_IN_GB)
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+        wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+            Subscriptions(
+                monthlySubscriptions = listOf(essentialMonthly),
+                yearlySubscriptions = listOf(proIYearly),
+            )
+        )
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.recommendedSubscription?.accountType).isEqualTo(AccountType.PRO_I)
+            assertThat(state.recommendedSubscription?.monthlySubscription).isNull()
+            assertThat(state.recommendedSubscription?.yearlySubscription).isEqualTo(proIYearly)
+        }
+    }
+
+    @Test
+    fun `test that recommended subscription is null when no plans are available`() = runTest {
+        val detail = accountDetail(storageUsed = 10 * BYTES_IN_GB)
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+        wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(Subscriptions(emptyList(), emptyList()))
         initViewModel()
         advanceUntilIdle()
 
@@ -152,12 +203,185 @@ class QuotaWarningUpgradeViewModelTest {
         }
     }
 
-    private fun subscription(accountType: AccountType, storage: Int, transfer: Int) = Subscription(
-        sku = "sku_${accountType.name}",
+    @Test
+    fun `test that loading stays active until storage detail is available`() = runTest {
+        val partial = accountDetailWithoutStorage()
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(partial))
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isTrue()
+            assertThat(state.storageUsedPercentage).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `test that loading completes once storage detail arrives`() = runTest {
+        val partial = accountDetailWithoutStorage()
+        val full = accountDetail(storageUsed = 19 * BYTES_IN_GB)
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(partial, full))
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isLoading).isFalse()
+            assertThat(state.storageUsed).isEqualTo(19 * BYTES_IN_GB)
+        }
+    }
+
+    private fun accountDetail(
+        storageUsed: Long,
+        accountType: AccountType = AccountType.FREE,
+    ): AccountDetail {
+        val storageDetail = AccountStorageDetail(
+            usedCloudDrive = 0,
+            usedRubbish = 0,
+            usedIncoming = 0,
+            totalStorage = 0,
+            usedStorage = storageUsed,
+        )
+        val levelDetail = mock<AccountLevelDetail> {
+            on { this.accountType }.thenReturn(accountType)
+        }
+        return mock {
+            on { this.storageDetail }.thenReturn(storageDetail)
+            on { this.levelDetail }.thenReturn(levelDetail)
+        }
+    }
+
+    @Test
+    fun `test that subscription cycle is resolved from the plan subscription matched by id`() =
+        runTest {
+            val detail = accountDetailWithCycle(
+                accountType = AccountType.PRO_I,
+                accountSubscriptionCycle = AccountSubscriptionCycle.MONTHLY,
+                planSubscriptionId = "sub-1",
+                subscriptions = listOf(
+                    subscriptionDetail("sub-1", AccountSubscriptionCycle.YEARLY, AccountType.PRO_I),
+                    subscriptionDetail("sub-2", AccountSubscriptionCycle.MONTHLY, AccountType.PRO_II),
+                ),
+            )
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.YEARLY)
+            }
+        }
+
+    @Test
+    fun `test that subscription cycle falls back to the matching plan level when no id matches`() =
+        runTest {
+            val detail = accountDetailWithCycle(
+                accountType = AccountType.PRO_I,
+                accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
+                planSubscriptionId = null,
+                subscriptions = listOf(
+                    subscriptionDetail("sub-1", AccountSubscriptionCycle.MONTHLY, AccountType.PRO_I),
+                ),
+            )
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.MONTHLY)
+            }
+        }
+
+    @Test
+    fun `test that subscription cycle falls back to the account-level cycle when no subscription matches`() =
+        runTest {
+            val detail = accountDetailWithCycle(
+                accountType = AccountType.PRO_I,
+                accountSubscriptionCycle = AccountSubscriptionCycle.YEARLY,
+                planSubscriptionId = null,
+                subscriptions = emptyList(),
+            )
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().subscriptionCycle)
+                    .isEqualTo(AccountSubscriptionCycle.YEARLY)
+            }
+        }
+
+    private fun accountDetailWithCycle(
+        accountType: AccountType,
+        accountSubscriptionCycle: AccountSubscriptionCycle,
+        planSubscriptionId: String?,
+        subscriptions: List<AccountSubscriptionDetail>,
+    ): AccountDetail {
+        val levelDetail = AccountLevelDetail(
+            accountType = accountType,
+            subscriptionStatus = null,
+            subscriptionRenewTime = 0,
+            accountSubscriptionCycle = accountSubscriptionCycle,
+            proExpirationTime = 0,
+            accountPlanDetail = planSubscriptionId?.let {
+                AccountPlanDetail(
+                    accountType = accountType,
+                    isProPlan = true,
+                    expirationTime = null,
+                    subscriptionId = it,
+                    featuresList = emptyList(),
+                    isFreeTrial = false,
+                )
+            },
+            accountSubscriptionDetailList = subscriptions,
+        )
+        val storageDetail = AccountStorageDetail(
+            usedCloudDrive = 0,
+            usedRubbish = 0,
+            usedIncoming = 0,
+            totalStorage = 0,
+            usedStorage = 0,
+        )
+        return mock {
+            on { this.levelDetail }.thenReturn(levelDetail)
+            on { this.storageDetail }.thenReturn(storageDetail)
+        }
+    }
+
+    private fun subscriptionDetail(
+        subscriptionId: String,
+        cycle: AccountSubscriptionCycle,
+        level: AccountType,
+    ) = AccountSubscriptionDetail(
+        subscriptionId = subscriptionId,
+        subscriptionStatus = null,
+        subscriptionCycle = cycle,
+        paymentMethodType = null,
+        renewalTime = 0,
+        subscriptionLevel = level,
+        featuresList = emptyList(),
+        isFreeTrial = false,
+    )
+
+    private fun accountDetailWithoutStorage(): AccountDetail {
+        val levelDetail = mock<AccountLevelDetail> {
+            on { this.accountType }.thenReturn(AccountType.FREE)
+        }
+        return mock {
+            on { this.storageDetail }.thenReturn(null)
+            on { this.levelDetail }.thenReturn(levelDetail)
+        }
+    }
+
+    private fun subscription(accountType: AccountType, storage: Int) = Subscription(
+        sku = "sku_${accountType.name}_$storage",
         accountType = accountType,
         handle = 1L,
         storage = storage,
-        transfer = transfer,
+        transfer = 0,
         amount = CurrencyAmount(4.99f, Currency("EUR")),
     )
 

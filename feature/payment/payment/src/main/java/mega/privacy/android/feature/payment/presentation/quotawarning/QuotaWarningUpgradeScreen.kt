@@ -42,6 +42,7 @@ import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
+import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.feature.payment.components.QuotaCurrentPlanCard
@@ -54,6 +55,7 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.resources.R as sharedR
+import java.util.Locale
 
 /**
  * Quota-warning upsell screen: shows the user's current usage against the plan limit and
@@ -382,10 +384,16 @@ private fun recommendedCardData(
     subscription: LocalisedSubscription,
     state: QuotaWarningUpgradeState,
     metric: QuotaMetric,
-    locale: java.util.Locale,
+    locale: Locale,
     context: android.content.Context,
 ): RecommendedCardData {
-    val useYearly = subscription.hasSubscriptionFor(isMonthly = false)
+    // Match the user's current billing cycle: monthly subscribers see monthly (falling back to
+    // yearly if no monthly option exists), everyone else (free/yearly/one-off) sees yearly.
+    val useYearly = if (state.subscriptionCycle == AccountSubscriptionCycle.MONTHLY) {
+        !subscription.hasSubscriptionFor(isMonthly = true)
+    } else {
+        subscription.hasSubscriptionFor(isMonthly = false)
+    }
     val perMonthPrice = if (useYearly) {
         subscription.localisePriceOfYearlyAmountPerMonth(locale)?.price
             ?: subscription.localisePriceCurrencyCode(locale, isMonthly = false).price
