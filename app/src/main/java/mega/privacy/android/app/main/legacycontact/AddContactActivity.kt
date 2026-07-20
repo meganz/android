@@ -3219,6 +3219,11 @@ class AddContactActivity : PasscodeActivity(), View.OnClickListener,
         const val EXTRA_CHAT_LINK: String = "chatLink"
 
         /**
+         * Extra group chat image URI (as a string), chosen for the new group's avatar.
+         */
+        const val EXTRA_GROUP_CHAT_IMAGE: String = "groupChatImage"
+
+        /**
          * Extra Contact Type
          */
         const val EXTRA_CONTACT_TYPE: String = "contactType"

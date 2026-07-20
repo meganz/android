@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -15,7 +17,9 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import timber.log.Timber
@@ -30,11 +34,13 @@ import javax.inject.Inject
  *
  * @property getContactsUseCase
  * @property contactItemUiStateMapper
+ * @property getFeatureFlagValueUseCase
  */
 @HiltViewModel
 class CreateChatViewModel @Inject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val contactItemUiStateMapper: ContactItemUiStateMapper,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : ViewModel() {
 
     private val queryChannel = Channel<String?>(Channel.CONFLATED)
@@ -63,12 +69,17 @@ class CreateChatViewModel @Inject constructor(
                     .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.ui.displayName })
                     .also { indexed -> handleToEmail = indexed.associate { it.ui.handle to it.data.email } }
             },
-        ) { query, indexed: List<IndexedContact> ->
+            flow {
+                emit(getFeatureFlagValueUseCase(AppFeatures.CustomChatAvatar))
+                awaitCancellation()
+            }
+        ) { query, indexed: List<IndexedContact>, chatAvatarFlagEnabled ->
             val visible =
                 if (query.isNullOrBlank()) indexed else indexed.filter { it.matches(query) }
             CreateChatUiState.Data(
                 contacts = visible.map { it.ui }.toImmutableList(),
                 query = query,
+                allowGroupImageSelection = chatAvatarFlagEnabled,
             )
         }.catch { Timber.e(it) }
             .asUiStateFlow(viewModelScope, CreateChatUiState.Loading)

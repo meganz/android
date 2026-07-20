@@ -106,6 +106,10 @@ class CreateGroupChatComposeActivity : AppCompatActivity() {
                                 AddContactActivity.ALLOW_ADD_PARTICIPANTS,
                                 result.allowAddParticipants,
                             )
+                            .putExtra(
+                                AddContactActivity.EXTRA_GROUP_CHAT_IMAGE,
+                                result.imageUri?.value,
+                            )
                             .putExtra(AddContactActivity.EXTRA_GROUP_CHAT, true)
                             .putExtra(AddContactActivity.EXTRA_ONLY_CREATE_GROUP, true)
                         setResult(RESULT_OK, data)

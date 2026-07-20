@@ -110,4 +110,20 @@ class ContactItemViewScreenshotTest {
             )
         }
     }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun ContactItemViewRemove() {
+        AndroidThemeForPreviews {
+            ContactItemView(
+                displayName = "Eve",
+                statusText = "Busy",
+                status = ContactItemStatus.Busy,
+                avatar = AvatarData.Initials(initials = "E", avatarColor = Color(0xFFAD1457)),
+                isVerified = true,
+                onRemoveClicked = {},
+            )
+        }
+    }
 }

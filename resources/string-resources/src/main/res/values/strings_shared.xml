@@ -3091,6 +3091,12 @@
     <string name="create_group_chat_get_chat_link_label">Get chat link</string>
     <!-- Create group chat: label of the toggle allowing non-host participants to add others -->
     <string name="create_group_chat_allow_add_participants_label">Allow non-hosts to add participants</string>
+    <!-- Create group chat: content description of the button used to add or change the group's image -->
+    <string name="create_group_chat_image_content_description">Group photo</string>
+    <!-- Create group chat: option to take a new photo with the camera for the group image -->
+    <string name="create_group_chat_image_take_photo">Take photo</string>
+    <!-- Create group chat: option to pick an existing photo from the gallery for the group image -->
+    <string name="create_group_chat_image_choose_from_gallery">Choose from gallery</string>
     <!-- Choose folders and files to pin to Home. Used both as the picker's top bar title and as the add button/link on the empty Pinned widget. -->
     <string name="home_pinned_choose_files_and_folders">Choose files &amp; folders</string>
     <!-- Title at the top of the redesigned subscription/upgrade page -->

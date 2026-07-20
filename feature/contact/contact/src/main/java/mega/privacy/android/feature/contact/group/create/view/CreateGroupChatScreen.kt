@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -54,6 +55,7 @@ internal fun CreateGroupChatScreen(
         isEkr: Boolean,
         isChatLink: Boolean,
         allowAddParticipants: Boolean,
+        imageUri: String?,
     ) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -86,6 +88,7 @@ internal fun CreateGroupChatScreenContent(
         isEkr: Boolean,
         isChatLink: Boolean,
         allowAddParticipants: Boolean,
+        imageUri: String?,
     ) -> Unit,
     onBack: () -> Unit,
     step: CreateGroupChatStep,
@@ -112,20 +115,24 @@ internal fun CreateGroupChatScreenContent(
         )
 
         CreateGroupChatStep.Settings -> SettingsStep(
-            contacts = (state as? CreateChatUiState.Data)?.contacts ?: emptyList(),
-            selectedHandles = selectionState.selectedHandles,
+            contacts = (state as? CreateChatUiState.Data)?.contacts?.toImmutableSet()
+                ?: emptyList<ContactItemUiState>().toImmutableSet(),
+            selectedHandles = selectionState.selectedHandles.toImmutableSet(),
             selectedCount = selectionState.selectedItemsCount,
             tagPrefix = CREATE_GROUP_CHAT_TAG_PREFIX,
-            onConfirm = { title, isEkr, isChatLink, allowAddParticipants ->
+            onConfirm = { title, isEkr, isChatLink, allowAddParticipants, imageUri ->
                 onConfirm(
                     selectionState.selectedHandles,
                     title,
                     isEkr,
                     isChatLink,
                     allowAddParticipants,
+                    imageUri,
                 )
             },
+            onRemoveParticipant = selectionState::toggleSelection,
             onBack = { stepChange(CreateGroupChatStep.Selection) },
+            allowGroupImageSelection = (state as? CreateChatUiState.Data)?.allowGroupImageSelection == true,
             modifier = modifier,
         )
     }
@@ -153,7 +160,11 @@ internal const val CREATE_GROUP_CHAT_CONFIRM_FAB_TAG = "$CREATE_GROUP_CHAT_TAG_P
 private class CreateGroupChatUiStateProvider : PreviewParameterProvider<CreateChatUiState> {
     override val values: Sequence<CreateChatUiState> = sequenceOf(
         CreateChatUiState.Loading,
-        CreateChatUiState.Data(contacts = persistentListOf(), query = null),
+        CreateChatUiState.Data(
+            contacts = persistentListOf(),
+            query = null,
+            allowGroupImageSelection = true,
+        ),
         CreateChatUiState.Data(
             contacts = listOf(
                 ContactItemUiState(
@@ -176,6 +187,7 @@ private class CreateGroupChatUiStateProvider : PreviewParameterProvider<CreateCh
                 ),
             ).toImmutableList(),
             query = null,
+            allowGroupImageSelection = true,
         ),
     )
 }
@@ -190,7 +202,7 @@ private fun CreateGroupChatScreenSelectionStepPreview(
             state = state,
             allowEmptyGroup = false,
             onSearchQueryChange = {},
-            onConfirm = { _, _, _, _, _ -> },
+            onConfirm = { _, _, _, _, _, _ -> },
             onBack = {},
             stepChange = {},
             step = CreateGroupChatStep.Selection,
@@ -225,6 +237,7 @@ private fun CreateGroupChatScreenSettingsStepPreview(
             ),
         ).toImmutableList(),
         query = null,
+        allowGroupImageSelection = true,
     )
 
     AndroidThemeForPreviews {
@@ -232,7 +245,7 @@ private fun CreateGroupChatScreenSettingsStepPreview(
             state = state,
             allowEmptyGroup = false,
             onSearchQueryChange = {},
-            onConfirm = { _, _, _, _, _ -> },
+            onConfirm = { _, _, _, _, _, _ -> },
             onBack = {},
             stepChange = {},
             step = CreateGroupChatStep.Settings,

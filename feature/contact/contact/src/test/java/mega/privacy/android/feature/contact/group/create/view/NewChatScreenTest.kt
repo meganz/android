@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertCountEquals
@@ -22,10 +23,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
 import mega.privacy.android.shared.contact.model.AvatarData
@@ -58,7 +61,7 @@ class NewChatScreenTest {
         setScreen(
             dataState(contact(1L, "Alice"), contact(2L, "Bob")),
             onConfirmOneToOne = { oneToOneHandle = it },
-            onConfirmGroup = { _, _, _, _, _ -> groupReported = true },
+            onConfirmGroup = { _, _, _, _, _, _ -> groupReported = true },
         )
 
         composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
@@ -87,7 +90,7 @@ class NewChatScreenTest {
         setScreen(
             dataState(contact(1L, "Alice"), contact(2L, "Bob")),
             onConfirmOneToOne = { oneToOneReported = true },
-            onConfirmGroup = { handles, _, _, _, _ -> groupHandles = handles },
+            onConfirmGroup = { handles, _, _, _, _, _ -> groupHandles = handles },
         )
 
         composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
@@ -97,6 +100,30 @@ class NewChatScreenTest {
 
         assertThat(groupHandles).containsExactly(1L, 2L)
         assertThat(oneToOneReported).isFalse()
+    }
+
+    @Test
+    fun `test that tapping the remove icon reports the participant handle`() {
+        val removed = mutableListOf<Long>()
+        composeTestRule.setContent {
+            SettingsStep(
+                contacts = listOf(contact(1L, "Alice"), contact(2L, "Bob")).toImmutableSet(),
+                selectedHandles = setOf(1L, 2L).toImmutableSet(),
+                selectedCount = 2,
+                tagPrefix = NEW_CHAT_TAG_PREFIX,
+                onConfirm = { _, _, _, _, _ -> },
+                onRemoveParticipant = { removed.add(it) },
+                allowGroupImageSelection = false,
+                onBack = {},
+            )
+        }
+
+        composeTestRule.onNodeWithTag(NEW_CHAT_SETTINGS_LIST_TAG)
+            .performScrollToNode(hasText("Alice"))
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_REMOVE, useUnmergedTree = true)[0]
+            .performSemanticsAction(SemanticsActions.OnClick)
+
+        assertThat(removed).containsExactly(1L)
     }
 
     @Test
@@ -145,7 +172,8 @@ class NewChatScreenTest {
         state: CreateChatUiState,
         onSearchQueryChange: (String?) -> Unit = {},
         onConfirmOneToOne: (Long) -> Unit = {},
-        onConfirmGroup: (Set<Long>, String?, Boolean, Boolean, Boolean) -> Unit = { _, _, _, _, _ -> },
+        onConfirmGroup: (Set<Long>, String?, Boolean, Boolean, Boolean, String?) -> Unit =
+            { _, _, _, _, _, _ -> },
         onBack: () -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -171,6 +199,7 @@ class NewChatScreenTest {
                     CreateChatUiState.Data(
                         contacts = contacts.toImmutableList(),
                         query = null,
+                        allowGroupImageSelection = true,
                     ),
                 )
             }
@@ -185,17 +214,22 @@ class NewChatScreenTest {
                     state = CreateChatUiState.Data(
                         contacts = visible.toImmutableList(),
                         query = query,
+                        allowGroupImageSelection = true,
                     )
                 },
                 onConfirmOneToOne = {},
-                onConfirmGroup = { _, _, _, _, _ -> },
+                onConfirmGroup = { _, _, _, _, _, _ -> },
                 onBack = {},
             )
         }
     }
 
     private fun dataState(vararg contacts: ContactItemUiState) =
-        CreateChatUiState.Data(contacts = contacts.toList().toImmutableList(), query = null)
+        CreateChatUiState.Data(
+            contacts = contacts.toList().toImmutableList(),
+            query = null,
+            allowGroupImageSelection = true,
+        )
 
     private fun contact(
         handle: Long,
@@ -225,6 +259,7 @@ class NewChatScreenTest {
 
     private companion object {
         const val CONTACT_ITEM_VIEW_ROW = "contact_item_view:row"
+        const val CONTACT_ITEM_VIEW_REMOVE = "contact_item_view:remove"
         const val NEW_CHAT_NEXT_FAB_TAG = "$NEW_CHAT_TAG_PREFIX$NEXT_FAB_SUFFIX"
         const val NEW_CHAT_SETTINGS_TAG = "$NEW_CHAT_TAG_PREFIX$SETTINGS_SUFFIX"
         const val NEW_CHAT_SETTINGS_LIST_TAG = "$NEW_CHAT_TAG_PREFIX$SETTINGS_LIST_SUFFIX"

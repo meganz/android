@@ -11,6 +11,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.contact.group.create.navigation.NewChatEntry
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -82,6 +83,8 @@ private class NewChatContract : ActivityResultContract<Unit, NewChatNavKey.NewCh
                     AddContactActivity.ALLOW_ADD_PARTICIPANTS,
                     false,
                 ),
+                imageUri = intent.getStringExtra(AddContactActivity.EXTRA_GROUP_CHAT_IMAGE)
+                    ?.let(::UriPath),
             )
         } else {
             null

@@ -2,6 +2,7 @@ package mega.privacy.android.navigation.destination
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.dialog.DialogNavKey
 
 /**
@@ -79,6 +80,7 @@ data object NewChatNavKey : NavKey {
          * @property isEkr Encrypted key rotation enabled (private, cannot be made public).
          * @property isChatLink A public chat link should be created.
          * @property allowAddParticipants Non-host participants may add others.
+         * @property imageUri Optional group avatar image chosen by the user, or null when none.
          */
         @Serializable
         data class GroupSettings(
@@ -86,6 +88,7 @@ data object NewChatNavKey : NavKey {
             val isEkr: Boolean,
             val isChatLink: Boolean,
             val allowAddParticipants: Boolean,
+            val imageUri: UriPath?,
         )
     }
 }
@@ -109,6 +112,7 @@ data class CreateGroupChatNavKey(val allowEmptyGroup: Boolean) : NavKey {
      * @property isEkr Encrypted key rotation enabled (private, cannot be made public).
      * @property isChatLink A public chat link should be created.
      * @property allowAddParticipants Non-host participants may add others.
+     * @property imageUri Optional group avatar image chosen by the user, or null when none.
      */
     @Serializable
     data class NewGroupChatResult(
@@ -117,5 +121,6 @@ data class CreateGroupChatNavKey(val allowEmptyGroup: Boolean) : NavKey {
         val isEkr: Boolean,
         val isChatLink: Boolean,
         val allowAddParticipants: Boolean,
+        val imageUri: UriPath?,
     )
 }

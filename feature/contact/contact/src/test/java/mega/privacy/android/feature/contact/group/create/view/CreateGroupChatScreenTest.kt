@@ -6,9 +6,9 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.hasImeAction
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
@@ -24,8 +24,8 @@ import kotlinx.collections.immutable.toImmutableList
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
 import mega.privacy.android.shared.contact.model.AvatarData
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.contact.model.ContactItemUiState
+import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,7 +46,13 @@ class CreateGroupChatScreenTest {
 
     @Test
     fun `test that the empty view is displayed when there are no contacts`() {
-        setScreen(CreateChatUiState.Data(contacts = persistentListOf(), query = null))
+        setScreen(
+            CreateChatUiState.Data(
+                contacts = persistentListOf(),
+                query = null,
+                allowGroupImageSelection = true,
+            )
+        )
 
         composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_EMPTY_TAG).assertIsDisplayed()
     }
@@ -146,7 +152,7 @@ class CreateGroupChatScreenTest {
         var result: Result? = null
         setScreen(
             dataState(contact(1L, "Alice")),
-            onConfirm = { handles, title, isEkr, isChatLink, allowAdd ->
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd, _ ->
                 result = Result(handles, title, isEkr, isChatLink, allowAdd)
             },
         )
@@ -170,7 +176,7 @@ class CreateGroupChatScreenTest {
         var result: Result? = null
         setScreen(
             dataState(contact(1L, "Alice")),
-            onConfirm = { handles, title, isEkr, isChatLink, allowAdd ->
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd, _ ->
                 result = Result(handles, title, isEkr, isChatLink, allowAdd)
             },
         )
@@ -189,7 +195,7 @@ class CreateGroupChatScreenTest {
         var result: Result? = null
         setScreen(
             dataState(contact(1L, "Alice")),
-            onConfirm = { handles, title, isEkr, isChatLink, allowAdd ->
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd, _ ->
                 result = Result(handles, title, isEkr, isChatLink, allowAdd)
             },
         )
@@ -206,7 +212,7 @@ class CreateGroupChatScreenTest {
         var result: Result? = null
         setScreen(
             dataState(contact(1L, "Alice")),
-            onConfirm = { handles, title, isEkr, isChatLink, allowAdd ->
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd, _ ->
                 result = Result(handles, title, isEkr, isChatLink, allowAdd)
             },
         )
@@ -227,7 +233,7 @@ class CreateGroupChatScreenTest {
         var result: Result? = null
         setScreen(
             dataState(contact(1L, "Alice")),
-            onConfirm = { handles, title, isEkr, isChatLink, allowAdd ->
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd, _ ->
                 result = Result(handles, title, isEkr, isChatLink, allowAdd)
             },
         )
@@ -259,7 +265,8 @@ class CreateGroupChatScreenTest {
         state: CreateChatUiState,
         allowEmptyGroup: Boolean = false,
         onSearchQueryChange: (String?) -> Unit = {},
-        onConfirm: (Set<Long>, String?, Boolean, Boolean, Boolean) -> Unit = { _, _, _, _, _ -> },
+        onConfirm: (Set<Long>, String?, Boolean, Boolean, Boolean, String?) -> Unit =
+            { _, _, _, _, _, _ -> },
         onBack: () -> Unit = {},
     ) {
         composeTestRule.setContent {
@@ -274,7 +281,11 @@ class CreateGroupChatScreenTest {
     }
 
     private fun dataState(vararg contacts: ContactItemUiState) =
-        CreateChatUiState.Data(contacts = contacts.toList().toImmutableList(), query = null)
+        CreateChatUiState.Data(
+            contacts = contacts.toList().toImmutableList(),
+            query = null,
+            allowGroupImageSelection = true,
+        )
 
     private fun contact(
         handle: Long,

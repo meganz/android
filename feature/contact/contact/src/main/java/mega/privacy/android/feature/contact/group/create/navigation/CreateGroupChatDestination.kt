@@ -7,6 +7,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.contact.group.create.CreateChatViewModel
 import mega.privacy.android.feature.contact.group.create.view.CreateGroupChatScreen
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CreateGroupChatNavKey
 
@@ -35,7 +36,7 @@ fun CreateGroupChatEntry(
         state = state,
         allowEmptyGroup = allowEmptyGroup,
         onSearchQueryChange = viewModel::setQuery,
-        onConfirm = { handles, title, isEkr, isChatLink, allowAddParticipants ->
+        onConfirm = { handles, title, isEkr, isChatLink, allowAddParticipants, imageUri ->
             navigationHandler.returnResult(
                 CreateGroupChatNavKey.KEY,
                 CreateGroupChatNavKey.NewGroupChatResult(
@@ -44,6 +45,7 @@ fun CreateGroupChatEntry(
                     isEkr = isEkr,
                     isChatLink = isChatLink,
                     allowAddParticipants = allowAddParticipants,
+                    imageUri = imageUri?.let(::UriPath),
                 ),
             )
         },

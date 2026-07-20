@@ -12,7 +12,9 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.contact.group.create.model.CreateChatUiState
+import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
@@ -24,6 +26,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 import java.time.Instant
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -36,20 +39,23 @@ class CreateChatViewModelTest {
         contactItemStatusMapper = ContactItemStatusMapper(),
         contactItemAvatarMapper = ContactItemAvatarMapper(),
     )
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeEach
     fun setUp() {
+        whenever { getFeatureFlagValueUseCase(AppFeatures.CustomChatAvatar) } doReturn false
         underTest = createViewModel()
     }
 
     @AfterEach
     fun tearDown() {
-        reset(getContactsUseCase)
+        reset(getContactsUseCase, getFeatureFlagValueUseCase)
     }
 
     private fun createViewModel() = CreateChatViewModel(
         getContactsUseCase = getContactsUseCase,
         contactItemUiStateMapper = contactItemUiStateMapper,
+        getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
     )
 
     @Test
@@ -159,6 +165,30 @@ class CreateChatViewModelTest {
                 assertThat(state.contacts.map { it.displayName }).containsExactly("Bob")
                 assertThat(underTest.emailsForSelected(setOf(1L)))
                     .containsExactly("a@test.com")
+            }
+        }
+
+    @Test
+    fun `test that allowGroupImageSelection is true when CustomChatAvatar flag is enabled`() =
+        runTest {
+            whenever { getFeatureFlagValueUseCase(AppFeatures.CustomChatAvatar) } doReturn true
+            underTest = createViewModel()
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().allowGroupImageSelection).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that allowGroupImageSelection is false when CustomChatAvatar flag is disabled`() =
+        runTest {
+            whenever { getFeatureFlagValueUseCase(AppFeatures.CustomChatAvatar) } doReturn false
+            underTest = createViewModel()
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().allowGroupImageSelection).isFalse()
             }
         }
 

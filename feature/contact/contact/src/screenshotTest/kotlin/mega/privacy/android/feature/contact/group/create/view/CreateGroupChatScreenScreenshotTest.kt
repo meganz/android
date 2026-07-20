@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import com.android.tools.screenshot.PreviewTest
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -24,7 +25,7 @@ class CreateGroupChatScreenScreenshotTest {
                 state = CreateChatUiState.Loading,
                 allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirm = { _, _, _, _, _, _ -> },
                 onBack = {},
             )
         }
@@ -36,10 +37,13 @@ class CreateGroupChatScreenScreenshotTest {
     fun CreateGroupChatScreenEmpty() {
         AndroidThemeForPreviews {
             CreateGroupChatScreen(
-                state = CreateChatUiState.Data(contacts = persistentListOf(), query = null),
+                state = CreateChatUiState.Data(
+                    contacts = persistentListOf(), query = null,
+                    allowGroupImageSelection = true,
+                ),
                 allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirm = { _, _, _, _, _, _ -> },
                 onBack = {},
             )
         }
@@ -54,7 +58,7 @@ class CreateGroupChatScreenScreenshotTest {
                 state = sampleData(),
                 allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirm = { _, _, _, _, _, _ -> },
                 onBack = {},
             )
         }
@@ -69,7 +73,7 @@ class CreateGroupChatScreenScreenshotTest {
                 state = sampleData(),
                 allowEmptyGroup = false,
                 onSearchQueryChange = {},
-                onConfirm = { _, _, _, _, _ -> },
+                onConfirm = { _, _, _, _, _, _ -> },
                 onBack = {},
                 step = CreateGroupChatStep.Settings,
                 selectionState = rememberContactSelectionState(
@@ -86,14 +90,16 @@ class CreateGroupChatScreenScreenshotTest {
     fun CreateGroupChatScreenChatLinkNameError() {
         AndroidThemeForPreviews {
             SettingsStep(
-                contacts = sampleData().contacts,
-                selectedHandles = setOf(1L, 2L),
+                contacts = sampleData().contacts.toImmutableSet(),
+                selectedHandles = setOf(1L, 2L).toImmutableSet(),
                 selectedCount = 2,
                 tagPrefix = CREATE_GROUP_CHAT_TAG_PREFIX,
-                onConfirm = { _, _, _, _ -> },
+                onConfirm = { _, _, _, _, _ -> },
+                onRemoveParticipant = {},
                 onBack = {},
                 initialChatLink = true,
                 initialConfirmAttempted = true,
+                allowGroupImageSelection = true,
             )
         }
     }
@@ -105,6 +111,7 @@ class CreateGroupChatScreenScreenshotTest {
             contact(3L, "Charlie Clark", "charlie@example.com", Color(0xFF6A1B9A)),
         ).toImmutableList(),
         query = null,
+        allowGroupImageSelection = true,
     )
 
     private fun contact(

@@ -7,6 +7,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.privacy.android.feature.contact.group.create.CreateChatViewModel
 import mega.privacy.android.feature.contact.group.create.view.NewChatScreen
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.NewChatNavKey
 
@@ -40,7 +41,7 @@ fun NewChatEntry(
                 ),
             )
         },
-        onConfirmGroup = { handles, title, isEkr, isChatLink, allowAddParticipants ->
+        onConfirmGroup = { handles, title, isEkr, isChatLink, allowAddParticipants, imageUri ->
             navigationHandler.returnResult(
                 NewChatNavKey.KEY,
                 NewChatNavKey.NewChatResult(
@@ -50,6 +51,7 @@ fun NewChatEntry(
                         isEkr = isEkr,
                         isChatLink = isChatLink,
                         allowAddParticipants = allowAddParticipants,
+                        imageUri = imageUri?.let(::UriPath),
                     ),
                 ),
             )

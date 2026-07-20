@@ -103,6 +103,10 @@ class NewChatComposeActivity : AppCompatActivity() {
                                     AddContactActivity.ALLOW_ADD_PARTICIPANTS,
                                     settings.allowAddParticipants,
                                 )
+                                .putExtra(
+                                    AddContactActivity.EXTRA_GROUP_CHAT_IMAGE,
+                                    settings.imageUri?.value,
+                                )
                         }
                         setResult(RESULT_OK, data)
                         finish()
