@@ -156,6 +156,18 @@ class FileInfoScreenTest {
     }
 
     @Test
+    fun `test that the loading skeleton uses the two-pane layout in landscape`() {
+        setContent(
+            uiState = FileInfoUiState(isLoading = true),
+            orientation = Configuration.ORIENTATION_LANDSCAPE,
+            deviceType = DeviceType.Tablet,
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_LOADING_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(FILE_INFO_DETAILS_TAG).assertExists()
+    }
+
+    @Test
     fun `test that clicking the location row invokes onLocationClick`() {
         var clicked = false
         setContent(uiState = fileState, onLocationClick = { clicked = true })
