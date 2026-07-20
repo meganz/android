@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandleUseCa
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -108,6 +109,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
     private val setShowLineNumbersPreferenceUseCase: SetShowLineNumbersPreferenceUseCase,
     private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val getNodeAccessUseCase: GetNodeAccessUseCase,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val textEditorBottomBarActionsMapper: TextEditorBottomBarActionsMapper,
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase,
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase,
@@ -1186,6 +1188,11 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 else node?.let { getNodeAccessUseCase(NodeId(resolvedNodeHandle)) }
             val isNodeExported = node?.exportedData != null
             val name = node?.name
+            val isNodeInBackups = node?.let {
+                runCatching { isNodeInBackupsUseCase(resolvedNodeHandle) }
+                    .onFailure { error -> Timber.e(error, "Failed to check if node is in backups") }
+                    .getOrDefault(false)
+            } ?: false
             name to textEditorBottomBarActionsMapper(
                 args.mode,
                 accessPermission,
@@ -1194,6 +1201,7 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                 args.showDownload,
                 args.showShare,
                 args.showSendToChat,
+                isNodeInBackups,
             )
         }.getOrElse { null to emptyList() }
         _uiState.update {

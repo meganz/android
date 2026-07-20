@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.PlaybackException
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.Player
 import androidx.media3.common.Timeline
 import androidx.media3.session.MediaController
@@ -64,29 +65,30 @@ internal class AudioMediaControllerFacade @Inject constructor(
             Timber.e(it, "Failed to create SessionToken for AudioPlayerService")
             return
         }
-        controllerFuture = MediaController.Builder(context, sessionToken).buildAsync().also { future ->
-            Futures.addCallback(
-                future,
-                object : FutureCallback<MediaController> {
-                    override fun onSuccess(result: MediaController) {
-                        // Guard against delivery after release() was already called.
-                        if (controllerFuture == null) {
-                            result.release()
-                            return
+        controllerFuture =
+            MediaController.Builder(context, sessionToken).buildAsync().also { future ->
+                Futures.addCallback(
+                    future,
+                    object : FutureCallback<MediaController> {
+                        override fun onSuccess(result: MediaController) {
+                            // Guard against delivery after release() was already called.
+                            if (controllerFuture == null) {
+                                result.release()
+                                return
+                            }
+                            controller = result
+                            result.addListener(playerListener)
+                            syncAndEmit(result)
+                            startPositionPolling()
                         }
-                        controller = result
-                        result.addListener(playerListener)
-                        syncAndEmit(result)
-                        startPositionPolling()
-                    }
 
-                    override fun onFailure(t: Throwable) {
-                        Timber.e(t, "Failed to connect MediaController to AudioPlayerService")
-                    }
-                },
-                ContextCompat.getMainExecutor(context),
-            )
-        }
+                        override fun onFailure(t: Throwable) {
+                            Timber.e(t, "Failed to connect MediaController to AudioPlayerService")
+                        }
+                    },
+                    ContextCompat.getMainExecutor(context),
+                )
+            }
     }
 
     private fun syncAndEmit(c: MediaController) {
@@ -102,6 +104,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
             artist = c.mediaMetadata.artist?.toString(),
             artworkUri = c.mediaMetadata.artworkUri?.toString(),
             currentMediaItemId = c.currentMediaItem?.mediaId,
+            playbackSpeed = c.playbackParameters.speed,
         )
         _playerState.tryEmit(currentState)
     }
@@ -147,6 +150,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
         override fun onTimelineChanged(timeline: Timeline, reason: Int) {
             val ctrl = controller ?: return
             updateState { copy(mediaItemCount = ctrl.mediaItemCount) }
+        }
+
+        override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+            updateState { copy(playbackSpeed = playbackParameters.speed) }
         }
 
         override fun onPlayerError(error: PlaybackException) {
@@ -211,6 +218,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
 
     override fun setRepeatMode(mode: Int) {
         controller?.setRepeatMode(mode)
+    }
+
+    override fun setPlaybackSpeed(speed: Float) {
+        controller?.setPlaybackSpeed(speed)
     }
 
     override fun stop() {

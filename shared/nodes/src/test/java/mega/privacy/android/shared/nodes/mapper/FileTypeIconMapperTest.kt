@@ -8,6 +8,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.util.stream.Stream
@@ -66,6 +67,15 @@ class FileTypeIconMapperTest {
                 R.drawable.ic_image_thumbnail_outline
             )
         }
+    }
+
+    @ParameterizedTest(name = "extension {0}")
+    @ValueSource(strings = ["heic", "webp"])
+    fun `test that modern image extensions return the image icon`(extension: String) {
+        Truth.assertThat(underTest(extension, IconType.Solid))
+            .isEqualTo(R.drawable.ic_image_medium_solid)
+        Truth.assertThat(underTest(extension, IconType.Outlined))
+            .isEqualTo(R.drawable.ic_image_thumbnail_outline)
     }
 
     private fun provideParams(): Stream<Arguments> = Stream.of(

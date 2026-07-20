@@ -951,6 +951,7 @@ internal class ChatExplorerViewModelTest {
                     isEkr = false,
                     allowAddParticipants = true,
                     isChatLink = false,
+                    imageUri = null,
                 )
             )
 
@@ -976,6 +977,7 @@ internal class ChatExplorerViewModelTest {
                     isEkr = true,
                     allowAddParticipants = false,
                     isChatLink = true,
+                    imageUri = null,
                 )
             )
 
@@ -1001,6 +1003,7 @@ internal class ChatExplorerViewModelTest {
                     isEkr = false,
                     allowAddParticipants = true,
                     isChatLink = false,
+                    imageUri = null,
                 )
             )
 
@@ -1034,6 +1037,7 @@ internal class ChatExplorerViewModelTest {
                         isEkr = false,
                         allowAddParticipants = true,
                         isChatLink = false,
+                        imageUri = null,
                     )
                 )
 
@@ -1067,6 +1071,7 @@ internal class ChatExplorerViewModelTest {
                     isEkr = false,
                     allowAddParticipants = true,
                     isChatLink = false,
+                    imageUri = null,
                 )
             )
             val triggered = awaitItem() as ChatExplorerUiState.Data

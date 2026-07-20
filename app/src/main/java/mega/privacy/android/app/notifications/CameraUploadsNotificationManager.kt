@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_SHOW_HOW_TO_UPL
 import mega.privacy.android.data.wrapper.StringWrapper
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadFolderType
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsStatusInfo
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.feature.sync.ui.formatter.FolderConflictMessageFormatter
@@ -33,7 +34,10 @@ import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.CameraUploadsFolderConflictDetectedEvent
 import timber.log.Timber
@@ -315,11 +319,25 @@ class CameraUploadsNotificationManager @Inject constructor(
      *  Display a notification in case the cloud storage does not have enough space
      */
     private suspend fun showStorageOverQuotaNotification() {
-        val pendingIntent =
+        val useUpsell = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+        }.getOrDefault(false)
+        val pendingIntent = if (useUpsell) {
+            megaNavigator.getPendingIntentWithDestination(
+                context = context,
+                singleActivityDestination = {
+                    QuotaWarningUpgradeNavKey(
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                }
+            )
+        } else {
             megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }
             )
+        }
         val notification = createNotification(
             title = context.getString(R.string.overquota_alert_title),
             content = context.getString(R.string.download_show_info),

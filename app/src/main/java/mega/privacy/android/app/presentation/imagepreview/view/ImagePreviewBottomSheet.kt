@@ -80,6 +80,7 @@ internal fun ImagePreviewBottomSheet(
     showHideMenu: suspend (ImageNode) -> Boolean,
     showUnhideMenu: suspend (ImageNode) -> Boolean,
     forceHideHiddenMenus: () -> Boolean,
+    isNodeInBackups: suspend (ImageNode) -> Boolean = { false },
     showMoveMenu: suspend (ImageNode) -> Boolean,
     showCopyMenu: suspend (ImageNode) -> Boolean,
     showRestoreMenu: suspend (ImageNode) -> Boolean,
@@ -195,6 +196,10 @@ internal fun ImagePreviewBottomSheet(
                 value = showUnhideMenu(imageNode)
             }
 
+            val isInBackups by produceState(false, imageNode) {
+                value = isNodeInBackups(imageNode)
+            }
+
             val isMoveMenuVisible by produceState(false, imageNode) {
                 value = showMoveMenu(imageNode)
             }
@@ -228,11 +233,13 @@ internal fun ImagePreviewBottomSheet(
             }
 
             // Temporary solution to handle group divider visibility in this legacy code
-            val isHideItemVisible = !forceHideHiddenMenus()
+            val isHideItemVisible = !isInBackups
+                    && !forceHideHiddenMenus()
                     && accountType != null
                     && (!accountType.isPaid || isBusinessAccountExpired
                     || (isHideMenuVisible && isHiddenNodesOnboarded != null))
-            val isUnhideItemVisible = !forceHideHiddenMenus()
+            val isUnhideItemVisible = !isInBackups
+                    && !forceHideHiddenMenus()
                     && accountType?.isPaid == true
                     && !isBusinessAccountExpired && isUnhideMenuVisible
 

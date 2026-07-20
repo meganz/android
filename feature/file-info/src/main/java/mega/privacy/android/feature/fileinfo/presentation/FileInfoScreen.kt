@@ -4,15 +4,14 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -39,7 +38,7 @@ import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.modifiers.shimmerEffect
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -130,13 +129,44 @@ private fun FileInfoContent(
     onDescriptionChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    FileInfoResponsiveLayout(
+        modifier = modifier,
+        header = { headerModifier ->
+            FileInfoHeader(uiState = uiState, modifier = headerModifier)
+        },
+        details = {
+            FileInfoDetails(
+                uiState = uiState,
+                nodeHandle = nodeHandle,
+                onLocationClick = onLocationClick,
+                onNavigate = onNavigate,
+                onDescriptionChange = onDescriptionChange,
+            )
+        },
+    )
+}
+
+/**
+ * Lays out the header and the scrollable details responsively: stacked in portrait, and a two-pane
+ * row in landscape (constrained to a centered fraction of the width on tablets so neither pane
+ * stretches across a wide screen). Shared by the loaded content and the loading skeleton so both
+ * adapt identically.
+ *
+ * @param header receives the sizing modifier to apply to the header slot (full width in portrait,
+ * an equal-weight column with the header aspect ratio in landscape)
+ * @param details the scrollable detail rows, laid out in a column
+ */
+@Composable
+internal fun FileInfoResponsiveLayout(
+    modifier: Modifier = Modifier,
+    header: @Composable (Modifier) -> Unit,
+    details: @Composable ColumnScope.() -> Unit,
+) {
     val isLandscape =
         LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val isTablet = LocalDeviceType.current == DeviceType.Tablet
 
     if (isLandscape) {
-        // On wide tablet screens the two panes are constrained to a fraction of the width and
-        // centered, so neither the header nor the map stretches across the whole screen.
         val contentWidthFraction = if (isTablet) TABLET_LANDSCAPE_WIDTH_FRACTION else 1f
         Box(
             modifier = modifier.fillMaxSize(),
@@ -146,18 +176,15 @@ private fun FileInfoContent(
                 modifier = Modifier
                     .fillMaxWidth(contentWidthFraction)
                     .fillMaxHeight()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.Top,
             ) {
-                FileInfoHeader(
-                    uiState = uiState,
-                    // Fill the available height on phones (matches the design) but cap it so the
-                    // header doesn't stretch to the full screen height on taller tablet screens.
-                    modifier = Modifier
+                header(
+                    Modifier
                         .weight(1f)
-                        .heightIn(max = LANDSCAPE_HEADER_MAX_HEIGHT)
-                        .fillMaxHeight(),
+                        .aspectRatio(HEADER_ASPECT_RATIO),
                 )
                 Column(
                     modifier = Modifier
@@ -167,15 +194,8 @@ private fun FileInfoContent(
                         .verticalScroll(rememberScrollState())
                         .testTag(FILE_INFO_DETAILS_TAG),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                ) {
-                    FileInfoDetails(
-                        uiState = uiState,
-                        nodeHandle = nodeHandle,
-                        onLocationClick = onLocationClick,
-                        onNavigate = onNavigate,
-                        onDescriptionChange = onDescriptionChange,
-                    )
-                }
+                    content = details,
+                )
             }
         }
     } else {
@@ -188,24 +208,18 @@ private fun FileInfoContent(
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            FileInfoHeader(
-                uiState = uiState,
-                modifier = Modifier
+            header(
+                Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .aspectRatio(HEADER_ASPECT_RATIO),
             )
-            FileInfoDetails(
-                uiState = uiState,
-                nodeHandle = nodeHandle,
-                onLocationClick = onLocationClick,
-                onNavigate = onNavigate,
-                onDescriptionChange = onDescriptionChange,
-            )
+            details()
         }
     }
 }
 
-private val LANDSCAPE_HEADER_MAX_HEIGHT = 264.dp
+// The header preview keeps the design's 380x200 container proportions across sizes.
+private const val HEADER_ASPECT_RATIO = 1.9f
 private const val TABLET_LANDSCAPE_WIDTH_FRACTION = 0.7f
 
 @Composable
@@ -269,7 +283,7 @@ private fun FileInfoDetails(
             uiState.isIncomingShare ->
                 add(stringResource(sharedR.string.file_info_information_incoming_share))
 
-            uiState.isFile -> uiState.fileTypeExtension?.uppercase()?.let(::add)
+            uiState.isFile -> uiState.fileTypeName?.text?.let(::add)
             else -> add(stringResource(sharedR.string.file_info_information_type_folder))
         }
         if (uiState.sizeInBytes > 0) {
@@ -452,29 +466,6 @@ private fun locationRootLabel(sourceType: NodeSourceType?): String? = when (sour
     else -> null
 }
 
-@Composable
-private fun FileInfoLoading(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .testTag(FILE_INFO_LOADING_TAG)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .shimmerEffect(shape = RoundedCornerShape(16.dp)),
-        )
-        Box(
-            modifier = Modifier
-                .width(200.dp)
-                .height(24.dp)
-                .shimmerEffect(),
-        )
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @CombinedThemePreviews
@@ -487,7 +478,7 @@ private fun FileInfoScreenFilePreview() {
                 title = "Presentation.pdf",
                 isFile = true,
                 iconRes = iconPackR.drawable.ic_pdf_medium_solid,
-                fileTypeExtension = "pdf",
+                fileTypeName = LocalizedText.StringRes(sharedR.string.file_type_name_pdf_document),
                 sizeInBytes = 10L * 1024 * 1024,
                 creationTime = 1_749_000_000L,
                 modificationTime = 1_749_500_000L,
@@ -518,7 +509,7 @@ private fun FileInfoScreenVideoPreview() {
                 title = "housetour.mov",
                 isFile = true,
                 iconRes = iconPackR.drawable.ic_video_medium_solid,
-                fileTypeExtension = "mov",
+                fileTypeName = LocalizedText.StringRes(sharedR.string.file_type_name_video),
                 sizeInBytes = 4L * 1024 * 1024,
                 durationText = "1:24",
                 creationTime = 1_749_000_000L,
@@ -661,22 +652,6 @@ private fun FileInfoScreenIncomingShareFolderPreview() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@CombinedThemePreviews
-@Composable
-private fun FileInfoScreenLoadingPreview() {
-    AndroidThemeForPreviews {
-        FileInfoScreen(
-            uiState = FileInfoUiState(isLoading = true),
-            nodeHandle = 0L,
-            onBack = {},
-            onLocationClick = {},
-            onNavigate = {},
-            onDescriptionChange = {},
-        )
-    }
-}
-
 internal const val FILE_INFO_SCREEN_TAG = "file_info_screen:scaffold"
 internal const val FILE_INFO_APP_BAR_TAG = "file_info_screen:app_bar"
 internal const val FILE_INFO_HEADER_TAG = "file_info_screen:header"
@@ -693,6 +668,5 @@ internal const val FILE_INFO_PERMISSIONS_TAG = "file_info_screen:permissions"
 internal const val FILE_INFO_VERSIONS_TAG = "file_info_screen:versions"
 internal const val FILE_INFO_CURRENT_VERSIONS_TAG = "file_info_screen:current_versions"
 internal const val FILE_INFO_PREVIOUS_VERSIONS_TAG = "file_info_screen:previous_versions"
-internal const val FILE_INFO_LOADING_TAG = "file_info_screen:loading"
 internal const val FILE_INFO_DESCRIPTION_TAG = "file_info_screen:description"
 internal const val FILE_INFO_TAGS_TAG = "file_info_screen:tags"

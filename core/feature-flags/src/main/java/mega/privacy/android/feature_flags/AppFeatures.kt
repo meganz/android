@@ -16,6 +16,13 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
 
+    /**
+     * Custom chat avatar
+     */
+    CustomChatAvatar(
+        "Ability to add a custom avatar to group chats",
+        false,
+    ),
 
     /**
      * Feature flag to route the revamped video player to its ComposeUI single-activity destination

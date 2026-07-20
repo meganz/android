@@ -24,6 +24,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContentTriggered
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.model.SnackbarAttributes
@@ -271,4 +273,5 @@ private fun previewItem(icon: ImageVector, labelRes: Int) = object : DoMoreWithM
         DoMoreWithMegaItem.Identifier.CameraUploads
     override val icon: ImageVector = icon
     override val labelRes: Int = labelRes
+    override val monitorVisibility: Flow<Boolean> = flowOf(true)
 }

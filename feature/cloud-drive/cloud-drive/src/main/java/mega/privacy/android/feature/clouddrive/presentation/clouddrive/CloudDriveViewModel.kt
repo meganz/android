@@ -62,6 +62,7 @@ import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTyp
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
 import mega.privacy.android.domain.usecase.node.HandleToBase64UseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.clouddrive.FetchNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -126,6 +127,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     private val areCredentialsVerifiedUseCase: AreCredentialsVerifiedUseCase,
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase,
     private val containsMediaItemUseCase: ContainsMediaItemUseCase,
     private val monitorAccountInactivityUseCase: MonitorAccountInactivityUseCase,
@@ -152,6 +154,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                 currentFolderId = stateData.currentFolderId,
                 currentViewType = stateUpdates.currentViewType,
                 hasWritePermission = stateData.hasWritePermission,
+                isNodeInBackups = stateData.isNodeInBackups,
                 nodesLoadingState = stateData.loadingState,
                 items = stateData.nodeUiItems,
                 hasMediaItems = stateData.hasMediaItems,
@@ -174,6 +177,7 @@ class CloudDriveViewModel @AssistedInject constructor(
     }
 
     private fun stateDataFlow(): Flow<StateData> = currentFolderIdFlow.flatMapLatest { folderId ->
+        val nodeInBackups = isNodeInBackups(folderId)
         getHiddenNodesSettingsFlow()
             .map { (isHiddenNodesEnabled, showHiddenNodes) ->
                 isHiddenNodesEnabled to (isHiddenNodesEnabled && !showHiddenNodes && !isSharedSourceType) // Hidden nodes are shown in shares screen
@@ -210,6 +214,7 @@ class CloudDriveViewModel @AssistedInject constructor(
                             currentFolderId = folderId,
                             title = title,
                             hasWritePermission = hasWritePermission,
+                            isNodeInBackups = nodeInBackups,
                             loadingState = fetchResult.loadingState,
                             hasMediaItems = fetchResult.hasMediaItems,
                             nodeUiItems = nodeUiItems
@@ -314,6 +319,14 @@ class CloudDriveViewModel @AssistedInject constructor(
                 accessPermission == AccessPermission.FULL
     }.onFailure {
         Timber.e(it, "Failed to check write permission")
+    }.getOrDefault(false)
+
+    private suspend fun isNodeInBackups(
+        folderId: NodeId,
+    ): Boolean = runCatching {
+        isNodeInBackupsUseCase(folderId.longValue)
+    }.onFailure {
+        Timber.e(it, "Failed to check if node is in backups")
     }.getOrDefault(false)
 
     private val isSharedSourceType: Boolean
@@ -498,6 +511,7 @@ private data class StateData(
     val currentFolderId: NodeId,
     val title: LocalizedText,
     val hasWritePermission: Boolean,
+    val isNodeInBackups: Boolean,
     val loadingState: NodesLoadingState,
     val hasMediaItems: Boolean,
     val nodeUiItems: List<TypedNodeItem<TypedNode>>,

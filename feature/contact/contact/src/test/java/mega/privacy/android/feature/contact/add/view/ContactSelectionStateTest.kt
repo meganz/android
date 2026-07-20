@@ -47,13 +47,65 @@ class ContactSelectionStateTest {
     }
 
     @Test
-    fun `test that selectedItemsCount counts both mega handles and phone emails`() {
+    fun `test that selectedItemsCount counts mega handles and phone and manual emails`() {
         val underTest = ContactSelectionState(
             initialSelectedHandles = setOf(1L, 2L),
             initialSelectedPhoneEmails = setOf("a@test.com"),
+            initialSelectedManualEmails = setOf("m@test.com"),
         )
 
-        assertThat(underTest.selectedItemsCount).isEqualTo(3)
+        assertThat(underTest.selectedItemsCount).isEqualTo(4)
+    }
+
+    @Test
+    fun `test that selectManualEmail adds without deselecting existing selection`() {
+        val underTest = ContactSelectionState(
+            initialSelectedManualEmails = setOf("a@test.com"),
+        )
+
+        underTest.selectManualEmail("b@test.com")
+
+        assertThat(underTest.selectedManualEmails)
+            .containsExactly("a@test.com", "b@test.com")
+    }
+
+    @Test
+    fun `test that removeManualEmail removes only the given email`() {
+        val underTest = ContactSelectionState(
+            initialSelectedManualEmails = setOf("a@test.com", "b@test.com"),
+        )
+
+        underTest.removeManualEmail("a@test.com")
+
+        assertThat(underTest.selectedManualEmails).containsExactly("b@test.com")
+    }
+
+    @Test
+    fun `test that isEmailSelected returns true when a manual email matches case-insensitively`() {
+        val underTest = ContactSelectionState(
+            initialSelectedManualEmails = setOf("Guest@Test.com"),
+        )
+
+        assertThat(underTest.isEmailSelected("guest@test.com")).isTrue()
+    }
+
+    @Test
+    fun `test that isEmailSelected returns true when a phone email matches case-insensitively`() {
+        val underTest = ContactSelectionState(
+            initialSelectedPhoneEmails = setOf("phone@test.com"),
+        )
+
+        assertThat(underTest.isEmailSelected("PHONE@test.com")).isTrue()
+    }
+
+    @Test
+    fun `test that isEmailSelected returns false when the email is not selected`() {
+        val underTest = ContactSelectionState(
+            initialSelectedPhoneEmails = setOf("phone@test.com"),
+            initialSelectedManualEmails = setOf("manual@test.com"),
+        )
+
+        assertThat(underTest.isEmailSelected("other@test.com")).isFalse()
     }
 
     @Test
@@ -69,24 +121,27 @@ class ContactSelectionStateTest {
     }
 
     @Test
-    fun `test that deselectAll clears both mega and phone selection`() {
+    fun `test that deselectAll clears mega and phone and manual selection`() {
         val underTest = ContactSelectionState(
             initialSelectedHandles = setOf(1L, 2L, 3L),
             initialSelectedPhoneEmails = setOf("a@test.com"),
+            initialSelectedManualEmails = setOf("m@test.com"),
         )
 
         underTest.deselectAll()
 
         assertThat(underTest.selectedHandles).isEmpty()
         assertThat(underTest.selectedPhoneEmails).isEmpty()
+        assertThat(underTest.selectedManualEmails).isEmpty()
         assertThat(underTest.selectedItemsCount).isEqualTo(0)
     }
 
     @Test
-    fun `test that the saver round trips both mega handles and phone emails`() {
+    fun `test that the saver round trips mega handles and phone and manual emails`() {
         val original = ContactSelectionState(
             initialSelectedHandles = setOf(1L, 2L, 3L),
             initialSelectedPhoneEmails = setOf("a@test.com", "b@test.com"),
+            initialSelectedManualEmails = setOf("m@test.com"),
         )
         val saver = ContactSelectionState.Saver
 
@@ -95,5 +150,6 @@ class ContactSelectionStateTest {
 
         assertThat(restored?.selectedHandles).isEqualTo(setOf(1L, 2L, 3L))
         assertThat(restored?.selectedPhoneEmails).isEqualTo(setOf("a@test.com", "b@test.com"))
+        assertThat(restored?.selectedManualEmails).isEqualTo(setOf("m@test.com"))
     }
 }

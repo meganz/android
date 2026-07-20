@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.folderpreference.MonitorFolderViewTyp
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderSortOrderUseCase
 import mega.privacy.android.domain.usecase.folderpreference.SetFolderViewTypeUseCase
 import mega.privacy.android.domain.usecase.node.HandleToBase64UseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesByIdUseCase
 import mega.privacy.android.domain.usecase.node.clouddrive.FetchNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -106,6 +107,7 @@ class CloudDriveViewModelTest {
     private val getIncomingShareParentUserEmailUseCase: GetIncomingShareParentUserEmailUseCase =
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val monitorSortCloudOrderUseCase: MonitorSortCloudOrderUseCase = mock()
     private val handleToBase64UseCase: HandleToBase64UseCase = mock()
     private val monitorFolderViewTypeUseCase: MonitorFolderViewTypeUseCase = mock()
@@ -159,6 +161,7 @@ class CloudDriveViewModelTest {
             areCredentialsVerifiedUseCase,
             getIncomingShareParentUserEmailUseCase,
             getNodeAccessPermission,
+            isNodeInBackupsUseCase,
             monitorSortCloudOrderUseCase,
             mockTracker,
             containsMediaItemUseCase,
@@ -203,6 +206,7 @@ class CloudDriveViewModelTest {
             areCredentialsVerifiedUseCase = areCredentialsVerifiedUseCase,
             getIncomingShareParentUserEmailUseCase = getIncomingShareParentUserEmailUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             monitorSortCloudOrderUseCase = monitorSortCloudOrderUseCase,
             containsMediaItemUseCase = containsMediaItemUseCase,
             monitorAccountInactivityUseCase = monitorAccountInactivityUseCase,

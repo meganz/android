@@ -2,6 +2,7 @@ package mega.privacy.mobile.home.presentation.home.widget.domore
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.coroutines.flow.Flow
 
 /**
  * A single action item shown in the "Do more with MEGA" home section.
@@ -32,6 +33,12 @@ interface DoMoreWithMegaItem {
      */
     @get:StringRes
     val labelRes: Int
+
+    /**
+     * Emits whether the item should currently be visible. Exposed as a [Flow] so the section
+     * updates reactively whenever the underlying state changes, rather than being sampled once.
+     */
+    val monitorVisibility: Flow<Boolean>
 
     /**
      * The set of shortcuts in the "Do more with MEGA" section. Earlier-declared entries appear

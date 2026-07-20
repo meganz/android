@@ -52,14 +52,20 @@ fun AddContactsEntry(
         onReadContactsPermissionGranted = viewModel::onReadContactsPermissionGranted,
         onContactsPicked = viewModel::onContactsPicked,
         onPhoneContactsPickedConsumed = viewModel::onPhoneContactsPickedConsumed,
+        onScanQrClick = viewModel::onScanQrClicked,
+        onScannedContactDialogDismissed = viewModel::onScannedContactDialogDismissed,
+        onInviteScannedContactConfirmed = viewModel::onInviteScannedContactConfirmed,
+        onScannedContactSelectConsumed = viewModel::onScannedContactSelectConsumed,
+        onScannedContactInviteConsumed = viewModel::onScannedContactInviteConsumed,
         initialSelectedHandles = preselectedHandles.toSet(),
     )
 }
 
 /**
- * Add contact to share entry. Renders the multi-select picker with the phone-contacts section
- * enabled, and publishes the merged MEGA + phone contact emails as a `List<String>` under
- * [AddContactToShareNavKey.KEY] when confirmed. Backs the "add contacts to a shared folder" flow.
+ * Add contact to share entry. Renders the multi-select picker with the phone-contacts section and
+ * free-text email entry enabled, and publishes the merged MEGA + phone + manually entered emails
+ * as a `List<String>` under [AddContactToShareNavKey.KEY] when confirmed. Backs the "add contacts
+ * to a shared folder" flow, where sharing with someone who is not yet a contact is allowed.
  *
  * @param navigationHandler
  */
@@ -89,6 +95,14 @@ fun AddContactToShareEntry(
         onReadContactsPermissionGranted = viewModel::onReadContactsPermissionGranted,
         onContactsPicked = viewModel::onContactsPicked,
         onPhoneContactsPickedConsumed = viewModel::onPhoneContactsPickedConsumed,
+        onScanQrClick = viewModel::onScanQrClicked,
+        onScannedContactDialogDismissed = viewModel::onScannedContactDialogDismissed,
+        onInviteScannedContactConfirmed = viewModel::onInviteScannedContactConfirmed,
+        onScannedContactSelectConsumed = viewModel::onScannedContactSelectConsumed,
+        onScannedContactInviteConsumed = viewModel::onScannedContactInviteConsumed,
+        allowManualEmailEntry = true,
+        isManualEmailValid = viewModel::isEmailValid,
+        megaContactHandleForEmail = viewModel::handleForEmail,
     )
 }
 
@@ -126,6 +140,11 @@ fun AddChatParticipantsEntry(
             )
         },
         onBack = { navigationHandler.remove(AddChatParticipantsNavKey(chatId)) },
+        onScanQrClick = viewModel::onScanQrClicked,
+        onScannedContactDialogDismissed = viewModel::onScannedContactDialogDismissed,
+        onInviteScannedContactConfirmed = viewModel::onInviteScannedContactConfirmed,
+        onScannedContactSelectConsumed = viewModel::onScannedContactSelectConsumed,
+        onScannedContactInviteConsumed = viewModel::onScannedContactInviteConsumed,
         titleRes = sharedR.string.add_participants_title,
     )
 }
@@ -164,6 +183,11 @@ fun AddMeetingParticipantsEntry(
             )
         },
         onBack = { navigationHandler.remove(AddMeetingParticipantsNavKey(chatId)) },
+        onScanQrClick = viewModel::onScanQrClicked,
+        onScannedContactDialogDismissed = viewModel::onScannedContactDialogDismissed,
+        onInviteScannedContactConfirmed = viewModel::onInviteScannedContactConfirmed,
+        onScannedContactSelectConsumed = viewModel::onScannedContactSelectConsumed,
+        onScannedContactInviteConsumed = viewModel::onScannedContactInviteConsumed,
         titleRes = sharedR.string.add_participants_title,
     )
 }

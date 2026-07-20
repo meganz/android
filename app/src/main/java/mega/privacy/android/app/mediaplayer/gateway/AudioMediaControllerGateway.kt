@@ -49,6 +49,9 @@ interface AudioMediaControllerGateway {
     /** Stops playback without releasing the player. */
     fun stop()
 
+    /** Sets the playback speed. A value of `1.0` is normal speed. */
+    fun setPlaybackSpeed(speed: Float)
+
     /** Releases the MediaController connection and all associated resources. */
     fun release()
 }

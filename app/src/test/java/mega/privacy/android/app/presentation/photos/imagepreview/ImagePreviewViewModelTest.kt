@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.file.CheckFileUriUseCase
 import mega.privacy.android.domain.usecase.filelink.GetPublicNodeFromSerializedDataUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.imagepreview.ClearImageResultUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
@@ -135,6 +136,7 @@ class ImagePreviewViewModelTest {
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase =
         mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val largeBundleHolder: LargeBundleHolder = mock()
 
     @Suppress("DEPRECATION")
@@ -188,6 +190,7 @@ class ImagePreviewViewModelTest {
         monitorConnectivityUseCase,
         getNodeNameCollisionRenameNameUseCase,
         getNodeAccessPermission,
+        isNodeInBackupsUseCase,
         getNodeByHandle,
         getFeatureFlagValueUseCase,
         isUserLoggedInUseCase,
@@ -230,6 +233,7 @@ class ImagePreviewViewModelTest {
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeByHandle = getNodeByHandle,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             isEditableImageUseCase = isEditableImageUseCase,
@@ -687,6 +691,23 @@ class ImagePreviewViewModelTest {
             whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.READ)
             whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
                 .thenReturn(ImagePreviewFetcherSource.TIMELINE)
+
+            val result = underTest.isPhotoEditorMenuVisible(imageNode)
+
+            assertThat(result).isFalse()
+        }
+
+    @Test
+    internal fun `test that isPhotoEditorMenuVisible returns false when node is in backups`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { type } doReturn StaticImageFileTypeInfo("image/jpeg", "jpg")
+                on { id } doReturn NodeId(123L)
+            }
+            whenever(getNodeAccessPermission(NodeId(123L))).thenReturn(AccessPermission.OWNER)
+            whenever(savedStateHandle.get<ImagePreviewFetcherSource>(IMAGE_NODE_FETCHER_SOURCE))
+                .thenReturn(ImagePreviewFetcherSource.CLOUD_DRIVE)
+            whenever(isNodeInBackupsUseCase(123L)).thenReturn(true)
 
             val result = underTest.isPhotoEditorMenuVisible(imageNode)
 

@@ -16,9 +16,7 @@ import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.FileManagementPreferencesFacade
 import mega.privacy.android.data.facade.HttpConnectionFacade
 import mega.privacy.android.data.facade.MediaRecorderFacade
-import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
-import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalRoomFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.data.facade.NotificationsFacade
@@ -62,8 +60,6 @@ import mega.privacy.android.data.gateway.WorkManagerGateway
 import mega.privacy.android.data.gateway.WorkerClassGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.gateway.chat.ChatStorageGateway
 import mega.privacy.android.data.gateway.contact.ContactGateway
@@ -187,13 +183,6 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun MediaPlayerPreferencesGateway(implementation: MediaPlayerPreferencesDatastore): MediaPlayerPreferencesGateway
-
-    @Binds
-    abstract fun bindMegaApiWrapper(implementation: MegaApiFacade): MegaApiGateway
-
-    @Binds
-    @Singleton
-    abstract fun bindMegaChatApiGateway(implementation: MegaChatApiFacade): MegaChatApiGateway
 
     @Binds
     @Singleton

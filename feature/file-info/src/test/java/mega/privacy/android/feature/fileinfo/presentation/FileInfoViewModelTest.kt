@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import androidx.navigation3.runtime.NavKey
+import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -45,6 +46,7 @@ import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import java.io.File
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.shared.nodes.mapper.FileTypeNameMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -71,6 +73,7 @@ internal class FileInfoViewModelTest {
     private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val fileTypeIconMapper: FileTypeIconMapper = mock()
+    private val fileTypeNameMapper: FileTypeNameMapper = mock()
     private val getNodePathByIdUseCase: GetNodePathByIdUseCase = mock()
     private val getNodeLocationByIdUseCase: GetNodeLocationByIdUseCase = mock()
     private val getImageNodeByIdUseCase: GetImageNodeByIdUseCase = mock()
@@ -95,6 +98,7 @@ internal class FileInfoViewModelTest {
             isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getNodeAccessPermission = getNodeAccessPermission,
             fileTypeIconMapper = fileTypeIconMapper,
+            fileTypeNameMapper = fileTypeNameMapper,
             getNodePathByIdUseCase = getNodePathByIdUseCase,
             getNodeLocationByIdUseCase = getNodeLocationByIdUseCase,
             getImageNodeByIdUseCase = getImageNodeByIdUseCase,
@@ -119,6 +123,7 @@ internal class FileInfoViewModelTest {
             isNodeInBackupsUseCase,
             getNodeAccessPermission,
             fileTypeIconMapper,
+            fileTypeNameMapper,
             getNodePathByIdUseCase,
             getNodeLocationByIdUseCase,
             getImageNodeByIdUseCase,
@@ -192,6 +197,7 @@ internal class FileInfoViewModelTest {
         val node = mockFileNode()
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
         whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
+        whenever(fileTypeNameMapper("heic")).thenReturn(FILE_TYPE_NAME)
 
         initViewModel()
         advanceUntilIdle()
@@ -202,7 +208,7 @@ internal class FileInfoViewModelTest {
             assertThat(isFile).isTrue()
             assertThat(iconRes).isEqualTo(FILE_ICON_RES)
             assertThat(thumbnailData).isEqualTo(ThumbnailRequest(NodeId(NODE_HANDLE)))
-            assertThat(fileTypeExtension).isEqualTo("heic")
+            assertThat(fileTypeName).isEqualTo(FILE_TYPE_NAME)
             assertThat(sizeInBytes).isEqualTo(1024L)
             assertThat(creationTime).isEqualTo(100L)
             assertThat(modificationTime).isEqualTo(200L)
@@ -224,7 +230,7 @@ internal class FileInfoViewModelTest {
         with(underTest.uiState.value) {
             assertThat(isFile).isFalse()
             assertThat(title).isEqualTo("folder")
-            assertThat(fileTypeExtension).isNull()
+            assertThat(fileTypeName).isNull()
             assertThat(thumbnailData).isNull()
             assertThat(iconRes).isNotNull()
             assertThat(sizeInBytes).isEqualTo(0L)
@@ -723,5 +729,6 @@ internal class FileInfoViewModelTest {
     private companion object {
         const val NODE_HANDLE = 99113034474275L
         const val FILE_ICON_RES = 12345
+        val FILE_TYPE_NAME = LocalizedText.StringRes(54321)
     }
 }

@@ -51,6 +51,9 @@ import mega.privacy.android.navigation.contract.state.SelectionModeController
 import mega.privacy.android.navigation.contract.transition.fadeTransition
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.ads.NewAdsContainer
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
 import mega.privacy.mobile.home.presentation.home.Home
@@ -78,15 +81,27 @@ fun HomeScreens(
             || storageUiState.storageState == StorageState.Orange
         ) {
             if (storageUiState.storageState.ordinal > handledStorageState.ordinal) {
-                outerNavigationHandler.navigate(
-                    OverQuotaDialogNavKey(
-                        isOverQuota = storageUiState.storageState == StorageState.Red,
-                        overQuotaAlert = false
-                    ),
-                    navOptions {
-                        popUpTo(OverQuotaDialogNavKey::class) { inclusive = true }
-                    }
-                )
+                if (storageUiState.isQuotaWarningUpsellEnabled) {
+                    outerNavigationHandler.navigate(
+                        QuotaWarningUpgradeNavKey(
+                            type = QuotaWarningType.Storage,
+                            trigger = QuotaWarningTrigger.General,
+                        ),
+                        navOptions {
+                            popUpTo(QuotaWarningUpgradeNavKey::class) { inclusive = true }
+                        }
+                    )
+                } else {
+                    outerNavigationHandler.navigate(
+                        OverQuotaDialogNavKey(
+                            isOverQuota = storageUiState.storageState == StorageState.Red,
+                            overQuotaAlert = false
+                        ),
+                        navOptions {
+                            popUpTo(OverQuotaDialogNavKey::class) { inclusive = true }
+                        }
+                    )
+                }
                 handledStorageState = storageUiState.storageState
             }
         }

@@ -7,10 +7,16 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
+import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
+import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.UserChatStatus
+import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.uri.UriPath
@@ -19,12 +25,19 @@ import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsFromUriUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsUseCase
+import mega.privacy.android.domain.usecase.contact.InviteContactWithHandleUseCase
+import mega.privacy.android.domain.usecase.IsEmailValidUseCase
 import mega.privacy.android.domain.usecase.environment.GetDeviceSdkVersionUseCase
+import mega.privacy.android.domain.usecase.qrcode.ParseScannedContactLinkHandleUseCase
+import mega.privacy.android.domain.usecase.qrcode.QueryScannedContactLinkUseCase
 import mega.privacy.android.feature.contact.add.model.AddContactUiState
 import mega.privacy.android.feature.contact.add.model.PhoneContactsSection
+import mega.privacy.android.feature.contact.add.model.ScannedContactDialog
+import mega.privacy.android.feature.contact.add.model.ScannedContactInviteFeedback
 import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemStatusMapper
 import mega.privacy.android.shared.contact.mapper.ContactItemUiStateMapper
+import mega.privacy.android.shared.contact.mapper.ScannedContactAvatarMapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,9 +47,12 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import de.palm.composestateevents.StateEventWithContentConsumed
 import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.triggered
 import java.time.Instant
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -54,6 +70,11 @@ class AddContactViewModelTest {
         contactItemStatusMapper = ContactItemStatusMapper(),
         contactItemAvatarMapper = ContactItemAvatarMapper(),
     )
+    private val scannerHandler = mock<ScannerHandler>()
+    private val parseScannedContactLinkHandleUseCase = mock<ParseScannedContactLinkHandleUseCase>()
+    private val queryScannedContactLinkUseCase = mock<QueryScannedContactLinkUseCase>()
+    private val inviteContactWithHandleUseCase = mock<InviteContactWithHandleUseCase>()
+    private val scannedContactAvatarMapper = ScannedContactAvatarMapper()
 
     @BeforeEach
     fun setUp() {
@@ -69,6 +90,10 @@ class AddContactViewModelTest {
             getDeviceSdkVersionUseCase,
             getLocalContactsUseCase,
             getLocalContactsFromUriUseCase,
+            scannerHandler,
+            parseScannedContactLinkHandleUseCase,
+            queryScannedContactLinkUseCase,
+            inviteContactWithHandleUseCase,
         )
     }
 
@@ -87,6 +112,12 @@ class AddContactViewModelTest {
         getLocalContactsUseCase = getLocalContactsUseCase,
         getLocalContactsFromUriUseCase = getLocalContactsFromUriUseCase,
         contactItemUiStateMapper = contactItemUiStateMapper,
+        scannerHandler = scannerHandler,
+        parseScannedContactLinkHandleUseCase = parseScannedContactLinkHandleUseCase,
+        queryScannedContactLinkUseCase = queryScannedContactLinkUseCase,
+        inviteContactWithHandleUseCase = inviteContactWithHandleUseCase,
+        scannedContactAvatarMapper = scannedContactAvatarMapper,
+        isEmailValidUseCase = IsEmailValidUseCase(),
     )
 
     @Test
@@ -403,6 +434,356 @@ class AddContactViewModelTest {
         }
     }
 
+    @Test
+    fun `test that handleForEmail returns the handle when the email matches case-insensitively`() =
+        runTest {
+            stubContactsFlow(
+                listOf(
+                    createContactItem(handle = 1L, email = "alice@test.com", alias = "Alice"),
+                    createContactItem(handle = 2L, email = "bob@test.com", alias = "Bob"),
+                )
+            )
+
+            underTest.uiState.test {
+                awaitDataState()
+                assertThat(underTest.handleForEmail("ALICE@Test.com")).isEqualTo(1L)
+            }
+        }
+
+    @Test
+    fun `test that handleForEmail returns null when no loaded contact has the email`() = runTest {
+        stubContactsFlow(listOf(createContactItem(handle = 1L, email = "alice@test.com")))
+
+        underTest.uiState.test {
+            awaitDataState()
+            assertThat(underTest.handleForEmail("stranger@test.com")).isNull()
+        }
+    }
+
+    @Test
+    fun `test that handleForEmail resolves a contact that is filtered out by the query`() =
+        runTest {
+            stubContactsFlow(
+                listOf(
+                    createContactItem(handle = 1L, email = "alice@test.com", alias = "Alice"),
+                    createContactItem(handle = 2L, email = "bob@test.com", alias = "Bob"),
+                )
+            )
+
+            underTest.setQuery("bob")
+            underTest.uiState.test {
+                val state = awaitDataState()
+                assertThat(state.contacts.map { it.displayName }).containsExactly("Bob")
+                assertThat(underTest.handleForEmail("alice@test.com")).isEqualTo(1L)
+            }
+        }
+
+    @Test
+    fun `test that isEmailValid returns true when the email is well formed`() {
+        assertThat(underTest.isEmailValid("user@example.com")).isTrue()
+    }
+
+    @Test
+    fun `test that isEmailValid returns false when the email is malformed`() {
+        assertThat(underTest.isEmailValid("not-an-email")).isFalse()
+    }
+
+    @Test
+    fun `test that onScanQrClicked does nothing when the scan is cancelled`() = runTest {
+        stubContactsFlow(emptyList())
+        whenever(scannerHandler.scanBarcode()).thenReturn(BarcodeScanResult.Cancelled)
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            expectNoEvents()
+        }
+        verifyNoInteractions(parseScannedContactLinkHandleUseCase, queryScannedContactLinkUseCase)
+    }
+
+    @Test
+    fun `test that scanner not installed dialog is shown when the scanner module is not installed`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            whenever(scannerHandler.scanBarcode()).thenAnswer {
+                throw BarcodeScannerModuleIsNotInstalled()
+            }
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onScanQrClicked()
+                assertThat(awaitDialog()).isEqualTo(ScannedContactDialog.ScannerNotInstalled)
+            }
+        }
+
+    @Test
+    fun `test that invalid code dialog is shown when the scanned code is not a contact link`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            whenever(scannerHandler.scanBarcode()).thenReturn(BarcodeScanResult.Success("not a link"))
+            whenever(parseScannedContactLinkHandleUseCase("not a link")).thenReturn(null)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onScanQrClicked()
+                assertThat(awaitDialog()).isEqualTo(ScannedContactDialog.InvalidCode)
+            }
+            verifyNoInteractions(queryScannedContactLinkUseCase)
+        }
+
+    @Test
+    fun `test that invalid code dialog is shown when the scanned value is null`() = runTest {
+        stubContactsFlow(emptyList())
+        whenever(scannerHandler.scanBarcode()).thenReturn(BarcodeScanResult.Success(null))
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            assertThat(awaitDialog()).isEqualTo(ScannedContactDialog.InvalidCode)
+        }
+        verifyNoInteractions(parseScannedContactLinkHandleUseCase, queryScannedContactLinkUseCase)
+    }
+
+    @Test
+    fun `test that invalid code dialog is shown when the contact link query fails`() = runTest {
+        stubContactsFlow(emptyList())
+        stubScannedCode(SCANNED_CODE, SCANNED_HANDLE_B64)
+        whenever(queryScannedContactLinkUseCase(SCANNED_HANDLE_B64))
+            .thenAnswer { throw RuntimeException("query failed") }
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            assertThat(awaitDialog()).isEqualTo(ScannedContactDialog.InvalidCode)
+        }
+    }
+
+    @Test
+    fun `test that invalid code dialog is shown when the query result is default`() = runTest {
+        stubContactsFlow(emptyList())
+        stubScannedCode(SCANNED_CODE, SCANNED_HANDLE_B64)
+        whenever(queryScannedContactLinkUseCase(SCANNED_HANDLE_B64)).thenReturn(
+            scannedResult(queryResult = QRCodeQueryResults.CONTACT_QUERY_DEFAULT)
+        )
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            assertThat(awaitDialog()).isEqualTo(ScannedContactDialog.InvalidCode)
+        }
+    }
+
+    @Test
+    fun `test that already added dialog is shown when the query result is EEXIST`() = runTest {
+        stubContactsFlow(emptyList())
+        stubScannedCode(SCANNED_CODE, SCANNED_HANDLE_B64)
+        whenever(queryScannedContactLinkUseCase(SCANNED_HANDLE_B64)).thenReturn(
+            scannedResult(queryResult = QRCodeQueryResults.CONTACT_QUERY_EEXIST)
+        )
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            assertThat(awaitDialog())
+                .isEqualTo(ScannedContactDialog.AlreadyAdded("scanned@test.com"))
+        }
+    }
+
+    @Test
+    fun `test that the scanned contact is auto-selected when they are already in the loaded list`() =
+        runTest {
+            stubContactsFlow(listOf(createContactItem(handle = 42L, email = "scanned@test.com")))
+            stubScannedCode(SCANNED_CODE, SCANNED_HANDLE_B64)
+            whenever(queryScannedContactLinkUseCase(SCANNED_HANDLE_B64)).thenReturn(
+                scannedResult(handle = 42L, isContact = true)
+            )
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onScanQrClicked()
+                var state = awaitDataState()
+                while (state.scannedContactSelectEvent !is StateEventWithContentTriggered) {
+                    state = awaitDataState()
+                }
+                val event = state.scannedContactSelectEvent
+                check(event is StateEventWithContentTriggered)
+                assertThat(event.content).isEqualTo(42L)
+                assertThat(state.scannedContactDialog).isNull()
+
+                underTest.onScannedContactSelectConsumed()
+                assertThat(awaitDataState().scannedContactSelectEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+        }
+
+    @Test
+    fun `test that already added dialog is shown when the scanned contact is not in the loaded list`() =
+        runTest {
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+            stubScannedCode(SCANNED_CODE, SCANNED_HANDLE_B64)
+            whenever(queryScannedContactLinkUseCase(SCANNED_HANDLE_B64)).thenReturn(
+                scannedResult(handle = 42L, isContact = true)
+            )
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onScanQrClicked()
+                assertThat(awaitDialog())
+                    .isEqualTo(ScannedContactDialog.AlreadyAdded("scanned@test.com"))
+            }
+        }
+
+    @Test
+    fun `test that found dialog is shown when the scanned user is not a contact`() = runTest {
+        stubContactsFlow(emptyList())
+        val result = scannedResult(handle = 42L, isContact = false)
+        stubScannedCode(SCANNED_CODE, SCANNED_HANDLE_B64)
+        whenever(queryScannedContactLinkUseCase(SCANNED_HANDLE_B64)).thenReturn(result)
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            assertThat(awaitDialog()).isEqualTo(
+                ScannedContactDialog.Found(
+                    contactName = "Scanned Contact",
+                    email = "scanned@test.com",
+                    handle = 42L,
+                    avatar = scannedContactAvatarMapper(result),
+                )
+            )
+        }
+    }
+
+    @Test
+    fun `test that sent feedback is fired when the invitation of the scanned contact is sent`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            stubFoundDialog()
+            whenever(inviteContactWithHandleUseCase("scanned@test.com", 42L, null))
+                .thenReturn(InviteContactRequest.Sent)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onScanQrClicked()
+                awaitDialog()
+                underTest.onInviteScannedContactConfirmed()
+                var state = awaitDataState()
+                while (state.scannedContactInviteEvent !is StateEventWithContentTriggered) {
+                    state = awaitDataState()
+                }
+                assertThat(state.scannedContactInviteEvent)
+                    .isEqualTo(triggered(ScannedContactInviteFeedback.Sent))
+                assertThat(state.scannedContactDialog).isNull()
+
+                underTest.onScannedContactInviteConsumed()
+                assertThat(awaitDataState().scannedContactInviteEvent)
+                    .isInstanceOf(StateEventWithContentConsumed::class.java)
+            }
+            verify(inviteContactWithHandleUseCase).invoke("scanned@test.com", 42L, null)
+        }
+
+    @Test
+    fun `test that already added dialog is shown when the invitation reports an existing contact`() =
+        runTest {
+            stubContactsFlow(emptyList())
+            stubFoundDialog()
+            whenever(inviteContactWithHandleUseCase("scanned@test.com", 42L, null))
+                .thenReturn(InviteContactRequest.AlreadyContact)
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onScanQrClicked()
+                awaitDialog()
+                underTest.onInviteScannedContactConfirmed()
+                var dialog = awaitDataState().scannedContactDialog
+                while (dialog !is ScannedContactDialog.AlreadyAdded) {
+                    dialog = awaitDataState().scannedContactDialog
+                }
+                assertThat(dialog)
+                    .isEqualTo(ScannedContactDialog.AlreadyAdded("scanned@test.com"))
+            }
+        }
+
+    @Test
+    fun `test that failed feedback is fired when the invitation fails`() = runTest {
+        stubContactsFlow(emptyList())
+        stubFoundDialog()
+        whenever(inviteContactWithHandleUseCase("scanned@test.com", 42L, null))
+            .thenAnswer { throw RuntimeException("invite failed") }
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            awaitDialog()
+            underTest.onInviteScannedContactConfirmed()
+            var state = awaitDataState()
+            while (state.scannedContactInviteEvent !is StateEventWithContentTriggered) {
+                state = awaitDataState()
+            }
+            assertThat(state.scannedContactInviteEvent)
+                .isEqualTo(triggered(ScannedContactInviteFeedback.Failed))
+        }
+    }
+
+    @Test
+    fun `test that onInviteScannedContactConfirmed does nothing when no found dialog is shown`() =
+        runTest {
+            stubContactsFlow(emptyList())
+
+            underTest.uiState.test {
+                awaitDataState()
+                underTest.onInviteScannedContactConfirmed()
+                expectNoEvents()
+            }
+            verifyNoInteractions(inviteContactWithHandleUseCase)
+        }
+
+    @Test
+    fun `test that onScannedContactDialogDismissed clears the dialog`() = runTest {
+        stubContactsFlow(emptyList())
+        whenever(scannerHandler.scanBarcode()).thenReturn(BarcodeScanResult.Success(null))
+
+        underTest.uiState.test {
+            awaitDataState()
+            underTest.onScanQrClicked()
+            awaitDialog()
+            underTest.onScannedContactDialogDismissed()
+            assertThat(awaitDataState().scannedContactDialog).isNull()
+        }
+    }
+
+    private suspend fun stubScannedCode(code: String, handle: String) {
+        whenever(scannerHandler.scanBarcode()).thenReturn(BarcodeScanResult.Success(code))
+        whenever(parseScannedContactLinkHandleUseCase(code)).thenReturn(handle)
+    }
+
+    private suspend fun stubFoundDialog() {
+        stubScannedCode(SCANNED_CODE, SCANNED_HANDLE_B64)
+        whenever(queryScannedContactLinkUseCase(SCANNED_HANDLE_B64)).thenReturn(
+            scannedResult(handle = 42L, isContact = false)
+        )
+    }
+
+    private fun scannedResult(
+        handle: Long = 42L,
+        isContact: Boolean = false,
+        queryResult: QRCodeQueryResults = QRCodeQueryResults.CONTACT_QUERY_OK,
+    ) = ScannedContactLinkResult(
+        contactName = "Scanned Contact",
+        email = "scanned@test.com",
+        handle = handle,
+        isContact = isContact,
+        qrCodeQueryResult = queryResult,
+    )
+
+    private suspend fun ReceiveTurbine<AddContactUiState>.awaitDialog(): ScannedContactDialog {
+        var dialog = awaitDataState().scannedContactDialog
+        while (dialog == null) {
+            dialog = awaitDataState().scannedContactDialog
+        }
+        return dialog
+    }
+
     private suspend fun ReceiveTurbine<AddContactUiState>.awaitDataStateSection(): PhoneContactsSection {
         return awaitDataState().phoneContactsSection
     }
@@ -453,5 +834,7 @@ class AddContactViewModelTest {
     private companion object {
         const val PRE_PICKER_SDK = 34
         const val PICKER_SDK = 37
+        const val SCANNED_CODE = "https://mega.nz/C!scannedHandle"
+        const val SCANNED_HANDLE_B64 = "scannedHandle"
     }
 }

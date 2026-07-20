@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -22,6 +24,7 @@ import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
@@ -33,6 +36,7 @@ import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
@@ -51,6 +55,13 @@ import timber.log.Timber
  * Collects raw player state from [AudioMediaControllerGateway] and maps it to [uiState].
  * Shuffle/repeat changes are persisted and analytics events are tracked here, keeping the
  * gateway focused on Media3 interaction only.
+ *
+ * [isPodcastMode] is resolved as early as possible: when [startPlayback] receives the launch
+ * intent, the node's duration is fetched from [GetNodeByHandleUseCase] before Media3 connects,
+ * so the correct mode is shown even during the initial [AudioPlayerUiState.Loading] phase.
+ * Once Media3 reports the actual duration the value is confirmed (or corrected). The user may
+ * override the auto-detected mode at any time via [togglePlayerMode]; the override resets when
+ * the playing item changes.
  */
 @HiltViewModel
 class AudioPlayerViewModel @Inject constructor(
@@ -66,7 +77,16 @@ class AudioPlayerViewModel @Inject constructor(
     val uiState: StateFlow<AudioPlayerUiState> =
         playerState.asUiStateFlow(viewModelScope, AudioPlayerUiState.Loading)
 
+    private val _isPodcastMode = MutableStateFlow(true)
+
+    /** Whether the player is currently in podcast mode. Available from the moment the launch
+     * intent is processed, before Media3 finishes connecting. */
+    val isPodcastMode: StateFlow<Boolean> = _isPodcastMode.asStateFlow()
+
     private var currentControllerState: AudioControllerState? = null
+    private var lastMediaItemId: String? = null
+    private var userOverriddenMode: Boolean? = null
+    private var prefetchJob: Job? = null
 
     private data class IntentData(
         val adapterType: Int,
@@ -129,6 +149,13 @@ class AudioPlayerViewModel @Inject constructor(
     private fun mapToUiState(state: AudioControllerState) {
         val existing = playerState.value as? AudioPlayerUiState.Data
         val data = intentData
+        if (state.currentMediaItemId != lastMediaItemId) {
+            lastMediaItemId = state.currentMediaItemId
+            userOverriddenMode = null
+        }
+        if (userOverriddenMode == null && state.durationMs > 0) {
+            _isPodcastMode.value = state.durationMs > PODCAST_MODE_DURATION_MS
+        }
         playerState.value = AudioPlayerUiState.Data(
             isPlaying = state.isPlaying,
             currentPosition = state.currentPositionMs,
@@ -149,6 +176,7 @@ class AudioPlayerViewModel @Inject constructor(
             localFilePath = data?.localFilePath,
             chatId = data?.chatId,
             msgId = data?.msgId,
+            currentPlaybackSpeed = state.playbackSpeed,
         )
     }
 
@@ -165,8 +193,24 @@ class AudioPlayerViewModel @Inject constructor(
         }
     }
 
+    private fun prefetchPlayerMode(handle: Long) {
+        prefetchJob?.cancel()
+        prefetchJob = viewModelScope.launch {
+            if (userOverriddenMode != null) return@launch
+            val node = runCatching { getNodeByHandleUseCase(handle) }
+                .onFailure { Timber.w(it, "Failed to prefetch node for player mode detection, handle=$handle") }
+                .getOrNull() as? TypedAudioNode ?: return@launch
+            if (userOverriddenMode != null) return@launch
+            _isPodcastMode.value = node.duration.inWholeMilliseconds > PODCAST_MODE_DURATION_MS
+        }
+    }
+
     fun startPlayback(intent: Intent) {
         setCurrentIntent(intent)
+        val handle = intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_VALUE.toLong())
+        if (handle != INVALID_VALUE.toLong()) {
+            prefetchPlayerMode(handle)
+        }
         val rebuildPlaylist = intent.getBooleanExtra(INTENT_EXTRA_KEY_REBUILD_PLAYLIST, true)
         if (rebuildPlaylist) {
             gateway.startService(intent)
@@ -193,6 +237,27 @@ class AudioPlayerViewModel @Inject constructor(
     fun toggleShuffle() {
         val state = currentControllerState ?: return
         gateway.setShuffleEnabled(!state.shuffleEnabled)
+    }
+
+    fun togglePlayerMode() {
+        val newMode = !_isPodcastMode.value
+        userOverriddenMode = newMode
+        _isPodcastMode.value = newMode
+    }
+
+    fun seekForward15() {
+        val state = currentControllerState ?: return
+        val target = if (state.durationMs > 0) {
+            minOf(state.currentPositionMs + SEEK_15_SECONDS_MS, state.durationMs)
+        } else {
+            state.currentPositionMs + SEEK_15_SECONDS_MS
+        }
+        gateway.seekTo(target)
+    }
+
+    fun seekBackward15() {
+        val state = currentControllerState ?: return
+        gateway.seekTo(maxOf(0L, state.currentPositionMs - SEEK_15_SECONDS_MS))
     }
 
     fun cycleRepeatMode() {
@@ -249,6 +314,10 @@ class AudioPlayerViewModel @Inject constructor(
             else -> NodeSourceType.MEDIA_PLAYER_DEFAULT
         }
 
+    fun setPlaybackSpeed(speed: Float) {
+        gateway.setPlaybackSpeed(speed)
+    }
+
     fun stopPlayer() {
         gateway.stop()
     }
@@ -256,5 +325,12 @@ class AudioPlayerViewModel @Inject constructor(
     override fun onCleared() {
         gateway.release()
         super.onCleared()
+    }
+
+    companion object {
+        // Tracks longer than 12 minutes are automatically detected as podcasts; shorter tracks are classified as music.
+        // The 12-minute threshold is defined in the design specification.
+        private const val PODCAST_MODE_DURATION_MS = 12 * 60 * 1_000L
+        private const val SEEK_15_SECONDS_MS = 15_000L
     }
 }

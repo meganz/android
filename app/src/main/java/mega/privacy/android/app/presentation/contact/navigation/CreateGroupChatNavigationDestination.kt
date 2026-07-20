@@ -11,6 +11,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.app.main.legacycontact.AddContactActivity
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.feature.contact.group.create.navigation.CreateGroupChatEntry
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -94,7 +95,12 @@ private class CreateGroupChatContract(
             title = intent.getStringExtra(AddContactActivity.EXTRA_CHAT_TITLE),
             isEkr = intent.getBooleanExtra(AddContactActivity.EXTRA_EKR, false),
             isChatLink = intent.getBooleanExtra(AddContactActivity.EXTRA_CHAT_LINK, false),
-            allowAddParticipants = allowEmptyGroup,
+            allowAddParticipants = intent.getBooleanExtra(
+                AddContactActivity.ALLOW_ADD_PARTICIPANTS,
+                false,
+            ),
+            imageUri = intent.getStringExtra(AddContactActivity.EXTRA_GROUP_CHAT_IMAGE)
+                ?.let(::UriPath),
         )
     }
 }

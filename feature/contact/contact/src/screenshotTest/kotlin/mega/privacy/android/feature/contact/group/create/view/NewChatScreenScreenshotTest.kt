@@ -24,7 +24,7 @@ class NewChatScreenScreenshotTest {
                 state = CreateChatUiState.Loading,
                 onSearchQueryChange = {},
                 onConfirmOneToOne = {},
-                onConfirmGroup = { _, _, _, _, _ -> },
+                onConfirmGroup = { _, _, _, _, _, _ -> },
                 onBack = {},
             )
         }
@@ -36,10 +36,14 @@ class NewChatScreenScreenshotTest {
     fun NewChatScreenEmpty() {
         AndroidThemeForPreviews {
             NewChatScreen(
-                state = CreateChatUiState.Data(contacts = persistentListOf(), query = null),
+                state = CreateChatUiState.Data(
+                    contacts = persistentListOf(),
+                    query = null,
+                    allowGroupImageSelection = true,
+                ),
                 onSearchQueryChange = {},
                 onConfirmOneToOne = {},
-                onConfirmGroup = { _, _, _, _, _ -> },
+                onConfirmGroup = { _, _, _, _, _, _ -> },
                 onBack = {},
             )
         }
@@ -54,7 +58,7 @@ class NewChatScreenScreenshotTest {
                 state = sampleData(),
                 onSearchQueryChange = {},
                 onConfirmOneToOne = {},
-                onConfirmGroup = { _, _, _, _, _ -> },
+                onConfirmGroup = { _, _, _, _, _, _ -> },
                 onBack = {},
                 step = NewChatStep.Selection,
                 selectionState = rememberContactSelectionState(),
@@ -72,7 +76,7 @@ class NewChatScreenScreenshotTest {
                 state = sampleData(),
                 onSearchQueryChange = {},
                 onConfirmOneToOne = {},
-                onConfirmGroup = { _, _, _, _, _ -> },
+                onConfirmGroup = { _, _, _, _, _, _ -> },
                 onBack = {},
                 step = NewChatStep.Selection,
                 selectionState = rememberContactSelectionState(
@@ -92,7 +96,7 @@ class NewChatScreenScreenshotTest {
                 state = sampleData(),
                 onSearchQueryChange = {},
                 onConfirmOneToOne = {},
-                onConfirmGroup = { _, _, _, _, _ -> },
+                onConfirmGroup = { _, _, _, _, _, _ -> },
                 onBack = {},
                 step = NewChatStep.Selection,
                 selectionState = rememberContactSelectionState(
@@ -112,7 +116,7 @@ class NewChatScreenScreenshotTest {
                 state = sampleData(),
                 onSearchQueryChange = {},
                 onConfirmOneToOne = {},
-                onConfirmGroup = { _, _, _, _, _ -> },
+                onConfirmGroup = { _, _, _, _, _, _ -> },
                 onBack = {},
                 step = NewChatStep.Settings,
                 selectionState = rememberContactSelectionState(
@@ -130,6 +134,7 @@ class NewChatScreenScreenshotTest {
             contact(3L, "Charlie Clark", "charlie@example.com", Color(0xFF6A1B9A)),
         ).toImmutableList(),
         query = null,
+        allowGroupImageSelection = true,
     )
 
     private fun contact(

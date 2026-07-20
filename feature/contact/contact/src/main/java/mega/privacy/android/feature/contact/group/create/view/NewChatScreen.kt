@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -57,6 +58,7 @@ internal fun NewChatScreen(
         isEkr: Boolean,
         isChatLink: Boolean,
         allowAddParticipants: Boolean,
+        imageUri: String?,
     ) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -89,6 +91,7 @@ internal fun NewChatScreenContent(
         isEkr: Boolean,
         isChatLink: Boolean,
         allowAddParticipants: Boolean,
+        imageUri: String?,
     ) -> Unit,
     onBack: () -> Unit,
     step: NewChatStep,
@@ -125,20 +128,24 @@ internal fun NewChatScreenContent(
         )
 
         NewChatStep.Settings -> SettingsStep(
-            contacts = (state as? CreateChatUiState.Data)?.contacts ?: emptyList(),
-            selectedHandles = selectionState.selectedHandles,
+            contacts = (state as? CreateChatUiState.Data)?.contacts?.toImmutableSet()
+                ?: emptySet<ContactItemUiState>().toImmutableSet(),
+            selectedHandles = selectionState.selectedHandles.toImmutableSet(),
             selectedCount = selectedCount,
             tagPrefix = NEW_CHAT_TAG_PREFIX,
-            onConfirm = { title, isEkr, isChatLink, allowAddParticipants ->
+            onConfirm = { title, isEkr, isChatLink, allowAddParticipants, imageUri ->
                 onConfirmGroup(
                     selectionState.selectedHandles,
                     title,
                     isEkr,
                     isChatLink,
                     allowAddParticipants,
+                    imageUri,
                 )
             },
+            onRemoveParticipant = selectionState::toggleSelection,
             onBack = { stepChange(NewChatStep.Selection) },
+            allowGroupImageSelection = (state as? CreateChatUiState.Data)?.allowGroupImageSelection == true,
             modifier = modifier,
         )
     }
@@ -151,7 +158,11 @@ internal const val NEW_CHAT_TAG_PREFIX = "new_chat"
 private class NewChatUiStateProvider : PreviewParameterProvider<CreateChatUiState> {
     override val values: Sequence<CreateChatUiState> = sequenceOf(
         CreateChatUiState.Loading,
-        CreateChatUiState.Data(contacts = persistentListOf(), query = null),
+        CreateChatUiState.Data(
+            contacts = persistentListOf(),
+            query = null,
+            allowGroupImageSelection = false
+        ),
         CreateChatUiState.Data(
             contacts = listOf(
                 ContactItemUiState(
@@ -174,6 +185,7 @@ private class NewChatUiStateProvider : PreviewParameterProvider<CreateChatUiStat
                 ),
             ).toImmutableList(),
             query = null,
+            allowGroupImageSelection = false,
         ),
     )
 }
@@ -188,7 +200,7 @@ private fun NewChatScreenSelectionStepPreview(
             state = state,
             onSearchQueryChange = {},
             onConfirmOneToOne = {},
-            onConfirmGroup = { _, _, _, _, _ -> },
+            onConfirmGroup = { _, _, _, _, _, _ -> },
             onBack = {},
             stepChange = {},
             step = NewChatStep.Selection,

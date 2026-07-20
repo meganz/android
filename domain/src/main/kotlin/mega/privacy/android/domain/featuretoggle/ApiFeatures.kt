@@ -22,6 +22,18 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Quota-warning upsell screen (AND-24264).
+     * When enabled, the storage over-quota flow shows the new quota-warning upsell screen instead
+     * of the legacy over-quota dialog.
+     */
+    QuotaWarningUpsellScreen(
+        experimentName = "qwup",
+        description = "Show the quota-warning upsell screen instead of the over-quota dialog",
+        singleCheckPerRun = true,
+        defaultValue = false,
+    ),
+
+    /**
      * Enables file info revamp
      */
     FileInfoRevamp(

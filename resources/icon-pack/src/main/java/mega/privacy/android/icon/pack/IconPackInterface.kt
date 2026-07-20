@@ -93,7 +93,10 @@ interface IconPackInterface {
             /**
              * medium_regular_outline
              */
-            interface Outline {}
+            interface Outline {
+                val FifteenForward: ImageVector
+                val FifteenBackward: ImageVector
+            }
 
             /**
              * medium_regular_solid

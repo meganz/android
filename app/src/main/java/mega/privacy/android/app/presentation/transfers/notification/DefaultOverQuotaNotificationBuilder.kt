@@ -10,7 +10,9 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.data.mapper.transfer.OverQuotaNotificationBuilder
 import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.account.GetAccountTypeUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.ClearEphemeralCredentialsUseCase
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.GetBandwidthOverQuotaDelayUseCase
@@ -18,8 +20,11 @@ import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.MegaNavigator
 import mega.privacy.android.navigation.destination.LoginNavKey
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
 import javax.inject.Inject
@@ -34,6 +39,7 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private val getAccountTypeUseCase: GetAccountTypeUseCase,
     private val getBandwidthOverQuotaDelayUseCase: GetBandwidthOverQuotaDelayUseCase,
     private val megaNavigator: MegaNavigator,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : OverQuotaNotificationBuilder {
 
     override suspend operator fun invoke(storageOverQuota: Boolean) = if (storageOverQuota) {
@@ -90,11 +96,25 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
     private suspend fun storageOverQuotaNotification(): Notification = with(context) {
         val contentText = getString(R.string.download_show_info)
         val message = getString(R.string.overquota_alert_title)
-        val pendingIntent =
+        val useUpsell = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+        }.getOrDefault(false)
+        val pendingIntent = if (useUpsell) {
+            megaNavigator.getPendingIntentWithDestination(
+                context = context,
+                singleActivityDestination = {
+                    QuotaWarningUpgradeNavKey(
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                }
+            )
+        } else {
             megaNavigator.getPendingIntentWithDestination(
                 context = context,
                 singleActivityDestination = { OverQuotaDialogNavKey(isOverQuota = true) }
             )
+        }
         val builder = NotificationCompat.Builder(
             context,
             Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,

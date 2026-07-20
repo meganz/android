@@ -46,6 +46,7 @@ class SyncMonitorInitializer : Initializer<Unit> {
     }
 
     override fun create(context: Context) {
+        if (!context.canResolveHiltEntryPoints()) return
         val entryPoint = EntryPointAccessors.fromApplication(
             context,
             SyncMonitorInitializerEntryPoint::class.java

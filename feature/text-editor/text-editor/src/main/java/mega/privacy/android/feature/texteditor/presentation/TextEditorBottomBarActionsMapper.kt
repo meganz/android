@@ -13,7 +13,8 @@ import javax.inject.Inject
  * - **Get Link**: View mode, when not in excluded adapter, access is OWNER, and node is not exported.
  * - **Share**: View mode, when [showShare].
  * - **Send to chat**: View mode, when [showSendToChat] (cloud node opens; not chat/local-only).
- * - **Edit**: View mode, when not in excluded adapter and access >= READWRITE (always last when shown).
+ * - **Edit**: View mode, when not in excluded adapter, access >= READWRITE, and the node is not in
+ *   Backups (Backups nodes are read-only via normal operations). Always last when shown.
  */
 class TextEditorBottomBarActionsMapper @Inject constructor() {
 
@@ -25,6 +26,7 @@ class TextEditorBottomBarActionsMapper @Inject constructor() {
         showDownload: Boolean,
         showShare: Boolean,
         showSendToChat: Boolean,
+        isNodeInBackups: Boolean = false,
     ): List<TextEditorBottomBarAction> {
         if (mode != TextEditorMode.View) return emptyList()
 
@@ -33,6 +35,7 @@ class TextEditorBottomBarActionsMapper @Inject constructor() {
                 && isNodeExported == false
 
         val showEdit = !inExcludedAdapterForGetLinkAndEdit
+                && !isNodeInBackups
                 && (accessPermission == AccessPermission.OWNER
                 || accessPermission == AccessPermission.FULL
                 || accessPermission == AccessPermission.READWRITE)

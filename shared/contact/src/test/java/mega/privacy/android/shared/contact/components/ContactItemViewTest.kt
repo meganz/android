@@ -30,6 +30,7 @@ class ContactItemViewTest {
     private val onLongClick = mock<() -> Unit>()
     private val onAvatarClick = mock<() -> Unit>()
     private val onMoreClicked = mock<() -> Unit>()
+    private val onRemoveClicked = mock<() -> Unit>()
 
     private val contact = ContactItemUiState(
         handle = 1L,
@@ -46,6 +47,7 @@ class ContactItemViewTest {
         onLongClick: (() -> Unit)? = this.onLongClick,
         onAvatarClick: (() -> Unit)? = this.onAvatarClick,
         onMoreClicked: (() -> Unit)? = this.onMoreClicked,
+        onRemoveClicked: (() -> Unit)? = null,
         inSelectionMode: Boolean = false,
     ) {
         composeTestRule.setContent {
@@ -55,6 +57,7 @@ class ContactItemViewTest {
                 onLongClick = onLongClick,
                 onAvatarClick = onAvatarClick,
                 onMoreClicked = onMoreClicked,
+                onRemoveClicked = onRemoveClicked,
                 inSelectionMode = inSelectionMode,
             )
         }
@@ -150,5 +153,21 @@ class ContactItemViewTest {
         setContent(inSelectionMode = false)
         composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_CHECKBOX, useUnmergedTree = true)
             .assertCountEquals(0)
+    }
+
+    @Test
+    fun `test that onRemoveClicked is fired when remove icon is clicked`() {
+        setContent(onMoreClicked = null, onRemoveClicked = onRemoveClicked)
+        composeTestRule.onNodeWithTag(CONTACT_ITEM_VIEW_REMOVE).performClick()
+        verify(onRemoveClicked).invoke()
+        verifyNoInteractions(onClick)
+        verifyNoInteractions(onLongClick)
+        verifyNoInteractions(onMoreClicked)
+    }
+
+    @Test
+    fun `test that remove icon is not rendered when onRemoveClicked is null`() {
+        setContent(onRemoveClicked = null)
+        composeTestRule.onNodeWithTag(CONTACT_ITEM_VIEW_REMOVE).assertDoesNotExist()
     }
 }

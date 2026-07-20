@@ -13,7 +13,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
 import dagger.Lazy
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.appstate.global.initialisation.GlobalInitialiser
@@ -121,9 +125,6 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
 
     @Inject
     lateinit var chatApiListenerCoordinator: ChatApiListenerCoordinator
-
-    @Inject
-    lateinit var workManagerConfigurationProvider: WorkManagerConfigurationProvider
 
     @Inject
     lateinit var globalInitialiser: GlobalInitialiser
@@ -317,8 +318,23 @@ class MegaApplication : Application(), DefaultLifecycleObserver, Configuration.P
     val currentActivity: Activity?
         get() = activityLifecycleHandler.getCurrentActivity()
 
+    /**
+     * WorkManager resolves this on-demand, which can happen before Hilt has injected this
+     * Application's fields (e.g. from an androidx.startup [androidx.startup.Initializer] that
+     * runs during the ContentProvider phase). Fetch [WorkManagerConfigurationProvider] through an
+     * entry point so it only depends on the Dagger component existing, not on field injection order.
+     */
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    internal interface WorkManagerConfigurationEntryPoint {
+        fun workManagerConfigurationProvider(): WorkManagerConfigurationProvider
+    }
+
     override val workManagerConfiguration: Configuration
-        get() = workManagerConfigurationProvider.workManagerConfiguration
+        get() = EntryPointAccessors.fromApplication(
+            this,
+            WorkManagerConfigurationEntryPoint::class.java
+        ).workManagerConfigurationProvider().workManagerConfiguration
 
     companion object {
         /**

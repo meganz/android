@@ -7,11 +7,14 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -56,13 +59,29 @@ class DoMoreWithMegaWidgetViewModel @Inject constructor(
 
     private val createAlbumState = MutableStateFlow(CreateAlbumState())
 
+    private val visibleItems: Flow<List<DoMoreWithMegaItem>> =
+        if (sortedItems.isEmpty()) {
+            flowOf(emptyList())
+        } else {
+            combine(
+                sortedItems.map { item ->
+                    item.monitorVisibility
+                        .catch { Timber.e(it); emit(true) }
+                        .map { visible -> item to visible }
+                }
+            ) { pairs ->
+                pairs.filter { it.second }.map { it.first }
+            }
+        }
+
     val uiState: StateFlow<DoMoreWithMegaUiState> =
         combine(
+            visibleItems,
             isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled.catch { Timber.e(it) },
             createAlbumState,
-        ) { isCameraUploadsEnabled, createAlbum ->
+        ) { visibleItems, isCameraUploadsEnabled, createAlbum ->
             DoMoreWithMegaUiState(
-                items = sortedItems,
+                items = visibleItems,
                 isCameraUploadsEnabled = isCameraUploadsEnabled,
                 hasPreviouslyEnabledCameraUploads = runCatching { hasCameraSyncEnabledUseCase() }
                     .onFailure { Timber.e(it) }
@@ -72,7 +91,7 @@ class DoMoreWithMegaWidgetViewModel @Inject constructor(
             )
         }.asUiStateFlow(
             scope = viewModelScope,
-            initialValue = DoMoreWithMegaUiState(items = sortedItems),
+            initialValue = DoMoreWithMegaUiState(),
         )
 
     private var createAlbumJob: Job? = null

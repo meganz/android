@@ -58,6 +58,7 @@ sealed interface CloudDriveUiState {
      * @property showContactNotVerifiedBanner
      * @property nodeSourceType
      * @property hasWritePermission
+     * @property isNodeInBackups
      * @property inactivityMonths
      * @property purgeTimestamp
      */
@@ -75,6 +76,7 @@ sealed interface CloudDriveUiState {
         val showContactNotVerifiedBanner: Boolean,
         override val nodeSourceType: NodeSourceType,
         val hasWritePermission: Boolean,
+        val isNodeInBackups: Boolean = false,
         val inactivityMonths: Int? = null,
         val purgeTimestamp: Long? = null,
     ) : CloudDriveUiState {
@@ -90,11 +92,13 @@ sealed interface CloudDriveUiState {
          */
         val isUploadAllowed = hasWritePermission
                 && nodeSourceType != NodeSourceType.RUBBISH_BIN
+                && !isNodeInBackups
 
         /**
          * True if media discovery is allowed in the current folder based on source, media presence
          */
         override val isMediaDiscoveryAllowed =
             nodeSourceType == NodeSourceType.CLOUD_DRIVE && hasMediaItems && !isCloudDriveRoot
+                    && !isNodeInBackups
     }
 }

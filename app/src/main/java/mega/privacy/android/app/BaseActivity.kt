@@ -77,6 +77,7 @@ import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.domain.exception.node.ForeignNodeException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
@@ -88,8 +89,11 @@ import mega.privacy.android.domain.usecase.setting.MonitorCookieSettingsSavedUse
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
 import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueue
 import mega.privacy.android.navigation.destination.OverQuotaDialogNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
 import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.resources.R as sharedResR
@@ -1089,30 +1093,50 @@ abstract class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionR
      * Launches MegaActivity to show over quota warning.
      */
     protected fun launchOverQuota() {
-        startActivity(
-            MegaActivity.getIntentWithExtraDestinations(
-                this,
-                listOf(OverQuotaDialogNavKey(true))
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-        )
-        finish()
+        lifecycleScope.launch {
+            startActivity(
+                storageOverQuotaIntent(isOverQuota = true).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            )
+            finish()
+        }
     }
 
     /**
      * Launches MegaActivity to show pre over quota warning.
      */
     protected fun launchPreOverQuota() {
-        startActivity(
+        lifecycleScope.launch {
+            startActivity(
+                storageOverQuotaIntent(isOverQuota = false).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+            )
+            finish()
+        }
+    }
+
+    private suspend fun storageOverQuotaIntent(isOverQuota: Boolean): Intent {
+        val useUpsell = runCatching {
+            getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)
+        }.getOrDefault(false)
+        return if (useUpsell) {
             MegaActivity.getIntentWithExtraDestinations(
-                this@BaseActivity,
-                listOf(OverQuotaDialogNavKey(false))
-            ).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            }
-        )
-        finish()
+                this,
+                listOf(
+                    QuotaWarningUpgradeNavKey(
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                )
+            )
+        } else {
+            MegaActivity.getIntentWithExtraDestinations(
+                this,
+                listOf(OverQuotaDialogNavKey(isOverQuota))
+            )
+        }
     }
 
     /**

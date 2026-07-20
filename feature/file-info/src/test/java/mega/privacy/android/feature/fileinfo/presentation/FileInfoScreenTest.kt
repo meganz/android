@@ -17,6 +17,7 @@ import androidx.annotation.StringRes
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
@@ -26,8 +27,8 @@ import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
 import mega.privacy.android.feature.fileinfo.presentation.view.FILE_INFO_NO_LOCATION_TAG
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.TagsNavKey
 import mega.privacy.android.navigation.destination.VersionsFileNavKey
@@ -46,7 +47,7 @@ class FileInfoScreenTest {
         title = "Presentation.pdf",
         isFile = true,
         iconRes = iconPackR.drawable.ic_pdf_medium_solid,
-        fileTypeExtension = "pdf",
+        fileTypeName = LocalizedText.StringRes(sharedR.string.file_type_name_pdf_document),
         sizeInBytes = 10L * 1024 * 1024,
         creationTime = 1_749_000_000L,
         modificationTime = 1_749_500_000L,
@@ -59,7 +60,6 @@ class FileInfoScreenTest {
         title = "New folder",
         isFile = false,
         iconRes = iconPackR.drawable.ic_folder_medium_solid,
-        fileTypeExtension = null,
         sizeInBytes = 0L,
         creationTime = 1_749_000_000L,
         modificationTime = null,
@@ -71,7 +71,25 @@ class FileInfoScreenTest {
 
         composeRule.onNodeWithTag(FILE_INFO_HEADER_TAG).assertIsDisplayed()
         composeRule.onNodeWithText("Presentation.pdf").assertIsDisplayed()
-        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains("PDF", substring = true)
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG)
+            .assertTextContains(getString(sharedR.string.file_type_name_pdf_document), substring = true)
+    }
+
+    @Test
+    fun `test that the subtitle falls back to a generic type when the type name is unknown`() {
+        setContent(
+            uiState = fileState.copy(
+                fileTypeName = LocalizedText.StringRes(
+                    sharedR.string.file_type_name_generic,
+                    listOf("XYZ"),
+                ),
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_SUBTITLE_TAG).assertTextContains(
+            getString(sharedR.string.file_type_name_generic, "XYZ"),
+            substring = true,
+        )
     }
 
     @Test
@@ -153,6 +171,18 @@ class FileInfoScreenTest {
         setContent(uiState = FileInfoUiState(isLoading = true))
 
         composeRule.onNodeWithTag(FILE_INFO_LOADING_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the loading skeleton uses the two-pane layout in landscape`() {
+        setContent(
+            uiState = FileInfoUiState(isLoading = true),
+            orientation = Configuration.ORIENTATION_LANDSCAPE,
+            deviceType = DeviceType.Tablet,
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_LOADING_TAG).assertIsDisplayed()
+        composeRule.onNodeWithTag(FILE_INFO_DETAILS_TAG).assertExists()
     }
 
     @Test
@@ -318,10 +348,7 @@ class FileInfoScreenTest {
     @Test
     fun `test that the duration badge and subtitle duration are shown for a video`() {
         setContent(
-            uiState = fileState.copy(
-                fileTypeExtension = "mov",
-                durationText = "1:24",
-            ),
+            uiState = fileState.copy(durationText = "1:24"),
         )
 
         composeRule.onNodeWithTag(FILE_INFO_DURATION_BADGE_TAG).assertExists()
@@ -500,8 +527,8 @@ class FileInfoScreenTest {
     private fun detailsPaneWidth(): Float = composeRule.onNodeWithTag(FILE_INFO_DETAILS_TAG)
         .getUnclippedBoundsInRoot().let { (it.right - it.left).value }
 
-    private fun getString(@StringRes resId: Int): String =
-        InstrumentationRegistry.getInstrumentation().targetContext.getString(resId)
+    private fun getString(@StringRes resId: Int, vararg formatArgs: Any): String =
+        InstrumentationRegistry.getInstrumentation().targetContext.getString(resId, *formatArgs)
 
     private fun getQuantityString(@PluralsRes resId: Int, quantity: Int): String =
         InstrumentationRegistry.getInstrumentation().targetContext.resources

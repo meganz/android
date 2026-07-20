@@ -29,8 +29,6 @@ internal class BootEventReceiverTest {
     @BeforeAll
     fun setUp() {
         underTest = BootEventReceiver()
-        underTest.applicationScope = applicationScope
-        underTest.startCameraUploadUseCase = startCameraUploadUseCase
     }
 
     @BeforeEach
@@ -45,9 +43,9 @@ internal class BootEventReceiverTest {
                 on { action }.thenReturn("android.intent.action.BATTERY_CHANGED")
             }
 
-            underTest.handleIntent(intent)
+            underTest.handleIntent(intent, applicationScope, startCameraUploadUseCase)
 
-            verifyNoInteractions(underTest.startCameraUploadUseCase)
+            verifyNoInteractions(startCameraUploadUseCase)
         }
 
     @Test
@@ -57,8 +55,8 @@ internal class BootEventReceiverTest {
                 on { action }.thenReturn("android.intent.action.BOOT_COMPLETED")
             }
 
-            underTest.handleIntent(intent)
+            underTest.handleIntent(intent, applicationScope, startCameraUploadUseCase)
 
-            verify(underTest.startCameraUploadUseCase).invoke()
+            verify(startCameraUploadUseCase).invoke()
         }
 }

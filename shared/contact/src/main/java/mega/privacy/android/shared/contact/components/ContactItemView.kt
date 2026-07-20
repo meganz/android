@@ -40,6 +40,7 @@ import java.util.Calendar
  * @param onLongClick
  * @param onAvatarClick When non-null, taps on the avatar fire this instead of bubbling up to [onClick].
  * @param onMoreClicked When non-null, a trailing kebab icon is rendered and fires this on tap.
+ * @param onRemoveClicked When non-null, a trailing x-circle icon is rendered and fires this on tap.
  * @param selected
  * @param inSelectionMode
  */
@@ -51,6 +52,7 @@ fun ContactItemView(
     onLongClick: (() -> Unit)? = null,
     onAvatarClick: (() -> Unit)? = null,
     onMoreClicked: (() -> Unit)? = null,
+    onRemoveClicked: (() -> Unit)? = null,
     selected: Boolean = false,
     inSelectionMode: Boolean = false,
 ) {
@@ -73,6 +75,7 @@ fun ContactItemView(
         onLongClick = onLongClick,
         onAvatarClick = onAvatarClick,
         onMoreClicked = onMoreClicked,
+        onRemoveClicked = onRemoveClicked,
         selected = selected,
         inSelectionMode = inSelectionMode,
     )
@@ -95,6 +98,7 @@ fun ContactItemView(
  * @param onLongClick Optional long-click handler on the row.
  * @param onAvatarClick When non-null, taps on the avatar fire this instead of bubbling up to [onClick].
  * @param onMoreClicked When non-null, a trailing kebab icon is rendered and fires this on tap.
+ * @param onRemoveClicked When non-null, a trailing x-circle icon is rendered and fires this on tap.
  * @param selected When true, replaces the avatar with a brand-coloured check tile (multi-select pickers).
  * @param inSelectionMode When true, renders a trailing checkbox in place of the kebab.
  */
@@ -110,6 +114,7 @@ fun ContactItemView(
     onLongClick: (() -> Unit)? = null,
     onAvatarClick: (() -> Unit)? = null,
     onMoreClicked: (() -> Unit)? = null,
+    onRemoveClicked: (() -> Unit)? = null,
     selected: Boolean = false,
     inSelectionMode: Boolean = false,
 ) {
@@ -162,6 +167,21 @@ fun ContactItemView(
                         MegaIcon(
                             painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.MoreVertical),
                             contentDescription = stringResource(R.string.more_options),
+                            tint = IconColor.Secondary,
+                        )
+                    }
+                }
+            }
+
+            onRemoveClicked != null -> {
+                {
+                    IconButton(
+                        onClick = onRemoveClicked,
+                        modifier = Modifier.testTag(CONTACT_ITEM_VIEW_REMOVE),
+                    ) {
+                        MegaIcon(
+                            painter = rememberVectorPainter(IconPack.Medium.Thin.Outline.XCircle),
+                            contentDescription = stringResource(R.string.general_remove),
                             tint = IconColor.Secondary,
                         )
                     }
@@ -251,6 +271,7 @@ private fun compareLastSeenWithToday(lastGreen: Calendar): Int {
 internal const val CONTACT_ITEM_VIEW_ROW = "contact_item_view:row"
 internal const val CONTACT_ITEM_VIEW_VERIFIED_BADGE = "contact_item_view:verified_badge"
 internal const val CONTACT_ITEM_VIEW_MORE = "contact_item_view:more"
+internal const val CONTACT_ITEM_VIEW_REMOVE = "contact_item_view:remove"
 internal const val CONTACT_ITEM_VIEW_CHECKBOX = "contact_item_view:checkbox"
 
 private class ContactItemPreviewProvider :
@@ -342,6 +363,21 @@ private fun ContactItemViewMoreMenuPreview() {
             isVerified = false,
             onClick = {},
             onMoreClicked = {},
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ContactItemViewRemovePreview() {
+    AndroidThemeForPreviews {
+        ContactItemView(
+            displayName = "Diana",
+            statusText = "Online",
+            status = ContactItemStatus.Online,
+            avatar = AvatarData.Initials(initials = "D", avatarColor = Color(0xFFE65100)),
+            isVerified = false,
+            onRemoveClicked = {},
         )
     }
 }

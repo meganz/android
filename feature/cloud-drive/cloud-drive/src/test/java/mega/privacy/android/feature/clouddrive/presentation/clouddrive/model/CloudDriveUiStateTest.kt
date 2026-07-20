@@ -44,6 +44,17 @@ class CloudDriveUiStateTest {
     }
 
     @Test
+    fun `test that isUploadAllowed returns false when isNodeInBackups is true`() {
+        val state = createDataState(
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            hasWritePermission = true,
+            isNodeInBackups = true,
+        )
+
+        assertThat(state.isUploadAllowed).isFalse()
+    }
+
+    @Test
     fun `test that isMediaDiscoveryAllow returns true when all conditions are met`() {
         val state = createDataState(
             isCloudDriveRoot = false,
@@ -87,12 +98,25 @@ class CloudDriveUiStateTest {
         assertThat(state.isMediaDiscoveryAllowed).isFalse()
     }
 
+    @Test
+    fun `test that isMediaDiscoveryAllow returns false when isNodeInBackups is true`() {
+        val state = createDataState(
+            isCloudDriveRoot = false,
+            hasMediaItems = true,
+            nodeSourceType = NodeSourceType.CLOUD_DRIVE,
+            isNodeInBackups = true,
+        )
+
+        assertThat(state.isMediaDiscoveryAllowed).isFalse()
+    }
+
     private fun createDataState(
         nodesLoadingState: NodesLoadingState = NodesLoadingState.FullyLoaded,
         isCloudDriveRoot: Boolean = false,
         hasMediaItems: Boolean = false,
         nodeSourceType: NodeSourceType = NodeSourceType.CLOUD_DRIVE,
         hasWritePermission: Boolean = false,
+        isNodeInBackups: Boolean = false,
     ) = CloudDriveUiState.Data(
         title = LocalizedText.Literal(""),
         nodesLoadingState = nodesLoadingState,
@@ -107,5 +131,6 @@ class CloudDriveUiStateTest {
         showContactNotVerifiedBanner = false,
         nodeSourceType = nodeSourceType,
         hasWritePermission = hasWritePermission,
+        isNodeInBackups = isNodeInBackups,
     )
 }
