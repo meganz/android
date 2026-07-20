@@ -50,6 +50,7 @@ class LoggerInitializer : Initializer<Unit> {
      *
      */
     override fun create(context: Context) {
+        if (!context.canResolveHiltEntryPoints()) return
         val entryPoint =
             EntryPointAccessors.fromApplication(context, LoggerInitializerEntryPoint::class.java)
 

@@ -35,6 +35,7 @@ class PasscodeInitializer : Initializer<Unit> {
      * Create
      */
     override fun create(context: Context) {
+        if (!context.canResolveHiltEntryPoints()) return
         PasscodeLifecycleDispatcher.init(context)
         PasscodeProcessLifecycleOwner.init(context)
         val entryPoint =
