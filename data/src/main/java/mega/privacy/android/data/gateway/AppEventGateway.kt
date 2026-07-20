@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.call.AudioDevice
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsSettingsAction
 import mega.privacy.android.domain.entity.featureflag.MiscLoadedState
 import mega.privacy.android.domain.entity.settings.cookie.CookieType
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 
 internal interface AppEventGateway {
 
@@ -67,6 +68,17 @@ internal interface AppEventGateway {
      *
      */
     suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean)
+
+    /**
+     * Monitor transfer over quota events (over quota and almost over quota)
+     */
+    fun monitorTransferOverQuotaEvent(): Flow<TransferOverQuotaStatus>
+
+    /**
+     * Broadcast a transfer over quota event
+     * @param status the [TransferOverQuotaStatus] to broadcast
+     */
+    suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus)
 
     /**
      * Broadcast storage over quota

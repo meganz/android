@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -125,6 +126,21 @@ interface TransferRepository {
      *
      */
     suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean)
+
+    /**
+     * Monitor transfer over quota events, covering both over quota and almost over quota.
+     *
+     * Unlike [monitorTransferOverQuota], this emits an event on every occurrence rather than only
+     * on state changes.
+     */
+    fun monitorTransferOverQuotaEvent(): Flow<TransferOverQuotaStatus>
+
+    /**
+     * Broadcast a transfer over quota event.
+     *
+     * @param status the [TransferOverQuotaStatus] to broadcast
+     */
+    suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus)
 
     /**
      * Monitor storage over quota
