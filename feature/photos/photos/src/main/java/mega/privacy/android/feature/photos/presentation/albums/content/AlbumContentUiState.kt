@@ -41,6 +41,7 @@ import mega.privacy.android.navigation.destination.AlbumContentPreviewNavKey
  */
 data class AlbumContentUiState(
     val isLoading: Boolean = true,
+    val isAddingPhotos: Boolean = false,
     val uiAlbum: AlbumUiState? = null,
     val photos: ImmutableList<PhotoUiState> = persistentListOf(),
     val selectedPhotos: ImmutableSet<PhotoUiState> = persistentSetOf(),

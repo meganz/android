@@ -49,6 +49,7 @@ import de.palm.composestateevents.triggered
 import kotlinx.coroutines.launch
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.dialogs.BasicDialog
+import mega.android.core.ui.components.indicators.InfiniteProgressBarIndicator
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
 import mega.android.core.ui.components.sheets.SheetActionHeader
@@ -448,7 +449,7 @@ internal fun AlbumContentScreen(
         },
     ) { innerPadding ->
         val isLoadingEmpty =
-            uiState.photos.isEmpty() && uiState.isLoading
+            uiState.photos.isEmpty() && (uiState.isLoading || uiState.isAddingPhotos)
         val hasPhotos = uiState.photos.isNotEmpty()
 
         when {
@@ -469,6 +470,13 @@ internal fun AlbumContentScreen(
                         .fillMaxSize()
                         .padding(top = innerPadding.calculateTopPadding()),
                 ) {
+                    if (uiState.isAddingPhotos) {
+                        InfiniteProgressBarIndicator(
+                            modifier = Modifier
+                                .testTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
+                                .fillMaxWidth(),
+                        )
+                    }
                     AlbumDynamicContentGrid(
                         modifier = Modifier
                             .fillMaxSize()

@@ -548,6 +548,44 @@ class AlbumContentScreenComposeTest {
     }
 
     @Test
+    fun `test that loading progress is visible when photos are not empty and adding photos`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = listOf(createMockPhoto(id = 1L)).toImmutableList(),
+            selectedPhotos = persistentSetOf(),
+            isLoading = false,
+            isAddingPhotos = true
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_LOADING_PROGRESS)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that skeleton is visible when photos are empty and adding photos`() {
+        val uiState = AlbumContentUiState(
+            uiAlbum = createMockAlbumUiState(),
+            photos = persistentListOf(),
+            selectedPhotos = persistentSetOf(),
+            isLoading = false,
+            isAddingPhotos = true
+        )
+
+        setComposeContent(uiState)
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithTag(ALBUM_CONTENT_SCREEN_SKELETON)
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun `test that fab should be hidden on selection mode`() {
         val uiState = AlbumContentUiState(
             uiAlbum = createMockAlbumUiState(),
