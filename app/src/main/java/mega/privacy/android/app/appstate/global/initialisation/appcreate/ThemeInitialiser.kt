@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.app.presentation.theme.ThemeModeState
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -14,11 +14,10 @@ import javax.inject.Inject
  */
 internal class ThemeInitialiser @Inject constructor(
     private val themeModeState: ThemeModeState,
-) : AppCreateInitialiser {
+) : SynchronousAppCreateInitialiser {
     override val name = "ThemeInitialiser"
-    override val isCritical = true
 
-    override suspend operator fun invoke() {
+    override operator fun invoke() {
         themeModeState.initialise()
     }
 }

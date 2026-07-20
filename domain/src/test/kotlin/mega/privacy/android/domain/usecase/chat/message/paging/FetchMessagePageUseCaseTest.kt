@@ -51,15 +51,15 @@ class FetchMessagePageUseCaseTest {
         val expectedMessages = listOf(mock<ChatMessage>())
 
         monitorChatRoomMessagesUseCase.stub {
-            onBlocking { invoke(any()) } doReturn emptyFlow()
+            on { invoke(any()) } doReturn emptyFlow()
         }
 
         loadMessagesUseCase.stub {
-            onBlocking { invoke(any()) } doReturn expectedStatus
+            on { invoke(any()) } doReturn expectedStatus
         }
 
         getMessageListUseCase.stub {
-            onBlocking { invoke(any()) } doReturn expectedMessages
+            on { invoke(any()) } doReturn expectedMessages
         }
 
         assertThat(underTest.invoke(0)).isEqualTo(

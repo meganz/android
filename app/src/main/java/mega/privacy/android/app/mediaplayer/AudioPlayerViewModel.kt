@@ -16,18 +16,33 @@ import mega.privacy.android.app.mediaplayer.gateway.AudioMediaControllerGateway
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeByExoPlayerMapper
 import mega.privacy.android.app.mediaplayer.model.AudioControllerState
 import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_ALBUM_SHARING
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_MSG_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.URL_FILE_LINK
+import mega.privacy.android.app.utils.Constants.URL_LOCAL_FILE_PATH
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioRepeatModeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.SetAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.node.GetNodeByHandleUseCase
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.FILE_LINK_ADAPTER
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopPlayingItemEnabledEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerLoopQueueEnabledEvent
 import mega.privacy.mobile.analytics.event.AudioPlayerShuffleEnabledEvent
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 
 /**
@@ -52,6 +67,17 @@ class AudioPlayerViewModel @Inject constructor(
         playerState.asUiStateFlow(viewModelScope, AudioPlayerUiState.Loading)
 
     private var currentControllerState: AudioControllerState? = null
+
+    private data class IntentData(
+        val adapterType: Int,
+        val nodeSourceType: NodeSourceType,
+        val fileLinkUrl: String?,
+        val localFilePath: String?,
+        val chatId: Long?,
+        val msgId: Long?,
+    )
+
+    private var intentData: IntentData? = null
 
     init {
         observePlayerState()
@@ -102,6 +128,7 @@ class AudioPlayerViewModel @Inject constructor(
 
     private fun mapToUiState(state: AudioControllerState) {
         val existing = playerState.value as? AudioPlayerUiState.Data
+        val data = intentData
         playerState.value = AudioPlayerUiState.Data(
             isPlaying = state.isPlaying,
             currentPosition = state.currentPositionMs,
@@ -116,7 +143,12 @@ class AudioPlayerViewModel @Inject constructor(
             currentPlayingHandle = state.currentMediaItemHandle,
             thumbnailData = state.currentMediaItemHandle?.let { ThumbnailRequest.fromHandle(it) },
             currentPlayingItemName = existing?.currentPlayingItemName,
-            currentAdapterType = existing?.currentAdapterType ?: INVALID_VALUE,
+            currentAdapterType = data?.adapterType ?: INVALID_VALUE,
+            nodeSourceType = data?.nodeSourceType ?: NodeSourceType.MEDIA_PLAYER_DEFAULT,
+            fileLinkUrl = data?.fileLinkUrl,
+            localFilePath = data?.localFilePath,
+            chatId = data?.chatId,
+            msgId = data?.msgId,
         )
     }
 
@@ -179,11 +211,43 @@ class AudioPlayerViewModel @Inject constructor(
         if (adapterType == INVALID_VALUE) {
             Timber.w("Audio player launched without a valid adapter type")
         }
+        val rawChatId = intent.getLongExtra(INTENT_EXTRA_KEY_CHAT_ID, INVALID_HANDLE)
+        val rawMsgId = intent.getLongExtra(INTENT_EXTRA_KEY_MSG_ID, INVALID_HANDLE)
+        intentData = IntentData(
+            adapterType = adapterType,
+            nodeSourceType = adapterTypeToNodeSourceType(adapterType),
+            fileLinkUrl = intent.getStringExtra(URL_FILE_LINK),
+            localFilePath = intent.getStringExtra(URL_LOCAL_FILE_PATH),
+            chatId = rawChatId.takeIf { it != INVALID_HANDLE },
+            msgId = rawMsgId.takeIf { it != INVALID_HANDLE },
+        )
         playerState.update { state ->
-            if (state is AudioPlayerUiState.Data) state.copy(currentAdapterType = adapterType)
-            else state
+            if (state is AudioPlayerUiState.Data) {
+                val data = intentData ?: return@update state
+                state.copy(
+                    currentAdapterType = data.adapterType,
+                    nodeSourceType = data.nodeSourceType,
+                    fileLinkUrl = data.fileLinkUrl,
+                    localFilePath = data.localFilePath,
+                    chatId = data.chatId,
+                    msgId = data.msgId,
+                )
+            } else state
         }
     }
+
+    private fun adapterTypeToNodeSourceType(adapterType: Int): NodeSourceType =
+        when (adapterType) {
+            OFFLINE_ADAPTER -> NodeSourceType.OFFLINE
+            RUBBISH_BIN_ADAPTER -> NodeSourceType.RUBBISH_BIN
+            FOLDER_LINK_ADAPTER, FROM_ALBUM_SHARING -> NodeSourceType.FOLDER_LINK
+            FROM_CHAT -> NodeSourceType.CHAT
+            FILE_LINK_ADAPTER -> NodeSourceType.FILE_LINK
+            FROM_IMAGE_VIEWER -> NodeSourceType.MEDIA_PLAYER_IMAGE_VIEWER
+            VERSIONS_ADAPTER -> NodeSourceType.MEDIA_PLAYER_VERSIONS
+            ZIP_ADAPTER -> NodeSourceType.MEDIA_PLAYER_ZIP_FILE
+            else -> NodeSourceType.MEDIA_PLAYER_DEFAULT
+        }
 
     fun stopPlayer() {
         gateway.stop()

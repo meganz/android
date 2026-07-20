@@ -41,7 +41,7 @@ class MonitorStorageStateUseCaseTest {
     @Test
     fun `test that current state is emitted`() = runTest {
         val expected = StorageState.Unknown
-        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(expected) }
+        getCurrentStorageStateUseCase.stub { on { invoke() }.thenReturn(expected) }
         notificationsRepository.stub { on { monitorEvent() }.thenReturn(flow { awaitCancellation() }) }
 
         underTest().test {
@@ -52,7 +52,7 @@ class MonitorStorageStateUseCaseTest {
     @Test
     fun `test that subsequent updates are emitted`() = runTest {
         val expected = StorageState.Green
-        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenReturn(StorageState.Unknown) }
+        getCurrentStorageStateUseCase.stub { on { invoke() }.thenReturn(StorageState.Unknown) }
         notificationsRepository.stub {
             on { monitorEvent() }.thenReturn(flow {
                 emit(StorageStateEvent(1L, expected))
@@ -70,7 +70,7 @@ class MonitorStorageStateUseCaseTest {
 
     @Test
     fun `test that unknown state is emitted when getting current state fails`() = runTest {
-        getCurrentStorageStateUseCase.stub { onBlocking { invoke() }.thenThrow(RuntimeException("error")) }
+        getCurrentStorageStateUseCase.stub { on { invoke() }.thenThrow(RuntimeException("error")) }
         notificationsRepository.stub { on { monitorEvent() }.thenReturn(flow { awaitCancellation() }) }
 
         underTest().test {

@@ -1,15 +1,17 @@
 package mega.privacy.android.domain.usecase.login
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.security.LoginRepository
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LocalLogoutUseCaseTest {
 
     private lateinit var underTest: LocalLogoutUseCase
@@ -18,26 +20,30 @@ class LocalLogoutUseCaseTest {
     private val localLogoutAppUseCase = mock<LocalLogoutAppUseCase>()
     private val chatLogoutUseCase = mock<ChatLogoutUseCase>()
 
-    @Before
+    @AfterEach
+    fun tearDown() {
+        reset(loginRepository, localLogoutAppUseCase, chatLogoutUseCase)
+    }
+
+    @BeforeEach
     fun setUp() {
         underTest = LocalLogoutUseCase(
             loginRepository = loginRepository,
             localLogoutAppUseCase = localLogoutAppUseCase,
-            chatLogoutUseCase = chatLogoutUseCase
+            chatLogoutUseCase = chatLogoutUseCase,
         )
     }
 
     @Test
-    fun `test that local logout invokes ChatLogout`() = runTest {
-        val disableChatApiUseCase = mock<DisableChatApiUseCase>()
-        underTest.invoke(disableChatApiUseCase)
-        verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+    fun `test that invoke calls chatLogoutUseCase`() = runTest {
+        underTest.invoke(disableChatApi = true)
+        verify(chatLogoutUseCase).invoke(disableChatApi = true)
     }
 
     @Test
-    fun `test that local logout invokes LocalLogoutApp on success`() = runTest {
+    fun `test that invoke calls localLogoutAppUseCase on success`() = runTest {
         whenever(loginRepository.localLogout()).thenReturn(Unit)
-        underTest.invoke(mock())
+        underTest.invoke(disableChatApi = true)
         verify(localLogoutAppUseCase).invoke()
     }
 }

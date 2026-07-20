@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.data.extensions.expirationTimeOrNull
 import mega.privacy.android.data.extensions.getPreviewFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -88,7 +89,7 @@ internal class PhotoMapper @Inject constructor(
                         label = node.label,
                         nodeLabel = nodeLabelMapper(node.label),
                         exportedData = node.takeIf { node.isExported }?.let {
-                            ExportedData(it.publicLink, it.publicLinkCreationTime)
+                            ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTimeOrNull())
                         },
                         isIncomingShare = node.isInShare,
                         isNodeKeyDecrypted = node.isNodeKeyDecrypted,
@@ -125,7 +126,7 @@ internal class PhotoMapper @Inject constructor(
                         label = node.label,
                         nodeLabel = nodeLabelMapper(node.label),
                         exportedData = node.takeIf { node.isExported }?.let {
-                            ExportedData(it.publicLink, it.publicLinkCreationTime)
+                            ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTimeOrNull())
                         },
                         isIncomingShare = node.isInShare,
                         isNodeKeyDecrypted = node.isNodeKeyDecrypted,

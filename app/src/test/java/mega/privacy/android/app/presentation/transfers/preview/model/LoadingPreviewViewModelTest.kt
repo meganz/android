@@ -53,11 +53,11 @@ class LoadingPreviewViewModelTest {
 
     private val getTransferByUniqueIdUseCase = mock<GetTransferByUniqueIdUseCase>()
     private val monitorTransferEventsUseCase = mock<MonitorTransferEventsUseCase> {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val broadcastTransferTagToCancelUseCase = mock<BroadcastTransferTagToCancelUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
-        onBlocking { invoke() } doReturn flowOf(true)
+        on { invoke() } doReturn flowOf(true)
     }
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
     private val appScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())

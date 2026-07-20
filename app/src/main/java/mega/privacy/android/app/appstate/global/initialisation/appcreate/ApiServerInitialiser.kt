@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.domain.usecase.apiserver.UpdateApiServerUseCase
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -9,9 +9,8 @@ import javax.inject.Inject
  */
 class ApiServerInitialiser @Inject constructor(
     private val updateApiServerUseCase: UpdateApiServerUseCase,
-) : AppCreateInitialiser {
+) : AsyncAppCreateInitialiser {
     override val name = "ApiServerInitialiser"
-    override val isCritical = false
 
     override suspend operator fun invoke() {
         updateApiServerUseCase()

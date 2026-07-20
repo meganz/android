@@ -5,6 +5,7 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.label.NodeLabelMapper
 import mega.privacy.android.domain.entity.Offline
+import mega.privacy.android.data.extensions.expirationTimeOrNull
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.NodeId
@@ -60,7 +61,7 @@ internal class ImageNodeMapper @Inject constructor(
             override val isMarkedSensitive = megaNode.isMarkedSensitive
             override val isSensitiveInherited = isSensitiveInherited
             override val exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-                ExportedData(it.publicLink, it.publicLinkCreationTime)
+                ExportedData(it.publicLink, it.publicLinkCreationTime, it.expirationTimeOrNull())
             }
             override val isTakenDown = megaNode.isTakenDown
             override val isIncomingShare = megaNode.isInShare

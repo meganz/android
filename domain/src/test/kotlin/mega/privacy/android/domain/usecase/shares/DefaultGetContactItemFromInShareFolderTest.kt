@@ -26,11 +26,11 @@ class DefaultGetContactItemFromInShareFolderTest {
     private val contactItem = mock<ContactItem>()
     private val cachedContactItem = mock<ContactItem>()
     private val nodeRepository = mock<NodeRepository> {
-        onBlocking { getOwnerIdFromInShare(nodeId, false) }.thenReturn(userId)
+        on { getOwnerIdFromInShare(nodeId, false) }.thenReturn(userId)
     }
     private val getContactItem = mock<GetContactItem> {
-        onBlocking { invoke(userId, true) }.thenReturn(contactItem)
-        onBlocking { invoke(userId, false) }.thenReturn(cachedContactItem)
+        on { invoke(userId, true) }.thenReturn(contactItem)
+        on { invoke(userId, false) }.thenReturn(cachedContactItem)
     }
 
 

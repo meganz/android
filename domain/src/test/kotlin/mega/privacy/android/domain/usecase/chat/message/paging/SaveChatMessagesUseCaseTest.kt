@@ -39,8 +39,8 @@ class SaveChatMessagesUseCaseTest {
         runTest {
             val chatId = 123L
             chatRepository.stub {
-                onBlocking { getMyUserHandle() } doReturn myUserHandle
-                onBlocking { getNextMessagePagingInfo(any(), any()) } doReturn null
+                on { getMyUserHandle() } doReturn myUserHandle
+                on { getNextMessagePagingInfo(any(), any()) } doReturn null
             }
 
             underTest(

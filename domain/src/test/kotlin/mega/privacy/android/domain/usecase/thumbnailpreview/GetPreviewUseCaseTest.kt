@@ -26,7 +26,7 @@ class GetPreviewUseCaseTest {
     fun `test that local preview is returned if present`() = runTest {
         val localFile = File("localFile")
         thumbnailPreviewRepository.stub {
-            onBlocking { getPreviewFromLocal(any()) }.thenReturn(localFile)
+            on { getPreviewFromLocal(any()) }.thenReturn(localFile)
         }
         assertThat(underTest(mock())).isSameInstanceAs(localFile)
     }
@@ -35,8 +35,8 @@ class GetPreviewUseCaseTest {
     fun `test that preview is fetched from  the remote if no local file is returned`() = runTest {
         val remoteFile = File("localFile")
         thumbnailPreviewRepository.stub {
-            onBlocking { getPreviewFromLocal(any()) }.thenReturn(null)
-            onBlocking { getPreviewFromServer(any()) }.thenReturn(remoteFile)
+            on { getPreviewFromLocal(any()) }.thenReturn(null)
+            on { getPreviewFromServer(any()) }.thenReturn(remoteFile)
         }
         assertThat(underTest(mock())).isSameInstanceAs(remoteFile)
     }

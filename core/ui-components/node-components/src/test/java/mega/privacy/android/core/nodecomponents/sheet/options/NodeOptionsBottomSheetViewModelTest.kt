@@ -557,7 +557,7 @@ class NodeOptionsBottomSheetViewModelTest {
         }
 
     @Test
-    fun `test that init does not monitor node updates for VIDEO_PLAYER_ZIP_FILE source`() =
+    fun `test that init does not monitor node updates for MEDIA_PLAYER_ZIP_FILE source`() =
         runTest {
             val localPath = "/data/app/test.mp4"
             val file = File(localPath)
@@ -586,7 +586,7 @@ class NodeOptionsBottomSheetViewModelTest {
             ).thenReturn(listOf(mock()))
 
             initViewModel(
-                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                nodeSourceType = NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
                 localFilePath = localPath,
             )
 
@@ -594,7 +594,7 @@ class NodeOptionsBottomSheetViewModelTest {
         }
 
     @Test
-    fun `test that init loads ZipFileTypedNode when source type is VIDEO_PLAYER_ZIP_FILE and localFilePath is provided`() =
+    fun `test that init loads ZipFileTypedNode when source type is MEDIA_PLAYER_ZIP_FILE and localFilePath is provided`() =
         runTest {
             val localPath = "/data/app/test.mp4"
             val file = File(localPath)
@@ -624,7 +624,7 @@ class NodeOptionsBottomSheetViewModelTest {
             ).thenReturn(listOf(expectedNodeUi))
 
             initViewModel(
-                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                nodeSourceType = NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
                 localFilePath = localPath,
             )
 
@@ -635,12 +635,12 @@ class NodeOptionsBottomSheetViewModelTest {
         }
 
     @Test
-    fun `test that init does not load ZipFileTypedNode when source type is VIDEO_PLAYER_ZIP_FILE and localFilePath is null`() =
+    fun `test that init does not load ZipFileTypedNode when source type is MEDIA_PLAYER_ZIP_FILE and localFilePath is null`() =
         runTest {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
 
             initViewModel(
-                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                nodeSourceType = NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
                 localFilePath = null,
             )
 
@@ -648,14 +648,14 @@ class NodeOptionsBottomSheetViewModelTest {
         }
 
     @Test
-    fun `test that init does not load ZipFileTypedNode when getFileByPathUseCase returns null for VIDEO_PLAYER_ZIP_FILE source`() =
+    fun `test that init does not load ZipFileTypedNode when getFileByPathUseCase returns null for MEDIA_PLAYER_ZIP_FILE source`() =
         runTest {
             val localPath = "/data/app/test.mp4"
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
             whenever(getFileByPathUseCase(localPath)).thenReturn(null)
 
             initViewModel(
-                nodeSourceType = NodeSourceType.VIDEO_PLAYER_ZIP_FILE,
+                nodeSourceType = NodeSourceType.MEDIA_PLAYER_ZIP_FILE,
                 localFilePath = localPath,
             )
 

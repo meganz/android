@@ -33,7 +33,7 @@ internal class DoesHaveLinksUseCaseTest {
     @Test
     fun `test that invoke returns true when account has public links`() = runTest {
         shareRepository.stub {
-            onBlocking { doesHaveLinks() }.thenReturn(true)
+            on { doesHaveLinks() }.thenReturn(true)
         }
 
         val result = underTest()
@@ -45,7 +45,7 @@ internal class DoesHaveLinksUseCaseTest {
     @Test
     fun `test that invoke returns false when account has no public links`() = runTest {
         shareRepository.stub {
-            onBlocking { doesHaveLinks() }.thenReturn(false)
+            on { doesHaveLinks() }.thenReturn(false)
         }
 
         val result = underTest()
@@ -57,7 +57,7 @@ internal class DoesHaveLinksUseCaseTest {
     @Test
     fun `test that invoke calls repository doesHaveLinks method`() = runTest {
         shareRepository.stub {
-            onBlocking { doesHaveLinks() }.thenReturn(true)
+            on { doesHaveLinks() }.thenReturn(true)
         }
 
         underTest()

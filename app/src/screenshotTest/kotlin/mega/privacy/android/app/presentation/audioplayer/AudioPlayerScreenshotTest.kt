@@ -29,7 +29,8 @@ class AudioPlayerScreenshotTest {
                 onShuffleClicked = {},
                 onRepeatClicked = {},
                 onPlaylistClicked = {},
-                onScreenClicked = {},
+                onBackPressed = {},
+                onMoreActionsClicked = {},
             )
         }
     }
@@ -54,7 +55,8 @@ class AudioPlayerScreenshotTest {
                 onShuffleClicked = {},
                 onRepeatClicked = {},
                 onPlaylistClicked = {},
-                onScreenClicked = {},
+                onBackPressed = {},
+                onMoreActionsClicked = {},
             )
         }
     }
@@ -79,7 +81,8 @@ class AudioPlayerScreenshotTest {
                 onShuffleClicked = {},
                 onRepeatClicked = {},
                 onPlaylistClicked = {},
-                onScreenClicked = {},
+                onBackPressed = {},
+                onMoreActionsClicked = {},
             )
         }
     }
@@ -103,7 +106,8 @@ class AudioPlayerScreenshotTest {
                 onShuffleClicked = {},
                 onRepeatClicked = {},
                 onPlaylistClicked = {},
-                onScreenClicked = {},
+                onBackPressed = {},
+                onMoreActionsClicked = {},
             )
         }
     }
@@ -130,7 +134,8 @@ class AudioPlayerScreenshotTest {
                 onShuffleClicked = {},
                 onRepeatClicked = {},
                 onPlaylistClicked = {},
-                onScreenClicked = {},
+                onBackPressed = {},
+                onMoreActionsClicked = {},
             )
         }
     }
@@ -154,7 +159,8 @@ class AudioPlayerScreenshotTest {
                 onShuffleClicked = {},
                 onRepeatClicked = {},
                 onPlaylistClicked = {},
-                onScreenClicked = {},
+                onBackPressed = {},
+                onMoreActionsClicked = {},
             )
         }
     }

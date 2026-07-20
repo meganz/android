@@ -64,7 +64,7 @@ internal class LogoutUseCaseTest {
     @Test
     internal fun `test that logout flag is set to false if exception is thrown`() = runTest {
         loginRepository.stub {
-            onBlocking { logout() }.thenAnswer { throw Exception("Logout failed") }
+            on { logout() }.thenAnswer { throw Exception("Logout failed") }
         }
 
         assertThrows<Exception> { underTest() }
@@ -88,10 +88,10 @@ internal class LogoutUseCaseTest {
         runTest {
             var job: Job? = null
             loginRepository.stub {
-                onBlocking { logout() }.thenAnswer { job?.cancel() }
+                on { logout() }.thenAnswer { job?.cancel() }
             }
             logoutTask1.stub {
-                onBlocking { onLogoutSuccess() } doSuspendableAnswer { yield() }
+                on { onLogoutSuccess() } doSuspendableAnswer { yield() }
             }
 
             job = launch { underTest() }
@@ -105,7 +105,7 @@ internal class LogoutUseCaseTest {
     fun `test that remaining on logout success tasks are called when an earlier task throws`() =
         runTest {
             logoutTask1.stub {
-                onBlocking { onLogoutSuccess() }.thenAnswer { throw Exception("Task failed") }
+                on { onLogoutSuccess() }.thenAnswer { throw Exception("Task failed") }
             }
 
             underTest()
@@ -117,7 +117,7 @@ internal class LogoutUseCaseTest {
     fun `test that invoke waits for all on logout success tasks to finish`() = runTest {
         var slowTaskCompleted = false
         logoutTask1.stub {
-            onBlocking { onLogoutSuccess() } doSuspendableAnswer {
+            on { onLogoutSuccess() } doSuspendableAnswer {
                 delay(100)
                 slowTaskCompleted = true
             }
@@ -133,7 +133,7 @@ internal class LogoutUseCaseTest {
         runTest {
             val exception = Exception("Logout failed")
             loginRepository.stub {
-                onBlocking { logout() }.thenAnswer { throw exception }
+                on { logout() }.thenAnswer { throw exception }
             }
 
             assertThrows<Exception> { underTest() }

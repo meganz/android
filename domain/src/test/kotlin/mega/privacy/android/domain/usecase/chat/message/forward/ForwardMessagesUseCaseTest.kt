@@ -101,8 +101,8 @@ class ForwardMessagesUseCaseTest {
         runTest {
 
             forwardNormalMessageUseCase.stub {
-                onBlocking { invoke(any(), any()) } doReturn emptyList()
-                onBlocking {
+                on { invoke(any(), any()) } doReturn emptyList()
+                on {
                     invoke(
                         any(),
                         argWhere { it is NormalMessage })
@@ -113,8 +113,8 @@ class ForwardMessagesUseCaseTest {
             }
 
             forwardContactUseCase.stub {
-                onBlocking { invoke(any(), any()) } doReturn emptyList()
-                onBlocking {
+                on { invoke(any(), any()) } doReturn emptyList()
+                on {
                     invoke(
                         any(),
                         argWhere { it is ContactAttachmentMessage })
@@ -138,11 +138,11 @@ class ForwardMessagesUseCaseTest {
         message1.stub { on { time } doReturn 10 }
 
         forwardNormalMessageUseCase.stub {
-            onBlocking { invoke(any(), any()) } doReturn emptyList()
+            on { invoke(any(), any()) } doReturn emptyList()
         }
 
         forwardContactUseCase.stub {
-            onBlocking { invoke(any(), any()) } doReturn emptyList()
+            on { invoke(any(), any()) } doReturn emptyList()
         }
 
         underTest(messagesToForward, chatHandles, null)

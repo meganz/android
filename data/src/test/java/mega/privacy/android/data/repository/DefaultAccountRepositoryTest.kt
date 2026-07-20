@@ -286,8 +286,8 @@ class DefaultAccountRepositoryTest {
         val expectedUserIdObj = null
         whenever(megaChatApiGateway.getMyEmail()).thenReturn(null)
         megaApiGateway.stub {
-            onBlocking { isMasterBusinessAccount() }.thenReturn(false)
-            onBlocking { getLoggedInUser() }.thenReturn(expectedUserIdObj)
+            on { isMasterBusinessAccount() }.thenReturn(false)
+            on { getLoggedInUser() }.thenReturn(expectedUserIdObj)
         }
 
         assertThat(underTest.getUserAccount()).isNotNull()
@@ -302,8 +302,8 @@ class DefaultAccountRepositoryTest {
             on { email }.thenReturn(mockEmail)
         }
         megaApiGateway.stub {
-            onBlocking { isMasterBusinessAccount() }.thenReturn(false)
-            onBlocking { getLoggedInUser() }.thenReturn(user)
+            on { isMasterBusinessAccount() }.thenReturn(false)
+            on { getLoggedInUser() }.thenReturn(user)
         }
 
         assertThat(underTest.getUserAccount().userId).isEqualTo(expectedUserIdObj)

@@ -4,6 +4,11 @@ import mega.privacy.android.data.constant.FileConstant.JPG_EXTENSION
 import nz.mega.sdk.MegaNode
 
 /**
+ * The public link's expiry time in seconds since the epoch, or null when the link never expires.
+ */
+fun MegaNode.expirationTimeOrNull(): Long? = expirationTime.takeIf { it > 0 }
+
+/**
  * Get Thumbnail Image File Name
  */
 fun MegaNode?.getThumbnailFileName(): String = this?.base64Handle.orEmpty()

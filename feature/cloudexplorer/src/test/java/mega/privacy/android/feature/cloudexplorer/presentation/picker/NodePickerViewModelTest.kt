@@ -42,7 +42,7 @@ internal class NodePickerViewModelTest {
         runTest(testDispatcher) {
             val expectedRoot = NodeId(42L)
             getRootNodeIdUseCase.stub {
-                onBlocking { invoke() } doReturn expectedRoot
+                on { invoke() } doReturn expectedRoot
             }
             underTest = NodePickerViewModel(getRootNodeIdUseCase)
 
@@ -55,7 +55,7 @@ internal class NodePickerViewModelTest {
     fun `test that uiState falls back to NodeId minus one when use case returns null`() =
         runTest(testDispatcher) {
             getRootNodeIdUseCase.stub {
-                onBlocking { invoke() } doReturn null
+                on { invoke() } doReturn null
             }
             underTest = NodePickerViewModel(getRootNodeIdUseCase)
 
@@ -68,7 +68,7 @@ internal class NodePickerViewModelTest {
     fun `test that uiState falls back to NodeId minus one when use case throws`() =
         runTest(testDispatcher) {
             getRootNodeIdUseCase.stub {
-                onBlocking { invoke() } doAnswer { throw RuntimeException("boom") }
+                on { invoke() } doAnswer { throw RuntimeException("boom") }
             }
             underTest = NodePickerViewModel(getRootNodeIdUseCase)
 

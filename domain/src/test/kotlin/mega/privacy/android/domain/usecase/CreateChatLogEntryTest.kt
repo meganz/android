@@ -20,13 +20,13 @@ class CreateChatLogEntryTest {
     private val timeString = "timeString"
 
     private val createTraceString = mock<CreateTraceString> {
-        onBlocking { invoke(any(), any()) }.thenReturn(
+        on { invoke(any(), any()) }.thenReturn(
             traceString
         )
     }
 
     private val getCurrentTimeString = mock<GetCurrentTimeString> {
-        onBlocking { invoke(any(), any()) }.thenReturn(
+        on { invoke(any(), any()) }.thenReturn(
             timeString
         )
     }
@@ -34,7 +34,7 @@ class CreateChatLogEntryTest {
     private val appVersion = "v1"
 
     private val environmentRepository = mock<EnvironmentRepository> {
-        onBlocking { getAppInfo() }.thenReturn(AppInfo(appVersion, null))
+        on { getAppInfo() }.thenReturn(AppInfo(appVersion, null))
     }
 
     @Before

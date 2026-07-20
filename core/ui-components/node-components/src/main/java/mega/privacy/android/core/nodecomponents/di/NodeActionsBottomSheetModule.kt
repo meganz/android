@@ -48,10 +48,10 @@ import mega.privacy.android.core.nodecomponents.model.NodeBottomSheetMenuItem
 import mega.privacy.android.domain.qualifier.features.Backups
 import mega.privacy.android.domain.qualifier.features.Chat
 import mega.privacy.android.domain.qualifier.features.CloudDrive
-import mega.privacy.android.domain.qualifier.features.VideoPlayerDefault
-import mega.privacy.android.domain.qualifier.features.VideoPlayerImageViewer
-import mega.privacy.android.domain.qualifier.features.VideoPlayerVersions
-import mega.privacy.android.domain.qualifier.features.VideoPlayerZipFile
+import mega.privacy.android.domain.qualifier.features.MediaPlayerDefault
+import mega.privacy.android.domain.qualifier.features.MediaPlayerImageViewer
+import mega.privacy.android.domain.qualifier.features.MediaPlayerVersions
+import mega.privacy.android.domain.qualifier.features.MediaPlayerZipFile
 import mega.privacy.android.domain.qualifier.features.FileLink
 import mega.privacy.android.domain.qualifier.features.FolderLink
 import mega.privacy.android.domain.qualifier.features.IncomingShares
@@ -393,7 +393,7 @@ abstract class NodeActionsBottomSheetModule {
          */
         @Provides
         @ElementsIntoSet
-        @VideoPlayerDefault
+        @MediaPlayerDefault
         @Singleton
         fun provideVideoPlayerDefaultBottomSheetOptions(
             infoMenuAction: InfoBottomSheetMenuItem,
@@ -432,7 +432,7 @@ abstract class NodeActionsBottomSheetModule {
          */
         @Provides
         @ElementsIntoSet
-        @VideoPlayerVersions
+        @MediaPlayerVersions
         @Singleton
         fun provideVideoPlayerVersionsBottomSheetOptions(
             downloadMenuAction: DownloadBottomSheetMenuItem,
@@ -443,7 +443,7 @@ abstract class NodeActionsBottomSheetModule {
          */
         @Provides
         @ElementsIntoSet
-        @VideoPlayerImageViewer
+        @MediaPlayerImageViewer
         @Singleton
         fun provideVideoPlayerImageViewerBottomSheetOptions(
             downloadMenuAction: DownloadBottomSheetMenuItem,
@@ -460,7 +460,7 @@ abstract class NodeActionsBottomSheetModule {
          */
         @Provides
         @ElementsIntoSet
-        @VideoPlayerZipFile
+        @MediaPlayerZipFile
         @Singleton
         fun provideVideoPlayerZipFileOptions(
             downloadMenuAction: DownloadBottomSheetMenuItem,

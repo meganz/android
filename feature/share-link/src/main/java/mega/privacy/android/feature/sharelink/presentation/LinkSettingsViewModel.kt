@@ -22,7 +22,10 @@ import mega.privacy.android.domain.usecase.filelink.EncryptLinkWithPasswordUseCa
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
+import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * ViewModel for the revamped Link settings editor screen.
@@ -41,13 +44,17 @@ class LinkSettingsViewModel @AssistedInject constructor(
     private val getPasswordStrengthUseCase: GetPasswordStrengthUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val passwordCache: ShareLinkPasswordCache,
+    private val separateKeyCache: ShareLinkSeparateKeyCache,
 ) : ViewModel() {
 
     private val handle: Long? = args.handles.firstOrNull()
     private val cachedPassword: LinkPassword? = handle?.let(passwordCache::get)
+    private val cachedSeparateKey: Boolean = handle?.let(separateKeyCache::get) ?: false
 
     private val _uiState = MutableStateFlow(
         LinkSettingsUiState(
+            isSeparateKeyEnabled = cachedSeparateKey,
+            initialSeparateKeyEnabled = cachedSeparateKey,
             isPasswordEnabled = cachedPassword != null,
             isPasswordAlreadySet = cachedPassword != null,
             initialPassword = cachedPassword?.password,
@@ -123,10 +130,16 @@ class LinkSettingsViewModel @AssistedInject constructor(
         nodeId: NodeId,
         state: LinkSettingsUiState,
     ) {
-        if (state.isExpiryEnabled) {
+        if (state.isSeparateKeyDirty) {
+            separateKeyCache.set(handle, state.isSeparateKeyEnabled)
+        }
+        if (state.isExpiryDirty) {
+            val expireTimeSeconds = state.expiryDate
+                ?.takeIf { state.isExpiryEnabled }
+                ?.milliseconds?.inWholeSeconds
             exportNodeUseCase(
                 nodeToExport = nodeId,
-                expireTime = state.expiryDate,
+                expireTime = expireTimeSeconds,
                 callerName = CALLER_NAME,
             )
         }
@@ -146,9 +159,21 @@ class LinkSettingsViewModel @AssistedInject constructor(
     private fun loadNode() {
         val handle = handle ?: return
         viewModelScope.launch {
-            publicLink = runCatching { getNodeByIdUseCase(NodeId(handle))?.exportedData?.publicLink }
+            val exportedData = runCatching { getNodeByIdUseCase(NodeId(handle))?.exportedData }
                 .onFailure { Timber.e(it, "Failed to load node for link settings") }
                 .getOrNull()
+            publicLink = exportedData?.publicLink
+            val expiryMillis = exportedData?.expirationTime?.seconds?.inWholeMilliseconds
+            if (expiryMillis != null) {
+                update {
+                    it.copy(
+                        isExpiryEnabled = true,
+                        isExpiryAlreadySet = true,
+                        initialExpiryDate = expiryMillis,
+                        expiryDate = expiryMillis,
+                    )
+                }
+            }
         }
     }
 
@@ -169,7 +194,17 @@ class LinkSettingsViewModel @AssistedInject constructor(
         copy(hasUnsavedChanges = isDirty, isSaveEnabled = isDirty && isValid && !isSaving)
 
     private val LinkSettingsUiState.isDirty: Boolean
-        get() = isSeparateKeyEnabled || isExpiryEnabled || expiryDate != null || isPasswordDirty
+        get() = isSeparateKeyDirty || isExpiryDirty || isPasswordDirty
+
+    private val LinkSettingsUiState.isSeparateKeyDirty: Boolean
+        get() = isSeparateKeyEnabled != initialSeparateKeyEnabled
+
+    private val LinkSettingsUiState.isExpiryDirty: Boolean
+        get() = if (isExpiryAlreadySet) {
+            !isExpiryEnabled || expiryDate != initialExpiryDate
+        } else {
+            isExpiryEnabled || expiryDate != null
+        }
 
     private val LinkSettingsUiState.isPasswordDirty: Boolean
         get() = if (isPasswordAlreadySet) {

@@ -105,7 +105,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(flow { awaitCancellation() })
         whenever(monitorAccountDetailUseCase()).thenReturn(flow { awaitCancellation() })
         getBusinessStatusUseCase.stub {
-            onBlocking { invoke() }.thenReturn(BusinessAccountStatus.Active)
+            on { invoke() }.thenReturn(BusinessAccountStatus.Active)
         }
         whenever(getPhotosByFolderIdUseCase(any(), any(), any())).thenReturn(
             flowOf(emptyList())
@@ -563,7 +563,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that checkWritePermission sets hasWritePermission to true for OWNER permission`() =
         runTest {
             getNodeAccessPermission.stub {
-                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.OWNER)
+                on { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.OWNER)
             }
 
             initViewModel()
@@ -575,7 +575,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that checkWritePermission sets hasWritePermission to true for READWRITE permission`() =
         runTest {
             getNodeAccessPermission.stub {
-                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.READWRITE)
+                on { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.READWRITE)
             }
 
             initViewModel()
@@ -587,7 +587,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that checkWritePermission sets hasWritePermission to true for FULL permission`() =
         runTest {
             getNodeAccessPermission.stub {
-                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.FULL)
+                on { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.FULL)
             }
 
             initViewModel()
@@ -599,7 +599,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that checkWritePermission sets hasWritePermission to false for READ permission`() =
         runTest {
             getNodeAccessPermission.stub {
-                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.READ)
+                on { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.READ)
             }
 
             initViewModel()
@@ -611,7 +611,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that checkWritePermission sets hasWritePermission to false for UNKNOWN permission`() =
         runTest {
             getNodeAccessPermission.stub {
-                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.UNKNOWN)
+                on { invoke(NodeId(testFolderId)) }.thenReturn(AccessPermission.UNKNOWN)
             }
 
             initViewModel()
@@ -623,7 +623,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that checkWritePermission sets hasWritePermission to false for null permission`() =
         runTest {
             getNodeAccessPermission.stub {
-                onBlocking { invoke(NodeId(testFolderId)) }.thenReturn(null)
+                on { invoke(NodeId(testFolderId)) }.thenReturn(null)
             }
 
             initViewModel()
@@ -635,7 +635,7 @@ class CloudDriveMediaDiscoveryViewModelTest {
     fun `test that checkWritePermission sets hasWritePermission to false when exception is thrown`() =
         runTest {
             getNodeAccessPermission.stub {
-                onBlocking { invoke(NodeId(testFolderId)) }.thenThrow(RuntimeException("Test exception"))
+                on { invoke(NodeId(testFolderId)) }.thenThrow(RuntimeException("Test exception"))
             }
 
             initViewModel()

@@ -63,6 +63,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onOpenSettings Invoked when the settings (gear) action is tapped.
  * @param onShareLink Invoked when the bottom "Share link" button is tapped.
  * @param onCopyLink Invoked when the copy icon on the link is tapped.
+ * @param onCopyKey Invoked when the copy icon on the separate key card is tapped.
  * @param modifier Modifier for the scaffold.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,6 +74,7 @@ fun ShareLinkScreen(
     onOpenSettings: () -> Unit,
     onShareLink: () -> Unit,
     onCopyLink: () -> Unit,
+    onCopyKey: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val linkCount = (uiState as? ShareLinkUiState.Data)?.handles?.size ?: 1
@@ -123,6 +125,7 @@ fun ShareLinkScreen(
                 is ShareLinkUiState.Data -> ShareLinkContent(
                     uiState = uiState,
                     onCopyLink = onCopyLink,
+                    onCopyKey = onCopyKey,
                 )
             }
         }
@@ -134,10 +137,13 @@ fun ShareLinkScreen(
 private fun ShareLinkContent(
     uiState: ShareLinkUiState.Data,
     onCopyLink: () -> Unit,
+    onCopyKey: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
+    val displayLink = uiState.linkWithoutKey?.takeIf { uiState.isKeySeparate } ?: uiState.link
+    val separateKey = uiState.key?.takeIf { uiState.isKeySeparate }
 
     Column(
         modifier = modifier
@@ -156,21 +162,36 @@ private fun ShareLinkContent(
                 modifier = Modifier.testTag(SHARE_LINK_ACCESS_BANNER_TAG),
                 title = stringResource(sharedR.string.share_link_access_banner_title),
                 body = pluralStringResource(
-                    sharedR.plurals.share_link_access_banner_description,
+                    if (uiState.isKeySeparate) {
+                        sharedR.plurals.share_link_access_banner_description_with_key
+                    } else {
+                        sharedR.plurals.share_link_access_banner_description
+                    },
                     uiState.handles.size,
                 ),
                 showCancelButton = false,
             )
 
             ShareLinkDetails(
-                link = uiState.link,
+                link = displayLink,
                 onCopyLink = {
                     coroutineScope.launch {
                         clipboard.setClipEntry(
-                            ClipData.newPlainText(COPIED_LINK_LABEL, uiState.link).toClipEntry(),
+                            ClipData.newPlainText(COPIED_LINK_LABEL, displayLink).toClipEntry(),
                         )
                     }
                     onCopyLink()
+                },
+                key = separateKey,
+                onCopyKey = {
+                    separateKey?.let {
+                        coroutineScope.launch {
+                            clipboard.setClipEntry(
+                                ClipData.newPlainText(COPIED_KEY_LABEL, it).toClipEntry(),
+                            )
+                        }
+                    }
+                    onCopyKey()
                 },
             )
         }
@@ -311,6 +332,7 @@ private fun ShareLinkScreenDataPreview() {
             onOpenSettings = {},
             onShareLink = {},
             onCopyLink = {},
+            onCopyKey = {},
         )
     }
 }
@@ -325,6 +347,7 @@ private fun ShareLinkScreenLoadingPreview() {
             onOpenSettings = {},
             onShareLink = {},
             onCopyLink = {},
+            onCopyKey = {},
         )
     }
 }
@@ -339,6 +362,7 @@ private fun ShareLinkScreenErrorPreview() {
             onOpenSettings = {},
             onShareLink = {},
             onCopyLink = {},
+            onCopyKey = {},
         )
     }
 }
@@ -350,3 +374,4 @@ internal const val SHARE_LINK_ACCESS_BANNER_TAG = "share_link_screen:access_bann
 internal const val SHARE_LINK_LOADING_TAG = "share_link_screen:loading"
 internal const val SHARE_LINK_ERROR_TAG = "share_link_screen:error"
 private const val COPIED_LINK_LABEL = "Copied Text"
+private const val COPIED_KEY_LABEL = "Copied Key"

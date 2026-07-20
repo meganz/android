@@ -7,7 +7,7 @@ import mega.privacy.android.app.jni.JniExceptionHandler
 import mega.privacy.android.app.jni.JniExceptionReporter
 import mega.privacy.android.domain.logging.Log
 import mega.privacy.android.domain.monitoring.CrashReporter
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -19,11 +19,10 @@ import javax.inject.Inject
  */
 internal class CrashReportingInitialiser @Inject constructor(
     private val crashReporter: CrashReporter,
-) : AppCreateInitialiser {
+) : SynchronousAppCreateInitialiser {
     override val name = "CrashReportingInitialiser"
-    override val isCritical = true
 
-    override suspend operator fun invoke() {
+    override operator fun invoke() {
         if (!BuildConfig.DEBUG) {
             val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
             Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->

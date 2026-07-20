@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.app.receivers.GlobalNetworkStateHandler
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -12,9 +12,8 @@ import javax.inject.Inject
  */
 internal class NetworkStateInitialiser @Inject constructor(
     private val globalNetworkStateHandler: GlobalNetworkStateHandler,
-) : AppCreateInitialiser {
+) : AsyncAppCreateInitialiser {
     override val name = "NetworkStateInitialiser"
-    override val isCritical = false
 
     override suspend operator fun invoke() {
         globalNetworkStateHandler.start()

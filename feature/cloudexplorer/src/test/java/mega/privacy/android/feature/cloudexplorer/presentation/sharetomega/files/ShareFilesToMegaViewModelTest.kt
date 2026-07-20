@@ -42,10 +42,10 @@ class ShareFilesToMegaViewModelTest {
     fun setUp() {
         reset(getRootNodeIdUseCase, filePrepareUseCase)
         getRootNodeIdUseCase.stub {
-            onBlocking { invoke() } doReturn NodeId(100L)
+            on { invoke() } doReturn NodeId(100L)
         }
         filePrepareUseCase.stub {
-            onBlocking { invoke(any()) } doReturn listOf(mock<DocumentEntity>())
+            on { invoke(any()) } doReturn listOf(mock<DocumentEntity>())
         }
         viewModel = createViewModel()
     }
@@ -59,7 +59,7 @@ class ShareFilesToMegaViewModelTest {
     fun `test that ui state exposes root node id from use case`() = runTest(testDispatcher) {
         val expectedRoot = NodeId(42L)
         getRootNodeIdUseCase.stub {
-            onBlocking { invoke() } doReturn expectedRoot
+            on { invoke() } doReturn expectedRoot
         }
         viewModel = createViewModel()
 
@@ -77,7 +77,7 @@ class ShareFilesToMegaViewModelTest {
     fun `test that ui state uses fallback root id when use case returns null`() =
         runTest(testDispatcher) {
             getRootNodeIdUseCase.stub {
-                onBlocking { invoke() } doReturn null
+                on { invoke() } doReturn null
             }
             viewModel = createViewModel()
 
@@ -95,7 +95,7 @@ class ShareFilesToMegaViewModelTest {
     fun `test that ui state flags hasNoFilesToUpload when the shared uris resolve to no files`() =
         runTest(testDispatcher) {
             filePrepareUseCase.stub {
-                onBlocking { invoke(any()) } doReturn emptyList()
+                on { invoke(any()) } doReturn emptyList()
             }
             viewModel = createViewModel()
 

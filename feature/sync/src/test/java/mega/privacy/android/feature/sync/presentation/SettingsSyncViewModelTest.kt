@@ -64,7 +64,7 @@ internal class SettingsSyncViewModelTest {
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(false))
         whenever(monitorSyncByChargingUseCase()).thenReturn(flowOf(false))
         getSyncDebrisSizeUseCase.stub {
-            onBlocking { invoke() }.thenReturn(0L)
+            on { invoke() }.thenReturn(0L)
         }
     }
 

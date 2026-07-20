@@ -39,16 +39,16 @@ class NodeMapperTest {
     val offline = mock<Offline>()
 
     private val megaApiGateway = mock<MegaApiGateway> {
-        onBlocking { getNumChildFolders(any()) }.thenReturn(0)
-        onBlocking { getNumChildFiles(any()) }.thenReturn(0)
-        onBlocking { isInRubbish(any()) }.thenReturn(false)
-        onBlocking { isPendingShare(any()) }.thenReturn(false)
-        onBlocking { getNumVersions(any()) }.thenReturn(2)
-        onBlocking { isSensitiveInherited(any()) }.thenReturn(false)
+        on { getNumChildFolders(any()) }.thenReturn(0)
+        on { getNumChildFiles(any()) }.thenReturn(0)
+        on { isInRubbish(any()) }.thenReturn(false)
+        on { isPendingShare(any()) }.thenReturn(false)
+        on { getNumVersions(any()) }.thenReturn(2)
+        on { isSensitiveInherited(any()) }.thenReturn(false)
     }
     private val megaApiFolderGateway = mock<MegaApiFolderGateway> {
-        onBlocking { getNumChildFolders(any()) }.thenReturn(0)
-        onBlocking { getNumChildFiles(any()) }.thenReturn(0)
+        on { getNumChildFolders(any()) }.thenReturn(0)
+        on { getNumChildFiles(any()) }.thenReturn(0)
     }
 
     private val expectedName = "testName"
@@ -214,6 +214,25 @@ class NodeMapperTest {
             )
         }
 
+        @Test
+        fun `test that exported link expiration time is mapped when the link expires`() = runTest {
+            val megaNode = getMockNode(isExported = true, expirationTime = 1_800_000L, isFile = false)
+            whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle))
+                .thenReturn(false)
+            val actual = mappedNode(megaNode)
+            assertThat(actual?.exportedData?.expirationTime).isEqualTo(1_800_000L)
+        }
+
+        @Test
+        fun `test that exported link expiration time is null when the link never expires`() =
+            runTest {
+                val megaNode = getMockNode(isExported = true, expirationTime = 0L, isFile = false)
+                whenever(megaLocalRoomGateway.isOfflineInformationAvailable(megaNode.handle))
+                    .thenReturn(false)
+                val actual = mappedNode(megaNode)
+                assertThat(actual?.exportedData?.expirationTime).isNull()
+            }
+
         private suspend fun mappedNode(megaNode: MegaNode) = underTest(
             megaNode = megaNode,
         )
@@ -255,6 +274,7 @@ class NodeMapperTest {
         isExported: Boolean = true,
         publicLink: String = expectedPublicLink,
         publicLinkCreationTime: Long = expectedPublicLinkCreationTime,
+        expirationTime: Long = 0L,
         isFile: Boolean,
     ): MegaNode {
         val node = mock<MegaNode> {
@@ -273,6 +293,7 @@ class NodeMapperTest {
             on { this.isExported }.thenReturn(isExported)
             on { this.publicLink }.thenReturn(publicLink)
             on { this.publicLinkCreationTime }.thenReturn(publicLinkCreationTime)
+            on { this.expirationTime }.thenReturn(expirationTime)
             on { this.serialize() }.thenReturn(expectedSerializedString)
         }
         return node

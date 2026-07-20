@@ -1,11 +1,10 @@
 package mega.privacy.android.app.mediaplayer
 
-import androidx.annotation.OptIn
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -33,6 +33,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -44,6 +46,7 @@ import androidx.media3.ui.TimeBar
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.image.MegaIcon
@@ -51,6 +54,7 @@ import mega.android.core.ui.components.image.MegaIconWithIndicator
 import mega.android.core.ui.theme.values.IconColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
+import mega.privacy.android.app.presentation.videoplayer.view.DarkStatusBarEffect
 import mega.privacy.android.app.presentation.videoplayer.view.TransparentNavigationBarEffect
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
@@ -78,8 +82,10 @@ internal const val AUDIO_PLAYER_CONTENT_TAG = "audio_player:content"
  * @param onShuffleClicked Called when the shuffle button is tapped.
  * @param onRepeatClicked Called when the repeat button is tapped.
  * @param onPlaylistClicked Called when the playlist button is tapped.
- * @param onScreenClicked Called when the screen background is tapped (toggles toolbar).
+ * @param onBackPressed Called when the back button in the top bar is tapped.
+ * @param onMoreActionsClicked Called when the more actions button in the top bar is tapped.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AudioPlayerScreen(
     uiState: AudioPlayerUiState,
@@ -90,24 +96,24 @@ fun AudioPlayerScreen(
     onShuffleClicked: () -> Unit,
     onRepeatClicked: () -> Unit,
     onPlaylistClicked: () -> Unit,
-    onScreenClicked: () -> Unit,
+    onBackPressed: () -> Unit,
+    onMoreActionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TransparentNavigationBarEffect()
+    DarkStatusBarEffect()
     OriginalTheme(isDark = true) {
-        Box(
+        MegaScaffoldWithTopAppBarScrollBehavior(
             modifier = modifier
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            AudioPlayerGradientTop,
-                            AudioPlayerGradientBottom,
-                        )
-                    )
+                .semantics { testTagsAsResourceId = true },
+            topBar = {
+                AudioPlayerTopBar(
+                    onBackPressed = onBackPressed,
+                    onMoreActionsClicked = onMoreActionsClicked,
                 )
-                .clickable(onClick = onScreenClicked)
-        ) {
+            }
+        ) { innerPadding ->
             when (uiState) {
                 is AudioPlayerUiState.Loading -> AudioPlayerContent(
                     isPlaying = false,
@@ -127,6 +133,7 @@ fun AudioPlayerScreen(
                     onShuffleClicked = onShuffleClicked,
                     onRepeatClicked = onRepeatClicked,
                     onPlaylistClicked = onPlaylistClicked,
+                    contentPadding = innerPadding,
                 )
 
                 is AudioPlayerUiState.Data -> AudioPlayerContent(
@@ -147,6 +154,7 @@ fun AudioPlayerScreen(
                     onShuffleClicked = onShuffleClicked,
                     onRepeatClicked = onRepeatClicked,
                     onPlaylistClicked = onPlaylistClicked,
+                    contentPadding = innerPadding,
                 )
             }
         }
@@ -172,13 +180,22 @@ private fun AudioPlayerContent(
     onShuffleClicked: () -> Unit,
     onRepeatClicked: () -> Unit,
     onPlaylistClicked: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(),
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        AudioPlayerGradientTop,
+                        AudioPlayerGradientBottom,
+                    )
+                )
+            )
+            .padding(top = contentPadding.calculateTopPadding(), start = 16.dp, end = 16.dp)
             .navigationBarsPadding()
-            .padding(horizontal = 24.dp)
             .testTag(AUDIO_PLAYER_CONTENT_TAG),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -515,7 +532,8 @@ private fun PreviewAudioPlayerScreenLoading() {
         onShuffleClicked = {},
         onRepeatClicked = {},
         onPlaylistClicked = {},
-        onScreenClicked = {},
+        onBackPressed = {},
+        onMoreActionsClicked = {},
     )
 }
 
@@ -546,7 +564,8 @@ private fun PreviewAudioPlayerScreenPlaying() {
         onShuffleClicked = {},
         onRepeatClicked = {},
         onPlaylistClicked = {},
-        onScreenClicked = {},
+        onBackPressed = {},
+        onMoreActionsClicked = {},
     )
 }
 
@@ -577,6 +596,7 @@ private fun PreviewAudioPlayerScreenPaused() {
         onShuffleClicked = {},
         onRepeatClicked = {},
         onPlaylistClicked = {},
-        onScreenClicked = {},
+        onBackPressed = {},
+        onMoreActionsClicked = {},
     )
 }

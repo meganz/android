@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.app.globalmanagement.ChatApiListenerCoordinator
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -12,11 +12,10 @@ import javax.inject.Inject
  */
 internal class ChatApiInitialiser @Inject constructor(
     private val chatApiListenerCoordinator: ChatApiListenerCoordinator,
-) : AppCreateInitialiser {
+) : SynchronousAppCreateInitialiser {
     override val name = "ChatApiInitialiser"
-    override val isCritical = true
 
-    override suspend operator fun invoke() {
+    override operator fun invoke() {
         chatApiListenerCoordinator.register()
     }
 }

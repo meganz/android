@@ -15,7 +15,8 @@ import mega.privacy.android.app.appstate.global.initialisation.appcreate.Greeter
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.MiscFlagsInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.NetworkStateInitialiser
 import mega.privacy.android.app.appstate.global.initialisation.appcreate.ThemeInitialiser
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 
 /**
  * Provides the app-create initialisers as a single explicitly ordered list.
@@ -29,28 +30,33 @@ internal class AppCreateInitialisersModule {
 
     @Provides
     fun provideAppCreateInitialisers(
-        crashReportingInitialiser: CrashReportingInitialiser,
-        themeInitialiser: ThemeInitialiser,
-        callObserverInitialiser: CallObserverInitialiser,
-        chatApiInitialiser: ChatApiInitialiser,
-        coilImageLoaderInitialiser: CoilImageLoaderInitialiser,
-        networkStateInitialiser: NetworkStateInitialiser,
         miscFlagsInitialiser: MiscFlagsInitialiser,
         apiServerInitialiser: ApiServerInitialiser,
         accountDefaultsInitialiser: AccountDefaultsInitialiser,
         greeterInitialiser: GreeterInitialiser,
+        networkStateInitialiser: NetworkStateInitialiser,
         fcmTopicInitialiser: FcmTopicInitialiser,
-    ): List<@JvmSuppressWildcards AppCreateInitialiser> = listOf(
-        crashReportingInitialiser,
-        themeInitialiser,
-        callObserverInitialiser,
-        chatApiInitialiser,
-        coilImageLoaderInitialiser,
-        networkStateInitialiser,
+    ): Set<@JvmSuppressWildcards AsyncAppCreateInitialiser> = setOf(
         miscFlagsInitialiser,
         apiServerInitialiser,
         accountDefaultsInitialiser,
         greeterInitialiser,
         fcmTopicInitialiser,
+        networkStateInitialiser,
+    )
+
+    @Provides
+    fun provideSyncAppCreateInitialisers(
+        crashReportingInitialiser: CrashReportingInitialiser,
+        themeInitialiser: ThemeInitialiser,
+        callObserverInitialiser: CallObserverInitialiser,
+        chatApiInitialiser: ChatApiInitialiser,
+        coilImageLoaderInitialiser: CoilImageLoaderInitialiser,
+    ): List<@JvmSuppressWildcards SynchronousAppCreateInitialiser> = listOf(
+        crashReportingInitialiser,
+        themeInitialiser,
+        callObserverInitialiser,
+        chatApiInitialiser,
+        coilImageLoaderInitialiser,
     )
 }

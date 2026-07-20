@@ -1,7 +1,7 @@
 package mega.privacy.android.app.appstate.global.initialisation.appcreate
 
 import mega.privacy.android.app.globalmanagement.CallChangesObserver
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 import javax.inject.Inject
 
 /**
@@ -12,11 +12,10 @@ import javax.inject.Inject
  */
 internal class CallObserverInitialiser @Inject constructor(
     private val callChangesObserver: CallChangesObserver,
-) : AppCreateInitialiser {
+) : SynchronousAppCreateInitialiser {
     override val name = "CallObserverInitialiser"
-    override val isCritical = true
 
-    override suspend operator fun invoke() {
+    override operator fun invoke() {
         callChangesObserver.init()
     }
 }

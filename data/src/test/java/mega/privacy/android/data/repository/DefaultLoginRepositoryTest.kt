@@ -40,6 +40,9 @@ import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
+import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
@@ -844,6 +847,45 @@ class DefaultLoginRepositoryTest {
         }
         underTest.logout()
         verify(credentialsPreferencesGateway).clear()
+    }
+
+    @Test
+    fun `test that localLogout invokes megaApiGateway localLogout`() = runTest {
+        val error = mock<MegaError> {
+            on { errorCode }.thenReturn(MegaError.API_OK)
+        }
+        whenever(megaApiGateway.localLogout(any())).thenAnswer {
+            (it.arguments[0] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(),
+                mock(),
+                error
+            )
+        }
+
+        underTest.localLogout()
+
+        verify(megaApiGateway).localLogout(any())
+    }
+
+    @Test
+    fun `test that chatLocalLogout invokes megaChatApiGateway localLogout`() = runTest {
+        val listenerCaptor = argumentCaptor<MegaChatRequestListenerInterface>()
+        val error = mock<MegaChatError> {
+            on { errorCode }.thenReturn(MegaChatError.ERROR_OK)
+        }
+        val request = mock<MegaChatRequest>()
+
+        whenever(megaChatApiGateway.localLogout(any())).thenAnswer {
+            (it.arguments[0] as MegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                request,
+                error
+            )
+        }
+
+        underTest.chatLocalLogout()
+
+        verify(megaChatApiGateway).localLogout(listenerCaptor.capture())
     }
 
     companion object {

@@ -11,6 +11,30 @@ import androidx.core.view.WindowCompat
 import com.google.accompanist.systemuicontroller.SystemUiController
 
 /**
+ * Forces the status bar to use light icons (suitable for dark backgrounds) for as long as
+ * this effect stays in composition, then restores the original appearance on dispose.
+ *
+ * Call this on screens that have a dark background but run in a window where
+ * [androidx.activity.enableEdgeToEdge] may have set light status-bar icons by default.
+ */
+@Composable
+internal fun DarkStatusBarEffect() {
+    val view = LocalView.current
+    val context = LocalContext.current
+    DisposableEffect(Unit) {
+        val window = (context as? Activity)?.window ?: return@DisposableEffect onDispose {}
+        val insetsController = WindowCompat.getInsetsController(window, view)
+        val originalLightIcons = insetsController.isAppearanceLightStatusBars
+
+        insetsController.isAppearanceLightStatusBars = false
+
+        onDispose {
+            insetsController.isAppearanceLightStatusBars = originalLightIcons
+        }
+    }
+}
+
+/**
  * Native-API overload that requires no Accompanist dependency.
  *
  * Uses [WindowCompat.getInsetsController] and [android.view.Window.navigationBarColor] directly.

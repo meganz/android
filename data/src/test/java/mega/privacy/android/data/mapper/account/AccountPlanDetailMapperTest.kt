@@ -23,6 +23,7 @@ internal class AccountPlanDetailMapperTest {
 
     private val expectedAccountLevel = 1L
     private val expectedExpirationTime = 123456789L
+    private val expectedStartTime = 100000000L
     private val expectedSubscriptionId = "test"
     private val megaStringList = mock<MegaStringList> {
         on { size() } doReturn 2
@@ -34,6 +35,7 @@ internal class AccountPlanDetailMapperTest {
         on { this.accountLevel }.thenReturn(expectedAccountLevel)
         on { this.isProPlan }.thenReturn(true)
         on { this.expirationTime }.thenReturn(expectedExpirationTime)
+        on { this.startTime }.thenReturn(expectedStartTime)
         on { this.id }.thenReturn(expectedSubscriptionId)
         on { this.features }.thenReturn(megaStringList)
         on { this.isTrial }.thenReturn(false)
@@ -45,7 +47,8 @@ internal class AccountPlanDetailMapperTest {
         expirationTime = expectedExpirationTime,
         subscriptionId = expectedSubscriptionId,
         featuresList = listOf("vpn", "pwm"),
-        isFreeTrial = false
+        isFreeTrial = false,
+        startTime = expectedStartTime,
     )
 
     @Test
@@ -61,5 +64,6 @@ internal class AccountPlanDetailMapperTest {
         assertThat(actual?.subscriptionId).isEqualTo(expectedAccountPlanDetail.subscriptionId)
         assertThat(actual?.featuresList).isEqualTo(expectedAccountPlanDetail.featuresList)
         assertThat(actual?.isFreeTrial).isEqualTo(expectedAccountPlanDetail.isFreeTrial)
+        assertThat(actual?.startTime).isEqualTo(expectedAccountPlanDetail.startTime)
     }
 }

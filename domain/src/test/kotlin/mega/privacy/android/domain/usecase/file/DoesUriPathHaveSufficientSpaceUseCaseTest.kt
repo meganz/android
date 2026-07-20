@@ -35,7 +35,7 @@ internal class DoesUriPathHaveSufficientSpaceUseCaseTest {
     internal fun `test that false is returned if the path has less space than required, `() =
         runTest {
             val required = 123L
-            getDiskSpaceBytesUseCase.stub { onBlocking { invoke(any()) }.thenReturn(required - 1) }
+            getDiskSpaceBytesUseCase.stub { on { invoke(any()) }.thenReturn(required - 1) }
 
             assertThat(underTest(UriPath(""), required)).isFalse()
         }
@@ -44,7 +44,7 @@ internal class DoesUriPathHaveSufficientSpaceUseCaseTest {
     internal fun `test that true is returned if the path has more space than required`() =
         runTest {
             val required = 123L
-            getDiskSpaceBytesUseCase.stub { onBlocking { invoke(any()) }.thenReturn(required + 1) }
+            getDiskSpaceBytesUseCase.stub { on { invoke(any()) }.thenReturn(required + 1) }
 
             assertThat(underTest(UriPath(""), required)).isTrue()
         }
@@ -52,7 +52,7 @@ internal class DoesUriPathHaveSufficientSpaceUseCaseTest {
     @Test
     internal fun `test that false is returned if file repository throws an error`() = runTest {
         val required = 123L
-        getDiskSpaceBytesUseCase.stub { onBlocking { invoke(any()) }.thenAnswer { throw IllegalArgumentException() } }
+        getDiskSpaceBytesUseCase.stub { on { invoke(any()) }.thenAnswer { throw IllegalArgumentException() } }
 
         assertThat(underTest(UriPath(""), required)).isFalse()
     }

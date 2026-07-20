@@ -55,7 +55,7 @@ internal class UnlockPasscodeUseCaseTest {
     @Test
     internal fun `test that passcode requests call the passcode check`() = runTest {
         checkPasscodeUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(true)
+            on { invoke(any()) }.thenReturn(true)
         }
         val expected = "passcode"
         underTest(UnlockPasscodeRequest.PasscodeRequest(expected))
@@ -65,7 +65,7 @@ internal class UnlockPasscodeUseCaseTest {
     @Test
     internal fun `test that password requests call the password check`() = runTest {
         accountRepository.stub {
-            onBlocking { isCurrentPassword(any()) }.thenReturn(true)
+            on { isCurrentPassword(any()) }.thenReturn(true)
         }
         val expected = "password"
         underTest(UnlockPasscodeRequest.PasswordRequest(expected))
@@ -84,10 +84,10 @@ internal class UnlockPasscodeUseCaseTest {
                 })
             }
             accountRepository.stub {
-                onBlocking { isCurrentPassword(any()) }.thenReturn(false)
+                on { isCurrentPassword(any()) }.thenReturn(false)
             }
             checkPasscodeUseCase.stub {
-                onBlocking { invoke(any()) }.thenReturn(false)
+                on { invoke(any()) }.thenReturn(false)
             }
 
             underTest.invoke(request)
@@ -111,10 +111,10 @@ internal class UnlockPasscodeUseCaseTest {
                 })
             }
             accountRepository.stub {
-                onBlocking { isCurrentPassword(any()) }.thenReturn(true)
+                on { isCurrentPassword(any()) }.thenReturn(true)
             }
             checkPasscodeUseCase.stub {
-                onBlocking { invoke(any()) }.thenReturn(true)
+                on { invoke(any()) }.thenReturn(true)
             }
 
             underTest.invoke(request)
@@ -136,11 +136,11 @@ internal class UnlockPasscodeUseCaseTest {
                 })
             }
             accountRepository.stub {
-                onBlocking { isCurrentPassword(any()) }.thenReturn(true)
+                on { isCurrentPassword(any()) }.thenReturn(true)
             }
 
             checkPasscodeUseCase.stub {
-                onBlocking { invoke(any()) }.thenReturn(true)
+                on { invoke(any()) }.thenReturn(true)
             }
 
             underTest.invoke(request)
@@ -162,11 +162,11 @@ internal class UnlockPasscodeUseCaseTest {
                 })
             }
             accountRepository.stub {
-                onBlocking { isCurrentPassword(any()) }.thenReturn(false)
+                on { isCurrentPassword(any()) }.thenReturn(false)
             }
 
             checkPasscodeUseCase.stub {
-                onBlocking { invoke(any()) }.thenReturn(false)
+                on { invoke(any()) }.thenReturn(false)
             }
 
             underTest.invoke(request)

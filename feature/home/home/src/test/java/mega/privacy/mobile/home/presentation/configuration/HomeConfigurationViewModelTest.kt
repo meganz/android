@@ -86,14 +86,14 @@ class HomeConfigurationViewModelTest {
                 stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
             val dynamicWidgets = setOf(dynamicWidget)
             dynamicWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn dynamicWidgets
+                on { getWidgets() } doReturn dynamicWidgets
             }
 
             val staticWidget =
                 stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
             val staticWidgets = setOf(staticWidget)
             staticWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn staticWidgets
+                on { getWidgets() } doReturn staticWidgets
             }
 
             stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
@@ -125,13 +125,13 @@ class HomeConfigurationViewModelTest {
             stubWidget(identifier = "dynamic1", defaultOrder = HomeWidgetOrder.Shortcuts)
         val dynamicWidgets = setOf(dynamicWidget)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn dynamicWidgets
+            on { getWidgets() } doReturn dynamicWidgets
         }
 
         val staticWidget = stubWidget(identifier = "static1", defaultOrder = HomeWidgetOrder.Banner)
         val staticWidgets = setOf(staticWidget)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn staticWidgets
+            on { getWidgets() } doReturn staticWidgets
         }
 
         stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
@@ -299,12 +299,12 @@ class HomeConfigurationViewModelTest {
 
         val dynamicWidgets = setOf(secondWidget, thirdWidget)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn dynamicWidgets
+            on { getWidgets() } doReturn dynamicWidgets
         }
 
         val staticWidgets = setOf(firstWidget)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn staticWidgets
+            on { getWidgets() } doReturn staticWidgets
         }
 
         stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
@@ -335,12 +335,12 @@ class HomeConfigurationViewModelTest {
 
         val dynamicWidgets = setOf(thirdWidget, firstWidget)
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn dynamicWidgets
+            on { getWidgets() } doReturn dynamicWidgets
         }
 
         val staticWidgets = setOf(secondWidget)
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn staticWidgets
+            on { getWidgets() } doReturn staticWidgets
         }
 
         stubGetEnabledFlaggedItemsUseCase(dynamicWidgets, staticWidgets)
@@ -373,12 +373,12 @@ class HomeConfigurationViewModelTest {
         }.toSet()
 
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn homeWidgets
+            on { getWidgets() } doReturn homeWidgets
         }
 
         val staticWidgets = emptySet<HomeWidget>()
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn staticWidgets
+            on { getWidgets() } doReturn staticWidgets
         }
 
         monitorHomeWidgetConfigurationUseCase.stub {
@@ -414,10 +414,10 @@ class HomeConfigurationViewModelTest {
             val staticWidgets = setOf(fixedWidget)
             val dynamicWidgets = setOf(draggableWidget)
             staticWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn staticWidgets
+                on { getWidgets() } doReturn staticWidgets
             }
             dynamicWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn dynamicWidgets
+                on { getWidgets() } doReturn dynamicWidgets
             }
             monitorHomeWidgetConfigurationUseCase.stub {
                 on { invoke() } doReturn flow {
@@ -497,10 +497,10 @@ class HomeConfigurationViewModelTest {
             val staticWidgets = setOf(fixedShortcuts, fixedBanner)
             val dynamicWidgets = setOf(draggableB, draggableC)
             staticWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn staticWidgets
+                on { getWidgets() } doReturn staticWidgets
             }
             dynamicWidgetsProvider.stub {
-                onBlocking { getWidgets() } doReturn dynamicWidgets
+                on { getWidgets() } doReturn dynamicWidgets
             }
             monitorHomeWidgetConfigurationUseCase.stub {
                 on { invoke() } doReturn flow {
@@ -561,7 +561,7 @@ class HomeConfigurationViewModelTest {
             on { canDelete } doReturn true
             on { this.isDraggable } doReturn isDraggable
             on { this.isConfigurable } doReturn isConfigurable
-            onBlocking { getWidgetName() } doReturn LocalizedText.Literal("Test")
+            on { getWidgetName() } doReturn LocalizedText.Literal("Test")
         }
     }
 
@@ -580,10 +580,10 @@ class HomeConfigurationViewModelTest {
      */
     private fun stubEmptyWidgetProviders() {
         dynamicWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn emptySet()
+            on { getWidgets() } doReturn emptySet()
         }
         staticWidgetsProvider.stub {
-            onBlocking { getWidgets() } doReturn emptySet()
+            on { getWidgets() } doReturn emptySet()
         }
         stubGetEnabledFlaggedItemsUseCase(emptySet())
     }

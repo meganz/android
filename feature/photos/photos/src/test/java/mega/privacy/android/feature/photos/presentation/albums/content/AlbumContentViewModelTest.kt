@@ -177,10 +177,10 @@ class AlbumContentViewModelTest {
 
     private fun stubCommon() {
         getFeatureFlagValueUseCase.stub {
-            onBlocking { invoke(any()) }.thenReturn(false)
+            on { invoke(any()) }.thenReturn(false)
         }
         isHiddenNodesOnboardedUseCase.stub {
-            onBlocking { invoke() }.thenReturn(false)
+            on { invoke() }.thenReturn(false)
         }
         mockMonitorStorageStateEvent(StorageState.Green)
         whenever(monitorShowHiddenItemsUseCase()).thenReturn(emptyFlow())
@@ -1141,7 +1141,7 @@ class AlbumContentViewModelTest {
     fun `test that updateBottomBarActionVisibility shows Hide when has non-sensitive node and is onboarded`() =
         runTest {
             isHiddenNodesOnboardedUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             createViewModel()
             val photo =
@@ -1159,7 +1159,7 @@ class AlbumContentViewModelTest {
     fun `test that updateBottomBarActionVisibility shows Unhide when paid and all nodes are sensitive`() =
         runTest {
             isHiddenNodesOnboardedUseCase.stub {
-                onBlocking { invoke() }.thenReturn(true)
+                on { invoke() }.thenReturn(true)
             }
             createViewModel()
 
@@ -1320,7 +1320,7 @@ class AlbumContentViewModelTest {
             val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.PRO_I))
             whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
             isHiddenNodesOnboardedUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             createViewModel()
@@ -1374,7 +1374,7 @@ class AlbumContentViewModelTest {
         val accountDetailFlow = MutableStateFlow(mockAccountDetail(AccountType.PRO_I))
         whenever(monitorAccountDetailUseCase()).thenReturn(accountDetailFlow)
         isHiddenNodesOnboardedUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
+            on { invoke() }.thenReturn(true)
         }
 
         underTest.hideNodes()

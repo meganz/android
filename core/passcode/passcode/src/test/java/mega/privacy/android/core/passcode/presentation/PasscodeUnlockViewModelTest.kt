@@ -108,7 +108,7 @@ internal class PasscodeUnlockViewModelTest {
             runTest {
                 initViewModel()
                 unlockPasscodeUseCase.stub {
-                    onBlocking { invoke(any()) }.thenAnswer { throw Exception("Unlock threw an exception") }
+                    on { invoke(any()) }.thenAnswer { throw Exception("Unlock threw an exception") }
                 }
                 underTest.state.test {
                     awaitItem()
@@ -174,7 +174,7 @@ internal class PasscodeUnlockViewModelTest {
             runTest {
                 initViewModel(
                     monitorPasscodeTypeUseCaseStub = monitorPasscodeTypeUseCase.stub {
-                        onBlocking { invoke() }.thenAnswer { throw NoPasscodeTypeSetException() }
+                        on { invoke() }.thenAnswer { throw NoPasscodeTypeSetException() }
                     }
                 )
 

@@ -32,13 +32,13 @@ class LoginUseCase @Inject constructor(
      *
      * @param email Account email.
      * @param password Account password.
-     * @param disableChatApiUseCase [DisableChatApiUseCase]
+     * @param disableChatApi True if should call [DisableChatApiUseCase]
      * @return Flow of [LoginStatus].
      */
     operator fun invoke(
         email: String,
         password: String,
-        disableChatApiUseCase: DisableChatApiUseCase,
+        disableChatApi: Boolean
     ) = callbackFlow {
         runCatching {
             loginMutex.lock()
@@ -49,7 +49,7 @@ class LoginUseCase @Inject constructor(
                 .onFailure { exception ->
                     when (exception) {
                         is ChatNotInitializedErrorStatus -> {
-                            chatLogoutUseCase(disableChatApiUseCase)
+                            chatLogoutUseCase(disableChatApi)
                         }
 
                         is ChatNotInitializedUnknownStatus -> {
@@ -63,7 +63,7 @@ class LoginUseCase @Inject constructor(
                 if (it !is LoginLoggedOutFromOtherLocation
                     && it !is LoginMultiFactorAuthRequired
                 ) {
-                    chatLogoutUseCase(disableChatApiUseCase)
+                    chatLogoutUseCase(disableChatApi)
                     resetChatSettingsUseCase()
                 }
                 close(it)

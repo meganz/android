@@ -40,11 +40,11 @@ class TransferOverQuotaViewModelTest {
 
     private val hasCredentialsUseCase = mock<HasCredentialsUseCase>()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock {
-        onBlocking { invoke() } doReturn emptyFlow()
+        on { invoke() } doReturn emptyFlow()
     }
     private val monitorBandwidthOverQuotaDelayUseCase: MonitorBandwidthOverQuotaDelayUseCase =
         mock {
-            onBlocking { invoke() } doReturn emptyFlow()
+            on { invoke() } doReturn emptyFlow()
         }
     private val updateTransferOverQuotaTimestampUseCase =
         mock<UpdateTransferOverQuotaTimestampUseCase>()

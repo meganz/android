@@ -84,7 +84,7 @@ internal class ChatTabsViewModelTest {
     private val hasArchivedChatsUseCase: HasArchivedChatsUseCase = mock()
     private val monitorHasAnyContactUseCase: MonitorHasAnyContactUseCase = mock()
     private val monitorChatArchivedUseCase = mock<MonitorChatArchivedUseCase> {
-        onBlocking { invoke() }.thenReturn(flowOf("Chat Title"))
+        on { invoke() }.thenReturn(flowOf("Chat Title"))
     }
 
     @BeforeEach

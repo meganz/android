@@ -9,10 +9,12 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.appstate.MegaActivity
 import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
+import mega.privacy.android.app.mediaplayer.Nav3AudioPlayerRouteLauncher
 import mega.privacy.android.app.presentation.settings.compose.navigation.SettingsNavigatorImpl
 import mega.privacy.android.app.presentation.videoplayer.Nav3VideoPlayerRouteLauncher
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.nodecomponents.mapper.NodeContentUriIntentMapper
+import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.usecase.GetFileTypeInfoByNameUseCase
 import mega.privacy.android.domain.usecase.domainmigration.GetDomainNameUseCase
@@ -37,6 +39,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MegaNavigatorImplTest {
@@ -51,6 +54,7 @@ class MegaNavigatorImplTest {
     private val getDomainNameUseCase = mock<GetDomainNameUseCase>()
     private val mediaPlayerIntentMapper = mock<MediaPlayerIntentMapper>()
     private val nav3VideoPlayerRouteLauncher = mock<Nav3VideoPlayerRouteLauncher>()
+    private val nav3AudioPlayerRouteLauncher = mock<Nav3AudioPlayerRouteLauncher>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
     private val navigationQueue = mock<NavigationEventQueue>()
     private val activityLifecycleHandler = mock<ActivityLifecycleHandler>()
@@ -72,6 +76,7 @@ class MegaNavigatorImplTest {
             getDomainNameUseCase = getDomainNameUseCase,
             mediaPlayerIntentMapper = mediaPlayerIntentMapper,
             nav3VideoPlayerRouteLauncher = nav3VideoPlayerRouteLauncher,
+            nav3AudioPlayerRouteLauncher = nav3AudioPlayerRouteLauncher,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             navigationQueue = navigationQueue,
             activityLifecycleHandler = activityLifecycleHandler,
@@ -91,6 +96,7 @@ class MegaNavigatorImplTest {
             getDomainNameUseCase,
             mediaPlayerIntentMapper,
             nav3VideoPlayerRouteLauncher,
+            nav3AudioPlayerRouteLauncher,
             getFeatureFlagValueUseCase,
             navigationQueue,
             activityLifecycleHandler,
@@ -239,7 +245,10 @@ class MegaNavigatorImplTest {
         runTest {
             underTest.openPdfViewerFromChat(
                 context = context,
-                content = NodeContentUri.RemoteContentUri(url = "https://mega.nz/pdf", shouldStopHttpSever = false),
+                content = NodeContentUri.RemoteContentUri(
+                    url = "https://mega.nz/pdf",
+                    shouldStopHttpSever = false
+                ),
                 nodeHandle = 1L,
                 chatId = 2L,
                 messageId = 3L,
@@ -248,5 +257,55 @@ class MegaNavigatorImplTest {
 
             verify(context).startActivity(any())
             verify(navigationQueue, never()).emit(any<NavKey>(), any(), any())
+        }
+
+    @Test
+    fun `test that launchMediaPlayer navigates to audio Nav3 route when audio route launcher returns route key`() =
+        runTest {
+            val audioFileType = AudioFileTypeInfo(
+                mimeType = "audio/mpeg",
+                extension = "mp3",
+                duration = Duration.ZERO,
+            )
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            whenever(getFileTypeInfoByNameUseCase(any(), any())).thenReturn(audioFileType)
+            whenever(nav3VideoPlayerRouteLauncher.routeOrNull(any())).thenReturn(null)
+            whenever(nav3AudioPlayerRouteLauncher.routeOrNull(any())).thenReturn(mock<NavKey>())
+
+            underTest.openMediaPlayerActivityFromChat(
+                context = context,
+                contentUri = NodeContentUri.RemoteContentUri(url = "https://mega.nz/file/test", shouldStopHttpSever = false),
+                handle = 1L,
+                messageId = 2L,
+                chatId = 3L,
+                name = "song.mp3",
+            )
+
+            verify(context, never()).startActivity(any())
+        }
+
+    @Test
+    fun `test that launchMediaPlayer starts activity when both route launchers return null`() =
+        runTest {
+            val audioFileType = AudioFileTypeInfo(
+                mimeType = "audio/mpeg",
+                extension = "mp3",
+                duration = Duration.ZERO,
+            )
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+            whenever(getFileTypeInfoByNameUseCase(any(), any())).thenReturn(audioFileType)
+            // nav3AudioPlayerRouteLauncher returns null by default after reset
+            whenever(nav3VideoPlayerRouteLauncher.routeOrNull(any())).thenReturn(null)
+
+            underTest.openMediaPlayerActivityFromChat(
+                context = context,
+                contentUri = NodeContentUri.RemoteContentUri(url = "https://mega.nz/file/test", shouldStopHttpSever = false),
+                handle = 1L,
+                messageId = 2L,
+                chatId = 3L,
+                name = "song.mp3",
+            )
+
+            verify(context).startActivity(any())
         }
 }

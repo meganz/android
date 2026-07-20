@@ -202,6 +202,7 @@ fun CloudDriveScreen(
             }
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
                 modifier = Modifier.testTag(CLOUD_DRIVE_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeOptionsActionUiState.availableActions,
@@ -232,6 +233,7 @@ fun CloudDriveScreen(
             )
         },
         content = { innerPadding ->
+            @SuppressLint("ComposeViewModelForwarding")
             CloudDriveContent(
                 isTabContent = false,
                 navigationHandler = navigationHandler,

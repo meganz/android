@@ -69,7 +69,7 @@ class PagedChatMessageRemoteMediatorTest {
         runTest {
 
             fetchMessages.stub {
-                onBlocking {
+                on {
                     invoke(any())
                 }.thenReturn(
                     FetchMessagePageResponse(
@@ -98,7 +98,7 @@ class PagedChatMessageRemoteMediatorTest {
             on { this.chatId }.thenReturn(chatId)
         }
         fetchMessages.stub {
-            onBlocking {
+            on {
                 invoke(any())
             }.thenReturn(response)
         }
@@ -112,7 +112,7 @@ class PagedChatMessageRemoteMediatorTest {
     internal fun `test that error response is returned if an error is thrown`() = runTest {
         val exception = Exception("This is the issue")
         fetchMessages.stub {
-            onBlocking {
+            on {
                 invoke(any())
             }.thenAnswer { throw exception }
         }
@@ -142,7 +142,7 @@ class PagedChatMessageRemoteMediatorTest {
 
             }
             fetchMessages.stub {
-                onBlocking {
+                on {
                     invoke(any())
                 }.thenReturn(response)
             }

@@ -103,7 +103,7 @@ internal class SelectSubtitleFileViewModelTest {
         val expectedSubtitleFileInfoList: List<SubtitleFileInfo> = listOf(mock(), mock(), mock())
 
         getSRTSubtitleFileListUseCase.stub {
-            onBlocking { invoke() }.thenReturn(expectedSubtitleFileInfoList)
+            on { invoke() }.thenReturn(expectedSubtitleFileInfoList)
         }
 
         whenever(subtitleFileInfoItemMapper(anyOrNull(), anyOrNull())).thenReturn(mock())

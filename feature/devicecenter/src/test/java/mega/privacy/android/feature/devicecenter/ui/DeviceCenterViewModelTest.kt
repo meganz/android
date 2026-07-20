@@ -49,7 +49,7 @@ internal class DeviceCenterViewModelTest {
 
     private val monitorConnectivityFlow = MutableSharedFlow<Boolean>(replay = 1)
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock {
-        onBlocking { invoke() } doReturn monitorConnectivityFlow
+        on { invoke() } doReturn monitorConnectivityFlow
     }
 
     private val isCameraUploadsEnabled = true

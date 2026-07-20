@@ -27,7 +27,7 @@ class ChatRoomMessageUpdateMapperTest {
     private val chatMessage = mock<ChatMessage>()
 
     private val chatMessageMapper = mock<ChatMessageMapper> {
-        onBlocking { invoke(any()) } doReturn chatMessage
+        on { invoke(any()) } doReturn chatMessage
     }
 
     @BeforeEach

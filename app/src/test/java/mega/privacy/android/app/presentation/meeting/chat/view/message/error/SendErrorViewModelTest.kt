@@ -35,8 +35,8 @@ class SendErrorViewModelTest {
         val failedMessage = mock<TypedMessage>()
         val message = mock<TypedMessage>()
         resendMessageUseCase.stub {
-            onBlocking { invoke(failedMessage) }.thenAnswer { throw Throwable() }
-            onBlocking { invoke(message) }.thenAnswer {}
+            on { invoke(failedMessage) }.thenAnswer { throw Throwable() }
+            on { invoke(message) }.thenAnswer {}
         }
 
         val input = setOf(failedMessage, message)

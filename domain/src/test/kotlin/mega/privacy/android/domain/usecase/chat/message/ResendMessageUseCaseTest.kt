@@ -72,6 +72,7 @@ class ResendMessageUseCaseTest {
     internal fun `test that retry use cases handles the message when corresponds`() = runTest {
         val message = mock<UserMessage>()
         whenever(retryMessageUseCase1.canRetryMessage(message)) doReturn true
+        whenever(retryMessageUseCase1.invoke(message)) doReturn Unit
         underTest(message)
         verify(retryMessageUseCase1).invoke(message)
     }
@@ -82,6 +83,7 @@ class ResendMessageUseCaseTest {
         whenever(retryMessageUseCase1.canRetryMessage(message)) doReturn false
         whenever(retryMessageUseCase2.canRetryMessage(message)) doReturn false
         whenever(retryMessageUseCase3.canRetryMessage(message)) doReturn true
+        whenever(retryMessageUseCase3.invoke(message)) doReturn Unit
         underTest(message)
         verify(retryMessageUseCase1).canRetryMessage(message)
         verify(retryMessageUseCase2).canRetryMessage(message)
@@ -99,7 +101,7 @@ class ResendMessageUseCaseTest {
             whenever(retryMessageUseCase2.canRetryMessage(message)) doReturn false
             whenever(retryMessageUseCase3.canRetryMessage(message)) doReturn false
             forwardMessageUseCase1.stub {
-                onBlocking {
+                on {
                     invoke(
                         listOf(expectedChatId),
                         message
@@ -122,7 +124,7 @@ class ResendMessageUseCaseTest {
             whenever(retryMessageUseCase2.canRetryMessage(message)) doReturn false
             whenever(retryMessageUseCase3.canRetryMessage(message)) doReturn false
             forwardMessageUseCase1.stub {
-                onBlocking {
+                on {
                     invoke(
                         listOf(expectedChatId),
                         message
@@ -131,7 +133,7 @@ class ResendMessageUseCaseTest {
             }
 
             forwardMessageUseCase2.stub {
-                onBlocking {
+                on {
                     invoke(
                         listOf(expectedChatId),
                         message
@@ -140,7 +142,7 @@ class ResendMessageUseCaseTest {
             }
 
             forwardMessageUseCase3.stub {
-                onBlocking {
+                on {
                     invoke(
                         listOf(expectedChatId),
                         message
@@ -163,7 +165,7 @@ class ResendMessageUseCaseTest {
         whenever(retryMessageUseCase2.canRetryMessage(message)) doReturn false
         whenever(retryMessageUseCase3.canRetryMessage(message)) doReturn false
         forwardMessageUseCase1.stub {
-            onBlocking { invoke(any(), any()) } doReturn listOf(ForwardResult.Success(123L))
+            on { invoke(any(), any()) } doReturn listOf(ForwardResult.Success(123L))
         }
 
         underTest(message)
@@ -175,10 +177,11 @@ class ResendMessageUseCaseTest {
     @Test
     internal fun `test that messages is not removed when it is retried`() = runTest {
         forwardMessageUseCase1.stub {
-            onBlocking { invoke(any(), any()) } doReturn listOf(ForwardResult.Success(123L))
+            on { invoke(any(), any()) } doReturn listOf(ForwardResult.Success(123L))
         }
         val message = mock<PendingFileAttachmentMessage>()
         whenever(retryMessageUseCase1.canRetryMessage(message)) doReturn true
+        whenever(retryMessageUseCase1.invoke(message)) doReturn Unit
 
         underTest(message)
 
@@ -195,7 +198,7 @@ class ResendMessageUseCaseTest {
         whenever(retryMessageUseCase2.canRetryMessage(message)) doReturn false
         whenever(retryMessageUseCase3.canRetryMessage(message)) doReturn false
         forwardMessageUseCase1.stub {
-            onBlocking {
+            on {
                 invoke(
                     listOf(expectedChatId),
                     message
@@ -204,7 +207,7 @@ class ResendMessageUseCaseTest {
         }
 
         forwardMessageUseCase2.stub {
-            onBlocking {
+            on {
                 invoke(
                     listOf(expectedChatId),
                     message
@@ -213,7 +216,7 @@ class ResendMessageUseCaseTest {
         }
 
         forwardMessageUseCase3.stub {
-            onBlocking {
+            on {
                 invoke(
                     listOf(expectedChatId),
                     message
@@ -234,7 +237,7 @@ class ResendMessageUseCaseTest {
         whenever(retryMessageUseCase2.canRetryMessage(message)) doReturn false
         whenever(retryMessageUseCase3.canRetryMessage(message)) doReturn false
         forwardMessageUseCase1.stub {
-            onBlocking {
+            on {
                 invoke(
                     listOf(expectedChatId),
                     message

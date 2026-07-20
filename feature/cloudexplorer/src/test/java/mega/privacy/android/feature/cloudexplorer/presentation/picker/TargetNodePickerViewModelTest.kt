@@ -63,7 +63,7 @@ internal class TargetNodePickerViewModelTest {
             stubRoot(ROOT)
             val path = listOf(NodeId(5L), NodeId(6L))
             getNodeNavigationStackUseCase.stub {
-                onBlocking { invoke(NodeId(TARGET)) } doReturn
+                on { invoke(NodeId(TARGET)) } doReturn
                         NodeNavigationStack(stack = path, isUnderRootNode = true)
             }
             val underTest = viewModel(latestTarget = TARGET)
@@ -81,7 +81,7 @@ internal class TargetNodePickerViewModelTest {
             stubRoot(ROOT)
             val path = listOf(NodeId(9L))
             getNodeNavigationStackUseCase.stub {
-                onBlocking { invoke(NodeId(TARGET)) } doReturn
+                on { invoke(NodeId(TARGET)) } doReturn
                         NodeNavigationStack(stack = path, isUnderRootNode = false)
             }
             val underTest = viewModel(latestTarget = TARGET)
@@ -94,7 +94,7 @@ internal class TargetNodePickerViewModelTest {
         }
 
     private fun stubRoot(rootNodeId: NodeId) = getRootNodeIdUseCase.stub {
-        onBlocking { invoke() } doReturn rootNodeId
+        on { invoke() } doReturn rootNodeId
     }
 
     private fun viewModel(latestTarget: Long?) = object : TargetNodePickerViewModel(

@@ -261,17 +261,17 @@ class NodeActionClickHandlerTest {
         whenever(mockNodeHandlesToJsonMapper(any<List<Long>>())).thenReturn("test-json")
         whenever(mockNodeHandlesToJsonMapper(any<String>())).thenReturn(listOf())
         mockCheckNodesNameCollisionUseCase.stub {
-            onBlocking { invoke(any(), any()) } doReturn NodeNameCollisionsResult(
+            on { invoke(any(), any()) } doReturn NodeNameCollisionsResult(
                 noConflictNodes = emptyMap(),
                 conflictNodes = emptyMap(),
                 type = NodeNameCollisionType.RESTORE
             )
         }
         mockIsHiddenNodesOnboardedUseCase.stub {
-            onBlocking { invoke() } doReturn false
+            on { invoke() } doReturn false
         }
         mockViewModel.stub {
-            onBlocking { isOnboarding() } doReturn false
+            on { isOnboarding() } doReturn false
         }
     }
 

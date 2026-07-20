@@ -75,13 +75,13 @@ class GetUserFullNameUseCaseTest {
     internal fun `test that last name is returned if first name throw an exception`() = runTest {
         val expected = "LastName"
         contactsRepository.stub {
-            onBlocking { getCurrentUserFirstName(any()) }.thenAnswer {
+            on { getCurrentUserFirstName(any()) }.thenAnswer {
                 throw MegaException(
                     1,
                     "First Name threw exception"
                 )
             }
-            onBlocking { getCurrentUserLastName(any()) }.thenReturn(expected)
+            on { getCurrentUserLastName(any()) }.thenReturn(expected)
         }
 
         assertThat(underTest(true)).isEqualTo(expected)
@@ -91,8 +91,8 @@ class GetUserFullNameUseCaseTest {
     internal fun `test that first name is returned if last name throws an exception`() = runTest {
         val expected = "FirstName"
         contactsRepository.stub {
-            onBlocking { getCurrentUserFirstName(any()) }.thenReturn(expected)
-            onBlocking { getCurrentUserLastName(any()) }.thenAnswer {
+            on { getCurrentUserFirstName(any()) }.thenReturn(expected)
+            on { getCurrentUserLastName(any()) }.thenAnswer {
                 throw MegaException(
                     1,
                     "Last Name threw exception"

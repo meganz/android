@@ -122,7 +122,7 @@ class VideoSectionViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val fakeMonitorAccountDetailFlow = MutableSharedFlow<AccountDetail>()
     private val isHiddenNodesOnboardedUseCase = mock<IsHiddenNodesOnboardedUseCase> {
-        onBlocking {
+        on {
             invoke()
         }.thenReturn(false)
     }

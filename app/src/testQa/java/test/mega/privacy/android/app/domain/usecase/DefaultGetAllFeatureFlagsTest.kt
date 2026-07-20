@@ -23,7 +23,7 @@ class DefaultGetAllFeatureFlagsTest {
 
     lateinit var underTest: GetAllFeatureFlags
     private val getFeatureFlagValueUseCase =
-        mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(false) }
+        mock<GetFeatureFlagValueUseCase> { on { invoke(any()) }.thenReturn(false) }
     private val qaRepository = mock<QARepository>()
 
     @Before

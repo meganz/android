@@ -57,17 +57,17 @@ internal class EditProfileViewModelTest {
     fun setUp() {
         whenever(monitorMyAvatarFile()).thenReturn(monitorMyAvatarFileFlow)
         getMyAvatarColorUseCase.stub {
-            onBlocking { invoke() }.doReturn(colorMyAvatar)
+            on { invoke() }.doReturn(colorMyAvatar)
         }
         getMyAvatarFileUseCase.stub {
-            onBlocking { invoke(any()) }.doReturn(null)
+            on { invoke(any()) }.doReturn(null)
         }
         // Set up mocks for the use cases called in init
         hasOfflineFilesUseCase.stub {
-            onBlocking { invoke() }.doReturn(false)
+            on { invoke() }.doReturn(false)
         }
         ongoingTransfersExistUseCase.stub {
-            onBlocking { invoke() }.doReturn(false)
+            on { invoke() }.doReturn(false)
         }
         // Set up monitorUserUpdates mock
         userUpdates = Channel()
@@ -84,10 +84,10 @@ internal class EditProfileViewModelTest {
 
         // Set up the test mocks
         testGetCurrentUserFirstName.stub {
-            onBlocking { invoke(false) }.doReturn(firstNameValue ?: "")
+            on { invoke(false) }.doReturn(firstNameValue ?: "")
         }
         testGetCurrentUserLastName.stub {
-            onBlocking { invoke(false) }.doReturn(lastNameValue ?: "")
+            on { invoke(false) }.doReturn(lastNameValue ?: "")
         }
 
         return EditProfileViewModel(
@@ -138,7 +138,7 @@ internal class EditProfileViewModelTest {
                     val initialState = awaitItem()
                     // Now set up the exception scenario
                     getCurrentUserLastName.stub {
-                        onBlocking { invoke(any()) }.thenAnswer {
+                        on { invoke(any()) }.thenAnswer {
                             throw MegaException(
                                 1,
                                 "Get last name threw an exception"
@@ -162,7 +162,7 @@ internal class EditProfileViewModelTest {
                     val initialState = awaitItem()
                     // Now set up the exception scenario
                     getCurrentUserFirstName.stub {
-                        onBlocking { invoke(true) }.thenAnswer {
+                        on { invoke(true) }.thenAnswer {
                             throw MegaException(
                                 1,
                                 "Get first name threw an exception"

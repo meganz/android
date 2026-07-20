@@ -127,7 +127,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
         if (publicLinkUrl.isNullOrBlank()
             && nodeSourceType != NodeSourceType.FOLDER_LINK
             && nodeSourceType != NodeSourceType.FILE_LINK
-            && nodeSourceType != NodeSourceType.VIDEO_PLAYER_ZIP_FILE
+            && nodeSourceType != NodeSourceType.MEDIA_PLAYER_ZIP_FILE
         ) {
             viewModelScope.launch {
                 monitorNodeUpdatesById(NodeId(nodeId))
@@ -239,7 +239,7 @@ class NodeOptionsBottomSheetViewModel @AssistedInject constructor(
     }.getOrNull() ?: PrimaryNodeResult(null)
 
     private suspend fun loadZipFileNode(): TypedNode? {
-        if (nodeSourceType != NodeSourceType.VIDEO_PLAYER_ZIP_FILE) return null
+        if (nodeSourceType != NodeSourceType.MEDIA_PLAYER_ZIP_FILE) return null
         return localFilePath?.let { path ->
             runCatching {
                 val file = getFileByPathUseCase(path) ?: return null

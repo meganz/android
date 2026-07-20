@@ -27,7 +27,7 @@ internal class IsChargingRequiredUseCaseTest {
     fun `test that false is returned if isChargingRequiredForVideoCompression is set to false`() =
         runTest {
             isChargingRequiredForVideoCompressionUseCase.stub {
-                onBlocking { invoke() }.thenReturn(false)
+                on { invoke() }.thenReturn(false)
             }
 
             assertThat(underTest(5)).isFalse()
@@ -39,7 +39,7 @@ internal class IsChargingRequiredUseCaseTest {
 
         whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(queueSize + 1)
         isChargingRequiredForVideoCompressionUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
+            on { invoke() }.thenReturn(true)
         }
 
         assertThat(underTest(queueSize.toLong())).isFalse()
@@ -51,7 +51,7 @@ internal class IsChargingRequiredUseCaseTest {
 
         whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(queueSize - 1)
         isChargingRequiredForVideoCompressionUseCase.stub {
-            onBlocking { invoke() }.thenReturn(true)
+            on { invoke() }.thenReturn(true)
         }
 
         assertThat(underTest(queueSize.toLong())).isTrue()

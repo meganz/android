@@ -32,10 +32,9 @@ class LoginWith2FAUseCaseTest {
 
     private val loginRepository = mock<LoginRepository>()
     private val chatLogoutUseCase = mock<ChatLogoutUseCase> {
-        onBlocking { invoke(disableChatApiUseCase) }.thenReturn(Unit)
+        on { invoke(true) }.thenReturn(Unit)
     }
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
-    private val disableChatApiUseCase = mock<DisableChatApiUseCase>()
     private val saveAccountCredentialsUseCase = mock<SaveAccountCredentialsUseCase>()
     private val loginMutex = mock<Mutex>()
 
@@ -72,11 +71,11 @@ class LoginWith2FAUseCaseTest {
             whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))
                 .thenReturn(flow { throw LoginRequireValidation() })
 
-            underTest.invoke(email, password, pin2FA, disableChatApiUseCase).test {
+            underTest.invoke(email, password, pin2FA, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
             }
 
-            verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+            verify(chatLogoutUseCase).invoke(disableChatApi = true)
             verify(resetChatSettingsUseCase).invoke()
             val inOrder = inOrder(loginMutex)
             inOrder.verify(loginMutex).lock()
@@ -89,7 +88,7 @@ class LoginWith2FAUseCaseTest {
             whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))
                 .thenReturn(flow { throw LoginWrongMultiFactorAuth() })
 
-            underTest.invoke(email, password, pin2FA, disableChatApiUseCase).test {
+            underTest.invoke(email, password, pin2FA, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(LoginWrongMultiFactorAuth::class.java)
             }
 
@@ -106,7 +105,7 @@ class LoginWith2FAUseCaseTest {
             whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))
                 .thenReturn(flow { throw LoginLoggedOutFromOtherLocation() })
 
-            underTest.invoke(email, password, pin2FA, disableChatApiUseCase).test {
+            underTest.invoke(email, password, pin2FA, disableChatApi = true).test {
                 assertThat(awaitError()).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
             }
 
@@ -122,7 +121,7 @@ class LoginWith2FAUseCaseTest {
         whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))
             .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
-        underTest.invoke(email, password, pin2FA, disableChatApiUseCase).test {
+        underTest.invoke(email, password, pin2FA, disableChatApi = true).test {
             assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
             cancelAndIgnoreRemainingEvents()
         }
@@ -137,15 +136,15 @@ class LoginWith2FAUseCaseTest {
     fun `test that exception thrown by chatLogoutUseCase is propagated`() = runTest {
         whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))
             .thenReturn(flow { throw LoginRequireValidation() })
-        whenever(chatLogoutUseCase.invoke(disableChatApiUseCase))
+        whenever(chatLogoutUseCase.invoke(true))
             .thenThrow(RuntimeException("chatLogout error"))
 
-        underTest.invoke(email, password, pin2FA, disableChatApiUseCase).test {
+        underTest.invoke(email, password, pin2FA, disableChatApi = true).test {
             val error = awaitError()
             assertThat(error).isInstanceOf(RuntimeException::class.java)
             assertThat(error).hasMessageThat().contains("chatLogout error")
         }
-        verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+        verify(chatLogoutUseCase).invoke(disableChatApi = true)
         verifyNoInteractions(resetChatSettingsUseCase)
         val inOrder = inOrder(loginMutex)
         inOrder.verify(loginMutex).lock()
@@ -159,12 +158,12 @@ class LoginWith2FAUseCaseTest {
         whenever(resetChatSettingsUseCase.invoke())
             .thenThrow(RuntimeException("resetChatSettings error"))
 
-        underTest.invoke(email, password, pin2FA, disableChatApiUseCase).test {
+        underTest.invoke(email, password, pin2FA, disableChatApi = true).test {
             val error = awaitError()
             assertThat(error).isInstanceOf(RuntimeException::class.java)
             assertThat(error).hasMessageThat().contains("resetChatSettings error")
         }
-        verify(chatLogoutUseCase).invoke(disableChatApiUseCase)
+        verify(chatLogoutUseCase).invoke(disableChatApi = true)
         verify(resetChatSettingsUseCase).invoke()
         val inOrder = inOrder(loginMutex)
         inOrder.verify(loginMutex).lock()
@@ -178,7 +177,7 @@ class LoginWith2FAUseCaseTest {
         whenever(saveAccountCredentialsUseCase.invoke())
             .thenThrow(RuntimeException("saveAccountCredentials error"))
 
-        underTest.invoke(email, password, pin2FA, disableChatApiUseCase).test {
+        underTest.invoke(email, password, pin2FA, disableChatApi = true).test {
             val error = awaitError()
             assertThat(error).isInstanceOf(RuntimeException::class.java)
             assertThat(error).hasMessageThat().contains("saveAccountCredentials error")

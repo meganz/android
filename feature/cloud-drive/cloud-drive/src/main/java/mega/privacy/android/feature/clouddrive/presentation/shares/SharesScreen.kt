@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.clouddrive.presentation.shares
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -184,6 +185,7 @@ internal fun SharesScreen(
             }
         },
         bottomBar = {
+            @SuppressLint("ComposeViewModelForwarding")
             NodeSelectionModeBottomBar(
                 modifier = Modifier.testTag(SHARES_SELECTION_MODE_BOTTOM_BAR_TAG),
                 availableActions = nodeActionState.availableActions,

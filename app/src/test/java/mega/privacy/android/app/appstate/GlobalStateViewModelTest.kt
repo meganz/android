@@ -931,7 +931,7 @@ class GlobalStateViewModelTest {
     fun `test that backgroundFastLogin calls use case and shows success message on success`() =
         runTest {
             backgroundFastLoginUseCase.stub {
-                onBlocking { invoke() }.thenReturn("fast-login-session")
+                on { invoke() }.thenReturn("fast-login-session")
             }
 
             underTest.backgroundFastLogin()
@@ -943,7 +943,7 @@ class GlobalStateViewModelTest {
     @Test
     fun `test that backgroundFastLogin does not show message on failure`() = runTest {
         backgroundFastLoginUseCase.stub {
-            onBlocking { invoke() }.thenThrow(RuntimeException("Test error"))
+            on { invoke() }.thenThrow(RuntimeException("Test error"))
         }
 
         underTest.backgroundFastLogin()

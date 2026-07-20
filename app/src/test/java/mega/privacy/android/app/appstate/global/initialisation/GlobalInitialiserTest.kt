@@ -5,8 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiserAction
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiserAction
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiserAction
 import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiserAction
 import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiserAction
 import org.junit.jupiter.api.Test
@@ -26,16 +28,22 @@ class GlobalInitialiserTest {
     fun `test that onAppCreate runs critical initialisers in list order before returning`() =
         runTest {
             val executionOrder = mutableListOf<String>()
-            val first = AppCreateInitialiserAction(name = "first", isCritical = true) {
-                executionOrder += "first"
-            }
-            val second = AppCreateInitialiserAction(name = "second", isCritical = true) {
-                executionOrder += "second"
-            }
+            val first =
+                SynchronousAppCreateInitialiserAction(
+                    name = "first"
+                ) {
+                    executionOrder += "first"
+                }
+            val second =
+                SynchronousAppCreateInitialiserAction(
+                    name = "second"
+                ) {
+                    executionOrder += "second"
+                }
 
             initUnderTest(
                 testScope = this,
-                appCreateInitialisers = listOf(first, second),
+                syncAppCreateInitialisers = listOf(first, second),
             )
 
             underTest.onAppCreate()
@@ -47,16 +55,17 @@ class GlobalInitialiserTest {
     fun `test that onAppCreate runs critical initialisers before async ones regardless of list order`() =
         runTest {
             val executionOrder = mutableListOf<String>()
-            val async = AppCreateInitialiserAction(name = "async", isCritical = false) {
+            val async = AsyncAppCreateInitialiserAction(name = "async") {
                 executionOrder += "async"
             }
-            val critical = AppCreateInitialiserAction(name = "critical", isCritical = true) {
+            val critical = SynchronousAppCreateInitialiserAction(name = "critical") {
                 executionOrder += "critical"
             }
 
             initUnderTest(
                 testScope = this,
-                appCreateInitialisers = listOf(async, critical),
+                syncAppCreateInitialisers = listOf(critical),
+                asyncAppCreateInitialisers = setOf(async),
             )
 
             underTest.onAppCreate()
@@ -68,13 +77,13 @@ class GlobalInitialiserTest {
     @Test
     fun `test that onAppCreate propagates exception when a critical initialiser fails`() =
         runTest {
-            val critical = AppCreateInitialiserAction(name = "critical", isCritical = true) {
+            val critical = SynchronousAppCreateInitialiserAction(name = "critical") {
                 throw RuntimeException("Critical boot failure")
             }
 
             initUnderTest(
                 testScope = this,
-                appCreateInitialisers = listOf(critical),
+                syncAppCreateInitialisers = listOf(critical),
             )
 
             assertThrows<RuntimeException> {
@@ -85,19 +94,19 @@ class GlobalInitialiserTest {
     @Test
     fun `test that onAppCreate runs all async initialisers when one fails`() = runTest {
         val invoked = mutableListOf<String>()
-        val failing = AppCreateInitialiserAction(name = "failing", isCritical = false) {
+        val failing = AsyncAppCreateInitialiserAction(name = "failing") {
             throw RuntimeException("Async failure")
         }
-        val other = AppCreateInitialiserAction(name = "other", isCritical = false) {
+        val other = AsyncAppCreateInitialiserAction(name = "other") {
             invoked += "other"
         }
-        val another = AppCreateInitialiserAction(name = "another", isCritical = false) {
+        val another = AsyncAppCreateInitialiserAction(name = "another") {
             invoked += "another"
         }
 
         initUnderTest(
             testScope = this,
-            appCreateInitialisers = listOf(failing, other, another),
+            asyncAppCreateInitialisers = setOf(failing, other, another),
         )
 
         assertDoesNotThrow {
@@ -111,16 +120,17 @@ class GlobalInitialiserTest {
     @Test
     fun `test that onAppCreate skips initialisers rejected by the filter`() = runTest {
         val invoked = mutableListOf<String>()
-        val included = AppCreateInitialiserAction(name = "included", isCritical = true) {
+        val included = SynchronousAppCreateInitialiserAction(name = "included") {
             invoked += "included"
         }
-        val excluded = AppCreateInitialiserAction(name = "excluded", isCritical = false) {
+        val excluded = AsyncAppCreateInitialiserAction(name = "excluded") {
             invoked += "excluded"
         }
 
         initUnderTest(
             testScope = this,
-            appCreateInitialisers = listOf(included, excluded),
+            syncAppCreateInitialisers = listOf(included),
+            asyncAppCreateInitialisers = setOf(excluded),
         )
 
         underTest.onAppCreate { it.name != "excluded" }
@@ -132,16 +142,17 @@ class GlobalInitialiserTest {
     @Test
     fun `test that onAppCreate is a no-op when called a second time`() = runTest {
         val invoked = mutableListOf<String>()
-        val critical = AppCreateInitialiserAction(name = "critical", isCritical = true) {
+        val critical = SynchronousAppCreateInitialiserAction(name = "critical") {
             invoked += "critical"
         }
-        val async = AppCreateInitialiserAction(name = "async", isCritical = false) {
+        val async = AsyncAppCreateInitialiserAction(name = "async") {
             invoked += "async"
         }
 
         initUnderTest(
             testScope = this,
-            appCreateInitialisers = listOf(critical, async),
+            syncAppCreateInitialisers = listOf(critical),
+            asyncAppCreateInitialisers = setOf(async),
         )
 
         underTest.onAppCreate()
@@ -225,13 +236,15 @@ class GlobalInitialiserTest {
 
     private fun initUnderTest(
         testScope: CoroutineScope,
-        appCreateInitialisers: List<AppCreateInitialiser> = emptyList(),
+        syncAppCreateInitialisers: List<SynchronousAppCreateInitialiser> = emptyList(),
+        asyncAppCreateInitialisers: Set<AsyncAppCreateInitialiser> = emptySet(),
         appStartInitialisers: Set<AppStartInitialiserAction> = emptySet(),
         postLoginInitialisers: Set<PostLoginInitialiserAction> = emptySet(),
     ) {
         underTest = GlobalInitialiser(
             coroutineScope = testScope,
-            appCreateInitialisers = appCreateInitialisers,
+            syncAppCreateInitialisers = syncAppCreateInitialisers,
+            asyncAppCreateInitialisers = asyncAppCreateInitialisers,
             appStartInitialisers = appStartInitialisers,
             postLoginInitialisers = { postLoginInitialisers },
         )

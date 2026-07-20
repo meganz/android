@@ -142,7 +142,7 @@ class MainNavigationStateViewModelTest {
         val mainDestinations = setOf(expected, notExpected as MainNavItem)
 
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(mainDestinations) }.thenReturn(flow { emit(setOf(expected)) })
+            on { invoke(mainDestinations) }.thenReturn(flow { emit(setOf(expected)) })
         }
 
         initUnderTest(mainDestinations)
@@ -185,7 +185,7 @@ class MainNavigationStateViewModelTest {
         }
         val mainDestinations = setOf(expected, alsoExpected as MainNavItem)
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(mainDestinations) }.thenReturn(flow {
+            on { invoke(mainDestinations) }.thenReturn(flow {
                 emit(
                     setOf(
                         expected,
@@ -445,7 +445,7 @@ class MainNavigationStateViewModelTest {
 
     private fun stubEmptyStartScreenPreference() {
         monitorStartScreenPreferenceDestinationUseCase.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flow {
                     emit(null)
                     awaitCancellation()
@@ -456,7 +456,7 @@ class MainNavigationStateViewModelTest {
 
     private fun stubStartScreenPreference(destination: StartScreenDestinationPreference) {
         monitorStartScreenPreferenceDestinationUseCase.stub {
-            onBlocking { invoke() }.thenReturn(
+            on { invoke() }.thenReturn(
                 flow {
                     emit(destination)
                     awaitCancellation()
@@ -478,7 +478,7 @@ class MainNavigationStateViewModelTest {
 
     private fun stubAllEnabledFlaggedItems() {
         getEnabledFlaggedItemsUseCase.stub {
-            onBlocking { invoke(any<Set<Any>>()) }.thenAnswer { flow { emit(it.arguments.first()) } }
+            on { invoke(any<Set<Any>>()) }.thenAnswer { flow { emit(it.arguments.first()) } }
         }
     }
 }

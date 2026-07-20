@@ -426,7 +426,7 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test that map location is hidden for a geo-tagged video`() = runTest {
+    fun `test that map location is shown for a geo-tagged video`() = runTest {
         val node = mockFileNode()
         val videoNode = mockImageNode(
             type = VideoFileTypeInfo(mimeType = "video/mp4", extension = "mp4", duration = 1.seconds),
@@ -440,7 +440,8 @@ internal class FileInfoViewModelTest {
         initViewModel()
         advanceUntilIdle()
 
-        assertThat(underTest.uiState.value.mapCoordinates).isNull()
+        assertThat(underTest.uiState.value.mapCoordinates)
+            .isEqualTo(Coordinates(latitude = 52.09, longitude = 5.12))
     }
 
     @Test
@@ -623,7 +624,7 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test that init loads folder versions for a folder with versioned files`() = runTest {
+    fun `test that init loads folder stats for a folder`() = runTest {
         val node = mockFolderNode()
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
         whenever(getNodeAccessPermission(NodeId(NODE_HANDLE))).thenReturn(AccessPermission.OWNER)
@@ -641,6 +642,9 @@ internal class FileInfoViewModelTest {
         advanceUntilIdle()
 
         with(underTest.uiState.value) {
+            assertThat(sizeInBytes).isEqualTo(22_800L)
+            assertThat(numberOfFiles).isEqualTo(3223)
+            assertThat(numberOfFolders).isEqualTo(540)
             assertThat(numberOfVersions).isEqualTo(91)
             assertThat(currentVersionsSizeInBytes).isEqualTo(22_800L)
             assertThat(previousVersionsSizeInBytes).isEqualTo(1_260L)
@@ -695,6 +699,7 @@ internal class FileInfoViewModelTest {
             assertThat(durationText).isEqualTo("1:24")
             assertThat(thumbnailData)
                 .isEqualTo(ThumbnailUriRequest(UriPath.fromFile(previewFile)))
+            assertThat(isMediaFile).isTrue()
         }
     }
 
@@ -710,6 +715,7 @@ internal class FileInfoViewModelTest {
         with(underTest.uiState.value) {
             assertThat(durationText).isNull()
             assertThat(thumbnailData).isEqualTo(ThumbnailRequest(NodeId(NODE_HANDLE)))
+            assertThat(isMediaFile).isFalse()
         }
         verifyNoInteractions(getPreviewUseCase)
     }

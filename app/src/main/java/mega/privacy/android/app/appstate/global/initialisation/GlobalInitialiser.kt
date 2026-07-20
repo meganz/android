@@ -3,9 +3,10 @@ package mega.privacy.android.app.appstate.global.initialisation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.navigation.contract.initialisation.initialisers.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.AsyncAppCreateInitialiser
+import mega.privacy.android.navigation.contract.initialisation.SynchronousAppCreateInitialiser
 import mega.privacy.android.navigation.contract.initialisation.initialisers.AppStartInitialiser
 import mega.privacy.android.navigation.contract.initialisation.initialisers.PostLoginInitialiser
 import timber.log.Timber
@@ -16,14 +17,16 @@ import javax.inject.Singleton
  * Auth initialiser handles initialisation tasks during user auth.
  *
  * @property coroutineScope
- * @property appCreateInitialisers ordered list of app-create initialisers
+ * @property syncAppCreateInitialisers ordered list of app-create initialisers
+ * @property asyncAppCreateInitialisers set of app-create initialisers
  * @property appStartInitialisers
  * @property postLoginInitialisers
  */
 @Singleton
 class GlobalInitialiser @Inject constructor(
     @ApplicationScope private val coroutineScope: CoroutineScope,
-    private val appCreateInitialisers: List<@JvmSuppressWildcards AppCreateInitialiser>,
+    private val syncAppCreateInitialisers: List<@JvmSuppressWildcards SynchronousAppCreateInitialiser>,
+    private val asyncAppCreateInitialisers: Set<@JvmSuppressWildcards AsyncAppCreateInitialiser>,
     private val appStartInitialisers: Set<@JvmSuppressWildcards AppStartInitialiser>,
     private val postLoginInitialisers: dagger.Lazy<Set<@JvmSuppressWildcards PostLoginInitialiser>>,
 ) {
@@ -43,15 +46,10 @@ class GlobalInitialiser @Inject constructor(
     fun onAppCreate(filter: (AppCreateInitialiser) -> Boolean = { true }) {
         if (onAppCreateCalled) return
         onAppCreateCalled = true
-        val (critical, nonCritical) = appCreateInitialisers
-            .filter(filter)
-            .partition { it.isCritical }
-        if (critical.isNotEmpty()) {
-            runBlocking {
-                critical.forEach { it() }
-            }
+        syncAppCreateInitialisers.filter(filter).forEach {
+            it()
         }
-        nonCritical.forEach { initialiser ->
+        asyncAppCreateInitialisers.filter(filter).forEach { initialiser ->
             coroutineScope.launch {
                 try {
                     initialiser()
