@@ -22,6 +22,7 @@ class AudioPlayerScreenshotTest {
         AndroidThemeForPreviews {
             AudioPlayerScreen(
                 uiState = AudioPlayerUiState.Loading,
+                isPodcastMode = true,
                 onPlayPauseClicked = {},
                 onSeekTo = {},
                 onNextClicked = {},
@@ -31,6 +32,11 @@ class AudioPlayerScreenshotTest {
                 onPlaylistClicked = {},
                 onBackPressed = {},
                 onMoreActionsClicked = {},
+                onToggleMode = {},
+                onSeekForward15 = {},
+                onSeekBackward15 = {},
+                onSpeedClicked = {},
+                onSleepTimerClicked = {},
             )
         }
     }
@@ -48,6 +54,7 @@ class AudioPlayerScreenshotTest {
                     currentPosition = 97_000L,
                     duration = 354_000L,
                 ),
+                isPodcastMode = false,
                 onPlayPauseClicked = {},
                 onSeekTo = {},
                 onNextClicked = {},
@@ -57,6 +64,11 @@ class AudioPlayerScreenshotTest {
                 onPlaylistClicked = {},
                 onBackPressed = {},
                 onMoreActionsClicked = {},
+                onToggleMode = {},
+                onSeekForward15 = {},
+                onSeekBackward15 = {},
+                onSpeedClicked = {},
+                onSleepTimerClicked = {},
             )
         }
     }
@@ -74,6 +86,7 @@ class AudioPlayerScreenshotTest {
                     currentPosition = 97_000L,
                     duration = 354_000L,
                 ),
+                isPodcastMode = false,
                 onPlayPauseClicked = {},
                 onSeekTo = {},
                 onNextClicked = {},
@@ -83,6 +96,11 @@ class AudioPlayerScreenshotTest {
                 onPlaylistClicked = {},
                 onBackPressed = {},
                 onMoreActionsClicked = {},
+                onToggleMode = {},
+                onSeekForward15 = {},
+                onSeekBackward15 = {},
+                onSpeedClicked = {},
+                onSleepTimerClicked = {},
             )
         }
     }
@@ -99,6 +117,7 @@ class AudioPlayerScreenshotTest {
                     artist = "Queen",
                     duration = 354_000L,
                 ),
+                isPodcastMode = false,
                 onPlayPauseClicked = {},
                 onSeekTo = {},
                 onNextClicked = {},
@@ -108,6 +127,11 @@ class AudioPlayerScreenshotTest {
                 onPlaylistClicked = {},
                 onBackPressed = {},
                 onMoreActionsClicked = {},
+                onToggleMode = {},
+                onSeekForward15 = {},
+                onSeekBackward15 = {},
+                onSpeedClicked = {},
+                onSleepTimerClicked = {},
             )
         }
     }
@@ -127,6 +151,7 @@ class AudioPlayerScreenshotTest {
                     shuffleEnabled = true,
                     repeatMode = Player.REPEAT_MODE_ONE,
                 ),
+                isPodcastMode = true,
                 onPlayPauseClicked = {},
                 onSeekTo = {},
                 onNextClicked = {},
@@ -136,6 +161,11 @@ class AudioPlayerScreenshotTest {
                 onPlaylistClicked = {},
                 onBackPressed = {},
                 onMoreActionsClicked = {},
+                onToggleMode = {},
+                onSeekForward15 = {},
+                onSeekBackward15 = {},
+                onSpeedClicked = {},
+                onSleepTimerClicked = {},
             )
         }
     }
@@ -152,6 +182,7 @@ class AudioPlayerScreenshotTest {
                     currentPlayingItemName = "podcast_episode_42.mp3",
                     duration = 3_600_000L,
                 ),
+                isPodcastMode = true,
                 onPlayPauseClicked = {},
                 onSeekTo = {},
                 onNextClicked = {},
@@ -161,6 +192,11 @@ class AudioPlayerScreenshotTest {
                 onPlaylistClicked = {},
                 onBackPressed = {},
                 onMoreActionsClicked = {},
+                onToggleMode = {},
+                onSeekForward15 = {},
+                onSeekBackward15 = {},
+                onSpeedClicked = {},
+                onSleepTimerClicked = {},
             )
         }
     }
@@ -190,5 +226,6 @@ class AudioPlayerScreenshotTest {
         hasPlaylist = false,
         currentAdapterType = -1,
         thumbnailData = null,
+        currentPlaybackSpeed = 1f,
     )
 }

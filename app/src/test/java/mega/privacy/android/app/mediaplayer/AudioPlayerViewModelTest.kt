@@ -458,4 +458,130 @@ class AudioPlayerViewModelTest {
         whenever(getStringExtra(URL_FILE_LINK)).thenReturn(fileLinkUrl)
         whenever(getStringExtra(URL_LOCAL_FILE_PATH)).thenReturn(localFilePath)
     }
+
+    @Test
+    fun `test that isPodcastMode is true by default`() = runTest {
+        assertThat(underTest.isPodcastMode.value).isTrue()
+    }
+
+    @Test
+    fun `test that isPodcastMode is set to false when player duration is below podcast threshold`() =
+        runTest {
+            underTest.isPodcastMode.test {
+                awaitItem() // default true
+                gatewayPlayerState.emit(AudioControllerState(durationMs = 5 * 60 * 1_000L))
+                assertThat(awaitItem()).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that isPodcastMode remains true when player duration exceeds podcast threshold`() =
+        runTest {
+            gatewayPlayerState.emit(AudioControllerState(durationMs = 15 * 60 * 1_000L))
+            assertThat(underTest.isPodcastMode.value).isTrue()
+        }
+
+    @Test
+    fun `test that togglePlayerMode sets isPodcastMode to false when in podcast mode`() = runTest {
+        underTest.isPodcastMode.test {
+            awaitItem() // default true
+            underTest.togglePlayerMode()
+            assertThat(awaitItem()).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that togglePlayerMode sets isPodcastMode to true when in music mode`() = runTest {
+        underTest.isPodcastMode.test {
+            awaitItem() // default true
+            underTest.togglePlayerMode()
+            awaitItem() // false
+            underTest.togglePlayerMode()
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that togglePlayerMode override is not overwritten by player state update`() =
+        runTest {
+            underTest.isPodcastMode.test {
+                awaitItem() // default true
+                underTest.togglePlayerMode()
+                assertThat(awaitItem()).isFalse()
+                // Same track, long duration — override must be preserved
+                gatewayPlayerState.emit(
+                    AudioControllerState(durationMs = 15 * 60 * 1_000L, currentMediaItemId = null)
+                )
+                expectNoEvents()
+            }
+        }
+
+    @Test
+    fun `test that isPodcastMode updates from player state after track changes`() = runTest {
+        underTest.isPodcastMode.test {
+            awaitItem() // default true
+            gatewayPlayerState.emit(
+                AudioControllerState(currentMediaItemId = "track1", durationMs = 15 * 60 * 1_000L)
+            )
+            expectNoEvents() // already true, no emission
+            underTest.togglePlayerMode()
+            assertThat(awaitItem()).isFalse()
+            // Track change resets override — long duration → auto-detected as podcast
+            gatewayPlayerState.emit(
+                AudioControllerState(currentMediaItemId = "track2", durationMs = 15 * 60 * 1_000L)
+            )
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that seekForward15 calls seekTo with current position plus 15 seconds`() = runTest {
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(AudioControllerState(currentPositionMs = 30_000L))
+            awaitItem() // Data
+            underTest.seekForward15()
+            verify(gateway).seekTo(45_000L)
+        }
+    }
+
+    @Test
+    fun `test that seekBackward15 calls seekTo with current position minus 15 seconds`() = runTest {
+        underTest.uiState.test {
+            awaitItem() // Loading
+            gatewayPlayerState.emit(AudioControllerState(currentPositionMs = 30_000L))
+            awaitItem() // Data
+            underTest.seekBackward15()
+            verify(gateway).seekTo(15_000L)
+        }
+    }
+
+    @Test
+    fun `test that seekBackward15 clamps to zero when current position is less than 15 seconds`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(currentPositionMs = 5_000L))
+                awaitItem() // Data
+                underTest.seekBackward15()
+                verify(gateway).seekTo(0L)
+            }
+        }
+
+    @Test
+    fun `test that setPlaybackSpeed delegates to gateway`() = runTest {
+        underTest.setPlaybackSpeed(1.5f)
+        verify(gateway).setPlaybackSpeed(1.5f)
+    }
+
+    @Test
+    fun `test that currentPlaybackSpeed in uiState reflects playback speed from player state`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+                gatewayPlayerState.emit(AudioControllerState(playbackSpeed = 1.5f))
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.currentPlaybackSpeed).isEqualTo(1.5f)
+            }
+        }
 }

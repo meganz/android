@@ -71,9 +71,11 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             onTransfer = onTransfer,
         )
 
+        val isPodcastMode by viewModel.isPodcastMode.collectAsStateWithLifecycle()
 
         AudioPlayerScreen(
             uiState = uiState,
+            isPodcastMode = isPodcastMode,
             onPlayPauseClicked = viewModel::togglePlayPause,
             onSeekTo = viewModel::seekTo,
             onNextClicked = viewModel::skipToNext,
@@ -87,6 +89,11 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
                     ?: return@AudioPlayerScreen
                 navigationHandler.navigate(navKey)
             },
+            onToggleMode = viewModel::togglePlayerMode,
+            onSeekForward15 = viewModel::seekForward15,
+            onSeekBackward15 = viewModel::seekBackward15,
+            onSpeedClicked = {},
+            onSleepTimerClicked = {},
         )
     }
 }

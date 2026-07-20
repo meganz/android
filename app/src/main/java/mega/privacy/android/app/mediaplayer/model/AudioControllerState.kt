@@ -23,6 +23,8 @@ data class AudioControllerState(
     val artworkUri: String? = null,
     /** Raw [androidx.media3.session.MediaController.getCurrentMediaItem] ID, always a Long-as-String in this app. */
     val currentMediaItemId: String? = null,
+    /** Current playback speed multiplier; `1.0` = normal speed. */
+    val playbackSpeed: Float = 1f,
 ) {
     /** Convenience accessor that converts [currentMediaItemId] to [Long], or `null` if absent. */
     val currentMediaItemHandle: Long?

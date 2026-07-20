@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.mediaplayer.AUDIO_PLAYER_CONTENT_TAG
 import mega.privacy.android.app.mediaplayer.AudioPlayerScreen
 import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,10 +49,17 @@ class AudioPlayerScreenTest {
         hasPlaylist = false,
         currentAdapterType = -1,
         thumbnailData = null,
+        nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
+        fileLinkUrl = null,
+        localFilePath = null,
+        chatId = null,
+        msgId = null,
+        currentPlaybackSpeed = 1f,
     )
 
     private fun setContent(
         uiState: AudioPlayerUiState = defaultData(),
+        isPodcastMode: Boolean = true,
         onPlayPauseClicked: () -> Unit = {},
         onSeekTo: (Long) -> Unit = {},
         onNextClicked: () -> Unit = {},
@@ -61,10 +69,16 @@ class AudioPlayerScreenTest {
         onPlaylistClicked: () -> Unit = {},
         onBackPressed: () -> Unit = {},
         onMoreActionsClicked: () -> Unit = {},
+        onToggleMode: () -> Unit = {},
+        onSeekForward15: () -> Unit = {},
+        onSeekBackward15: () -> Unit = {},
+        onSpeedClicked: () -> Unit = {},
+        onSleepTimerClicked: () -> Unit = {},
     ) {
         composeTestRule.setContent {
             AudioPlayerScreen(
                 uiState = uiState,
+                isPodcastMode = isPodcastMode,
                 onPlayPauseClicked = onPlayPauseClicked,
                 onSeekTo = onSeekTo,
                 onNextClicked = onNextClicked,
@@ -74,6 +88,11 @@ class AudioPlayerScreenTest {
                 onPlaylistClicked = onPlaylistClicked,
                 onBackPressed = onBackPressed,
                 onMoreActionsClicked = onMoreActionsClicked,
+                onToggleMode = onToggleMode,
+                onSeekForward15 = onSeekForward15,
+                onSeekBackward15 = onSeekBackward15,
+                onSpeedClicked = onSpeedClicked,
+                onSleepTimerClicked = onSleepTimerClicked,
             )
         }
     }

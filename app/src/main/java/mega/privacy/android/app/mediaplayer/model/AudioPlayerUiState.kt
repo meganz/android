@@ -35,6 +35,7 @@ sealed interface AudioPlayerUiState {
      * @property localFilePath Local file path; non-null only for zip-file launches.
      * @property chatId Chat room ID; non-null only for chat launches.
      * @property msgId Message ID; non-null only for chat launches.
+     * @property currentPlaybackSpeed Current playback speed multiplier. Defaults to `1f` (normal speed).
      */
     data class Data(
         val isPlaying: Boolean,
@@ -51,10 +52,11 @@ sealed interface AudioPlayerUiState {
         val hasPlaylist: Boolean,
         val currentAdapterType: Int,
         val thumbnailData: ThumbnailData?,
-        val nodeSourceType: NodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
-        val fileLinkUrl: String? = null,
-        val localFilePath: String? = null,
-        val chatId: Long? = null,
-        val msgId: Long? = null,
+        val nodeSourceType: NodeSourceType,
+        val fileLinkUrl: String?,
+        val localFilePath: String?,
+        val chatId: Long?,
+        val msgId: Long?,
+        val currentPlaybackSpeed: Float,
     ) : AudioPlayerUiState
 }

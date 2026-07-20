@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -33,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +51,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.MegaTextWithIndicator
 import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.image.MegaIconWithIndicator
@@ -56,12 +60,14 @@ import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
 import mega.privacy.android.app.presentation.videoplayer.view.DarkStatusBarEffect
 import mega.privacy.android.app.presentation.videoplayer.view.TransparentNavigationBarEffect
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.shared.nodes.components.NodeThumbnailView
 import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
+import mega.privacy.android.shared.resources.R as sharedR
 
 internal const val AUDIO_PLAYER_CONTENT_TAG = "audio_player:content"
 
@@ -74,21 +80,35 @@ internal const val AUDIO_PLAYER_CONTENT_TAG = "audio_player:content"
  * When [uiState] is [AudioPlayerUiState.Loading] the full layout is still shown, but the
  * play/pause button displays a throbber and transport controls are disabled.
  *
+ * The UI adapts based on [isPodcastMode]:
+ * - **Podcast mode**: shuffle, skip-prev/next, repeat.
+ * - **Music mode**: speed indicator, ±15 s seek, sleep timer.
+ *
+ * [isPodcastMode] is a separate state from [uiState] so that the correct mode can be shown
+ * even while the player is still in the [AudioPlayerUiState.Loading] phase.
+ *
  * @param uiState Current UI state.
+ * @param isPodcastMode Whether the podcast-mode control layout is active.
  * @param onPlayPauseClicked Called when the play/pause button is tapped.
  * @param onSeekTo Called with the target position in milliseconds when the user drags the slider.
  * @param onNextClicked Called when the skip-next button is tapped.
  * @param onPreviousClicked Called when the skip-previous button is tapped.
- * @param onShuffleClicked Called when the shuffle button is tapped.
- * @param onRepeatClicked Called when the repeat button is tapped.
+ * @param onShuffleClicked Called when the shuffle button is tapped (podcast mode only).
+ * @param onRepeatClicked Called when the repeat button is tapped (podcast mode only).
  * @param onPlaylistClicked Called when the playlist button is tapped.
  * @param onBackPressed Called when the back button in the top bar is tapped.
  * @param onMoreActionsClicked Called when the more actions button in the top bar is tapped.
+ * @param onToggleMode Called when the user taps the mode button to switch between podcast/music.
+ * @param onSeekForward15 Called when the user taps the +15 s button (music mode only).
+ * @param onSeekBackward15 Called when the user taps the −15 s button (music mode only).
+ * @param onSpeedClicked Called when the user taps the speed indicator (music mode only).
+ * @param onSleepTimerClicked Called when the user taps the sleep-timer button (music mode only).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AudioPlayerScreen(
     uiState: AudioPlayerUiState,
+    isPodcastMode: Boolean,
     onPlayPauseClicked: () -> Unit,
     onSeekTo: (Long) -> Unit,
     onNextClicked: () -> Unit,
@@ -98,6 +118,11 @@ fun AudioPlayerScreen(
     onPlaylistClicked: () -> Unit,
     onBackPressed: () -> Unit,
     onMoreActionsClicked: () -> Unit,
+    onToggleMode: () -> Unit,
+    onSeekForward15: () -> Unit,
+    onSeekBackward15: () -> Unit,
+    onSpeedClicked: () -> Unit,
+    onSleepTimerClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     TransparentNavigationBarEffect()
@@ -126,6 +151,8 @@ fun AudioPlayerScreen(
                     thumbnailData = null,
                     repeatMode = Player.REPEAT_MODE_OFF,
                     shuffleEnabled = false,
+                    isPodcastMode = isPodcastMode,
+                    currentPlaybackSpeed = 1f,
                     onPlayPauseClicked = onPlayPauseClicked,
                     onSeekTo = onSeekTo,
                     onNextClicked = onNextClicked,
@@ -134,6 +161,11 @@ fun AudioPlayerScreen(
                     onRepeatClicked = onRepeatClicked,
                     onPlaylistClicked = onPlaylistClicked,
                     contentPadding = innerPadding,
+                    onToggleMode = onToggleMode,
+                    onSeekForward15 = onSeekForward15,
+                    onSeekBackward15 = onSeekBackward15,
+                    onSpeedClicked = onSpeedClicked,
+                    onSleepTimerClicked = onSleepTimerClicked,
                 )
 
                 is AudioPlayerUiState.Data -> AudioPlayerContent(
@@ -147,6 +179,8 @@ fun AudioPlayerScreen(
                     thumbnailData = uiState.thumbnailData,
                     repeatMode = uiState.repeatMode,
                     shuffleEnabled = uiState.shuffleEnabled,
+                    isPodcastMode = isPodcastMode,
+                    currentPlaybackSpeed = uiState.currentPlaybackSpeed,
                     onPlayPauseClicked = onPlayPauseClicked,
                     onSeekTo = onSeekTo,
                     onNextClicked = onNextClicked,
@@ -155,6 +189,11 @@ fun AudioPlayerScreen(
                     onRepeatClicked = onRepeatClicked,
                     onPlaylistClicked = onPlaylistClicked,
                     contentPadding = innerPadding,
+                    onToggleMode = onToggleMode,
+                    onSeekForward15 = onSeekForward15,
+                    onSeekBackward15 = onSeekBackward15,
+                    onSpeedClicked = onSpeedClicked,
+                    onSleepTimerClicked = onSleepTimerClicked,
                 )
             }
         }
@@ -173,6 +212,8 @@ private fun AudioPlayerContent(
     thumbnailData: ThumbnailData?,
     repeatMode: Int,
     shuffleEnabled: Boolean,
+    isPodcastMode: Boolean,
+    currentPlaybackSpeed: Float,
     onPlayPauseClicked: () -> Unit,
     onSeekTo: (Long) -> Unit,
     onNextClicked: () -> Unit,
@@ -181,6 +222,11 @@ private fun AudioPlayerContent(
     onRepeatClicked: () -> Unit,
     onPlaylistClicked: () -> Unit,
     contentPadding: PaddingValues = PaddingValues(),
+    onToggleMode: () -> Unit,
+    onSeekForward15: () -> Unit,
+    onSeekBackward15: () -> Unit,
+    onSpeedClicked: () -> Unit,
+    onSleepTimerClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -226,23 +272,37 @@ private fun AudioPlayerContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        PlaybackControlsRow(
-            isPlaying = isPlaying,
-            isLoading = isLoading,
-            shuffleEnabled = shuffleEnabled,
-            repeatMode = repeatMode,
-            onShuffleClicked = onShuffleClicked,
-            onPreviousClicked = onPreviousClicked,
-            onPlayPauseClicked = onPlayPauseClicked,
-            onNextClicked = onNextClicked,
-            onRepeatClicked = onRepeatClicked,
-        )
+        if (isPodcastMode) {
+            PodcastPlaybackControlsRow(
+                isPlaying = isPlaying,
+                isLoading = isLoading,
+                shuffleEnabled = shuffleEnabled,
+                repeatMode = repeatMode,
+                onShuffleClicked = onShuffleClicked,
+                onPreviousClicked = onPreviousClicked,
+                onPlayPauseClicked = onPlayPauseClicked,
+                onNextClicked = onNextClicked,
+                onRepeatClicked = onRepeatClicked,
+            )
+        } else {
+            MusicPlaybackControlsRow(
+                isPlaying = isPlaying,
+                isLoading = isLoading,
+                currentPlaybackSpeed = currentPlaybackSpeed,
+                onSpeedClicked = onSpeedClicked,
+                onSeekBackward15 = onSeekBackward15,
+                onPlayPauseClicked = onPlayPauseClicked,
+                onSeekForward15 = onSeekForward15,
+                onSleepTimerClicked = onSleepTimerClicked,
+            )
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         PrimaryActionRow(
+            isPodcastMode = isPodcastMode,
             onAirplay = {},
-            onActionClicked = {},
+            onToggleMode = onToggleMode,
             onPlaylistClicked = onPlaylistClicked,
         )
     }
@@ -310,7 +370,7 @@ private fun MetadataSection(
     }
 }
 
-@OptIn(UnstableApi::class)
+@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 private fun SeekBarSection(
     currentPosition: Long,
@@ -378,7 +438,7 @@ private fun SeekBarSection(
 }
 
 @Composable
-private fun PlaybackControlsRow(
+private fun PodcastPlaybackControlsRow(
     isPlaying: Boolean,
     isLoading: Boolean,
     shuffleEnabled: Boolean,
@@ -465,9 +525,99 @@ private fun PlaybackControlsRow(
 }
 
 @Composable
+private fun MusicPlaybackControlsRow(
+    isPlaying: Boolean,
+    isLoading: Boolean,
+    currentPlaybackSpeed: Float,
+    onSpeedClicked: () -> Unit,
+    onSeekBackward15: () -> Unit,
+    onPlayPauseClicked: () -> Unit,
+    onSeekForward15: () -> Unit,
+    onSleepTimerClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val speedNotDefault = remember(currentPlaybackSpeed) { currentPlaybackSpeed != 1f }
+    val speedText = remember(currentPlaybackSpeed) {
+        if (currentPlaybackSpeed % 1f == 0f) "${currentPlaybackSpeed.toInt()}x"
+        else "${currentPlaybackSpeed}x"
+    }
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .minimumInteractiveComponentSize()
+                .clickable(onClick = onSpeedClicked),
+        ) {
+            MegaTextWithIndicator(
+                text = speedText,
+                style = MaterialTheme.typography.titleMedium,
+                textColor = if (speedNotDefault) TextColor.Brand else TextColor.Primary,
+                showIndicator = speedNotDefault,
+            )
+        }
+
+        IconButton(
+            onClick = onSeekBackward15,
+            enabled = !isLoading,
+        ) {
+            MegaIcon(
+                imageVector = IconPack.Medium.Regular.Outline.FifteenBackward,
+                tint = IconColor.Primary,
+                contentDescription = "Seek backward 15 seconds",
+                modifier = Modifier.size(32.dp),
+            )
+        }
+
+        IconButton(
+            onClick = onPlayPauseClicked,
+            enabled = !isLoading,
+            modifier = Modifier.size(64.dp),
+        ) {
+            if (isLoading) {
+                MediaPlayerLoadingIndicator(modifier = Modifier.size(64.dp))
+            } else {
+                MegaIcon(
+                    imageVector =
+                        if (isPlaying) IconPack.Medium.Regular.Solid.Pause
+                        else IconPack.Medium.Regular.Solid.Play,
+                    tint = IconColor.Primary,
+                    contentDescription = if (isPlaying) "Pause" else "Play",
+                    modifier = Modifier.size(64.dp),
+                )
+            }
+        }
+
+        IconButton(
+            onClick = onSeekForward15,
+            enabled = !isLoading,
+        ) {
+            MegaIcon(
+                imageVector = IconPack.Medium.Regular.Outline.FifteenForward,
+                tint = IconColor.Primary,
+                contentDescription = "Seek forward 15 seconds",
+                modifier = Modifier.size(32.dp),
+            )
+        }
+
+        IconButton(onClick = onSleepTimerClicked) {
+            MegaIcon(
+                imageVector = IconPack.Medium.Thin.Outline.ClockStopwatchShort,
+                tint = IconColor.Primary,
+                contentDescription = "Sleep timer",
+            )
+        }
+    }
+}
+
+@Composable
 private fun PrimaryActionRow(
+    isPodcastMode: Boolean,
     onAirplay: () -> Unit,
-    onActionClicked: () -> Unit,
+    onToggleMode: () -> Unit,
     onPlaylistClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -487,8 +637,11 @@ private fun PrimaryActionRow(
         }
 
         SecondaryFilledButton(
-            text = "Podcast mode",
-            onClick = onActionClicked,
+            text = stringResource(
+                if (isPodcastMode) sharedR.string.audio_player_podcast_mode_label
+                else sharedR.string.audio_player_music_mode_label
+            ),
+            onClick = onToggleMode,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 8.dp),
@@ -525,6 +678,7 @@ private fun formatMs(ms: Long): String {
 private fun PreviewAudioPlayerScreenLoading() {
     AudioPlayerScreen(
         uiState = AudioPlayerUiState.Loading,
+        isPodcastMode = true,
         onPlayPauseClicked = {},
         onSeekTo = {},
         onNextClicked = {},
@@ -534,12 +688,61 @@ private fun PreviewAudioPlayerScreenLoading() {
         onPlaylistClicked = {},
         onBackPressed = {},
         onMoreActionsClicked = {},
+        onToggleMode = {},
+        onSeekForward15 = {},
+        onSeekBackward15 = {},
+        onSpeedClicked = {},
+        onSleepTimerClicked = {},
     )
 }
 
 @Preview
 @Composable
-private fun PreviewAudioPlayerScreenPlaying() {
+private fun PreviewAudioPlayerScreenPodcastMode() {
+    AudioPlayerScreen(
+        uiState = AudioPlayerUiState.Data(
+            isPlaying = true,
+            title = "Hardcore History: Supernova in the East",
+            artist = "Dan Carlin",
+            artworkUri = null,
+            currentPosition = 97_000L,
+            duration = 21_600_000L,
+            shuffleEnabled = false,
+            hasPlaylist = true,
+            repeatMode = Player.REPEAT_MODE_OFF,
+            isLoading = false,
+            currentPlayingHandle = null,
+            currentPlayingItemName = null,
+            currentAdapterType = -1,
+            thumbnailData = null,
+            nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
+            fileLinkUrl = null,
+            localFilePath = null,
+            chatId = null,
+            msgId = null,
+            currentPlaybackSpeed = 1f,
+        ),
+        isPodcastMode = true,
+        onPlayPauseClicked = {},
+        onSeekTo = {},
+        onNextClicked = {},
+        onPreviousClicked = {},
+        onShuffleClicked = {},
+        onRepeatClicked = {},
+        onPlaylistClicked = {},
+        onBackPressed = {},
+        onMoreActionsClicked = {},
+        onToggleMode = {},
+        onSeekForward15 = {},
+        onSeekBackward15 = {},
+        onSpeedClicked = {},
+        onSleepTimerClicked = {},
+    )
+}
+
+@Preview
+@Composable
+private fun PreviewAudioPlayerScreenMusicMode() {
     AudioPlayerScreen(
         uiState = AudioPlayerUiState.Data(
             isPlaying = true,
@@ -556,7 +759,14 @@ private fun PreviewAudioPlayerScreenPlaying() {
             currentPlayingItemName = null,
             currentAdapterType = -1,
             thumbnailData = null,
+            nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
+            fileLinkUrl = null,
+            localFilePath = null,
+            chatId = null,
+            msgId = null,
+            currentPlaybackSpeed = 1f,
         ),
+        isPodcastMode = false,
         onPlayPauseClicked = {},
         onSeekTo = {},
         onNextClicked = {},
@@ -566,6 +776,11 @@ private fun PreviewAudioPlayerScreenPlaying() {
         onPlaylistClicked = {},
         onBackPressed = {},
         onMoreActionsClicked = {},
+        onToggleMode = {},
+        onSeekForward15 = {},
+        onSeekBackward15 = {},
+        onSpeedClicked = {},
+        onSleepTimerClicked = {},
     )
 }
 
@@ -588,7 +803,14 @@ private fun PreviewAudioPlayerScreenPaused() {
             hasPlaylist = false,
             currentAdapterType = -1,
             thumbnailData = null,
+            nodeSourceType = NodeSourceType.MEDIA_PLAYER_DEFAULT,
+            fileLinkUrl = null,
+            localFilePath = null,
+            chatId = null,
+            msgId = null,
+            currentPlaybackSpeed = 1f,
         ),
+        isPodcastMode = true,
         onPlayPauseClicked = {},
         onSeekTo = {},
         onNextClicked = {},
@@ -598,5 +820,10 @@ private fun PreviewAudioPlayerScreenPaused() {
         onPlaylistClicked = {},
         onBackPressed = {},
         onMoreActionsClicked = {},
+        onToggleMode = {},
+        onSeekForward15 = {},
+        onSeekBackward15 = {},
+        onSpeedClicked = {},
+        onSleepTimerClicked = {},
     )
 }

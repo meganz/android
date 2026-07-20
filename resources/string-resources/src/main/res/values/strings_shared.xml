@@ -3301,6 +3301,10 @@
     <string name="contacts_qr_scanner_not_ready_dialog_title">QR scanner not ready</string>
     <!-- Body of the dialog shown when the QR scanner is still downloading, prompting the user to retry shortly -->
     <string name="contacts_qr_scanner_not_ready_dialog_body">The QR scanner is still downloading. Try again in a few seconds.</string>
+    <!-- Audio player: label for the mode-toggle button when the player is in podcast mode -->
+    <string name="audio_player_podcast_mode_label">Podcast mode</string>
+    <!-- Audio player: label for the mode-toggle button when the player is in music mode -->
+    <string name="audio_player_music_mode_label">Music mode</string>
     <!-- Share link revamp: title of the row that toggles sharing the link without its decryption key -->
     <string name="share_link_separate_key_title">Separate link and key</string>
     <!-- Share link revamp: subtitle explaining the "Separate link and key" row -->
