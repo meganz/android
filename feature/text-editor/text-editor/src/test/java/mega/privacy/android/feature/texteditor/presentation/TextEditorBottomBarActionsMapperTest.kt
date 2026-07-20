@@ -165,6 +165,40 @@ internal class TextEditorBottomBarActionsMapperTest {
     }
 
     @Test
+    fun `test that Edit is hidden when node is in backups`() {
+        val result = underTest(
+            mode = TextEditorMode.View,
+            accessPermission = AccessPermission.OWNER,
+            isNodeExported = false,
+            inExcludedAdapterForGetLinkAndEdit = false,
+            showDownload = true,
+            showShare = true,
+            showSendToChat = false,
+            isNodeInBackups = true,
+        )
+        assertThat(result).doesNotContain(TextEditorBottomBarAction.Edit)
+        assertThat(result).contains(TextEditorBottomBarAction.Download)
+        assertThat(result).contains(TextEditorBottomBarAction.GetLink)
+    }
+
+    @Test
+    fun `test that Edit is hidden when node is in backups even with FULL or READWRITE access`() {
+        listOf(AccessPermission.FULL, AccessPermission.READWRITE).forEach { access ->
+            val result = underTest(
+                mode = TextEditorMode.View,
+                accessPermission = access,
+                isNodeExported = false,
+                inExcludedAdapterForGetLinkAndEdit = false,
+                showDownload = true,
+                showShare = true,
+                showSendToChat = false,
+                isNodeInBackups = true,
+            )
+            assertThat(result).doesNotContain(TextEditorBottomBarAction.Edit)
+        }
+    }
+
+    @Test
     fun `test that Edit is shown for FULL and READWRITE access`() {
         listOf(AccessPermission.FULL, AccessPermission.READWRITE).forEach { access ->
             val result = underTest(

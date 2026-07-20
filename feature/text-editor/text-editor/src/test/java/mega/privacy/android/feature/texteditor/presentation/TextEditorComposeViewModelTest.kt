@@ -50,6 +50,7 @@ import mega.privacy.android.domain.usecase.filelink.GetPublicNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetPublicChildNodeFromIdUseCase
 import mega.privacy.android.domain.entity.node.publiclink.PublicLinkFile
 import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.publiclink.MapTypedNodeToPublicLinkUseCase
 import mega.privacy.android.domain.usecase.node.chat.GetChatFileUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -94,6 +95,7 @@ internal class TextEditorComposeViewModelTest {
     private val saveTextContentForTextEditorUseCase: SaveTextContentForTextEditorUseCase = mock()
     private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val getNodeAccessUseCase: GetNodeAccessUseCase = mock()
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase = mock()
     private val attachMultipleNodesUseCase: AttachMultipleNodesUseCase = mock()
     private val get1On1ChatIdUseCase: Get1On1ChatIdUseCase = mock()
     private val exportNodeUseCase: ExportNodeUseCase = mock()
@@ -143,6 +145,7 @@ internal class TextEditorComposeViewModelTest {
             saveTextContentForTextEditorUseCase,
             getNodeByIdUseCase,
             getNodeAccessUseCase,
+            isNodeInBackupsUseCase,
             attachMultipleNodesUseCase,
             get1On1ChatIdUseCase,
             exportNodeUseCase,
@@ -166,6 +169,7 @@ internal class TextEditorComposeViewModelTest {
         runBlocking {
             whenever(getNodeByIdUseCase(any())).thenReturn(null)
             whenever(getNodeAccessUseCase(any())).thenReturn(null)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(false)
             whenever(getFeatureFlagValueUseCase(any())).thenReturn(true)
             whenever(getNodeVersionsByHandleUseCase(any())).thenReturn(emptyList())
         }
@@ -218,6 +222,7 @@ internal class TextEditorComposeViewModelTest {
             setShowLineNumbersPreferenceUseCase = setShowLineNumbersPreferenceUseCase,
             getNodeByIdUseCase = getNodeByIdUseCase,
             getNodeAccessUseCase = getNodeAccessUseCase,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             textEditorBottomBarActionsMapper = textEditorBottomBarActionsMapper,
             attachMultipleNodesUseCase = attachMultipleNodesUseCase,
             get1On1ChatIdUseCase = get1On1ChatIdUseCase,
@@ -919,6 +924,23 @@ internal class TextEditorComposeViewModelTest {
         advanceUntilIdle()
         assertThat(underTest.uiState.value.bottomBarActions)
             .containsExactly(TextEditorBottomBarAction.Download, TextEditorBottomBarAction.Edit)
+    }
+
+    @Test
+    fun `test that View mode hides Edit action when node is in backups`() = runTest {
+        val node = mock<TypedNode>()
+        whenever(node.exportedData).thenReturn(mock())
+        runBlocking {
+            whenever(getNodeByIdUseCase(any())).thenReturn(node)
+            whenever(getNodeAccessUseCase(any())).thenReturn(AccessPermission.OWNER)
+            whenever(isNodeInBackupsUseCase(any())).thenReturn(true)
+        }
+        doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
+            .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
+        initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View, showShare = false)
+        advanceUntilIdle()
+        assertThat(underTest.uiState.value.bottomBarActions)
+            .doesNotContain(TextEditorBottomBarAction.Edit)
     }
 
     @Test

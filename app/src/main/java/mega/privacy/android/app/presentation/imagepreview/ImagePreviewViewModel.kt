@@ -75,6 +75,7 @@ import mega.privacy.android.domain.usecase.node.CheckChatNodesNameCollisionAndCo
 import mega.privacy.android.domain.usecase.node.CheckNodesNameCollisionWithActionUseCase
 import mega.privacy.android.domain.usecase.node.DeleteNodesUseCase
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeInBackupsUseCase
 import mega.privacy.android.domain.usecase.node.MoveNodesToRubbishUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import mega.privacy.android.domain.usecase.offline.MonitorOfflineNodeUpdatesUseCase
@@ -123,6 +124,7 @@ class ImagePreviewViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getNodeNameCollisionRenameNameUseCase: GetNodeNameCollisionRenameNameUseCase,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getNodeByHandle: GetNodeByHandle,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val isEditableImageUseCase: IsEditableImageUseCase,
@@ -363,6 +365,12 @@ class ImagePreviewViewModel @Inject constructor(
         return menu?.isUnhideMenuVisible(imageNode) ?: false
     }
 
+    suspend fun isNodeInBackups(imageNode: ImageNode): Boolean {
+        return runCatching { isNodeInBackupsUseCase(imageNode.id.longValue) }
+            .onFailure { Timber.e(it, "Failed to check if node is in backups") }
+            .getOrDefault(false)
+    }
+
     // When ImageNode from ShareItems, then we always hide the hidden menus (Hide/Unhide) in Bottom Sheet
     fun forceHideHiddenMenus(): Boolean {
         return imagePreviewMenuSource == ImagePreviewMenuSource.SHARED_ITEMS
@@ -431,7 +439,9 @@ class ImagePreviewViewModel @Inject constructor(
         }.getOrDefault(false) && runCatching {
             getFeatureFlagValueUseCase(ApiFeatures.VideoEditor)
         }.getOrDefault(false)
-        return isValidSource && hasWritePermission && (isSupportedImage || isSupportedVideo)
+        val isNotInBackups = !isNodeInBackups(imageNode)
+        return isValidSource && hasWritePermission && isNotInBackups &&
+                (isSupportedImage || isSupportedVideo)
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
