@@ -16,7 +16,7 @@ import mega.privacy.android.app.mediaplayer.model.AudioPlayerUiState
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
-import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.nodecomponents.sheet.options.DarkNodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
@@ -98,9 +98,9 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
     }
 }
 
-private fun AudioPlayerUiState.Data.buildNodeOptionsNavKey(): NodeOptionsBottomSheetNavKey? {
+private fun AudioPlayerUiState.Data.buildNodeOptionsNavKey(): DarkNodeOptionsBottomSheetNavKey? {
     val handle = currentPlayingHandle ?: return null
-    return NodeOptionsBottomSheetNavKey(
+    return DarkNodeOptionsBottomSheetNavKey(
         nodeHandle = handle,
         nodeSourceType = nodeSourceType,
         publicLinkUrl = fileLinkUrl,

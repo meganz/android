@@ -11,6 +11,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.scene.OverlayScene
 import mega.android.core.ui.components.sheets.MegaModalBottomSheet
 import mega.android.core.ui.components.sheets.MegaModalBottomSheetBackground
+import mega.android.core.ui.theme.AndroidTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 class BottomSheetScene<T : Any>(
@@ -25,6 +26,8 @@ class BottomSheetScene<T : Any>(
 
     override val entries = listOf(sheetEntry)
 
+    private val forceDarkTheme = sheetEntry.forceDarkTheme()
+
     @OptIn(ExperimentalMaterial3Api::class)
     override val content = @Composable {
         val sheetState =
@@ -34,16 +37,23 @@ class BottomSheetScene<T : Any>(
             onBack()
         }
 
-        MegaModalBottomSheet(
-            sheetState = sheetState,
-            onDismissRequest = {
-                onBack()
-            },
-            modifier = Modifier.statusBarsPadding(),
-            bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
-            properties = bottomSheetProperties,
-        ) {
-            sheetEntry.Content()
+        val sheet: @Composable () -> Unit = {
+            MegaModalBottomSheet(
+                sheetState = sheetState,
+                onDismissRequest = {
+                    onBack()
+                },
+                modifier = Modifier.statusBarsPadding(),
+                bottomSheetBackground = MegaModalBottomSheetBackground.Surface1,
+                properties = bottomSheetProperties,
+            ) {
+                sheetEntry.Content()
+            }
+        }
+        if (forceDarkTheme) {
+            AndroidTheme(isDark = true, content = sheet)
+        } else {
+            sheet()
         }
     }
 

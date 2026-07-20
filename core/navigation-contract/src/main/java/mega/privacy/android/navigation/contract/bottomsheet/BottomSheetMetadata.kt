@@ -8,6 +8,7 @@ object BottomSheetMetadata {
     const val SKIP_PARTIALLY_EXPANDED = "skip_partially_expanded"
     const val DISMISS_ON_BACK = "dismiss_on_back"
     const val DISMISS_ON_OUTSIDE_CLICK = "dismiss_on_outside_click"
+    const val FORCE_DARK_THEME = "force_dark_theme"
 }
 
 /**
@@ -27,11 +28,13 @@ fun NavEntryMetadataScope.withBottomSheet(
     skipPartiallyExpanded: Boolean = true,
     dismissOnBack: Boolean = true,
     dismissOnOutsideClick: Boolean = true,
+    forceDarkTheme: Boolean = false,
 ) {
     set(BottomSheetMetadata.KEY, true)
     set(BottomSheetMetadata.SKIP_PARTIALLY_EXPANDED, skipPartiallyExpanded)
     set(BottomSheetMetadata.DISMISS_ON_BACK, dismissOnBack)
     set(BottomSheetMetadata.DISMISS_ON_OUTSIDE_CLICK, dismissOnOutsideClick)
+    set(BottomSheetMetadata.FORCE_DARK_THEME, forceDarkTheme)
 }
 
 /**
@@ -46,11 +49,13 @@ fun bottomSheetMetadata(
     skipPartiallyExpanded: Boolean = true,
     dismissOnBack: Boolean = true,
     dismissOnOutsideClick: Boolean = true,
+    forceDarkTheme: Boolean = false,
 ) = mapOf(
     BottomSheetMetadata.KEY to true,
     BottomSheetMetadata.SKIP_PARTIALLY_EXPANDED to skipPartiallyExpanded,
     BottomSheetMetadata.DISMISS_ON_BACK to dismissOnBack,
     BottomSheetMetadata.DISMISS_ON_OUTSIDE_CLICK to dismissOnOutsideClick,
+    BottomSheetMetadata.FORCE_DARK_THEME to forceDarkTheme,
 )
 
 internal fun NavEntry<*>.isBottomSheet() = this.metadata[BottomSheetMetadata.KEY] == true
@@ -62,3 +67,6 @@ internal fun NavEntry<*>.dismissOnBack() =
 
 internal fun NavEntry<*>.dismissOnOutsideClick() =
     (this.metadata[BottomSheetMetadata.DISMISS_ON_OUTSIDE_CLICK] ?: false) == true
+
+internal fun NavEntry<*>.forceDarkTheme() =
+    (this.metadata[BottomSheetMetadata.FORCE_DARK_THEME] ?: false) == true
