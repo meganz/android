@@ -28,6 +28,9 @@ class TopLevelBackStackNavigationHandler(
     }
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
+        if (navOptions?.dropIfAlreadyShown == true && isAlreadyShown(destinations)) {
+            return
+        }
         applyNavOptions(navOptions, destinations)
         if (backStack.backStack.takeLast(destinations.size).containsAll(destinations)) {
             return
@@ -58,6 +61,11 @@ class TopLevelBackStackNavigationHandler(
 
         // Navigate back after setting the result
         backStack.removeLast()
+    }
+
+    private fun isAlreadyShown(destinations: List<NavKey>): Boolean {
+        val backStackClasses = backStack.backStack.map { it::class }
+        return destinations.all { it::class in backStackClasses }
     }
 
     private fun applyNavOptions(navOptions: NavOptions?, destinations: List<NavKey>) {
