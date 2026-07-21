@@ -14,6 +14,7 @@ interface NavigationHandler : NavigationResultsHandler {
 
     /**
      * Remove a specific destination from the back stack.
+     * @param navKey The destination to remove
      */
     fun remove(navKey: NavKey)
 
@@ -51,8 +52,9 @@ interface NavigationHandler : NavigationResultsHandler {
      * Clear the entire back stack and navigate to a destination.
      *
      * @param destination The destination to navigate to
+     * @param navOptions Optional navigation options for customizing navigation behavior
      */
-    fun navigateAndClearBackStack(destination: NavKey)
+    fun navigateAndClearBackStack(destination: NavKey, navOptions: NavOptions? = null)
 
     /**
      * Navigate to a destination and clear the back stack up to a new parent destination.
@@ -60,9 +62,15 @@ interface NavigationHandler : NavigationResultsHandler {
      * @param destination The destination to navigate to
      * @param newParent The new parent destination to set in the back stack
      * @param inclusive Whether to include the new parent in the pop operation
+     * @param navOptions Optional navigation options for customizing navigation behavior
      */
-    fun navigateAndClearTo(destination: NavKey, newParent: NavKey, inclusive: Boolean = false) =
-        navigateAndClearTo(listOf(destination), newParent, inclusive)
+    fun navigateAndClearTo(
+        destination: NavKey,
+        newParent: NavKey,
+        inclusive: Boolean = false,
+        navOptions: NavOptions? = null,
+    ) =
+        navigateAndClearTo(listOf(destination), newParent, inclusive, navOptions)
 
     /**
      * Navigate to a destination and clear the back stack up to a new parent destination.
@@ -70,6 +78,12 @@ interface NavigationHandler : NavigationResultsHandler {
      * @param destination The destinations to navigate to
      * @param newParent The new parent destination to set in the back stack
      * @param inclusive Whether to include the new parent in the pop operation
+     * @param navOptions Optional navigation options for customizing navigation behavior
      */
-    fun navigateAndClearTo(destination: List<NavKey>, newParent: NavKey, inclusive: Boolean = false)
+    fun navigateAndClearTo(
+        destination: List<NavKey>,
+        newParent: NavKey,
+        inclusive: Boolean = false,
+        navOptions: NavOptions? = null,
+    )
 }

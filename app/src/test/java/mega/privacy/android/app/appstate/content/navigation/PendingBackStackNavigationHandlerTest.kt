@@ -832,6 +832,74 @@ class PendingBackStackNavigationHandlerTest {
     }
 
     @Test
+    fun `test that navigateAndClearBackStack with navOptions clears backStack and adds destination`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearBackStack(Destination3, options)
+
+        assertThat(backStack).containsExactly(Destination3)
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with navOptions popUpTo pops back stack beyond the new parent`() {
+        backStack.addAll(listOf(Destination1, Destination2, Destination3))
+
+        val options = navOptions {
+            popUpTo<Destination1> {
+                inclusive = true
+            }
+        }
+        underTest.navigateAndClearTo(
+            Destination3,
+            newParent = Destination2,
+            inclusive = true,
+            navOptions = options,
+        )
+
+        assertThat(backStack).containsExactly(DefaultLandingScreen, Destination3)
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with launchSingleTop replaces remaining top destination of same type`() {
+        data class TestKey(val value: String) : NavKey
+
+        backStack.addAll(listOf(Destination1, TestKey("A")))
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearTo(
+            TestKey("B"),
+            newParent = TestKey("A"),
+            inclusive = false,
+            navOptions = options,
+        )
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, TestKey("B")
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with null navOptions only clears back to the new parent`() {
+        backStack.addAll(listOf(Destination1, Destination2))
+
+        underTest.navigateAndClearTo(
+            Destination3,
+            newParent = Destination1,
+            inclusive = false,
+            navOptions = null,
+        )
+
+        assertThat(backStack).containsExactly(
+            DefaultLandingScreen, Destination1, Destination3
+        ).inOrder()
+    }
+
+    @Test
     fun `test that navigate removes existing dialog before re-adding it`() {
         underTest.displayDialog(DialogDestination1)
         underTest.navigate(Destination1)

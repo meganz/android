@@ -1040,11 +1040,17 @@ private fun PhotosMainScreenPreview() {
                 override fun navigate(destination: NavKey, navOptions: NavOptions?) {}
                 override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {}
                 override fun backTo(destination: NavKey, inclusive: Boolean) {}
-                override fun navigateAndClearBackStack(destination: NavKey) {}
+                override fun navigateAndClearBackStack(
+                    destination: NavKey,
+                    navOptions: NavOptions?,
+                ) {
+                }
+
                 override fun navigateAndClearTo(
                     destination: NavKey,
                     newParent: NavKey,
                     inclusive: Boolean,
+                    navOptions: NavOptions?,
                 ) {
                 }
 
@@ -1052,6 +1058,7 @@ private fun PhotosMainScreenPreview() {
                     destination: List<NavKey>,
                     newParent: NavKey,
                     inclusive: Boolean,
+                    navOptions: NavOptions?,
                 ) {
                 }
 

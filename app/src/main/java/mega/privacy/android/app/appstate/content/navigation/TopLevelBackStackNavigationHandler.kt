@@ -46,12 +46,14 @@ class TopLevelBackStackNavigationHandler(
         removeFromBackStackTo(destination, inclusive)
     }
 
-    override fun navigateAndClearBackStack(destination: NavKey) {
+    override fun navigateAndClearBackStack(destination: NavKey, navOptions: NavOptions?) {
+        applyNavOptions(navOptions, listOf(destination))
         backStack.replaceStack(destination)
     }
 
-    override fun navigateAndClearTo(destination: List<NavKey>, newParent: NavKey, inclusive: Boolean) {
+    override fun navigateAndClearTo(destination: List<NavKey>, newParent: NavKey, inclusive: Boolean, navOptions: NavOptions?) {
         removeFromBackStackTo(newParent, inclusive)
+        applyNavOptions(navOptions, destination)
         backStack.addAll(destination)
     }
 

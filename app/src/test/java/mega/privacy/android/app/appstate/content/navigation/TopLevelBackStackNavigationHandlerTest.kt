@@ -33,6 +33,9 @@ class TopLevelBackStackNavigationHandlerTest {
     @Serializable
     private data class ParameterizedDialogDestination(val value: String) : DialogNavKey
 
+    @Serializable
+    private data class ParameterizedDestination(val value: String) : NavKey
+
     @BeforeEach
     fun setUp() {
         backStack = TopLevelBackStack(StartKey)
@@ -147,5 +150,77 @@ class TopLevelBackStackNavigationHandlerTest {
         underTest.navigate(Destination1)
 
         assertThat(backStack.backStack).containsExactly(StartKey, Destination1).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearBackStack with navOptions replaces the stack with the destination`() {
+        underTest.navigate(Destination1)
+        underTest.navigate(Destination2)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearBackStack(Destination3, options)
+
+        assertThat(backStack.backStack).containsExactly(StartKey, Destination3).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearTo clears back to the new parent and adds the destination`() {
+        underTest.navigate(Destination1)
+        underTest.navigate(Destination2)
+
+        underTest.navigateAndClearTo(Destination3, newParent = Destination1, inclusive = false)
+
+        assertThat(backStack.backStack).containsExactly(
+            StartKey,
+            Destination1,
+            Destination3,
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with launchSingleTop replaces remaining top destination of same type`() {
+        underTest.navigate(ParameterizedDestination("A"))
+        underTest.navigate(Destination1)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearTo(
+            ParameterizedDestination("B"),
+            newParent = ParameterizedDestination("A"),
+            inclusive = false,
+            navOptions = options,
+        )
+
+        assertThat(backStack.backStack).containsExactly(
+            StartKey,
+            ParameterizedDestination("B"),
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with popUpTo pops back stack beyond the new parent`() {
+        underTest.navigate(Destination1)
+        underTest.navigate(Destination2)
+        underTest.navigate(Destination3)
+
+        val options = navOptions {
+            popUpTo<Destination1> {
+                inclusive = true
+            }
+        }
+        underTest.navigateAndClearTo(
+            ParameterizedDestination("new"),
+            newParent = Destination3,
+            inclusive = true,
+            navOptions = options,
+        )
+
+        assertThat(backStack.backStack).containsExactly(
+            StartKey,
+            ParameterizedDestination("new"),
+        ).inOrder()
     }
 }

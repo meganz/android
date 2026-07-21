@@ -134,18 +134,19 @@ class PendingBackStackNavigationHandler(
         ensureNotEmpty()
     }
 
-    override fun navigateAndClearBackStack(destination: NavKey) {
+    override fun navigateAndClearBackStack(destination: NavKey, navOptions: NavOptions?) {
         backstack.clear()
-        navigate(destination)
+        navigate(destination, navOptions)
     }
 
     override fun navigateAndClearTo(
         destination: List<NavKey>,
         newParent: NavKey,
         inclusive: Boolean,
+        navOptions: NavOptions?,
     ) {
         removeFromBackStackTo(newParent, inclusive)
-        navigate(destination)
+        navigate(destination, navOptions)
     }
 
     override fun <T> returnResult(key: String, value: T) {

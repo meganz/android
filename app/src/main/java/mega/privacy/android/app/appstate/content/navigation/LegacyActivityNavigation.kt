@@ -97,8 +97,9 @@ class LegacyActivityNavigationHandler(
         }
     }
 
-    override fun navigateAndClearBackStack(destination: NavKey) {
+    override fun navigateAndClearBackStack(destination: NavKey, navOptions: NavOptions?) {
         backStack.clear()
+        applyNavOptions(navOptions, listOf(destination))
         backStack.add(destination)
     }
 
@@ -106,8 +107,10 @@ class LegacyActivityNavigationHandler(
         destination: List<NavKey>,
         newParent: NavKey,
         inclusive: Boolean,
+        navOptions: NavOptions?
     ) {
         backTo(newParent, inclusive)
+        applyNavOptions(navOptions, destination)
         backStack.addAll(destination)
     }
 
