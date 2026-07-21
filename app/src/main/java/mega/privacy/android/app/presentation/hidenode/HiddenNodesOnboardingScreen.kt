@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -28,7 +27,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -55,13 +53,11 @@ import mega.privacy.mobile.analytics.event.HideNodeUpgradeScreenEvent
 
 @Composable
 internal fun HiddenNodesOnboardingScreen(
-    viewModel: HiddenNodesOnboardingViewModel,
+    state: HiddenNodesOnboardingState,
     isOnboarding: Boolean,
     onClickBack: () -> Unit,
     onClickContinue: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     LaunchedEffect(Unit) {
         Analytics.tracker.trackEvent(
             if (isOnboarding) HideNodeOnboardingScreenEvent else HideNodeUpgradeScreenEvent
@@ -112,12 +108,12 @@ private fun HiddenNodesOnboardingAppBar(
 
 @Composable
 private fun HiddenNodesOnboardingBottomBar(
-    modifier: Modifier = Modifier,
     accountType: AccountType?,
     isBusinessAccountExpired: Boolean,
     isOnboarding: Boolean,
     onClickBack: () -> Unit,
     onClickContinue: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier

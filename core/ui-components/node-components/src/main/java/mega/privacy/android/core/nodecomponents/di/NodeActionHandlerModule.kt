@@ -17,6 +17,7 @@ import mega.privacy.android.core.nodecomponents.action.clickhandler.EditActionCl
 import mega.privacy.android.core.nodecomponents.action.clickhandler.FavouriteActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.GetLinkActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.HideActionClickHandler
+import mega.privacy.android.core.nodecomponents.action.clickhandler.HideOnboardingInfoActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.InfoActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.LabelActionClickHandler
 import mega.privacy.android.core.nodecomponents.action.clickhandler.LeaveShareActionClickHandler
@@ -72,6 +73,7 @@ object NodeActionHandlerModule {
         availableOfflineAction: AvailableOfflineActionClickHandler,
         removeOfflineAction: RemoveOfflineActionClickHandler,
         hideAction: HideActionClickHandler,
+        hideOnboardingInfoAction: HideOnboardingInfoActionClickHandler,
         renameNodeAction: RenameNodeActionClickHandler,
         moveToRubbishBinAction: MoveToRubbishBinActionClickHandler,
         manageLinkAction: ManageLinkActionClickHandler,
@@ -110,6 +112,7 @@ object NodeActionHandlerModule {
             availableOfflineAction,
             removeOfflineAction,
             hideAction,
+            hideOnboardingInfoAction,
             renameNodeAction,
             moveToRubbishBinAction,
             manageLinkAction,
