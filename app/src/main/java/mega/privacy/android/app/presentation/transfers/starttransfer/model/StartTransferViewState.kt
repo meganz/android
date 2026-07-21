@@ -18,6 +18,7 @@ import java.io.File
  * @property askDestinationForDownload user needs to choose a destination for this [TransferTriggerEvent.DownloadTriggerEvent]. Depending on Android version and user settings, download destination should be asked for each new download.
  * @property triggerEventWithoutPermission user needs to answer requested permission after triggering this event
  * @property isStorageOverQuota True if the user is in storage over quota state.
+ * @property isQuotaWarningUpsellEnabled True when the quota-warning upsell screen should be shown instead of the not-enough-space dialog.
  * @property previewFileToOpen
  * @property isOpenWithAction True if the user is opening a file with another app.
  * @property transferTagToCancel A transfer tag if there is a user's request to cancel it, null otherwise.
@@ -32,6 +33,7 @@ data class StartTransferViewState(
     val askDestinationForDownload: TransferTriggerEvent.DownloadTriggerEvent? = null,
     val triggerEventWithoutPermission: TransferTriggerEvent? = null,
     val isStorageOverQuota: Boolean = false,
+    val isQuotaWarningUpsellEnabled: Boolean = false,
     val previewFileToOpen: File? = null,
     val isOpenWithAction: Boolean = false,
     val transferTagToCancel: Int? = null,

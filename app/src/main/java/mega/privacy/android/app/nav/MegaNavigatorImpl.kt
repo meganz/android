@@ -118,10 +118,13 @@ import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.ManageChatHistoryNavKey
 import mega.privacy.android.navigation.destination.MyAccountNavKey
 import mega.privacy.android.navigation.destination.OfflineInfoNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.destination.SettingsCameraUploadsNavKey
 import mega.privacy.android.navigation.destination.SyncListNavKey
 import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import mega.privacy.android.navigation.settings.SettingsNavigator
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
@@ -259,6 +262,20 @@ internal class MegaNavigatorImpl @Inject constructor(
                 context = context, source = source
             )
         }
+    }
+
+    override fun openQuotaWarningUpsell(
+        context: Context,
+        type: QuotaWarningType,
+        trigger: QuotaWarningTrigger,
+    ) {
+        navigateForSingleActivity(
+            context = context,
+            singleActivityDestination = QuotaWarningUpgradeNavKey(
+                type = type,
+                trigger = trigger,
+            ),
+        )
     }
 
     override fun navigateToCancelAccountPlan(context: Context, usedStorage: String) {
