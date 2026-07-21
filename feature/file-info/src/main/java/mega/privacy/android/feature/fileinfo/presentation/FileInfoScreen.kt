@@ -96,7 +96,7 @@ internal fun FileInfoScreen(
             MegaTopAppBar(
                 modifier = Modifier.testTag(FILE_INFO_APP_BAR_TAG),
                 title = stringResource(sharedR.string.general_info),
-                navigationType = AppBarNavigationType.Close(onBack),
+                navigationType = AppBarNavigationType.Back(onBack),
             )
         },
     ) { contentPadding ->
