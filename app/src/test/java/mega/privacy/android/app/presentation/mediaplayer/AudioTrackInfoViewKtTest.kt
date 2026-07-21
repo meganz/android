@@ -101,6 +101,7 @@ internal class AudioTrackInfoViewKtTest {
         onLocationClicked: () -> Unit = {},
         addedValue: String? = null,
         lastModifiedValue: String? = null,
+        showLocation: Boolean = true,
     ) {
         composeTestRule.setContent {
             AudioNodeInfoView(
@@ -110,7 +111,8 @@ internal class AudioTrackInfoViewKtTest {
                 locationValue = locationValue,
                 onLocationClicked = onLocationClicked,
                 addedValue = addedValue,
-                lastModifiedValue = lastModifiedValue
+                lastModifiedValue = lastModifiedValue,
+                showLocation = showLocation,
             )
         }
     }
@@ -181,5 +183,17 @@ internal class AudioTrackInfoViewKtTest {
             .assertTextEquals(testValue)
         composeTestRule.onNodeWithTag(AUDIO_LAST_MODIFIED_TEST_TAG).assertIsDisplayed()
             .assertTextEquals(lastModifiedValue)
+    }
+
+    @Test
+    fun `test that location is hidden when showLocation is false`() {
+        setContentForAudioNodeInfoView(
+            sizeValue = expectedSizeValue,
+            locationValue = expectedLocationInfo,
+            showLocation = false,
+        )
+
+        composeTestRule.onNodeWithTag(AUDIO_LOCATION_TEST_TAG, true).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(AUDIO_SIZE_TEST_TAG, true).assertExists()
     }
 }

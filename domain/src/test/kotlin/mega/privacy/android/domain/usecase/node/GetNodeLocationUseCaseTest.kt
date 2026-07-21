@@ -23,6 +23,7 @@ class GetNodeLocationUseCaseTest {
 
     private val isNodeInCloudDriveUseCase = mock<IsNodeInCloudDriveUseCase>()
     private val isNodeInRubbishBinUseCase = mock<IsNodeInRubbishBinUseCase>()
+    private val isNodeInBackupsUseCase = mock<IsNodeInBackupsUseCase>()
     private val getAncestorsIdsUseCase = mock<GetAncestorsIdsUseCase>()
 
     private val nodeId = NodeId(100L)
@@ -35,6 +36,7 @@ class GetNodeLocationUseCaseTest {
         underTest = GetNodeLocationUseCase(
             isNodeInCloudDriveUseCase = isNodeInCloudDriveUseCase,
             isNodeInRubbishBinUseCase = isNodeInRubbishBinUseCase,
+            isNodeInBackupsUseCase = isNodeInBackupsUseCase,
             getAncestorsIdsUseCase = getAncestorsIdsUseCase,
         )
     }
@@ -44,12 +46,16 @@ class GetNodeLocationUseCaseTest {
         reset(
             isNodeInCloudDriveUseCase,
             isNodeInRubbishBinUseCase,
+            isNodeInBackupsUseCase,
             getAncestorsIdsUseCase,
         )
     }
 
     @ParameterizedTest
-    @EnumSource(NodeSourceType::class, names = ["CLOUD_DRIVE", "RUBBISH_BIN", "INCOMING_SHARES"])
+    @EnumSource(
+        NodeSourceType::class,
+        names = ["CLOUD_DRIVE", "RUBBISH_BIN", "BACKUPS", "INCOMING_SHARES"],
+    )
     fun `test that correct node location is returned`(
         nodeSourceType: NodeSourceType,
     ) = runTest {
@@ -57,7 +63,11 @@ class GetNodeLocationUseCaseTest {
         val expected = NodeLocation(
             node = node,
             nodeSourceType = nodeSourceType,
-            ancestorIds = ancestorIds.dropLast(if (nodeSourceType == NodeSourceType.INCOMING_SHARES) 0 else 1),
+            ancestorIds = ancestorIds.dropLast(
+                if (nodeSourceType == NodeSourceType.INCOMING_SHARES ||
+                    nodeSourceType == NodeSourceType.BACKUPS
+                ) 0 else 1
+            ),
         )
 
         when (nodeSourceType) {
@@ -72,9 +82,17 @@ class GetNodeLocationUseCaseTest {
                 whenever(getAncestorsIdsUseCase(node)) doReturn ancestorIds
             }
 
+            NodeSourceType.BACKUPS -> {
+                whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
+                whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn false
+                whenever(isNodeInBackupsUseCase(nodeId.longValue)) doReturn true
+                whenever(getAncestorsIdsUseCase(node)) doReturn ancestorIds
+            }
+
             else -> {
                 whenever(isNodeInCloudDriveUseCase(nodeId.longValue)) doReturn false
                 whenever(isNodeInRubbishBinUseCase(nodeId)) doReturn false
+                whenever(isNodeInBackupsUseCase(nodeId.longValue)) doReturn false
                 whenever(getAncestorsIdsUseCase(node)) doReturn ancestorIds
             }
         }

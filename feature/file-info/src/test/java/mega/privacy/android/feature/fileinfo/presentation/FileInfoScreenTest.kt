@@ -196,6 +196,13 @@ class FileInfoScreenTest {
     }
 
     @Test
+    fun `test that the location row is hidden when the node is in backups`() {
+        setContent(uiState = fileState.copy(nodeSourceType = NodeSourceType.BACKUPS))
+
+        composeRule.onNodeWithTag(FILE_INFO_LOCATION_TAG).assertDoesNotExist()
+    }
+
+    @Test
     fun `test that the editable description field shows the current description`() {
         setContent(
             uiState = fileState.copy(

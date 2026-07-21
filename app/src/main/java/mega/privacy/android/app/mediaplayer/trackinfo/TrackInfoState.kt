@@ -16,6 +16,7 @@ import java.io.File
  * @property availableOffline if this node is available in offline
  * @property size the human readable size of this node
  * @property location the human readable location of this node
+ * @property isNodeInBackups whether the node is in Backups (location is hidden for Backups nodes)
  * @property nodeDestination List of NavKey where the app needs to navigate if the user wants to see the location.
  * @property added the human readable added time of this node
  * @property lastModified the human readable last modified time of this node
@@ -29,6 +30,7 @@ data class TrackInfoState(
     val availableOffline: Boolean = false,
     val size: String = "",
     val location: LocationInfo? = null,
+    val isNodeInBackups: Boolean = false,
     val nodeDestination: List<NavKey>? = null,
     val added: Long = 0,
     val lastModified: Long = 0,

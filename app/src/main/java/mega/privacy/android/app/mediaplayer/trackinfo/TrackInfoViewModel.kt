@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.mapper.file.FileSizeStringMapper
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.node.TypedAudioNode
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -75,7 +76,12 @@ class TrackInfoViewModel @Inject constructor(
             getNodeLocationUseCase(node)
         }.onSuccess { nodeLocation ->
             val nodeDestination = nodeDestinationMapper(nodeLocation)
-            _state.update { state -> state.copy(nodeDestination = nodeDestination) }
+            _state.update { state ->
+                state.copy(
+                    nodeDestination = nodeDestination,
+                    isNodeInBackups = nodeLocation.nodeSourceType == NodeSourceType.BACKUPS,
+                )
+            }
         }.onFailure {
             Timber.e("Failed to get node location: $it")
         }
