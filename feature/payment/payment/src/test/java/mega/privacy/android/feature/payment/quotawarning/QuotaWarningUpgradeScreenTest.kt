@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.feature.payment.components.TEST_TAG_QUOTA_CURRENT_PLAN_CARD
 import mega.privacy.android.feature.payment.presentation.quotawarning.QuotaWarningUpgradeScreen
 import mega.privacy.android.feature.payment.presentation.quotawarning.QuotaWarningUpgradeState
+import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_CONTACT_SUPPORT
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_LEARN_MORE
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_SKELETON
 import mega.privacy.android.feature.payment.presentation.quotawarning.TEST_TAG_QUOTA_WARNING_TITLE
@@ -41,6 +42,8 @@ class QuotaWarningUpgradeScreenTest {
                 onUpgradeClick = {},
                 onViewAllPlansClick = {},
                 onLearnMoreClick = {},
+                onContactSupportClick = {},
+                onManagePlanClick = {},
                 onClose = {},
             )
         }
@@ -121,6 +124,25 @@ class QuotaWarningUpgradeScreenTest {
         composeRule.onNodeWithText(
             composeRule.activity.getString(sharedR.string.subscription_quota_transfer_over_title)
         ).assertExists()
+    }
+
+    @Test
+    fun `test that highest plan scenario shows contact support and hides upgrade options`() {
+        setScreen(
+            type = QuotaWarningType.Storage,
+            trigger = QuotaWarningTrigger.Upload,
+            state = QuotaWarningUpgradeState(
+                currentPlan = AccountType.PRO_III,
+                storageState = StorageState.Red,
+                storageUsedPercentage = 98,
+                isHighestPlan = true,
+                isLoading = false,
+            ),
+        )
+
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_CONTACT_SUPPORT).assertExists()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_WARNING_VIEW_ALL_PLANS).assertDoesNotExist()
+        composeRule.onNodeWithTag(TEST_TAG_QUOTA_CURRENT_PLAN_CARD).assertExists()
     }
 
     @Test

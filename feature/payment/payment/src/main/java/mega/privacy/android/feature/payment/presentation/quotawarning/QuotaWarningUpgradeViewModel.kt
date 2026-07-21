@@ -10,11 +10,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -31,6 +33,7 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
     private val monitorStorageStateUseCase: MonitorStorageStateUseCase,
     private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
     private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
+    private val getCurrentUserEmail: GetCurrentUserEmail,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
 ) : ViewModel() {
 
@@ -42,8 +45,19 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
+        fetchEmail()
         monitorAccountDetail()
         monitorQuotaState()
+    }
+
+    private fun fetchEmail() {
+        viewModelScope.launch {
+            val email = runCatching { getCurrentUserEmail() }.getOrElse {
+                Timber.e(it)
+                null
+            }
+            _state.update { it.copy(email = email) }
+        }
     }
 
     private fun monitorQuotaState() {
@@ -76,6 +90,11 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
                     val levelDetail = detail.levelDetail
                     val storageDetail = detail.storageDetail
                     val storageUsed = storageDetail?.usedStorage
+                    val isHighestPlan = isHighestPlan(
+                        currentPlan = levelDetail?.accountType,
+                        totalStorage = storageDetail?.totalStorage,
+                        subscriptions = subscriptions,
+                    )
                     _state.update {
                         it.copy(
                             currentPlan = levelDetail?.accountType,
@@ -89,8 +108,14 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
                             transferTotal = detail.transferDetail?.totalTransfer,
                             transferUsedPercentage = detail.transferDetail?.usedTransferPercentage
                                 ?: 0,
-                            recommendedSubscription = subscriptions
-                                ?.let { subs -> recommendedSubscription(storageUsed, subs) },
+                            recommendedSubscription = if (isHighestPlan) {
+                                null
+                            } else {
+                                subscriptions?.let { subs ->
+                                    recommendedSubscription(storageUsed, subs)
+                                }
+                            },
+                            isHighestPlan = isHighestPlan,
                             isLoading = it.isLoading && storageDetail == null,
                         )
                     }
@@ -111,6 +136,26 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
         return matchingSubscription?.subscriptionCycle
             ?.takeIf { it != AccountSubscriptionCycle.UNKNOWN }
             ?: levelDetail.accountSubscriptionCycle
+    }
+
+    /**
+     * True when the user is on a paid plan and no available subscription offers more storage than
+     * their current plan, i.e. there is nothing left to upgrade to. In that case the screen shows a
+     * "Contact support" action instead of a purchase card.
+     */
+    private fun isHighestPlan(
+        currentPlan: AccountType?,
+        totalStorage: Long?,
+        subscriptions: Subscriptions?,
+    ): Boolean {
+        if (currentPlan?.isPaid != true) return false
+        val plans = subscriptions
+            ?.let { it.monthlySubscriptions + it.yearlySubscriptions }
+            ?.takeIf { it.isNotEmpty() }
+            ?: return false
+        // subscription.storage is expressed in GB, so compare against the plan quota in GB
+        val currentStorageGb = (totalStorage ?: 0L) / BYTES_IN_GB
+        return plans.none { it.storage.toLong() > currentStorageGb }
     }
 
     /**

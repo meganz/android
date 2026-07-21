@@ -3367,6 +3367,18 @@
     <string name="subscription_quota_current_plan_transfer_usage_with_total">%1$s of %2$s used</string>
     <!-- Subtitle of the quota-warning upsell screen when storage is over the limit and the user was trying to upload -->
     <string name="subscription_quota_storage_over_upload_subtitle">Youve run out of storage space. Upgrade your plan to continue uploading</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is out of storage. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_storage_highest_plan_subtitle">Make room in Cloud drive, or manage your plan at [A]mega.io[/A] for more storage</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">As a result, your download may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">As a result, media playback may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">To continue your download, manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">To continue media playback, manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Text button on the quota-warning upsell screen shown to top-tier users, opening a support email to request a custom plan -->
+    <string name="subscription_quota_contact_support">Contact Support</string>
     <!-- Audio player: label for the mode-toggle button when the player is in podcast mode -->
     <string name="audio_player_podcast_mode_label">Podcast mode</string>
     <!-- Audio player: label for the mode-toggle button when the player is in music mode -->

@@ -133,6 +133,58 @@ class QuotaWarningMessageMapperTest {
     }
 
     @Test
+    fun `test that highest plan storage maps to the manage-plan subtitle with a link`() {
+        val result = underTest(
+            type = QuotaWarningType.Storage,
+            trigger = QuotaWarningTrigger.Upload,
+            storageState = StorageState.Red,
+            isTransferOverQuota = false,
+            isProUser = true,
+            isHighestPlan = true,
+        )
+
+        assertThat(result.subtitleId)
+            .isEqualTo(sharedR.string.subscription_quota_storage_highest_plan_subtitle)
+        assertThat(result.subtitleHasLink).isTrue()
+        assertThat(result.showLearnMore).isFalse()
+        assertThat(result.titleId)
+            .isEqualTo(sharedR.string.subscription_quota_storage_almost_full_title)
+    }
+
+    @Test
+    fun `test that highest plan transfer running low on download maps to the manage-plan subtitle`() {
+        val result = underTest(
+            type = QuotaWarningType.Transfer,
+            trigger = QuotaWarningTrigger.Download,
+            storageState = StorageState.Unknown,
+            isTransferOverQuota = false,
+            isProUser = true,
+            isHighestPlan = true,
+        )
+
+        assertThat(result.subtitleId)
+            .isEqualTo(sharedR.string.subscription_quota_transfer_low_download_highest_plan_subtitle)
+        assertThat(result.subtitleHasLink).isTrue()
+        assertThat(result.showLearnMore).isFalse()
+    }
+
+    @Test
+    fun `test that highest plan transfer over quota on streaming maps to the manage-plan subtitle`() {
+        val result = underTest(
+            type = QuotaWarningType.Transfer,
+            trigger = QuotaWarningTrigger.Streaming,
+            storageState = StorageState.Unknown,
+            isTransferOverQuota = true,
+            isProUser = true,
+            isHighestPlan = true,
+        )
+
+        assertThat(result.subtitleId)
+            .isEqualTo(sharedR.string.subscription_quota_transfer_over_streaming_highest_plan_subtitle)
+        assertThat(result.subtitleHasLink).isTrue()
+    }
+
+    @Test
     fun `test that transfer over quota on streaming maps to the streaming exceeded subtitle`() {
         val result = underTest(
             type = QuotaWarningType.Transfer,

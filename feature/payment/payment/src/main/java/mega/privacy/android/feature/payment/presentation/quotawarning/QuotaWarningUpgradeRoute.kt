@@ -7,6 +7,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.payment.UpgradeSource
 import mega.privacy.android.feature.payment.presentation.billing.BillingViewModel
@@ -62,8 +63,25 @@ fun QuotaWarningUpgradeRoute(
         onLearnMoreClick = {
             activity?.let { megaNavigator.launchUrl(it, TRANSFER_QUOTA_LEARN_MORE_URL) }
         },
+        onContactSupportClick = {
+            activity?.let {
+                megaNavigator.openAskForCustomizedPlan(
+                    context = it,
+                    email = uiState.email,
+                    accountType = uiState.currentPlan ?: AccountType.FREE,
+                )
+            }
+        },
+        onManagePlanClick = {
+            activity?.let {
+                // Keep the pricing page intact — the "no plans" param would suppress the plan list
+                megaNavigator.launchUrl(it, MANAGE_PLAN_URL, appendNoPlansParam = false)
+            }
+        },
         onClose = onBack,
     )
 }
 
-private const val TRANSFER_QUOTA_LEARN_MORE_URL = "https://help.mega.io/plans-storage/transfers"
+private const val TRANSFER_QUOTA_LEARN_MORE_URL =
+    "https://help.mega.io/plans-storage/space-storage/transfer-quota"
+private const val MANAGE_PLAN_URL = "https://mega.io/pricing#pro-flexi"

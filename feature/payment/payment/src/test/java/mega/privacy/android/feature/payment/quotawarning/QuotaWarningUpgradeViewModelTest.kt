@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.payment.Subscriptions
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.feature.payment.model.mapper.LocalisedPriceCurrencyCodeStringMapper
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -48,6 +49,7 @@ class QuotaWarningUpgradeViewModelTest {
     private val monitorStorageStateUseCase = mock<MonitorStorageStateUseCase>()
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
     private val getSubscriptionsUseCase = mock<GetSubscriptionsUseCase>()
+    private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val localisedPriceCurrencyCodeStringMapper =
         mock<LocalisedPriceCurrencyCodeStringMapper>()
     private val formattedSizeMapper = mock<FormattedSizeMapper>()
@@ -61,6 +63,7 @@ class QuotaWarningUpgradeViewModelTest {
             monitorStorageStateUseCase,
             monitorTransferOverQuotaUseCase,
             getSubscriptionsUseCase,
+            getCurrentUserEmail,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
         )
@@ -68,6 +71,7 @@ class QuotaWarningUpgradeViewModelTest {
         whenever(monitorStorageStateUseCase()).thenReturn(emptyFlow())
         whenever(monitorTransferOverQuotaUseCase()).thenReturn(emptyFlow())
         wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(Subscriptions(emptyList(), emptyList()))
+        wheneverBlocking { getCurrentUserEmail() }.thenReturn(null)
     }
 
     private fun initViewModel() {
@@ -76,6 +80,7 @@ class QuotaWarningUpgradeViewModelTest {
             monitorStorageStateUseCase = monitorStorageStateUseCase,
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             getSubscriptionsUseCase = getSubscriptionsUseCase,
+            getCurrentUserEmail = getCurrentUserEmail,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
         )
     }
@@ -204,6 +209,93 @@ class QuotaWarningUpgradeViewModelTest {
     }
 
     @Test
+    fun `test that highest plan is detected when a paid user has no larger plan to upgrade to`() =
+        runTest {
+            val essential = subscription(AccountType.ESSENTIAL, storage = 100)
+            val proIII = subscription(AccountType.PRO_III, storage = 10240)
+            val detail = accountDetail(
+                storageUsed = 9000 * BYTES_IN_GB,
+                accountType = AccountType.PRO_III,
+                totalStorage = 10240 * BYTES_IN_GB,
+            )
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+            wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+                Subscriptions(
+                    monthlySubscriptions = listOf(essential, proIII),
+                    yearlySubscriptions = emptyList(),
+                )
+            )
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isHighestPlan).isTrue()
+                assertThat(state.recommendedSubscription).isNull()
+            }
+        }
+
+    @Test
+    fun `test that highest plan is false when a larger plan is available`() = runTest {
+        val proII = subscription(AccountType.PRO_II, storage = 2048)
+        val proIII = subscription(AccountType.PRO_III, storage = 10240)
+        val detail = accountDetail(
+            storageUsed = 1000 * BYTES_IN_GB,
+            accountType = AccountType.PRO_II,
+            totalStorage = 2048 * BYTES_IN_GB,
+        )
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+        wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+            Subscriptions(
+                monthlySubscriptions = listOf(proII, proIII),
+                yearlySubscriptions = emptyList(),
+            )
+        )
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isHighestPlan).isFalse()
+            assertThat(state.recommendedSubscription).isNotNull()
+        }
+    }
+
+    @Test
+    fun `test that highest plan is false for a free user`() = runTest {
+        val essential = subscription(AccountType.ESSENTIAL, storage = 100)
+        val detail = accountDetail(
+            storageUsed = 19 * BYTES_IN_GB,
+            accountType = AccountType.FREE,
+            totalStorage = 20 * BYTES_IN_GB,
+        )
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+        wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+            Subscriptions(
+                monthlySubscriptions = listOf(essential),
+                yearlySubscriptions = emptyList(),
+            )
+        )
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().isHighestPlan).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that email is populated from getCurrentUserEmail`() = runTest {
+        wheneverBlocking { getCurrentUserEmail() }.thenReturn("user@mega.co.nz")
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().email).isEqualTo("user@mega.co.nz")
+        }
+    }
+
+    @Test
     fun `test that loading stays active until storage detail is available`() = runTest {
         val partial = accountDetailWithoutStorage()
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(partial))
@@ -235,12 +327,13 @@ class QuotaWarningUpgradeViewModelTest {
     private fun accountDetail(
         storageUsed: Long,
         accountType: AccountType = AccountType.FREE,
+        totalStorage: Long = 0,
     ): AccountDetail {
         val storageDetail = AccountStorageDetail(
             usedCloudDrive = 0,
             usedRubbish = 0,
             usedIncoming = 0,
-            totalStorage = 0,
+            totalStorage = totalStorage,
             usedStorage = storageUsed,
         )
         val levelDetail = mock<AccountLevelDetail> {
