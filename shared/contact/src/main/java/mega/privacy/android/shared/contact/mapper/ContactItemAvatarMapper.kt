@@ -3,6 +3,7 @@ package mega.privacy.android.shared.contact.mapper
 import androidx.compose.ui.graphics.Color
 import com.vdurmont.emoji.EmojiParser
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.shared.contact.extension.displayName
 import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtils
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
@@ -32,16 +33,11 @@ class ContactItemAvatarMapper @Inject constructor() {
             AvatarData.Image(file = File(avatarUri))
         } else {
             AvatarData.Initials(
-                initials = contactItem.getAvatarFirstLetter(),
+                initials = getAvatarFirstLetter(contactItem.displayName()),
                 avatarColor = parseHexColor(contactItem.defaultAvatarColor),
             )
         }
     }
-
-    private fun ContactItem.getAvatarFirstLetter(): String =
-        getAvatarFirstLetter(
-            contactData.alias ?: contactData.fullName ?: email
-        )
 
     private fun getAvatarFirstLetter(text: String): String {
         val unknown = "U"

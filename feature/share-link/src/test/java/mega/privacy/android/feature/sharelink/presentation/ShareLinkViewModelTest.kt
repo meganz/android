@@ -20,7 +20,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
-import mega.privacy.android.domain.usecase.node.ExportNodeUseCase
+import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.feature.sharelink.session.LinkPassword
 import mega.privacy.android.feature.sharelink.session.ShareLinkPasswordCache
 import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
@@ -43,7 +43,7 @@ class ShareLinkViewModelTest {
     private lateinit var underTest: ShareLinkViewModel
 
     private val getNodeByIdUseCase = mock<GetNodeByIdUseCase>()
-    private val exportNodeUseCase = mock<ExportNodeUseCase>()
+    private val exportNodesUseCase = mock<ExportNodesUseCase>()
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val splitLinkAndKeyUseCase = mock<SplitLinkAndKeyUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
@@ -60,7 +60,7 @@ class ShareLinkViewModelTest {
         underTest = ShareLinkViewModel(
             args = ShareLinkViewModel.Args(handles = listOf(NODE_HANDLE)),
             getNodeByIdUseCase = getNodeByIdUseCase,
-            exportNodeUseCase = exportNodeUseCase,
+            exportNodesUseCase = exportNodesUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
             splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
             fileTypeIconMapper = fileTypeIconMapper,
@@ -73,7 +73,7 @@ class ShareLinkViewModelTest {
     fun tearDown() {
         reset(
             getNodeByIdUseCase,
-            exportNodeUseCase,
+            exportNodesUseCase,
             monitorAccountDetailUseCase,
             splitLinkAndKeyUseCase,
             fileTypeIconMapper,
@@ -86,6 +86,7 @@ class ShareLinkViewModelTest {
     fun `test that uiState is Data with the existing public link and node details when the node is already exported`() =
         runTest {
             val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "report.pdf"
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
                 on { size } doReturn 2048L
@@ -97,24 +98,25 @@ class ShareLinkViewModelTest {
                 .thenReturn(LinkAndKey("https://mega.nz/file/abc", "key123"))
 
             underTest.uiState.test {
-                val data = awaitData()
-                assertThat(data.nodeName).isEqualTo("report.pdf")
-                assertThat(data.isFolder).isFalse()
-                assertThat(data.iconRes).isEqualTo(FILE_ICON_RES)
-                assertThat(data.sizeInBytes).isEqualTo(2048L)
-                assertThat(data.modificationTime).isEqualTo(1_718_000_000L)
-                assertThat(data.link).isEqualTo("https://mega.nz/file/abc#key123")
-                assertThat(data.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
-                assertThat(data.key).isEqualTo("key123")
+                val node = awaitData().primary
+                assertThat(node.name).isEqualTo("report.pdf")
+                assertThat(node.isFolder).isFalse()
+                assertThat(node.iconRes).isEqualTo(FILE_ICON_RES)
+                assertThat(node.sizeInBytes).isEqualTo(2048L)
+                assertThat(node.modificationTime).isEqualTo(1_718_000_000L)
+                assertThat(node.link).isEqualTo("https://mega.nz/file/abc#key123")
+                assertThat(node.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
+                assertThat(node.key).isEqualTo("key123")
                 cancelAndIgnoreRemainingEvents()
             }
-            verifyNoInteractions(exportNodeUseCase)
+            verifyNoInteractions(exportNodesUseCase)
         }
 
     @Test
-    fun `test that uiState is Data with a link created via exportNodeUseCase when the node has no public link`() =
+    fun `test that uiState is Data with a link created via exportNodesUseCase when the node has no public link`() =
         runTest {
             val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "video.mp4"
                 on { exportedData } doReturn null
                 on { size } doReturn 10L
@@ -122,16 +124,16 @@ class ShareLinkViewModelTest {
                 on { type } doReturn UnknownFileTypeInfo(mimeType = "video/mp4", extension = "mp4")
             }
             whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
-            whenever(exportNodeUseCase(NodeId(NODE_HANDLE), null, CALLER_NAME))
-                .thenReturn("https://mega.nz/file/new#newkey")
+            whenever(exportNodesUseCase(listOf(NODE_HANDLE), CALLER_NAME))
+                .thenReturn(mapOf(NODE_HANDLE to "https://mega.nz/file/new#newkey"))
             whenever(splitLinkAndKeyUseCase("https://mega.nz/file/new#newkey"))
                 .thenReturn(LinkAndKey("https://mega.nz/file/new", "newkey"))
 
             underTest.uiState.test {
-                val data = awaitData()
-                assertThat(data.link).isEqualTo("https://mega.nz/file/new#newkey")
-                assertThat(data.linkWithoutKey).isEqualTo("https://mega.nz/file/new")
-                assertThat(data.key).isEqualTo("newkey")
+                val node = awaitData().primary
+                assertThat(node.link).isEqualTo("https://mega.nz/file/new#newkey")
+                assertThat(node.linkWithoutKey).isEqualTo("https://mega.nz/file/new")
+                assertThat(node.key).isEqualTo("newkey")
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -140,6 +142,7 @@ class ShareLinkViewModelTest {
     fun `test that uiState Data marks the node as a folder with no size when the node is a folder`() =
         runTest {
             val node = mock<TypedFolderNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "Documents"
                 on { exportedData } doReturn ExportedData("https://mega.nz/folder/fid#fkey", 0L)
             }
@@ -148,11 +151,11 @@ class ShareLinkViewModelTest {
                 .thenReturn(LinkAndKey("https://mega.nz/folder/fid", "fkey"))
 
             underTest.uiState.test {
-                val data = awaitData()
-                assertThat(data.isFolder).isTrue()
-                assertThat(data.sizeInBytes).isNull()
-                assertThat(data.modificationTime).isNull()
-                assertThat(data.key).isEqualTo("fkey")
+                val node = awaitData().primary
+                assertThat(node.isFolder).isTrue()
+                assertThat(node.sizeInBytes).isNull()
+                assertThat(node.modificationTime).isNull()
+                assertThat(node.key).isEqualTo("fkey")
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -161,6 +164,7 @@ class ShareLinkViewModelTest {
     fun `test that uiState Data carries the account type from monitorAccountDetailUseCase`() =
         runTest {
             val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "report.pdf"
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
                 on { type } doReturn PdfFileTypeInfo
@@ -191,13 +195,14 @@ class ShareLinkViewModelTest {
             assertThat(item).isEqualTo(ShareLinkUiState.Error)
             cancelAndIgnoreRemainingEvents()
         }
-        verifyNoInteractions(exportNodeUseCase)
+        verifyNoInteractions(exportNodesUseCase)
     }
 
     @Test
     fun `test that a cached password marks the link as password protected`() =
         runTest {
             val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "report.pdf"
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
                 on { type } doReturn PdfFileTypeInfo
@@ -218,6 +223,7 @@ class ShareLinkViewModelTest {
     fun `test that a cached separate-key preference marks the link and key as separate`() =
         runTest {
             val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "report.pdf"
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
                 on { type } doReturn PdfFileTypeInfo
@@ -228,9 +234,9 @@ class ShareLinkViewModelTest {
             whenever(separateKeyCache.monitor(NODE_HANDLE)).thenReturn(flowOf(true))
 
             underTest.uiState.test {
-                val data = awaitData { it.isKeySeparate }
-                assertThat(data.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
-                assertThat(data.key).isEqualTo("key123")
+                val node = awaitData { it.isKeySeparate }.primary
+                assertThat(node.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
+                assertThat(node.key).isEqualTo("key123")
                 cancelAndIgnoreRemainingEvents()
             }
         }
@@ -239,6 +245,7 @@ class ShareLinkViewModelTest {
     fun `test that the link and key are not separate by default`() =
         runTest {
             val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "report.pdf"
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
                 on { type } doReturn PdfFileTypeInfo
@@ -257,6 +264,7 @@ class ShareLinkViewModelTest {
     fun `test that enabling the separate-key preference mid-session marks the link and key as separate`() =
         runTest {
             val node = mock<TypedFileNode> {
+                on { id } doReturn NodeId(NODE_HANDLE)
                 on { name } doReturn "report.pdf"
                 on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
                 on { type } doReturn PdfFileTypeInfo
@@ -272,9 +280,9 @@ class ShareLinkViewModelTest {
 
                 separateKeyFlow.value = true
 
-                val data = awaitData { it.isKeySeparate }
-                assertThat(data.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
-                assertThat(data.key).isEqualTo("key123")
+                val node = awaitData { it.isKeySeparate }.primary
+                assertThat(node.linkWithoutKey).isEqualTo("https://mega.nz/file/abc")
+                assertThat(node.key).isEqualTo("key123")
                 cancelAndIgnoreRemainingEvents()
             }
         }

@@ -50,6 +50,7 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.Cl
 import mega.privacy.android.domain.entity.transfer.pending.PendingTransfer
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.exception.NotEnoughStorageException
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.monitoring.CrashReporter
 import mega.privacy.android.domain.usecase.SetAskForDownloadLocationUseCase
 import mega.privacy.android.domain.usecase.SetDownloadLocationUseCase
@@ -58,6 +59,7 @@ import mega.privacy.android.domain.usecase.canceltoken.CancelCancelTokenUseCase
 import mega.privacy.android.domain.usecase.canceltoken.InvalidateCancelTokenUseCase
 import mega.privacy.android.domain.usecase.chat.message.SendChatAttachmentsUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.TotalFileSizeOfNodesUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.domain.usecase.node.GetFilePreviewDownloadPathUseCase
@@ -186,6 +188,7 @@ class StartTransfersComponentViewModelTest {
     private val getPreviewDownloadUseCase = mock<GetPreviewDownloadUseCase>()
     private val ratingHandlerImpl = mock<RatingHandlerImpl>()
     private val crashReporter = mock<CrashReporter>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     private val node: TypedFileNode = mock()
     private val nodes = listOf(node)
@@ -274,6 +277,7 @@ class StartTransfersComponentViewModelTest {
             getPreviewDownloadUseCase = getPreviewDownloadUseCase,
             ratingHandler = ratingHandlerImpl,
             crashReporter = crashReporter,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
         )
     }
 
@@ -326,6 +330,7 @@ class StartTransfersComponentViewModelTest {
             monitorStorageStateEventUseCase,
             getPreviewDownloadUseCase,
             crashReporter,
+            getFeatureFlagValueUseCase,
         )
         initialStub()
     }
@@ -333,6 +338,7 @@ class StartTransfersComponentViewModelTest {
     private fun initialStub() = runTest {
         whenever(monitorOngoingActiveTransfersUseCase(any())).thenReturn(emptyFlow())
         whenever(monitorStorageOverQuotaUseCase()).thenReturn(emptyFlow())
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen)).thenReturn(false)
         val storageStateEvent = mock<StorageStateEvent> {
             on { storageState } doReturn StorageState.Unknown
         }
@@ -926,6 +932,39 @@ class StartTransfersComponentViewModelTest {
             assertThat(awaitItem()).isEqualTo(isStorageOverQuota)
         }
     }
+
+    @Test
+    fun `test that init sets isQuotaWarningUpsellEnabled to true when the feature flag is enabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
+                .thenReturn(true)
+            initTest()
+            underTest.uiState.map { it.isQuotaWarningUpsellEnabled }.test {
+                assertThat(awaitItem()).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that init sets isQuotaWarningUpsellEnabled to false when the feature flag is disabled`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
+                .thenReturn(false)
+            initTest()
+            underTest.uiState.map { it.isQuotaWarningUpsellEnabled }.test {
+                assertThat(awaitItem()).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that init sets isQuotaWarningUpsellEnabled to false when the feature flag check throws`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.QuotaWarningUpsellScreen))
+                .thenThrow(RuntimeException("error"))
+            initTest()
+            underTest.uiState.map { it.isQuotaWarningUpsellEnabled }.test {
+                assertThat(awaitItem()).isFalse()
+            }
+        }
 
     @Test
     fun `test that when storage state is paywall transfers are not started`() = runTest {

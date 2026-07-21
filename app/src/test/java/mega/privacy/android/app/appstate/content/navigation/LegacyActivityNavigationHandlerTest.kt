@@ -6,6 +6,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
+import mega.privacy.android.navigation.contract.navOptions
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,6 +27,12 @@ internal class LegacyActivityNavigationHandlerTest {
 
     @Serializable
     private data object Destination2 : NavKey
+
+    @Serializable
+    private data object Destination3 : NavKey
+
+    @Serializable
+    private data class ParameterizedDestination(val value: String) : NavKey
 
     @BeforeEach
     fun setUp() {
@@ -136,6 +143,69 @@ internal class LegacyActivityNavigationHandlerTest {
         underTest.navigateAndClearBackStack(Destination2)
 
         assertThat(backStack.toList()).containsExactly(Destination2)
+    }
+
+    @Test
+    fun `test that navigateAndClearBackStack with navOptions replaces the stack with the destination`() {
+        backStack.add(Destination1)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearBackStack(Destination2, options)
+
+        assertThat(backStack.toList()).containsExactly(Destination2)
+    }
+
+    @Test
+    fun `test that navigateAndClearTo clears back to the new parent and adds the destination`() {
+        backStack.add(Destination1)
+        backStack.add(Destination2)
+
+        underTest.navigateAndClearTo(Destination3, newParent = Destination1, inclusive = false)
+
+        assertThat(backStack.toList()).containsExactly(Root, Destination1, Destination3).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with launchSingleTop replaces remaining top destination of same type`() {
+        backStack.add(ParameterizedDestination("A"))
+        backStack.add(Destination1)
+
+        val options = navOptions {
+            launchSingleTop = true
+        }
+        underTest.navigateAndClearTo(
+            ParameterizedDestination("B"),
+            newParent = ParameterizedDestination("A"),
+            inclusive = false,
+            navOptions = options,
+        )
+
+        assertThat(backStack.toList()).containsExactly(
+            Root,
+            ParameterizedDestination("B"),
+        ).inOrder()
+    }
+
+    @Test
+    fun `test that navigateAndClearTo with popUpTo pops back stack beyond the new parent`() {
+        backStack.add(Destination1)
+        backStack.add(Destination2)
+
+        val options = navOptions {
+            popUpTo<Destination1> {
+                inclusive = true
+            }
+        }
+        underTest.navigateAndClearTo(
+            Destination3,
+            newParent = Destination2,
+            inclusive = true,
+            navOptions = options,
+        )
+
+        assertThat(backStack.toList()).containsExactly(Root, Destination3).inOrder()
     }
 
     @Test

@@ -40,6 +40,7 @@ import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
 import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
+import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -64,7 +65,6 @@ import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
-import mega.privacy.android.core.coroutine.asUiStateFlow
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -686,7 +686,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         val parentDocumentId = resolveParentDocumentId(nodeId)
             ?: throw FileNotFoundException("Cannot resolve parent for $documentId")
         renameNodeUseCase.get()(nodeId.longValue, newName)
-        // Block until documentState holds Loaded(newName); SAF's DocumentInfo.fromUri reads
+        // Block until documentState holds Data(newName); SAF's DocumentInfo.fromUri reads
         // queryDocument synchronously after this returns and a stale cursor surfaces as
         // "Failed to rename document" in DocumentsUI even though the cloud rename succeeded.
         documentRequestFlow.emit(documentId)

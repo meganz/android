@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -97,6 +98,7 @@ class AlbumContentViewModel @AssistedInject constructor(
     private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
     private val getUserAlbum: MonitorUserAlbumByIdUseCase,
     private val getAlbumPhotosUseCase: GetAlbumPhotosUseCase,
+    private val observeAlbumPhotosAddingProgress: ObserveAlbumPhotosAddingProgress,
     private val albumUiStateMapper: AlbumUiStateMapper,
     private val legacyMediaSystemAlbumMapper: LegacyMediaSystemAlbumMapper,
     private val updateAlbumPhotosRemovingProgressCompleted: UpdateAlbumPhotosRemovingProgressCompleted,
@@ -335,6 +337,22 @@ class AlbumContentViewModel @AssistedInject constructor(
 
         observeAlbum(albumId)
         observeAlbumPhotos(albumId, refresh = false)
+        observePhotosAddingProgress(albumId)
+    }
+
+    private fun observePhotosAddingProgress(albumId: AlbumId) {
+        observeAlbumPhotosAddingProgress(albumId)
+            .catch { Timber.e(it) }
+            .onEach { progress ->
+                when {
+                    progress?.isProgressing == true ->
+                        _state.update { it.copy(isAddingPhotos = true) }
+
+                    progress != null && progress.totalAddedPhotos == 0 ->
+                        _state.update { it.copy(isAddingPhotos = false) }
+                }
+            }
+            .launchIn(viewModelScope)
     }
 
     private fun observeAlbum(albumId: AlbumId) {
@@ -479,7 +497,8 @@ class AlbumContentViewModel @AssistedInject constructor(
                 it.copy(
                     albumSortConfiguration = sortConfiguration,
                     photos = sortedPhotosUiState,
-                    isLoading = false
+                    isLoading = false,
+                    isAddingPhotos = false
                 )
             }
         }

@@ -209,12 +209,14 @@ internal fun FileInfoContent(
             }
 
             //location
-            nodeLocationInfo?.location?.let {
-                LocationInfoView(
-                    location = it,
-                    modifier = paddingHorizontal,
-                    onClick = onLocationClick,
-                )
+            if (!isNodeInBackups) {
+                nodeLocationInfo?.location?.let {
+                    LocationInfoView(
+                        location = it,
+                        modifier = paddingHorizontal,
+                        onClick = onLocationClick,
+                    )
+                }
             }
 
             //creation and modification times
@@ -245,11 +247,10 @@ internal fun FileInfoContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .testTag(TEST_TAG_DESCRIPTION)
                     .clickable {
                         if (viewState.accountDeactivatedStatus != null) {
                             showExpiredBusinessDialog = true
-                        } else {
-                            onSetDescriptionClick(descriptionText)
                         }
                     },
                 descriptionText = descriptionText,

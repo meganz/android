@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import mega.privacy.android.feature.photos.presentation.albums.create.createAlbumDialog
 import mega.privacy.android.navigation.contract.FeatureDestination
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
@@ -16,6 +17,11 @@ class MediaFeatureDestination : FeatureDestination {
                 navigationHandler = navigationHandler,
                 onTransfer = transferHandler::setTransferEvent,
                 resultFlow = navigationHandler::monitorResult
+            )
+
+            createAlbumDialog(
+                onDismiss = navigationHandler::back,
+                returnResult = navigationHandler::returnResult,
             )
 
             videoPlaylistDetailScreen(

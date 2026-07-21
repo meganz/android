@@ -50,8 +50,16 @@ class LegacyActivityNavigationHandler(
     }
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
+        if (navOptions?.dropIfAlreadyShown == true && isAlreadyShown(destinations)) {
+            return
+        }
         applyNavOptions(navOptions, destinations)
         backStack.addAll(destinations)
+    }
+
+    private fun isAlreadyShown(destinations: List<NavKey>): Boolean {
+        val backStackClasses = backStack.map { it::class }
+        return destinations.all { it::class in backStackClasses }
     }
 
     private fun applyNavOptions(navOptions: NavOptions?, destinations: List<NavKey>) {
@@ -89,8 +97,9 @@ class LegacyActivityNavigationHandler(
         }
     }
 
-    override fun navigateAndClearBackStack(destination: NavKey) {
+    override fun navigateAndClearBackStack(destination: NavKey, navOptions: NavOptions?) {
         backStack.clear()
+        applyNavOptions(navOptions, listOf(destination))
         backStack.add(destination)
     }
 
@@ -98,8 +107,10 @@ class LegacyActivityNavigationHandler(
         destination: List<NavKey>,
         newParent: NavKey,
         inclusive: Boolean,
+        navOptions: NavOptions?
     ) {
         backTo(newParent, inclusive)
+        applyNavOptions(navOptions, destination)
         backStack.addAll(destination)
     }
 

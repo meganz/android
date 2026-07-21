@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -31,6 +32,7 @@ import mega.privacy.android.domain.entity.node.SortDirection
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.entity.photos.Sort
@@ -41,6 +43,7 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetNodeListByIdsUseCase
 import mega.privacy.android.domain.usecase.IsHiddenNodesOnboardedUseCase
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
+import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateNodeSensitiveUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
@@ -99,6 +102,7 @@ class AlbumContentViewModelTest {
     private val getDefaultAlbumsMapUseCase = mock<GetDefaultAlbumsMapUseCase>()
     private val getUserAlbum = mock<MonitorUserAlbumByIdUseCase>()
     private val getAlbumPhotosUseCase = mock<GetAlbumPhotosUseCase>()
+    private val observeAlbumPhotosAddingProgress = mock<ObserveAlbumPhotosAddingProgress>()
     private val albumUiStateMapper = mock<AlbumUiStateMapper>()
     private val legacyMediaSystemAlbumMapper = mock<LegacyMediaSystemAlbumMapper>()
     private val updateAlbumPhotosRemovingProgressCompleted =
@@ -147,6 +151,7 @@ class AlbumContentViewModelTest {
             getDefaultAlbumsMapUseCase,
             getUserAlbum,
             getAlbumPhotosUseCase,
+            observeAlbumPhotosAddingProgress,
             albumUiStateMapper,
             legacyMediaSystemAlbumMapper,
             updateAlbumPhotosRemovingProgressCompleted,
@@ -187,6 +192,7 @@ class AlbumContentViewModelTest {
         whenever(monitorHiddenNodesEnabledUseCase()).thenReturn(emptyFlow())
         whenever(monitorAccountDetailUseCase()).thenReturn(emptyFlow())
         whenever(monitorThemeModeUseCase()).thenReturn(themeModeFlow)
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(flowOf(null))
     }
 
     private fun createViewModel(
@@ -198,6 +204,7 @@ class AlbumContentViewModelTest {
             getDefaultAlbumsMapUseCase = getDefaultAlbumsMapUseCase,
             getUserAlbum = getUserAlbum,
             getAlbumPhotosUseCase = getAlbumPhotosUseCase,
+            observeAlbumPhotosAddingProgress = observeAlbumPhotosAddingProgress,
             albumUiStateMapper = albumUiStateMapper,
             legacyMediaSystemAlbumMapper = legacyMediaSystemAlbumMapper,
             updateAlbumPhotosRemovingProgressCompleted = updateAlbumPhotosRemovingProgressCompleted,
@@ -409,6 +416,119 @@ class AlbumContentViewModelTest {
 
         verify(updateAlbumPhotosRemovingProgressCompleted).invoke(albumId)
     }
+
+    @Test
+    fun `test that isAddingPhotos is true when adding progress is in progress`() = runTest {
+        val albumId = AlbumId(123L)
+        val mockUserAlbum = mock<MediaAlbum.User> {
+            on { id }.thenReturn(albumId)
+        }
+        val mockAlbumUiState = mock<AlbumUiState> {
+            on { mediaAlbum }.thenReturn(mockUserAlbum)
+            on { title }.thenReturn(LocalizedText.Literal("Album"))
+            on { cover }.thenReturn(null)
+        }
+        whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+        whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+        whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(
+            flowOf(
+                AlbumPhotosAddingProgress(
+                    isProgressing = true,
+                    totalAddedPhotos = 0,
+                    isAsync = false,
+                )
+            )
+        )
+
+        createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isAddingPhotos).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that isAddingPhotos is false when adding completes with zero photos added`() = runTest {
+        val albumId = AlbumId(123L)
+        val mockUserAlbum = mock<MediaAlbum.User> {
+            on { id }.thenReturn(albumId)
+        }
+        val mockAlbumUiState = mock<AlbumUiState> {
+            on { mediaAlbum }.thenReturn(mockUserAlbum)
+            on { title }.thenReturn(LocalizedText.Literal("Album"))
+            on { cover }.thenReturn(null)
+        }
+        whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+        whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+        whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(flowOf())
+        whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(
+            flowOf(
+                AlbumPhotosAddingProgress(
+                    isProgressing = true,
+                    totalAddedPhotos = 0,
+                    isAsync = false,
+                ),
+                AlbumPhotosAddingProgress(
+                    isProgressing = false,
+                    totalAddedPhotos = 0,
+                    isAsync = false,
+                )
+            )
+        )
+
+        createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+        underTest.state.test {
+            assertThat(expectMostRecentItem().isAddingPhotos).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that isAddingPhotos is cleared when getAlbumPhotosUseCase emits the added photos`() =
+        runTest {
+            val albumId = AlbumId(123L)
+            val mockUserAlbum = mock<MediaAlbum.User> {
+                on { id }.thenReturn(albumId)
+            }
+            val mockAlbumUiState = mock<AlbumUiState> {
+                on { mediaAlbum }.thenReturn(mockUserAlbum)
+                on { title }.thenReturn(LocalizedText.Literal("Album"))
+                on { cover }.thenReturn(null)
+            }
+            val legacyPhoto = mock<Photo.Image> {
+                on { id }.thenReturn(1L)
+            }
+            val photo = mock<PhotoUiState.Image> {
+                on { id }.thenReturn(1L)
+            }
+            val photosFlow = MutableSharedFlow<List<Photo>>(replay = 1)
+            whenever(getUserAlbum(any())).thenReturn(flowOf(mockUserAlbum))
+            whenever(albumUiStateMapper(mockUserAlbum)).thenReturn(mockAlbumUiState)
+            whenever(getAlbumPhotosUseCase(any(), any())).thenReturn(photosFlow)
+            whenever(photoUiStateMapper(legacyPhoto)).thenReturn(photo)
+            whenever(observeAlbumPhotosAddingProgress(any())).thenReturn(
+                flowOf(
+                    AlbumPhotosAddingProgress(
+                        isProgressing = true,
+                        totalAddedPhotos = 0,
+                        isAsync = false,
+                    )
+                )
+            )
+
+            createViewModel(AlbumContentNavKey(id = albumId.id, type = "custom"))
+
+            assertThat(underTest.state.value.isAddingPhotos).isTrue()
+
+            photosFlow.emit(listOf(legacyPhoto))
+
+            underTest.state.test {
+                val state = expectMostRecentItem()
+                assertThat(state.isAddingPhotos).isFalse()
+                assertThat(state.photos).isNotEmpty()
+            }
+        }
 
     @Test
     fun `test that savePhotosToDevice updates state correctly when nodes are fetched`() = runTest {

@@ -77,6 +77,8 @@ import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent.St
 import mega.privacy.android.domain.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.ConfirmationDialog
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.LocalSnackBarHostStateOriginal
@@ -173,10 +175,22 @@ internal fun StartTransferComponent(
 
     if (!isPasscodeLocked) {
         if (showStorageOverQuotaWarning) {
-            NotEnoughSpaceForUploadDialog(onCancel = {
-                onCancelNotEnoughSpaceForUploadDialog()
-                showStorageOverQuotaWarning = false
-            })
+            if (uiState.isQuotaWarningUpsellEnabled) {
+                LaunchedEffect(Unit) {
+                    showStorageOverQuotaWarning = false
+                    onCancelNotEnoughSpaceForUploadDialog()
+                    context.megaNavigator.openQuotaWarningUpsell(
+                        context = context,
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                }
+            } else {
+                NotEnoughSpaceForUploadDialog(onCancel = {
+                    onCancelNotEnoughSpaceForUploadDialog()
+                    showStorageOverQuotaWarning = false
+                })
+            }
         }
 
         if (areTransferOverQuotaWarningsAllowed) {
@@ -426,24 +440,35 @@ private fun StartTransferComponent(
             )
         }
         showQuotaExceededDialog.value?.let {
-            StorageStatusDialogView(
-                storageState = it,
-                preWarning = it != StorageState.Red,
-                overQuotaAlert = true,
-                onUpgradeClick = {
-                    context.megaNavigator.openUpgradeAccount(context = context)
-                },
-                onCustomizedPlanClick = { email, accountType ->
-                    AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
-                },
-                onAchievementsClick = {
-                    context.startActivity(
-                        Intent(context, MyAccountActivity::class.java)
-                            .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+            if (uiState.isQuotaWarningUpsellEnabled) {
+                LaunchedEffect(Unit) {
+                    showQuotaExceededDialog.value = null
+                    context.megaNavigator.openQuotaWarningUpsell(
+                        context = context,
+                        type = QuotaWarningType.Transfer,
+                        trigger = QuotaWarningTrigger.Download,
                     )
-                },
-                onClose = { showQuotaExceededDialog.value = null },
-            )
+                }
+            } else {
+                StorageStatusDialogView(
+                    storageState = it,
+                    preWarning = it != StorageState.Red,
+                    overQuotaAlert = true,
+                    onUpgradeClick = {
+                        context.megaNavigator.openUpgradeAccount(context = context)
+                    },
+                    onCustomizedPlanClick = { email, accountType ->
+                        AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
+                    },
+                    onAchievementsClick = {
+                        context.startActivity(
+                            Intent(context, MyAccountActivity::class.java)
+                                .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+                        )
+                    },
+                    onClose = { showQuotaExceededDialog.value = null },
+                )
+            }
         }
         uiState.confirmLargeDownload?.let {
             val isPreview = it.transferTriggerEvent is TransferTriggerEvent.StartDownloadForPreview

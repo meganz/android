@@ -100,11 +100,13 @@ data class ShowChatMessagesNavKey(val chatId: Long) : NoSessionNavKey.Optional, 
  * Navigation key for Chat List
  *
  * @param createNewChat True if the Chat List screen should open with the Create New Chat flow
+ * @param showMeetingTab True to open the Chat List with the Meetings tab selected
  */
 @Serializable
 @Parcelize
 data class ChatListNavKey(
     val createNewChat: Boolean = false,
+    val showMeetingTab: Boolean = false,
 ) : NavKey, Parcelable
 
 /**
@@ -129,8 +131,21 @@ data class AddContactToShareNavKey(
     }
 }
 
+/**
+ * Navigation key for the contact info screen.
+ *
+ * @param email Email of the contact, or null when opening from a 1:1 chat.
+ * @param chatId Id of the 1:1 chat with the contact, or null when opening by email.
+ */
 @Serializable
-data class ContactInfoNavKey(val email: String) : NavKey
+data class ContactInfoNavKey(
+    val email: String? = null,
+    val chatId: Long? = null,
+) : NavKey {
+    init {
+        require(email != null || chatId != null) { "Either email or chatId must be provided" }
+    }
+}
 
 @Serializable
 data class FileContactInfoNavKey(

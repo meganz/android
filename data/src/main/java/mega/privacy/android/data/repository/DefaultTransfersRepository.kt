@@ -61,6 +61,7 @@ import mega.privacy.android.domain.entity.transfer.InProgressTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferAppData
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.entity.transfer.TransferOverQuotaStatus
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.entity.transfer.pending.InsertPendingTransferRequest
@@ -399,6 +400,13 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun broadcastTransferOverQuota(isCurrentOverQuota: Boolean) {
         appEventGateway.broadcastTransferOverQuota(isCurrentOverQuota)
+    }
+
+    override fun monitorTransferOverQuotaEvent(): Flow<TransferOverQuotaStatus> =
+        appEventGateway.monitorTransferOverQuotaEvent()
+
+    override suspend fun broadcastTransferOverQuotaEvent(status: TransferOverQuotaStatus) {
+        appEventGateway.broadcastTransferOverQuotaEvent(status)
     }
 
     override fun monitorStorageOverQuota(): Flow<Boolean> =

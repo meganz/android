@@ -27,19 +27,25 @@ import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import mega.android.core.ui.components.LinkSpannedText
 import mega.android.core.ui.components.MegaScaffold
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.button.AnchoredButtonGroup
 import mega.android.core.ui.components.button.SecondaryNavigationIconButton
 import mega.android.core.ui.model.Button
+import mega.android.core.ui.model.MegaSpanStyle
+import mega.android.core.ui.model.SpanIndicator
+import mega.android.core.ui.model.SpanStyleWithAnnotation
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidTheme
+import mega.android.core.ui.theme.values.LinkColor
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
@@ -64,6 +70,8 @@ import java.util.Locale
  * @param onUpgradeClick called with the subscription to purchase when the upgrade button is tapped
  * @param onViewAllPlansClick called when the "View all plans" link is tapped
  * @param onLearnMoreClick called when the "Learn more" link (transfer scenario) is tapped
+ * @param onContactSupportClick called when the "Contact support" button (highest-plan scenario) is tapped
+ * @param onManagePlanClick called when the inline "mega.io" link (highest-plan scenario) is tapped
  * @param onClose called when the close button is tapped
  */
 @Composable
@@ -74,6 +82,8 @@ fun QuotaWarningUpgradeScreen(
     onUpgradeClick: (Subscription) -> Unit,
     onViewAllPlansClick: () -> Unit,
     onLearnMoreClick: () -> Unit,
+    onContactSupportClick: () -> Unit,
+    onManagePlanClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -86,6 +96,7 @@ fun QuotaWarningUpgradeScreen(
         uiState.storageState,
         uiState.isTransferOverQuota,
         isProUser,
+        uiState.isHighestPlan,
     ) {
         QuotaWarningMessageMapper()(
             type = type,
@@ -93,6 +104,7 @@ fun QuotaWarningUpgradeScreen(
             storageState = uiState.storageState,
             isTransferOverQuota = uiState.isTransferOverQuota,
             isProUser = isProUser,
+            isHighestPlan = uiState.isHighestPlan,
         )
     }
 
@@ -122,12 +134,16 @@ fun QuotaWarningUpgradeScreen(
         title = title,
         subtitle = subtitle,
         showLearnMore = message.showLearnMore,
+        subtitleHasLink = message.subtitleHasLink,
+        isHighestPlan = uiState.isHighestPlan,
         isLoading = uiState.isLoading,
         currentCard = currentCard,
         recommended = recommended,
         onUpgradeClick = onUpgradeClick,
         onViewAllPlansClick = onViewAllPlansClick,
         onLearnMoreClick = onLearnMoreClick,
+        onContactSupportClick = onContactSupportClick,
+        onManagePlanClick = onManagePlanClick,
         onClose = onClose,
         modifier = modifier,
     )
@@ -139,12 +155,16 @@ private fun QuotaWarningUpgradeContent(
     title: String,
     subtitle: String,
     showLearnMore: Boolean,
+    subtitleHasLink: Boolean,
+    isHighestPlan: Boolean,
     isLoading: Boolean,
     currentCard: CurrentCardData,
     recommended: RecommendedCardData?,
     onUpgradeClick: (Subscription) -> Unit,
     onViewAllPlansClick: () -> Unit,
     onLearnMoreClick: () -> Unit,
+    onContactSupportClick: () -> Unit,
+    onManagePlanClick: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -173,8 +193,10 @@ private fun QuotaWarningUpgradeContent(
             if (!isLoading) {
                 QuotaWarningBottomBar(
                     recommended = recommended,
+                    isHighestPlan = isHighestPlan,
                     onUpgradeClick = onUpgradeClick,
                     onViewAllPlansClick = onViewAllPlansClick,
+                    onContactSupportClick = onContactSupportClick,
                 )
             }
         },
@@ -187,9 +209,11 @@ private fun QuotaWarningUpgradeContent(
                 title = title,
                 subtitle = subtitle,
                 showLearnMore = showLearnMore,
+                subtitleHasLink = subtitleHasLink,
                 currentCard = currentCard,
                 recommended = recommended,
                 onLearnMoreClick = onLearnMoreClick,
+                onManagePlanClick = onManagePlanClick,
                 modifier = Modifier.padding(innerPadding),
             )
         }
@@ -222,9 +246,11 @@ private fun QuotaWarningDataContent(
     title: String,
     subtitle: String,
     showLearnMore: Boolean,
+    subtitleHasLink: Boolean,
     currentCard: CurrentCardData,
     recommended: RecommendedCardData?,
     onLearnMoreClick: () -> Unit,
+    onManagePlanClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -257,15 +283,38 @@ private fun QuotaWarningDataContent(
                     .fillMaxWidth()
                     .testTag(TEST_TAG_QUOTA_WARNING_TITLE),
             )
-            MegaText(
-                text = subtitle,
-                style = MaterialTheme.typography.bodyLarge,
-                textColor = TextColor.Primary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag(TEST_TAG_QUOTA_WARNING_SUBTITLE),
-            )
+            if (subtitleHasLink) {
+                LinkSpannedText(
+                    value = subtitle,
+                    spanStyles = mapOf(
+                        SpanIndicator('A') to SpanStyleWithAnnotation(
+                            megaSpanStyle = MegaSpanStyle.LinkColorStyle(
+                                spanStyle = SpanStyle(),
+                                linkColor = LinkColor.Primary,
+                            ),
+                            annotation = MANAGE_PLAN_LINK_ANNOTATION,
+                        ),
+                    ),
+                    onAnnotationClick = { onManagePlanClick() },
+                    baseTextColor = TextColor.Primary,
+                    baseStyle = MaterialTheme.typography.bodyLarge.copy(
+                        textAlign = TextAlign.Center,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TEST_TAG_QUOTA_WARNING_SUBTITLE),
+                )
+            } else {
+                MegaText(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textColor = TextColor.Primary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TEST_TAG_QUOTA_WARNING_SUBTITLE),
+                )
+            }
             if (showLearnMore) {
                 MegaText(
                     text = stringResource(sharedR.string.general_learn_more),
@@ -306,15 +355,30 @@ private fun QuotaWarningDataContent(
 @Composable
 private fun QuotaWarningBottomBar(
     recommended: RecommendedCardData?,
+    isHighestPlan: Boolean,
     onUpgradeClick: (Subscription) -> Unit,
     onViewAllPlansClick: () -> Unit,
+    onContactSupportClick: () -> Unit,
 ) {
     val subscriptionToBuy = recommended?.subscriptionToBuy
     val upgradeText = recommended?.planName?.let {
         stringResource(sharedR.string.subscription_quota_upgrade_button, it)
     }
     val viewAllText = stringResource(sharedR.string.subscription_quota_view_all_plans)
+    val contactSupportText = stringResource(sharedR.string.subscription_quota_contact_support)
     val buttonGroup = buildList<@Composable ColumnScope.() -> Button> {
+        if (isHighestPlan) {
+            add {
+                Button.TextOnlyButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(TEST_TAG_QUOTA_WARNING_CONTACT_SUPPORT),
+                    text = contactSupportText,
+                    onClick = onContactSupportClick,
+                )
+            }
+            return@buildList
+        }
         if (subscriptionToBuy != null && upgradeText != null) {
             add {
                 Button.PrimaryButton(
@@ -458,6 +522,8 @@ private fun recommendedCardData(
 
 private const val CONTENT_MAX_WIDTH = 500
 
+private const val MANAGE_PLAN_LINK_ANNOTATION = "mega.io"
+
 /**
  * Test tag for the quota-warning screen close button
  */
@@ -494,6 +560,11 @@ const val TEST_TAG_QUOTA_WARNING_UPGRADE_BUTTON = "quota_warning:upgrade_button"
 const val TEST_TAG_QUOTA_WARNING_VIEW_ALL_PLANS = "quota_warning:view_all_plans"
 
 /**
+ * Test tag for the quota-warning screen "Contact support" button (highest-plan scenario)
+ */
+const val TEST_TAG_QUOTA_WARNING_CONTACT_SUPPORT = "quota_warning:contact_support"
+
+/**
  * Test tag for the quota-warning screen skeleton
  */
 const val TEST_TAG_QUOTA_WARNING_SKELETON = "quota_warning:skeleton"
@@ -509,12 +580,16 @@ private fun QuotaWarningUpgradeContentPreview(
             title = preview.title,
             subtitle = preview.subtitle,
             showLearnMore = preview.showLearnMore,
+            subtitleHasLink = preview.subtitleHasLink,
+            isHighestPlan = preview.isHighestPlan,
             isLoading = preview.isLoading,
             currentCard = preview.currentCard,
             recommended = preview.recommended,
             onUpgradeClick = {},
             onViewAllPlansClick = {},
             onLearnMoreClick = {},
+            onContactSupportClick = {},
+            onManagePlanClick = {},
             onClose = {},
         )
     }
@@ -529,6 +604,8 @@ private fun QuotaWarningUpgradeContentLandscapePreview() {
             title = "Your storage is 80% full",
             subtitle = "Upgrade your plan before you run out of space",
             showLearnMore = false,
+            subtitleHasLink = false,
+            isHighestPlan = false,
             isLoading = false,
             currentCard = CurrentCardData(
                 planName = "Free",
@@ -551,6 +628,8 @@ private fun QuotaWarningUpgradeContentLandscapePreview() {
             onUpgradeClick = {},
             onViewAllPlansClick = {},
             onLearnMoreClick = {},
+            onContactSupportClick = {},
+            onManagePlanClick = {},
             onClose = {},
         )
     }
@@ -563,6 +642,8 @@ private data class QuotaWarningPreviewState(
     val isLoading: Boolean,
     val currentCard: CurrentCardData,
     val recommended: RecommendedCardData?,
+    val subtitleHasLink: Boolean = false,
+    val isHighestPlan: Boolean = false,
 )
 
 private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarningPreviewState> {
@@ -608,6 +689,19 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
     )
     private val transferRecommended =
         storageRecommended.copy(usageText = "1 GB of 2.4 TB used")
+
+    private val transferCurrentProIIILow = CurrentCardData(
+        planName = "Pro III",
+        currentPlanLabel = "Current plan",
+        usagePercentage = 97f,
+        usageLevel = QuotaUsageLevel.Warning,
+        usageText = "233 TB of 240 TB used",
+    )
+    private val transferCurrentProIIIExceeded = transferCurrentProIIILow.copy(
+        usagePercentage = 100f,
+        usageLevel = QuotaUsageLevel.Error,
+        usageText = "240 TB of 240 TB used",
+    )
 
     override val values = sequenceOf(
         QuotaWarningPreviewState(
@@ -657,6 +751,59 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
             isLoading = false,
             currentCard = transferCurrentExceeded,
             recommended = transferRecommended,
+        ),
+        QuotaWarningPreviewState(
+            title = "Your storage is 100% full",
+            subtitle = "Make room in Cloud drive, or manage your plan at [A]mega.io[/A] for more storage",
+            showLearnMore = false,
+            subtitleHasLink = true,
+            isHighestPlan = true,
+            isLoading = false,
+            currentCard = storageCurrentFull.copy(
+                planName = "Pro III",
+                usageText = "10 TB of 10 TB used",
+            ),
+            recommended = null,
+        ),
+        QuotaWarningPreviewState(
+            title = "You've used 97% of your transfer quota",
+            subtitle = "As a result, your download may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota",
+            showLearnMore = false,
+            subtitleHasLink = true,
+            isHighestPlan = true,
+            isLoading = false,
+            currentCard = transferCurrentProIIILow,
+            recommended = null,
+        ),
+        QuotaWarningPreviewState(
+            title = "You've used 97% of your transfer quota",
+            subtitle = "As a result, media playback may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota",
+            showLearnMore = false,
+            subtitleHasLink = true,
+            isHighestPlan = true,
+            isLoading = false,
+            currentCard = transferCurrentProIIILow,
+            recommended = null,
+        ),
+        QuotaWarningPreviewState(
+            title = "Transfer quota exceeded",
+            subtitle = "To continue your download, manage your plan at [A]mega.io[/A] for more transfer quota",
+            showLearnMore = false,
+            subtitleHasLink = true,
+            isHighestPlan = true,
+            isLoading = false,
+            currentCard = transferCurrentProIIIExceeded,
+            recommended = null,
+        ),
+        QuotaWarningPreviewState(
+            title = "Transfer quota exceeded",
+            subtitle = "To continue media playback, manage your plan at [A]mega.io[/A] for more transfer quota",
+            showLearnMore = false,
+            subtitleHasLink = true,
+            isHighestPlan = true,
+            isLoading = false,
+            currentCard = transferCurrentProIIIExceeded,
+            recommended = null,
         ),
         QuotaWarningPreviewState(
             title = "",

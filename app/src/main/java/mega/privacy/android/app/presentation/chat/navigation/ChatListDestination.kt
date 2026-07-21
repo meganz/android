@@ -18,6 +18,7 @@ fun EntryProviderScope<NavKey>.chatListLegacyDestination(removeDestination: () -
             val intent = Intent(context, ChatActivity::class.java).apply {
                 putExtra(ChatActivity.OPEN_CHAT_LIST, true)
                 putExtra(ChatActivity.CREATE_NEW_CHAT, key.createNewChat)
+                putExtra(ChatActivity.EXTRA_SHOW_MEETING_TAB, key.showMeetingTab)
             }
             context.startActivity(intent)
             removeDestination()

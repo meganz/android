@@ -10,7 +10,6 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.LocalizedText
@@ -23,7 +22,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 
@@ -45,13 +43,8 @@ class AlbumsTabScreenComposeTest {
 
     private fun setComposeContent(
         uiState: AlbumsTabUiState,
-        addNewAlbum: (String) -> Unit = {},
         deleteAlbums: () -> Unit = {},
         onNavigate: (NavKey) -> Unit = {},
-        showNewAlbumDialogEvent: StateEvent = consumed,
-        resetNewAlbumDialogEvent: () -> Unit = {},
-        resetErrorMessage: () -> Unit = {},
-        resetAddNewAlbumSuccess: () -> Unit = {},
         resetNavigationEvent: () -> Unit = {},
         resetDeleteAlbumsConfirmationEvent: () -> Unit = {},
         onAlbumSelectionToggle: (MediaAlbum.User) -> Unit = {}
@@ -60,13 +53,8 @@ class AlbumsTabScreenComposeTest {
             AlbumsTabScreen(
                 uiState = uiState,
                 modifier = Modifier,
-                addNewAlbum = addNewAlbum,
                 deleteAlbums = deleteAlbums,
                 onNavigate = onNavigate,
-                showNewAlbumDialogEvent = showNewAlbumDialogEvent,
-                resetNewAlbumDialogEvent = resetNewAlbumDialogEvent,
-                resetErrorMessage = resetErrorMessage,
-                resetAddNewAlbumSuccess = resetAddNewAlbumSuccess,
                 resetNavigationEvent = resetNavigationEvent,
                 resetDeleteAlbumsConfirmationEvent = resetDeleteAlbumsConfirmationEvent,
                 onAlbumSelectionToggle = onAlbumSelectionToggle
@@ -113,39 +101,6 @@ class AlbumsTabScreenComposeTest {
                 .onNodeWithText(album.title.get(context))
                 .assertIsDisplayed()
         }
-    }
-
-    @Test
-    fun `test that new album dialog is visible when event triggered`() {
-        val uiState = AlbumsTabUiState(isLoading = false, albums = emptyList())
-
-        setComposeContent(uiState, showNewAlbumDialogEvent = triggered)
-
-        composeTestRule
-            .onNodeWithTag(ALBUMS_SCREEN_ADD_NEW_ALBUM_DIALOG)
-            .assertIsDisplayed()
-    }
-
-    @Test
-    fun `test that on confirm dialog should trigger add new album callback`() {
-        val uiState = AlbumsTabUiState(isLoading = false, albums = emptyList())
-        val mockCallback: (String) -> Unit = mock()
-
-        setComposeContent(
-            uiState = uiState,
-            showNewAlbumDialogEvent = triggered,
-            addNewAlbum = mockCallback
-        )
-
-        composeTestRule
-            .onNodeWithTag(ALBUMS_SCREEN_ADD_NEW_ALBUM_DIALOG)
-            .assertIsDisplayed()
-
-        composeTestRule
-            .onNodeWithText(context.getString(sharedResR.string.general_create_label))
-            .performClick()
-
-        verify(mockCallback).invoke(any())
     }
 
     @Test

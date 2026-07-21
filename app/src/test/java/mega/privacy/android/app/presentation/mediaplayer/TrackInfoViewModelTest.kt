@@ -143,6 +143,30 @@ class TrackInfoViewModelTest {
     }
 
     @Test
+    fun `test that isNodeInBackups is true when the node location is in backups`() = runTest {
+        val handle = 100L
+        val node = mock<TypedAudioNode> {
+            on { id } doReturn NodeId(handle)
+        }
+        val nodeLocation = mock<NodeLocation> {
+            on { this.node } doReturn node
+            on { ancestorIds } doReturn emptyList()
+            on { nodeSourceType } doReturn NodeSourceType.BACKUPS
+        }
+
+        whenever(getNodeLocationUseCase(node)) doReturn nodeLocation
+        whenever(nodeDestinationMapper(nodeLocation)) doReturn emptyList()
+
+        initUnderTest()
+        underTest.getNodeDestination(node)
+        advanceUntilIdle()
+
+        underTest.state.map { it.isNodeInBackups }.test {
+            assertThat(awaitItem()).isTrue()
+        }
+    }
+
+    @Test
     fun `test the state is updated correctly after loadNodeInfo is invoked`() = runTest {
         val testSize = "100 KB"
         val testDuration = "1:40"

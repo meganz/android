@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.entity.videosection.PlaylistType
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
+import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.MediaMainRoute
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentScreen
 import mega.privacy.android.feature.photos.presentation.albums.content.AlbumContentViewModel
@@ -69,6 +70,8 @@ import mega.privacy.android.navigation.destination.AlbumImportNavKey
 import mega.privacy.android.navigation.destination.AlbumImportPreviewNavKey
 import mega.privacy.android.navigation.destination.CameraUploadsProgressNavKey
 import mega.privacy.android.navigation.destination.CloudDriveMediaDiscoveryNavKey
+import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
+import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
 import mega.privacy.android.navigation.destination.FileExplorerNavKey
 import mega.privacy.android.navigation.destination.ImportAlbumNavKey
 import mega.privacy.android.navigation.destination.LegacyAlbumCoverSelectionNavKey
@@ -92,6 +95,9 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
     entry<MediaMainNavKey> {
         val photoSelectionResult by navigationHandler.monitorResult<Long?>(PhotosSelectionNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
+        val createAlbumResult by navigationHandler
+            .monitorResult<CreateAlbumDialogResult?>(CreateAlbumDialogNavKey.RESULT)
+            .collectAsStateWithLifecycle(null)
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
                 creationCallback = { it.create(null) }
@@ -113,6 +119,19 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
                 )
 
                 navigationHandler.clearResult(PhotosSelectionNavKey.RESULT)
+            }
+        }
+
+        LaunchedEffect(createAlbumResult) {
+            createAlbumResult?.let { result ->
+                navigationHandler.navigate(
+                    PhotosSelectionNavKey(
+                        albumId = result.albumId,
+                        selectionMode = AlbumFlow.Creation.ordinal,
+                    )
+                )
+
+                navigationHandler.clearResult(CreateAlbumDialogNavKey.RESULT)
             }
         }
 

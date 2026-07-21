@@ -97,6 +97,7 @@ import mega.privacy.android.navigation.contract.NavOptions
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.contract.state.ReportSelectionMode
+import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.navigation.destination.MediaTimelinePhotoPreviewNavKey
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -559,7 +560,7 @@ fun MediaMainScreen(
                         && !(currentTabIndex == MediaScreen.Albums.ordinal && albumsTabUiState.isLoading),
                 onClick = {
                     if (currentTabIndex == MediaScreen.Albums.ordinal) {
-                        viewModel.showNewAlbumDialog()
+                        navigationHandler.navigate(CreateAlbumDialogNavKey)
                     } else {
                         videoPlaylistsTabViewModel.showCreateVideoPlaylistDialog()
                     }
@@ -947,8 +948,6 @@ private fun MediaScreen.MediaContent(
             @SuppressLint("ComposeViewModelForwarding")
             AlbumsTabRoute(
                 modifier = Modifier.fillMaxSize(),
-                showNewAlbumDialogEvent = uiState.newAlbumDialogEvent,
-                resetNewAlbumDialogEvent = mainViewModel::resetNewAlbumDialog,
                 onNavigate = navigationHandler::navigate,
                 viewModel = albumsTabViewModel,
                 contentPadding = timelineContentPadding.excludeTopPadding(),
@@ -1040,11 +1039,17 @@ private fun PhotosMainScreenPreview() {
                 override fun navigate(destination: NavKey, navOptions: NavOptions?) {}
                 override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {}
                 override fun backTo(destination: NavKey, inclusive: Boolean) {}
-                override fun navigateAndClearBackStack(destination: NavKey) {}
+                override fun navigateAndClearBackStack(
+                    destination: NavKey,
+                    navOptions: NavOptions?,
+                ) {
+                }
+
                 override fun navigateAndClearTo(
                     destination: NavKey,
                     newParent: NavKey,
                     inclusive: Boolean,
+                    navOptions: NavOptions?,
                 ) {
                 }
 
@@ -1052,6 +1057,7 @@ private fun PhotosMainScreenPreview() {
                     destination: List<NavKey>,
                     newParent: NavKey,
                     inclusive: Boolean,
+                    navOptions: NavOptions?,
                 ) {
                 }
 

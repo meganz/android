@@ -5,11 +5,12 @@ import kotlin.reflect.KClass
 /**
  * Lightweight navigation options for back stack manipulation.
  *
- * Supports [launchSingleTop] and [popUpTo] operations.
+ * Supports [launchSingleTop], [dropIfAlreadyShown] and [popUpTo] operations.
  * Animation options are not supported as they are handled by the scene strategy.
  */
 class NavOptions internal constructor(
     val launchSingleTop: Boolean,
+    val dropIfAlreadyShown: Boolean,
     val popUpTo: PopUpTo?,
 ) {
 
@@ -45,8 +46,20 @@ class NavOptions internal constructor(
     class Builder {
         /**
          * Whether the destination should be launched as single top.
+         *
+         * When `true`, an existing instance of the same destination at the top of the back stack
+         * is removed and the new one is added in its place.
          */
         var launchSingleTop: Boolean = false
+
+        /**
+         * Whether the navigation should be dropped when the destination is already on the back stack.
+         *
+         * When `true`, if an instance of the same destination is already present anywhere on the
+         * back stack, the navigation request is ignored and the existing instance is kept in place.
+         * Unlike [launchSingleTop], no existing entry is removed or moved.
+         */
+        var dropIfAlreadyShown: Boolean = false
 
         @PublishedApi
         internal var popUpTo: PopUpTo? = null
@@ -70,7 +83,7 @@ class NavOptions internal constructor(
             popUpTo = PopUpTo.Builder(routeClass = null).apply(block).build()
         }
 
-        fun build() = NavOptions(launchSingleTop, popUpTo)
+        fun build() = NavOptions(launchSingleTop, dropIfAlreadyShown, popUpTo)
     }
 }
 
@@ -81,6 +94,10 @@ class NavOptions internal constructor(
  * ```
  * navOptions {
  *     launchSingleTop = true
+ * }
+ *
+ * navOptions {
+ *     dropIfAlreadyShown = true
  * }
  *
  * navOptions {

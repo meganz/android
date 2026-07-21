@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.node.NodeContentUri
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.sync.SyncType
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.navigation.payment.UpgradeAccountSource
 import java.io.File
 
@@ -107,6 +109,19 @@ interface AppNavigator {
     fun openUpgradeAccount(
         context: Context,
         source: UpgradeAccountSource = UpgradeAccountSource.UNKNOWN,
+    )
+
+    /**
+     * Open the quota-warning upsell screen in the single activity, launching it if the caller is a
+     * legacy activity.
+     *
+     * @param type the quota metric (storage or transfer) the warning is about
+     * @param trigger the user action that triggered the warning, used to select the screen copy
+     */
+    fun openQuotaWarningUpsell(
+        context: Context,
+        type: QuotaWarningType,
+        trigger: QuotaWarningTrigger,
     )
 
     /**
@@ -587,6 +602,14 @@ interface AppNavigator {
      * @param email    The email of the contact.
      */
     fun openContactInfoActivity(context: Context, email: String)
+
+    /**
+     * Method to open the contact info screen for the peer of a 1:1 chat.
+     *
+     * @param context Activity context.
+     * @param chatId  The ID of the 1:1 chat with the contact.
+     */
+    fun openContactInfoActivity(context: Context, chatId: Long)
 
     /**
      * Method to open ContactAttachmentActivity.class.

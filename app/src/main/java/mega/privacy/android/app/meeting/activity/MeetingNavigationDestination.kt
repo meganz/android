@@ -1,6 +1,9 @@
 package mega.privacy.android.app.meeting.activity
 
+import android.app.Activity
 import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
@@ -156,16 +159,25 @@ fun EntryProviderScope<NavKey>.legacyWaitingRoomScreen(
     }
 }
 
-fun EntryProviderScope<NavKey>.createScheduledMeetingScreen(removeDestination: () -> Unit) {
+fun EntryProviderScope<NavKey>.createScheduledMeetingScreen(
+    removeDestination: () -> Unit,
+    navigateToMeetingsTab: () -> Unit,
+) {
     entry<CreateScheduledMeetingNavKey>(
         metadata = transparentMetadata()
     ) {
         val context = LocalContext.current
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                navigateToMeetingsTab()
+            } else {
+                removeDestination()
+            }
+        }
         LaunchedEffect(Unit) {
-            context.startActivity(Intent(context, CreateScheduledMeetingActivity::class.java))
-
-            // Immediately pop this destination from the back stack
-            removeDestination()
+            launcher.launch(Intent(context, CreateScheduledMeetingActivity::class.java))
         }
     }
 }

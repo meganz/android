@@ -24,6 +24,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
+    implementation(project(":shared:contact"))
     implementation(project(":shared:nodes"))
     implementation(project(":resources:icon-pack"))
     implementation(project(":resources:string-resources"))

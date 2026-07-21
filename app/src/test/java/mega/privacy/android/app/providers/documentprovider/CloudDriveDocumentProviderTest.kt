@@ -17,16 +17,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.analytics.test.AnalyticsTestRule
+import mega.privacy.android.app.R
 import mega.privacy.android.app.providers.documentprovider.model.ChildrenSlot
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveDocumentRow
 import mega.privacy.android.app.providers.documentprovider.model.CloudDriveSessionState
 import mega.privacy.android.app.providers.documentprovider.model.DocumentSlot
-import mega.privacy.android.app.R
 import mega.privacy.android.shared.resources.R as sharedR
 import org.junit.After
 import org.junit.Before
@@ -368,7 +367,7 @@ class CloudDriveDocumentProviderTest {
     fun `test that queryDocument returns cached row when documentState mismatches but cache hits`() =
         runTest {
             // Get Info flow: a child listing was previously loaded, then SAF queries the child
-            // doc directly. documentState may not yet be Loaded for the requested id, but the
+            // doc directly. documentState may not yet be Data for the requested id, but the
             // cached row from the prior listing should serve immediately without a loading cursor.
             setReadySession()
             val requestedId = "$CLOUD_DRIVE_ROOT_ID:42"
@@ -615,7 +614,7 @@ class CloudDriveDocumentProviderTest {
     fun `test that queryChildDocuments still returns Loaded children when cached row matches an already-loaded parent`() =
         runTest {
             // The fast path is only taken when childrenState has not yet caught up. Once the
-            // load completes and childrenState becomes Loaded for the same parent, the cursor
+            // load completes and childrenState becomes Data for the same parent, the cursor
             // should serve the real rows instead of returning empty.
             setReadySession()
             val folderId = "$CLOUD_DRIVE_ROOT_ID:60"

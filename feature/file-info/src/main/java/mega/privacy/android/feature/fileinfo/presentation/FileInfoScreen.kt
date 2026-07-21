@@ -96,7 +96,7 @@ internal fun FileInfoScreen(
             MegaTopAppBar(
                 modifier = Modifier.testTag(FILE_INFO_APP_BAR_TAG),
                 title = stringResource(sharedR.string.general_info),
-                navigationType = AppBarNavigationType.Close(onBack),
+                navigationType = AppBarNavigationType.Back(onBack),
             )
         },
     ) { contentPadding ->
@@ -302,7 +302,6 @@ private fun FileInfoDetails(
                 text = uiState.title,
                 textColor = TextColor.Primary,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
                 style = AppTheme.typography.titleMedium,
             )
             if (subtitle.isNotEmpty()) {

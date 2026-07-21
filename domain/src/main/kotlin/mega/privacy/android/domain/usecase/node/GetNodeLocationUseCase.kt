@@ -12,6 +12,7 @@ import javax.inject.Inject
 class GetNodeLocationUseCase @Inject constructor(
     private val isNodeInCloudDriveUseCase: IsNodeInCloudDriveUseCase,
     private val isNodeInRubbishBinUseCase: IsNodeInRubbishBinUseCase,
+    private val isNodeInBackupsUseCase: IsNodeInBackupsUseCase,
     private val getAncestorsIdsUseCase: GetAncestorsIdsUseCase,
 ) {
     /**
@@ -21,10 +22,15 @@ class GetNodeLocationUseCase @Inject constructor(
         val nodeSourceType = when {
             isNodeInCloudDriveUseCase(node.id.longValue) -> NodeSourceType.CLOUD_DRIVE
             isNodeInRubbishBinUseCase(node.id) -> NodeSourceType.RUBBISH_BIN
+            isNodeInBackupsUseCase(node.id.longValue) -> NodeSourceType.BACKUPS
             else -> NodeSourceType.INCOMING_SHARES
         }
         val ancestorIds = getAncestorsIdsUseCase(node)
-            .dropLast(if (nodeSourceType == NodeSourceType.INCOMING_SHARES) 0 else 1)
+            .dropLast(
+                if (nodeSourceType == NodeSourceType.INCOMING_SHARES ||
+                    nodeSourceType == NodeSourceType.BACKUPS
+                ) 0 else 1
+            )
 
         return NodeLocation(
             node = node,

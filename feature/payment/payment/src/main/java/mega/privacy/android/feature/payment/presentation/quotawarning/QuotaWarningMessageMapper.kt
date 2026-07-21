@@ -30,6 +30,7 @@ enum class QuotaMetric {
  * @property titleTakesPercentage whether [titleId] takes the usage percentage as a format argument
  * @property subtitleId subtitle string resource
  * @property showLearnMore whether the subtitle is followed by a "Learn more" link
+ * @property subtitleHasLink whether the subtitle contains an inline "mega.io" link ([A]…[/A] span)
  * @property metric which usage metric (storage or transfer) the cards display
  * @property level severity of the current-plan usage bar, derived from the backend quota state
  */
@@ -38,6 +39,7 @@ data class QuotaWarningMessage(
     val titleTakesPercentage: Boolean,
     @StringRes val subtitleId: Int,
     val showLearnMore: Boolean,
+    val subtitleHasLink: Boolean = false,
     val metric: QuotaMetric,
     val level: QuotaUsageLevel,
 )
@@ -57,6 +59,8 @@ class QuotaWarningMessageMapper @Inject constructor() {
      * @param storageState the backend storage state, used for storage warnings
      * @param isTransferOverQuota whether the backend reports the transfer quota as exceeded
      * @param isProUser whether the current account is a paid (Pro) plan
+     * @param isHighestPlan whether the user is already on the highest available plan, so the copy
+     * directs them to manage their plan at mega.io instead of upgrading in-app
      * @return the copy, metric and severity to show
      */
     operator fun invoke(
@@ -65,9 +69,47 @@ class QuotaWarningMessageMapper @Inject constructor() {
         storageState: StorageState,
         isTransferOverQuota: Boolean,
         isProUser: Boolean,
-    ): QuotaWarningMessage = when (type) {
-        QuotaWarningType.Storage -> storageMessage(storageState, trigger)
-        QuotaWarningType.Transfer -> transferMessage(trigger, isTransferOverQuota, isProUser)
+        isHighestPlan: Boolean = false,
+    ): QuotaWarningMessage {
+        val message = when (type) {
+            QuotaWarningType.Storage -> storageMessage(storageState, trigger)
+            QuotaWarningType.Transfer -> transferMessage(trigger, isTransferOverQuota, isProUser)
+        }
+        return if (isHighestPlan) {
+            message.copy(
+                subtitleId = highestPlanSubtitle(type, trigger, isTransferOverQuota),
+                showLearnMore = false,
+                subtitleHasLink = true,
+            )
+        } else {
+            message
+        }
+    }
+
+    private fun highestPlanSubtitle(
+        type: QuotaWarningType,
+        trigger: QuotaWarningTrigger,
+        isTransferOverQuota: Boolean,
+    ): Int = when (type) {
+        QuotaWarningType.Storage ->
+            sharedR.string.subscription_quota_storage_highest_plan_subtitle
+
+        QuotaWarningType.Transfer -> {
+            val isStreaming = trigger == QuotaWarningTrigger.Streaming
+            when {
+                isTransferOverQuota && isStreaming ->
+                    sharedR.string.subscription_quota_transfer_over_streaming_highest_plan_subtitle
+
+                isTransferOverQuota ->
+                    sharedR.string.subscription_quota_transfer_over_download_highest_plan_subtitle
+
+                isStreaming ->
+                    sharedR.string.subscription_quota_transfer_low_streaming_highest_plan_subtitle
+
+                else ->
+                    sharedR.string.subscription_quota_transfer_low_download_highest_plan_subtitle
+            }
+        }
     }
 
     private fun storageMessage(

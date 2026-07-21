@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -142,15 +143,16 @@ private fun ShareLinkContent(
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
-    val displayLink = uiState.linkWithoutKey?.takeIf { uiState.isKeySeparate } ?: uiState.link
-    val separateKey = uiState.key?.takeIf { uiState.isKeySeparate }
+    val primary = uiState.primary
+    val displayLink = primary.linkWithoutKey?.takeIf { uiState.isKeySeparate } ?: primary.link
+    val separateKey = primary.key?.takeIf { uiState.isKeySeparate }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState()),
     ) {
-        NodeHeader(uiState = uiState)
+        NodeHeader(node = primary)
 
         Column(
             modifier = Modifier
@@ -200,16 +202,17 @@ private fun ShareLinkContent(
 
 @Composable
 private fun NodeHeader(
-    uiState: ShareLinkUiState.Data,
+    node: ShareLinkNodeItem,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
-    val subtitle = buildList {
-        uiState.sizeInBytes?.let { add(formatFileSize(it, context)) }
-        uiState.modificationTime?.let { add(formatModifiedDate(locale, it)) }
-    }.joinToString(separator = " • ")
-
+    val subtitle = remember(node.sizeInBytes, node.modificationTime) {
+        buildList {
+            node.sizeInBytes?.let { add(formatFileSize(it, context)) }
+            node.modificationTime?.let { add(formatModifiedDate(locale, it)) }
+        }.joinToString(separator = " • ")
+    }
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
@@ -221,7 +224,7 @@ private fun NodeHeader(
         ) {
             Image(
                 modifier = Modifier.size(32.dp),
-                painter = painterResource(id = uiState.iconRes),
+                painter = painterResource(id = node.iconRes),
                 contentDescription = null,
             )
             Column(
@@ -229,7 +232,7 @@ private fun NodeHeader(
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 MegaText(
-                    text = uiState.nodeName,
+                    text = node.name,
                     textColor = TextColor.Primary,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
@@ -310,15 +313,21 @@ internal data object ShareLinkSettingsAction : MenuActionWithIcon {
 }
 
 private val previewData = ShareLinkUiState.Data(
-    handles = listOf(1L),
-    nodeName = "Presentation.pdf",
-    isFolder = false,
-    iconRes = iconPackR.drawable.ic_pdf_medium_solid,
-    sizeInBytes = 10L * 1024 * 1024,
-    modificationTime = 1_749_000_000L,
-    link = "https://mega.nz/file/abc123#decryptionKey",
-    linkWithoutKey = "https://mega.nz/file/abc123",
-    key = "decryptionKey",
+    nodeLinks = listOf(
+        ShareLinkNodeItem(
+            handle = 1L,
+            name = "Presentation.pdf",
+            isFolder = false,
+            iconRes = iconPackR.drawable.ic_pdf_medium_solid,
+            sizeInBytes = 10L * 1024 * 1024,
+            modificationTime = 1_749_000_000L,
+            childFolderCount = null,
+            childFileCount = null,
+            link = "https://mega.nz/file/abc123#decryptionKey",
+            linkWithoutKey = "https://mega.nz/file/abc123",
+            key = "decryptionKey",
+        ),
+    ),
     accountType = null,
 )
 

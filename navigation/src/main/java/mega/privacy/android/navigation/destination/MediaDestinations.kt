@@ -38,6 +38,20 @@ data class PhotosSelectionNavKey(
 }
 
 @Serializable
+data object CreateAlbumDialogNavKey : NavKey {
+    const val RESULT = "CreateAlbumDialogNavKey::result"
+}
+
+/**
+ * Result returned once an album has been created from [CreateAlbumDialogNavKey].
+ */
+@Serializable
+data class CreateAlbumDialogResult(
+    val albumId: Long,
+    val albumName: String,
+)
+
+@Serializable
 data object AlbumDecryptionKeyNavKey : NavKey
 
 @Serializable

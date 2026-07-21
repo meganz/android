@@ -76,6 +76,10 @@ class PendingBackStackNavigationHandler(
 
     override fun navigate(destinations: List<NavKey>, navOptions: NavOptions?) {
         Timber.d("PendingBackStackNavigationHandler::navigate $destinations")
+        if (navOptions?.dropIfAlreadyShown == true && isAlreadyShown(destinations)) {
+            Timber.d("Destinations are already on the backstack, dropping navigation")
+            return
+        }
         applyNavOptions(navOptions, destinations)
         if (backstack.takeLast(destinations.size).containsAll(destinations)) {
             Timber.d("Destinations are already on the backstack")
@@ -130,18 +134,19 @@ class PendingBackStackNavigationHandler(
         ensureNotEmpty()
     }
 
-    override fun navigateAndClearBackStack(destination: NavKey) {
+    override fun navigateAndClearBackStack(destination: NavKey, navOptions: NavOptions?) {
         backstack.clear()
-        navigate(destination)
+        navigate(destination, navOptions)
     }
 
     override fun navigateAndClearTo(
         destination: List<NavKey>,
         newParent: NavKey,
         inclusive: Boolean,
+        navOptions: NavOptions?,
     ) {
         removeFromBackStackTo(newParent, inclusive)
-        navigate(destination)
+        navigate(destination, navOptions)
     }
 
     override fun <T> returnResult(key: String, value: T) {
@@ -286,6 +291,11 @@ class PendingBackStackNavigationHandler(
 
     private fun AuthStatus?.sessionOrNull(): String? =
         (this as? AuthStatus.LoggedIn)?.session
+
+    private fun isAlreadyShown(destinations: List<NavKey>): Boolean {
+        val backStackClasses = (backstack + backstack.pending).map { it::class }
+        return destinations.all { it::class in backStackClasses }
+    }
 
     private fun applyNavOptions(navOptions: NavOptions?, destinations: List<NavKey>) {
         if (navOptions == null) return

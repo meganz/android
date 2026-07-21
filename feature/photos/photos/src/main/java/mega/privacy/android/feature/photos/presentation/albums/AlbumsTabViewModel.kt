@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -17,13 +16,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.core.sharedcomponents.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.provider.AlbumsDataProvider
@@ -42,18 +37,14 @@ import kotlin.sequences.contains
 class AlbumsTabViewModel @Inject constructor(
     private val albumsProvider: Set<@JvmSuppressWildcards AlbumsDataProvider>,
     private val albumUiStateMapper: AlbumUiStateMapper,
-    private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
     private val snackbarEventQueue: SnackbarEventQueue,
-    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase,
-    private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
 ) : ViewModel() {
     internal val uiState: StateFlow<AlbumsTabUiState>
         field = MutableStateFlow(AlbumsTabUiState())
 
-    private var addNewAlbumJob: Job? = null
     private var isInitialized = false
 
     internal fun initialize() {
@@ -98,32 +89,6 @@ class AlbumsTabViewModel @Inject constructor(
         }
             .catch { Timber.e(it) }
             .launchIn(viewModelScope)
-    }
-
-    internal fun addNewAlbum(name: String) {
-        if (addNewAlbumJob?.isActive == true) return
-
-        addNewAlbumJob = viewModelScope.launch {
-            runCatching {
-                validateAndCreateUserAlbumUseCase(name)
-            }.onFailure { e ->
-                Timber.e(e)
-                if (e is AlbumNameValidationException) {
-                    val message = albumNameValidationExceptionMessageMapper(e)
-                    uiState.update {
-                        it.copy(addNewAlbumErrorMessage = triggered(message))
-                    }
-                }
-            }.onSuccess { albumId ->
-                Timber.d("AlbumsTabViewModel: $name created")
-                uiState.update {
-                    it.copy(
-                        addNewAlbumErrorMessage = consumed(),
-                        addNewAlbumSuccessEvent = triggered(albumId)
-                    )
-                }
-            }
-        }
     }
 
     internal fun areAllAlbumsSelected(): Boolean {
@@ -214,26 +179,11 @@ class AlbumsTabViewModel @Inject constructor(
         }
     }
 
-    internal fun getPresetNewAlbumName(defaultName: String): String {
-        val userAlbumNames = uiState.value.albums
-            .mapNotNull { (it.mediaAlbum as? MediaAlbum.User)?.title }
-        return getNextDefaultAlbumNameUseCase(defaultName, userAlbumNames)
-    }
-
     internal fun resetNavigationEvent() {
         uiState.update { it.copy(navigationEvent = consumed()) }
     }
 
     internal fun resetDeleteAlbumsConfirmationEvent() {
         uiState.update { it.copy(deleteAlbumsConfirmationEvent = consumed) }
-    }
-
-
-    internal fun resetErrorMessage() {
-        uiState.update { it.copy(addNewAlbumErrorMessage = consumed()) }
-    }
-
-    internal fun resetAddNewAlbumSuccess() {
-        uiState.update { it.copy(addNewAlbumSuccessEvent = consumed()) }
     }
 }

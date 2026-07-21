@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalResources
@@ -22,8 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import mega.android.core.ui.components.MegaText
@@ -34,7 +30,6 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.sharedcomponents.button.DoMoreWithMegaItemButton
-import mega.privacy.android.core.sharedcomponents.dialog.EnterAlbumNameDialog
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -52,6 +47,8 @@ import mega.privacy.android.navigation.destination.DriveSyncNavKey.Companion.SYN
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AlbumContentNavKey
+import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
+import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.shared.resources.R as sharedR
@@ -84,67 +81,46 @@ class DoMoreWithMegaWidget @Inject constructor() : HomeWidget, Flagged {
         FeatureFlagGate(feature) {
             val viewModel = hiltViewModel<DoMoreWithMegaWidgetViewModel>()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            var showCreateAlbumDialog by rememberSaveable { mutableStateOf(false) }
             if (uiState.items.isNotEmpty()) {
                 DoMoreWithMegaSection(
                     items = uiState.items,
                     onItemClick = { item ->
-                        if (item.identifier == DoMoreWithMegaItem.Identifier.CreateAlbum) {
-                            showCreateAlbumDialog = true
-                        } else {
-                            navigationHandler.navigateForItem(
-                                identifier = item.identifier,
-                                isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
-                                hasPreviouslyEnabledCameraUploads = uiState.hasPreviouslyEnabledCameraUploads,
-                            )
-                        }
+                        navigationHandler.navigateForItem(
+                            identifier = item.identifier,
+                            isCameraUploadsEnabled = uiState.isCameraUploadsEnabled,
+                            hasPreviouslyEnabledCameraUploads = uiState.hasPreviouslyEnabledCameraUploads,
+                        )
                     },
                     modifier = modifier,
-                )
-            }
-            if (showCreateAlbumDialog) {
-                val newAlbumPlaceholder =
-                    stringResource(sharedR.string.create_new_album_input_album_name_placeholder)
-                val presetAlbumName = rememberSaveable {
-                    viewModel.getPresetNewAlbumName(newAlbumPlaceholder)
-                }
-                EnterAlbumNameDialog(
-                    onConfirm = viewModel::createAlbum,
-                    onDismiss = {
-                        showCreateAlbumDialog = false
-                        viewModel.resetCreateAlbumErrorMessage()
-                    },
-                    resetErrorMessage = viewModel::resetCreateAlbumErrorMessage,
-                    positiveButtonText = stringResource(sharedR.string.general_create_label),
-                    errorText = (uiState.createAlbumErrorMessage as? StateEventWithContentTriggered)
-                        ?.content,
-                    defaultSuggestion = { presetAlbumName },
                 )
             }
 
             val snackBarEventQueue = rememberSnackBarQueue()
             val resources = LocalResources.current
-            EventEffect(
-                event = uiState.albumCreatedEvent,
-                onConsumed = viewModel::resetAlbumCreatedEvent,
-            ) { createdAlbum ->
-                showCreateAlbumDialog = false
-                snackBarEventQueue.queueMessage(
-                    SnackbarAttributes(
-                        message = resources.getString(
-                            sharedR.string.home_do_more_with_mega_album_created_message,
-                            createdAlbum.name,
+            val createdAlbum by navigationHandler
+                .monitorResult<CreateAlbumDialogResult?>(CreateAlbumDialogNavKey.RESULT)
+                .collectAsStateWithLifecycle(null)
+
+            LaunchedEffect(createdAlbum) {
+                createdAlbum?.let { album ->
+                    snackBarEventQueue.queueMessage(
+                        SnackbarAttributes(
+                            message = resources.getString(
+                                sharedR.string.home_do_more_with_mega_album_created_message,
+                                album.albumName,
+                            ),
+                            action = resources.getString(
+                                sharedR.string.home_do_more_with_mega_see_album_action,
+                            ),
+                            actionClick = {
+                                navigationHandler.navigate(
+                                    AlbumContentNavKey(id = album.albumId, type = "custom"),
+                                )
+                            },
                         ),
-                        action = resources.getString(
-                            sharedR.string.home_do_more_with_mega_see_album_action,
-                        ),
-                        actionClick = {
-                            navigationHandler.navigate(
-                                AlbumContentNavKey(id = createdAlbum.id.id, type = "custom"),
-                            )
-                        },
-                    ),
-                )
+                    )
+                    navigationHandler.clearResult(CreateAlbumDialogNavKey.RESULT)
+                }
             }
         }
     }
@@ -182,9 +158,9 @@ private fun NavigationHandler.navigateForItem(
         DoMoreWithMegaItem.Identifier.ScanDocument ->
             navigate(ContinuousScanNavKey)
 
+        DoMoreWithMegaItem.Identifier.CreateAlbum ->
+            navigate(CreateAlbumDialogNavKey)
 
-        // Handled in DisplayWidget via the create-album dialog, not navigation
-        DoMoreWithMegaItem.Identifier.CreateAlbum -> Unit
         DoMoreWithMegaItem.Identifier.AddContact ->
             navigate(InviteContactNavKey())
 

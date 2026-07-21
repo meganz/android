@@ -20,15 +20,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import de.palm.composestateevents.StateEvent
-import de.palm.composestateevents.StateEventWithContentTriggered
-import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import mega.android.core.ui.model.HighlightedText
 import mega.android.core.ui.modifiers.calculateSafeBottomPadding
@@ -42,12 +38,8 @@ import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
-import mega.privacy.android.feature.photos.model.AlbumFlow
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
-import mega.privacy.android.core.sharedcomponents.dialog.EnterAlbumNameDialog
 import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbumConfirmationDialog
-import mega.privacy.android.navigation.destination.PhotosSelectionNavKey
-import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.mobile.analytics.event.DeleteAlbumCancelButtonPressedEvent
 import mega.privacy.mobile.analytics.event.DeleteAlbumsConfirmationDialogEvent
 
@@ -56,8 +48,6 @@ fun AlbumsTabRoute(
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: AlbumsTabViewModel = hiltViewModel(),
-    showNewAlbumDialogEvent: StateEvent = consumed,
-    resetNewAlbumDialogEvent: () -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -65,17 +55,11 @@ fun AlbumsTabRoute(
     AlbumsTabScreen(
         uiState = uiState,
         onNavigate = onNavigate,
-        addNewAlbum = viewModel::addNewAlbum,
         deleteAlbums = viewModel::deleteAlbums,
         modifier = modifier,
-        showNewAlbumDialogEvent = showNewAlbumDialogEvent,
-        resetNewAlbumDialogEvent = resetNewAlbumDialogEvent,
-        resetErrorMessage = viewModel::resetErrorMessage,
-        resetAddNewAlbumSuccess = viewModel::resetAddNewAlbumSuccess,
         resetNavigationEvent = viewModel::resetNavigationEvent,
         resetDeleteAlbumsConfirmationEvent = viewModel::resetDeleteAlbumsConfirmationEvent,
         onAlbumSelectionToggle = viewModel::toggleAlbumSelection,
-        getPresetNewAlbumName = viewModel::getPresetNewAlbumName,
         contentPadding = contentPadding,
     )
 }
@@ -84,37 +68,18 @@ fun AlbumsTabRoute(
 @Composable
 internal fun AlbumsTabScreen(
     uiState: AlbumsTabUiState,
-    addNewAlbum: (String) -> Unit,
     deleteAlbums: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     modifier: Modifier = Modifier,
-    showNewAlbumDialogEvent: StateEvent = consumed,
-    resetNewAlbumDialogEvent: () -> Unit = {},
-    resetErrorMessage: () -> Unit = {},
-    resetAddNewAlbumSuccess: () -> Unit = {},
     resetNavigationEvent: () -> Unit = {},
     resetDeleteAlbumsConfirmationEvent: () -> Unit = {},
     onAlbumSelectionToggle: (MediaAlbum.User) -> Unit = {},
-    getPresetNewAlbumName: (String) -> String = { "" },
     contentPadding: PaddingValues = PaddingValues(),
 ) {
     val placeholder = if (uiState.themeMode.isDarkMode()) {
         painterResource(R.drawable.ic_album_cover_d)
     } else {
         painterResource(R.drawable.ic_album_cover)
-    }
-
-    EventEffect(
-        event = uiState.addNewAlbumSuccessEvent,
-        onConsumed = resetAddNewAlbumSuccess
-    ) { albumId ->
-        resetNewAlbumDialogEvent()
-        onNavigate(
-            PhotosSelectionNavKey(
-                albumId = albumId.id,
-                selectionMode = AlbumFlow.Creation.ordinal
-            )
-        )
     }
 
     EventEffect(
@@ -195,20 +160,6 @@ internal fun AlbumsTabScreen(
             }
         }
 
-        if (showNewAlbumDialogEvent == triggered) {
-            val defaultAlbumName =
-                stringResource(sharedR.string.create_new_album_input_album_name_placeholder)
-            EnterAlbumNameDialog(
-                modifier = Modifier.testTag(ALBUMS_SCREEN_ADD_NEW_ALBUM_DIALOG),
-                onDismiss = resetNewAlbumDialogEvent,
-                onConfirm = addNewAlbum,
-                resetErrorMessage = resetErrorMessage,
-                errorText = (uiState.addNewAlbumErrorMessage as? StateEventWithContentTriggered)?.content,
-                positiveButtonText = stringResource(sharedR.string.general_create_label),
-                defaultSuggestion = { getPresetNewAlbumName(defaultAlbumName) }
-            )
-        }
-
         RemoveAlbumConfirmationDialog(
             modifier = Modifier.testTag(ALBUMS_SCREEN_REMOVE_ALBUM_CONFIRMATION_DIALOG),
             size = uiState.selectedUserAlbums.size,
@@ -269,7 +220,6 @@ private fun AlbumsTabSkeletonViewPreview() {
     AndroidThemeForPreviews {
         AlbumsTabScreen(
             uiState = AlbumsTabUiState(isLoading = true),
-            addNewAlbum = {},
             deleteAlbums = {},
             onNavigate = {},
         )
@@ -278,6 +228,5 @@ private fun AlbumsTabSkeletonViewPreview() {
 
 const val ALBUMS_SCREEN_SKELETON = "albums_tab_screen:skeleton"
 const val ALBUMS_SCREEN_ALBUM_GRID_ITEM = "albums_tab_screen:album_grid_item"
-const val ALBUMS_SCREEN_ADD_NEW_ALBUM_DIALOG = "albums_tab_screen:add_new_album_dialog"
 const val ALBUMS_SCREEN_REMOVE_ALBUM_CONFIRMATION_DIALOG =
     "albums_tab_screen:remove_album_confirmation_dialog"
