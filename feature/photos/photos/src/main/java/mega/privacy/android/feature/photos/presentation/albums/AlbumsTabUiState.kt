@@ -6,15 +6,12 @@ import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 
 data class AlbumsTabUiState(
     val isLoading: Boolean = true,
     val albums: List<AlbumUiState> = emptyList(),
     val selectedUserAlbums: Set<MediaAlbum.User> = emptySet(),
-    val addNewAlbumErrorMessage: StateEventWithContent<String> = consumed(),
-    val addNewAlbumSuccessEvent: StateEventWithContent<AlbumId> = consumed(),
     val navigationEvent: StateEventWithContent<NavKey> = consumed(),
     val deleteAlbumsConfirmationEvent: StateEvent = consumed,
     val themeMode: ThemeMode = ThemeMode.System,

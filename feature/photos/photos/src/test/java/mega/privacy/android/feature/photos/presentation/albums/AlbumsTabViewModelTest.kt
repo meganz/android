@@ -10,13 +10,9 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.exception.account.AlbumNameValidationException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
-import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
-import mega.privacy.android.core.sharedcomponents.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.feature.photos.mapper.AlbumUiStateMapper
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumSelectionAction
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
@@ -28,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
@@ -43,13 +38,9 @@ internal class AlbumsTabViewModelTest {
     private lateinit var underTest: AlbumsTabViewModel
 
     private val mockAlbumsDataProvider: AlbumsDataProvider = mock()
-    private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase = mock()
     private val mockAlbumUiStateMapper: AlbumUiStateMapper = mock()
-    private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper =
-        mock()
     private val removeAlbumsUseCase: RemoveAlbumsUseCase = mock()
     private val snackbarEventQueue: SnackbarEventQueue = mock()
-    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase = mock()
     private val monitorThemeModeUseCase: MonitorThemeModeUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
 
@@ -57,12 +48,9 @@ internal class AlbumsTabViewModelTest {
     fun setUp() {
         reset(
             mockAlbumsDataProvider,
-            validateAndCreateUserAlbumUseCase,
             mockAlbumUiStateMapper,
-            albumNameValidationExceptionMessageMapper,
             removeAlbumsUseCase,
             snackbarEventQueue,
-            getNextDefaultAlbumNameUseCase,
             monitorThemeModeUseCase,
             monitorShowHiddenItemsUseCase
         )
@@ -71,12 +59,9 @@ internal class AlbumsTabViewModelTest {
     private fun initViewModel() {
         underTest = AlbumsTabViewModel(
             albumsProvider = setOf(mockAlbumsDataProvider),
-            validateAndCreateUserAlbumUseCase = validateAndCreateUserAlbumUseCase,
             albumUiStateMapper = mockAlbumUiStateMapper,
-            albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
             removeAlbumsUseCase = removeAlbumsUseCase,
             snackbarEventQueue = snackbarEventQueue,
-            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
         )
@@ -183,12 +168,9 @@ internal class AlbumsTabViewModelTest {
 
         underTest = AlbumsTabViewModel(
             albumsProvider = setOf(mockProvider1, mockProvider2),
-            validateAndCreateUserAlbumUseCase = validateAndCreateUserAlbumUseCase,
             albumUiStateMapper = mockAlbumUiStateMapper,
-            albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
             removeAlbumsUseCase = removeAlbumsUseCase,
             snackbarEventQueue = snackbarEventQueue,
-            getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             monitorThemeModeUseCase = monitorThemeModeUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase
         )
@@ -202,41 +184,6 @@ internal class AlbumsTabViewModelTest {
             assertThat(state.albums[1]).isEqualTo(expectedAlbumUiState2)
             verify(mockAlbumUiStateMapper).invoke(albums1[0])
             verify(mockAlbumUiStateMapper).invoke(albums2[0])
-        }
-    }
-
-    @Test
-    fun `test that add new albums calls the use case and update state on success`() = runTest {
-        val expectedName = "New Album"
-        whenever(validateAndCreateUserAlbumUseCase(expectedName)).thenReturn(AlbumId(1))
-
-        initViewModel()
-
-        underTest.addNewAlbum(expectedName)
-
-        underTest.uiState.test {
-            val state = awaitItem()
-            assertThat(state.addNewAlbumErrorMessage).isEqualTo(consumed())
-            assertThat(state.addNewAlbumSuccessEvent).isEqualTo(triggered(AlbumId(1)))
-        }
-
-        verify(validateAndCreateUserAlbumUseCase).invoke(expectedName)
-    }
-
-    @Test
-    fun `test that on validation exception should update error message`() = runTest {
-        val errorMessage = "errorMessage"
-        whenever(albumNameValidationExceptionMessageMapper(any())).thenReturn(errorMessage)
-        whenever(validateAndCreateUserAlbumUseCase(any())).thenAnswer {
-            throw AlbumNameValidationException.InvalidCharacters("/")
-        }
-
-        initViewModel()
-
-        underTest.addNewAlbum("album")
-
-        underTest.uiState.test {
-            assertThat(awaitItem().addNewAlbumErrorMessage).isEqualTo(triggered(errorMessage))
         }
     }
 
@@ -543,69 +490,6 @@ internal class AlbumsTabViewModelTest {
             underTest.toggleAlbumSelection(mockAlbums[0] as MediaAlbum.User)
 
             assertThat(underTest.areAllAlbumsSelected()).isFalse()
-        }
-
-    @Test
-    fun `test that getPresetNewAlbumName returns default name when no albums exist`() = runTest {
-        val defaultName = "New album"
-        whenever(mockAlbumsDataProvider.order).thenReturn(1)
-        whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(emptyList()))
-        whenever(getNextDefaultAlbumNameUseCase(defaultName, emptyList())).thenReturn(defaultName)
-        initViewModel()
-
-        // Wait for albums to be loaded
-        underTest.uiState.test {
-            awaitItem()
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        val result = underTest.getPresetNewAlbumName(defaultName)
-
-        assertThat(result).isEqualTo(defaultName)
-        verify(getNextDefaultAlbumNameUseCase).invoke(defaultName, emptyList())
-    }
-
-    @Test
-    fun `test that getPresetNewAlbumName returns next available name when albums exist`() =
-        runTest {
-            val defaultName = "New album"
-            val expectedName = "New album (1)"
-            val mockAlbums = listOf(
-                createMockUserAlbum(1L, "New album"),
-                createMockUserAlbum(2L, "Album 2")
-            )
-            val expectedAlbumUiState1 = AlbumUiState(
-                mediaAlbum = mockAlbums[0],
-                title = LocalizedText.Literal("New album"),
-                isExported = false
-            )
-            val expectedAlbumUiState2 = AlbumUiState(
-                mediaAlbum = mockAlbums[1],
-                title = LocalizedText.Literal("Album 2"),
-                isExported = false
-            )
-
-            whenever(mockAlbumsDataProvider.order).thenReturn(1)
-            whenever(mockAlbumsDataProvider.monitorAlbums()).thenReturn(flowOf(mockAlbums))
-            whenever(mockAlbumUiStateMapper(mockAlbums[0])).thenReturn(expectedAlbumUiState1)
-            whenever(mockAlbumUiStateMapper(mockAlbums[1])).thenReturn(expectedAlbumUiState2)
-            whenever(getNextDefaultAlbumNameUseCase(defaultName, listOf("New album", "Album 2")))
-                .thenReturn(expectedName)
-            initViewModel()
-
-            // Wait for albums to be loaded
-            underTest.uiState.test {
-                awaitItem()
-                cancelAndIgnoreRemainingEvents()
-            }
-
-            val result = underTest.getPresetNewAlbumName(defaultName)
-
-            assertThat(result).isEqualTo(expectedName)
-            verify(getNextDefaultAlbumNameUseCase).invoke(
-                defaultName,
-                listOf("New album", "Album 2")
-            )
         }
 
     private fun createMockAlbums(): List<MediaAlbum> {

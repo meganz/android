@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -47,7 +48,7 @@ class CreateAlbumDialogViewModel @Inject constructor(
 
     private val defaultName =
         context.getString(sharedResR.string.create_new_album_input_album_name_placeholder)
-    private val userAlbumNames = MutableStateFlow<List<String>>(emptyList())
+    private val userAlbumNames = MutableStateFlow<List<String>?>(null)
     private val events = MutableStateFlow(CreateAlbumEvents())
 
     val uiState: StateFlow<CreateAlbumDialogState> by lazy {
@@ -79,7 +80,7 @@ class CreateAlbumDialogViewModel @Inject constructor(
             )
         }.asUiStateFlow(
             scope = viewModelScope,
-            initialValue = CreateAlbumDialogState(placeholder = defaultName),
+            initialValue = CreateAlbumDialogState(),
         )
     }
 
@@ -95,7 +96,12 @@ class CreateAlbumDialogViewModel @Inject constructor(
 
         createAlbumJob = viewModelScope.launch {
             val finalName = input.trim().ifBlank {
-                getNextDefaultAlbumNameUseCase(defaultName, userAlbumNames.value)
+                val albumNames = userAlbumNames.first { it != null }.orEmpty()
+                if (albumNames.isEmpty()) {
+                    defaultName
+                } else {
+                    getNextDefaultAlbumNameUseCase(defaultName, albumNames)
+                }
             }
             runCatching {
                 validateAndCreateUserAlbumUseCase(finalName)

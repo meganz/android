@@ -3,8 +3,6 @@ package mega.privacy.android.feature.photos.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import de.palm.composestateevents.consumed
-import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -24,18 +22,6 @@ class MediaMainViewModel @Inject constructor(
 
     init {
         getTimelineRevampFlag()
-    }
-
-    fun showNewAlbumDialog() {
-        uiState.update {
-            it.copy(newAlbumDialogEvent = triggered)
-        }
-    }
-
-    fun resetNewAlbumDialog() {
-        uiState.update {
-            it.copy(newAlbumDialogEvent = consumed)
-        }
     }
 
     private fun getTimelineRevampFlag() {

@@ -1,12 +1,14 @@
 package mega.privacy.android.feature.photos.presentation.albums.create
 
 import android.content.Context
-import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentTriggered
 import de.palm.composestateevents.consumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.sharedcomponents.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
@@ -71,6 +73,16 @@ class CreateAlbumDialogViewModelTest {
         )
     }
 
+    // state is lazily started (asUiStateFlow / WhileSubscribed), so keep an active collector
+    // for the duration of the test to run the upstream that computes the placeholder. The
+    // collector runs on an unconfined dispatcher so it starts eagerly without advancing time.
+    private fun TestScope.initAndCollect() {
+        initViewModel()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            underTest.uiState.collect {}
+        }
+    }
+
     @Test
     fun `test that placeholder reflects the suggestion computed from the monitored albums`() =
         runTest {
@@ -79,12 +91,9 @@ class CreateAlbumDialogViewModelTest {
             whenever(getNextDefaultAlbumNameUseCase(defaultName, listOf(defaultName)))
                 .thenReturn("New album (1)")
 
-            initViewModel()
+            initAndCollect()
 
-            underTest.uiState.test {
-                assertThat(expectMostRecentItem().placeholder).isEqualTo("New album (1)")
-                cancelAndIgnoreRemainingEvents()
-            }
+            assertThat(underTest.uiState.value.placeholder).isEqualTo("New album (1)")
         }
 
     @Test
@@ -96,12 +105,9 @@ class CreateAlbumDialogViewModelTest {
                 .thenReturn("New album (1)")
             whenever(validateAndCreateUserAlbumUseCase(any())).thenReturn(AlbumId(10L))
 
-            initViewModel()
+            initAndCollect()
 
-            underTest.uiState.test {
-                underTest.createAlbum("   ")
-                cancelAndIgnoreRemainingEvents()
-            }
+            underTest.createAlbum("   ")
 
             verify(getNextDefaultAlbumNameUseCase, times(2))
                 .invoke(defaultName, listOf(defaultName))
@@ -112,12 +118,9 @@ class CreateAlbumDialogViewModelTest {
     fun `test that createAlbum uses the trimmed input verbatim when it is not blank`() = runTest {
         whenever(validateAndCreateUserAlbumUseCase(any())).thenReturn(AlbumId(10L))
 
-        initViewModel()
+        initAndCollect()
 
-        underTest.uiState.test {
-            underTest.createAlbum("  Holiday  ")
-            cancelAndIgnoreRemainingEvents()
-        }
+        underTest.createAlbum("  Holiday  ")
 
         verify(validateAndCreateUserAlbumUseCase).invoke("Holiday")
     }
@@ -126,16 +129,14 @@ class CreateAlbumDialogViewModelTest {
     fun `test that createAlbum emits the album created event on success`() = runTest {
         whenever(validateAndCreateUserAlbumUseCase("Holiday")).thenReturn(AlbumId(42L))
 
-        initViewModel()
+        initAndCollect()
 
-        underTest.uiState.test {
-            underTest.createAlbum("Holiday")
-            val event = expectMostRecentItem().albumCreatedEvent
-            assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
-            assertThat((event as StateEventWithContentTriggered).content)
-                .isEqualTo(CreateAlbumDialogResult(albumId = 42L, albumName = "Holiday"))
-            cancelAndIgnoreRemainingEvents()
-        }
+        underTest.createAlbum("Holiday")
+
+        val event = underTest.uiState.value.albumCreatedEvent
+        assertThat(event).isInstanceOf(StateEventWithContentTriggered::class.java)
+        assertThat((event as StateEventWithContentTriggered).content)
+            .isEqualTo(CreateAlbumDialogResult(albumId = 42L, albumName = "Holiday"))
     }
 
     @Test
@@ -146,16 +147,14 @@ class CreateAlbumDialogViewModelTest {
             whenever(albumNameValidationExceptionMessageMapper(AlbumNameValidationException.Exists))
                 .thenReturn("Already exists")
 
-            initViewModel()
+            initAndCollect()
 
-            underTest.uiState.test {
-                underTest.createAlbum("Existing")
-                val error = expectMostRecentItem().errorMessage
-                assertThat(error).isInstanceOf(StateEventWithContentTriggered::class.java)
-                assertThat((error as StateEventWithContentTriggered).content)
-                    .isEqualTo("Already exists")
-                cancelAndIgnoreRemainingEvents()
-            }
+            underTest.createAlbum("Existing")
+
+            val error = underTest.uiState.value.errorMessage
+            assertThat(error).isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((error as StateEventWithContentTriggered).content)
+                .isEqualTo("Already exists")
         }
 
     @Test
@@ -163,15 +162,12 @@ class CreateAlbumDialogViewModelTest {
         whenever(validateAndCreateUserAlbumUseCase(any()))
             .thenAnswer { throw RuntimeException("boom") }
 
-        initViewModel()
+        initAndCollect()
 
-        underTest.uiState.test {
-            underTest.createAlbum("Whatever")
-            assertThat(expectMostRecentItem().errorMessage).isEqualTo(consumed())
-            cancelAndIgnoreRemainingEvents()
-        }
+        underTest.createAlbum("Whatever")
 
         verifyNoInteractions(albumNameValidationExceptionMessageMapper)
+        assertThat(underTest.uiState.value.errorMessage).isEqualTo(consumed())
     }
 
     @Test
@@ -181,34 +177,24 @@ class CreateAlbumDialogViewModelTest {
         whenever(albumNameValidationExceptionMessageMapper(AlbumNameValidationException.Exists))
             .thenReturn("Already exists")
 
-        initViewModel()
+        initAndCollect()
+        underTest.createAlbum("Existing")
 
-        underTest.uiState.test {
-            underTest.createAlbum("Existing")
-            assertThat(expectMostRecentItem().errorMessage)
-                .isInstanceOf(StateEventWithContentTriggered::class.java)
+        underTest.resetErrorMessage()
 
-            underTest.resetErrorMessage()
-            assertThat(expectMostRecentItem().errorMessage).isEqualTo(consumed())
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertThat(underTest.uiState.value.errorMessage).isEqualTo(consumed())
     }
 
     @Test
     fun `test that resetAlbumCreatedEvent consumes the album created event`() = runTest {
         whenever(validateAndCreateUserAlbumUseCase(any())).thenReturn(AlbumId(42L))
 
-        initViewModel()
+        initAndCollect()
+        underTest.createAlbum("Holiday")
 
-        underTest.uiState.test {
-            underTest.createAlbum("Holiday")
-            assertThat(expectMostRecentItem().albumCreatedEvent)
-                .isInstanceOf(StateEventWithContentTriggered::class.java)
+        underTest.resetAlbumCreatedEvent()
 
-            underTest.resetAlbumCreatedEvent()
-            assertThat(expectMostRecentItem().albumCreatedEvent).isEqualTo(consumed())
-            cancelAndIgnoreRemainingEvents()
-        }
+        assertThat(underTest.uiState.value.albumCreatedEvent).isEqualTo(consumed())
     }
 
     private fun userAlbum(id: Long, title: String) = MediaAlbum.User(
