@@ -21,6 +21,7 @@ internal fun VideoPlayerTopBar(
     onBackPressed: () -> Unit,
     onMoreActionsClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    trailingContent: @Composable () -> Unit = {},
 ) {
     BlurMegaTopAppBar(
         modifier = modifier.testTag(VIDEO_PLAYER_TOP_BAR_TEST_TAG),
@@ -30,6 +31,7 @@ internal fun VideoPlayerTopBar(
         onActionPressed = {
             onMoreActionsClicked()
         },
+        trailingIcons = { trailingContent() },
     )
 }
 

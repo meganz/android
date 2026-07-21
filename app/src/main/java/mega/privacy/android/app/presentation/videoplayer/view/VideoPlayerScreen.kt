@@ -112,6 +112,7 @@ import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerMoreOp
 import mega.privacy.android.app.presentation.videoplayer.model.VideoSpeedPlaybackMenuAction
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.core.nodecomponents.list.NodeActionListTile
+import mega.privacy.android.core.transfers.widget.TransfersToolbarWidget
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.icon.pack.IconPack
@@ -143,6 +144,7 @@ internal fun VideoPlayerScreen(
     onRetry: () -> Unit,
     onFinish: () -> Unit,
     onEnterPip: () -> Unit,
+    navigateToTransfers: () -> Unit,
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -664,6 +666,11 @@ internal fun VideoPlayerScreen(
                     title = uiState.metadata.title ?: uiState.metadata.nodeName,
                     onBackPressed = { backDispatcher?.onBackPressed() },
                     onMoreActionsClicked = onMoreActionsClicked,
+                    trailingContent = {
+                        TransfersToolbarWidget {
+                            navigateToTransfers()
+                        }
+                    },
                 )
             }
 

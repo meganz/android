@@ -29,6 +29,7 @@ import mega.privacy.android.navigation.ACTION_PENDING_DEEP_LINK
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
+import mega.privacy.android.navigation.destination.TransfersNavKey
 import mega.privacy.android.shared.nodes.sheet.PublicLinkAuthAlertBottomSheet
 import mega.privacy.android.shared.nodes.sheet.PublicLinkType
 
@@ -127,6 +128,7 @@ internal fun EntryProviderScope<NavKey>.videoPlayerScreen(
             onRetry = onRetry,
             onFinish = onFinish,
             onEnterPip = onEnterPip,
+            navigateToTransfers = { navigationHandler.navigate(TransfersNavKey()) },
         )
     }
 }
