@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
@@ -43,9 +44,10 @@ class HiddenNodesOnboardingActivity : AppCompatActivity() {
 
         setContent {
             val themeMode by monitorThemeModeUseCase().collectAsState(initial = ThemeMode.System)
+            val state by viewModel.state.collectAsStateWithLifecycle()
             OriginalTheme(isDark = themeMode.isDarkMode()) {
                 HiddenNodesOnboardingScreen(
-                    viewModel = viewModel,
+                    state = state,
                     isOnboarding = isOnboarding,
                     onClickBack = ::finish,
                     onClickContinue = ::handleContinue,

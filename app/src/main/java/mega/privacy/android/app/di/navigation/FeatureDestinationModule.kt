@@ -13,6 +13,7 @@ import mega.privacy.android.app.appstate.content.navigation.PermissionFeatureDes
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.main.ads.AdsFreeIntroFeatureDestination
+import mega.privacy.android.app.presentation.hidenode.HiddenNodesOnboardingFeatureDestination
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.nav.MediaPlayerIntentMapper
 import mega.privacy.android.app.presentation.documentscanner.navigation.LegacyScanDocumentDestination
@@ -145,6 +146,11 @@ class FeatureDestinationModule {
     @IntoSet
     fun provideAdsFreeIntroFeatureDestination(): FeatureDestination =
         AdsFreeIntroFeatureDestination()
+
+    @Provides
+    @IntoSet
+    fun provideHiddenNodesOnboardingFeatureDestination(): FeatureDestination =
+        HiddenNodesOnboardingFeatureDestination()
 
     @Provides
     @Singleton
