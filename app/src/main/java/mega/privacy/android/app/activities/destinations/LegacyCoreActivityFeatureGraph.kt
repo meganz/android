@@ -56,6 +56,8 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.ChatListNavKey
+import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.LegacyMediaPlayerNavKey
 
 class LegacyCoreActivityFeatureGraph(
@@ -142,7 +144,19 @@ class LegacyCoreActivityFeatureGraph(
                 rtcAudioManagerGateway
             )
             legacyWaitingRoomScreen(navigationHandler::back, megaChatRequestHandler, chatManagement)
-            createScheduledMeetingScreen(navigationHandler::back)
+            createScheduledMeetingScreen(
+                removeDestination = navigationHandler::back,
+                navigateToMeetingsTab = {
+                    navigationHandler.navigate(
+                        destination = ChatListNavKey(showMeetingTab = true),
+                        navOptions = navOptions {
+                            popUpTo<CreateScheduledMeetingNavKey> {
+                                inclusive = true
+                            }
+                        },
+                    )
+                },
+            )
             legacySettingsCameraUploadsActivityNavKey(navigationHandler::back)
             cameraBackupPermissionsScreen(navigationHandler)
             fileInfoScreen(navigationHandler::back)

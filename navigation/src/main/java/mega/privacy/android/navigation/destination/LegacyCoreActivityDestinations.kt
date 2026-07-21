@@ -100,11 +100,13 @@ data class ShowChatMessagesNavKey(val chatId: Long) : NoSessionNavKey.Optional, 
  * Navigation key for Chat List
  *
  * @param createNewChat True if the Chat List screen should open with the Create New Chat flow
+ * @param showMeetingTab True to open the Chat List with the Meetings tab selected
  */
 @Serializable
 @Parcelize
 data class ChatListNavKey(
     val createNewChat: Boolean = false,
+    val showMeetingTab: Boolean = false,
 ) : NavKey, Parcelable
 
 /**
