@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.qrcode.mapper.MyQRCodeTextErrorMapp
 import mega.privacy.android.app.presentation.qrcode.model.QRCodeUIState
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.app.utils.AlertsAndWarnings
+import com.google.mlkit.common.MlKitException
 import mega.privacy.android.core.nodecomponents.scanner.BarcodeScanResult
 import mega.privacy.android.core.nodecomponents.scanner.BarcodeScannerModuleIsNotInstalled
 import mega.privacy.android.core.nodecomponents.scanner.ScannerHandler
@@ -294,11 +295,17 @@ class QRCodeViewModel @Inject constructor(
                 }
                 .onFailure { error ->
                     Timber.e(error)
-                    // When we receive the BarcodeModuleIsNotInstalled exception,
-                    // The module has not been installed, but it is currently installing.
-                    // Therefore, just let the user click the scan QR button again.
-                    if (error !is BarcodeScannerModuleIsNotInstalled) {
-                        setResultMessage(sharedR.string.general_text_error)
+                    when {
+                        // The module has not been installed, but it is currently installing.
+                        // Let the user click the scan QR button again.
+                        error is BarcodeScannerModuleIsNotInstalled -> Unit
+                        // On some devices (e.g. Pixel running Android 14+), pressing back in the
+                        // GMS barcode scanner fires onFailure with MlKitException.INTERNAL instead
+                        // of onCanceled. This is a known GMS library bug with no official fix.
+                        // Treat it as a silent cancellation to avoid showing a misleading error.
+                        // See: https://issuetracker.google.com/issues/261579118
+                        error is MlKitException && error.errorCode == MlKitException.INTERNAL -> Unit
+                        else -> setResultMessage(sharedR.string.general_text_error)
                     }
                 }
         }
