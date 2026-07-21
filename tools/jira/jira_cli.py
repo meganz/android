@@ -300,18 +300,21 @@ def expect_status(code, body, expected):
 
 def cmd_status(args):
     _validate(args.key, ISSUE_KEY_RE, "issue key")
-    code, body = jira("GET", f"/issue/{args.key}?fields=summary,status,assignee,customfield_10400")
+    code, body = jira("GET", f"/issue/{args.key}?fields=summary,status,assignee,customfield_10400,parent")
     expect_status(code, body, 200)
     data = json.loads(body)
     f = data["fields"]
     a = f.get("assignee") or {}
     ti = f.get("customfield_10400")
+    parent = f.get("parent")
     out = {
         "key": data["key"],
         "summary": f["summary"],
         "status": f["status"]["name"],
         "assignee": a.get("displayName", "unassigned"),
         "test_instruction_empty": not ti or not str(ti).strip(),
+        "parent_key": parent.get("key") if parent else None,
+        "parent_summary": (parent.get("fields") or {}).get("summary") if parent else None,
         "browse_url": f"{BASE_URL}/browse/{data['key']}",
     }
     print(json.dumps(out, indent=2))
@@ -479,7 +482,7 @@ def cmd_read_field(args):
     code, body = jira("GET", f"/issue/{args.key}?fields={args.field_id}")
     expect_status(code, body, 200)
     data = json.loads(body)
-    v = data["fields"].get(args.field_id)
+    v = (data.get("fields") or {}).get(args.field_id)
     if v is None:
         return  # empty
     if isinstance(v, str):
