@@ -33,15 +33,21 @@ class ShareLinkScreenTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     private val data = ShareLinkUiState.Data(
-        handles = listOf(1L),
-        nodeName = "Presentation.pdf",
-        isFolder = false,
-        iconRes = iconPackR.drawable.ic_pdf_medium_solid,
-        sizeInBytes = 10L * 1024 * 1024,
-        modificationTime = 1_749_000_000L,
-        link = "https://mega.nz/file/abc123#decryptionKey",
-        linkWithoutKey = "https://mega.nz/file/abc123",
-        key = "decryptionKey",
+        nodeLinks = listOf(
+            ShareLinkNodeItem(
+                handle = 1L,
+                name = "Presentation.pdf",
+                isFolder = false,
+                iconRes = iconPackR.drawable.ic_pdf_medium_solid,
+                sizeInBytes = 10L * 1024 * 1024,
+                modificationTime = 1_749_000_000L,
+                childFolderCount = null,
+                childFileCount = null,
+                link = "https://mega.nz/file/abc123#decryptionKey",
+                linkWithoutKey = "https://mega.nz/file/abc123",
+                key = "decryptionKey",
+            ),
+        ),
         accountType = null,
     )
 
@@ -99,7 +105,7 @@ class ShareLinkScreenTest {
             .performClick()
         composeRule.waitForIdle()
 
-        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.link)
+        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.primary.link)
     }
 
     @Test
@@ -148,7 +154,7 @@ class ShareLinkScreenTest {
         composeRule.onNodeWithTag(SHARE_LINK_KEY_COPY_TAG).performScrollTo().performClick()
         composeRule.waitForIdle()
 
-        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.key)
+        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.primary.key)
     }
 
     private fun setContent(
