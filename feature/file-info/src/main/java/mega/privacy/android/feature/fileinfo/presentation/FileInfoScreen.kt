@@ -302,7 +302,6 @@ private fun FileInfoDetails(
                 text = uiState.title,
                 textColor = TextColor.Primary,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
                 style = AppTheme.typography.titleMedium,
             )
             if (subtitle.isNotEmpty()) {
