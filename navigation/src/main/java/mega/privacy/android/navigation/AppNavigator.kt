@@ -604,6 +604,14 @@ interface AppNavigator {
     fun openContactInfoActivity(context: Context, email: String)
 
     /**
+     * Method to open the contact info screen for the peer of a 1:1 chat.
+     *
+     * @param context Activity context.
+     * @param chatId  The ID of the 1:1 chat with the contact.
+     */
+    fun openContactInfoActivity(context: Context, chatId: Long)
+
+    /**
      * Method to open ContactAttachmentActivity.class.
      *
      * @param context Activity context.

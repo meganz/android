@@ -3,6 +3,7 @@ package mega.privacy.android.app.providers.documentprovider
 import android.provider.DocumentsContract.Document
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import dagger.Lazy as DaggerLazy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -27,9 +28,9 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
 import mega.privacy.android.domain.usecase.MonitorPasscodeLockPreferenceUseCase
@@ -66,7 +67,6 @@ import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
-import dagger.Lazy as DaggerLazy
 
 /**
  * Unit tests for [CloudDriveDocumentDataProvider].
@@ -322,7 +322,7 @@ class CloudDriveDocumentDataProviderTest {
         whenever(addNodeType.invoke(any())).thenReturn(typedNode)
         val expectedRow = CloudDriveDocumentRow(
             documentId = documentId,
-            displayName = "Loaded Doc",
+            displayName = "Data Doc",
             mimeType = Document.MIME_TYPE_DIR,
             size = 0L,
             lastModified = 1000L,
@@ -716,7 +716,7 @@ class CloudDriveDocumentDataProviderTest {
                 .isEqualTo(cachedRow)
 
             // Step 2: switch to a parent that resolves to NotFound — childrenState transitions
-            // away from the root's Loaded, but the row from the earlier listing must remain.
+            // away from the root's Data, but the row from the earlier listing must remain.
             underTest.childrenState.test {
                 advanceUntilIdle()
                 underTest.loadChildrenInBackground("$DOCUMENT_ID_PREFIX:99")

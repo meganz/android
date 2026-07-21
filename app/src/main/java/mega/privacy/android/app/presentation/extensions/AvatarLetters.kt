@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.extensions
 import com.vdurmont.emoji.EmojiParser
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.shares.ShareRecipient
+import mega.privacy.android.shared.contact.extension.displayName
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtils
 import mega.privacy.android.thirdpartylib.twemoji.EmojiUtilsShortcodes
 import java.util.Locale
@@ -23,7 +24,7 @@ fun ShareRecipient.getAvatarFirstLetter(): String = when (this) {
  * @return The first letter of the string to be painted in the default avatar.
  */
 fun ContactItem.getAvatarFirstLetter(): String =
-    getAvatarFirstLetter(contactData.alias ?: contactData.fullName ?: email)
+    getAvatarFirstLetter(displayName())
 
 /**
  * Retrieve the first letter of a String.

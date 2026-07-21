@@ -129,8 +129,21 @@ data class AddContactToShareNavKey(
     }
 }
 
+/**
+ * Navigation key for the contact info screen.
+ *
+ * @param email Email of the contact, or null when opening from a 1:1 chat.
+ * @param chatId Id of the 1:1 chat with the contact, or null when opening by email.
+ */
 @Serializable
-data class ContactInfoNavKey(val email: String) : NavKey
+data class ContactInfoNavKey(
+    val email: String? = null,
+    val chatId: Long? = null,
+) : NavKey {
+    init {
+        require(email != null || chatId != null) { "Either email or chatId must be provided" }
+    }
+}
 
 @Serializable
 data class FileContactInfoNavKey(

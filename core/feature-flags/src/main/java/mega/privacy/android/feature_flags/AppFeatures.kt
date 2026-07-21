@@ -60,6 +60,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
     /**
+     * Contact info compose u i
+     */
+    ContactInfoComposeUI(
+        "Enable compose version of the contact info screen",
+        false,
+    ),
+
+    /**
      * Contacts compose u i
      */
     ContactsComposeUI(

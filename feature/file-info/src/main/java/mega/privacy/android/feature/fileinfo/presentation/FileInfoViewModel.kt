@@ -47,6 +47,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
+import mega.privacy.android.shared.contact.extension.displayName
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.mapper.FileTypeNameMapper
@@ -173,9 +174,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
                     isNodeInRubbish = isInRubbish,
                     isNodeInBackups = isInBackups,
                     isMediaFile = isMediaFile,
-                    ownerName = owner?.let {
-                        it.contactData.alias ?: it.contactData.fullName ?: it.email
-                    },
+                    ownerName = owner?.displayName(),
                     ownerEmail = owner?.email,
                 )
             }

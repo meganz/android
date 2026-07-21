@@ -976,6 +976,12 @@ internal class MegaNavigatorImpl @Inject constructor(
         )
     }
 
+    override fun openContactInfoActivity(context: Context, chatId: Long) {
+        navigateForSingleActivity(
+            context = context, singleActivityDestination = ContactInfoNavKey(chatId = chatId)
+        )
+    }
+
 
     override fun openContactAttachmentActivity(context: Context, chatId: Long, msgId: Long) {
         navigateForSingleActivity(

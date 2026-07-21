@@ -1,6 +1,7 @@
 package mega.privacy.android.shared.contact.mapper
 
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.shared.contact.extension.displayName
 import mega.privacy.android.shared.contact.model.ContactItemUiState
 import javax.inject.Inject
 
@@ -28,21 +29,11 @@ class ContactItemUiStateMapper @Inject constructor(
         contactItem: ContactItem,
     ): ContactItemUiState = ContactItemUiState(
         handle = contactItem.handle,
-        displayName = resolveDisplayName(contactItem),
+        displayName = contactItem.displayName(),
         status = contactItemStatusMapper(contactItem.status),
         lastSeen = contactItem.lastSeen,
         avatar = contactItemAvatarMapper(contactItem),
         isVerified = contactItem.areCredentialsVerified,
         email = contactItem.email,
     )
-
-    private fun resolveDisplayName(contactItem: ContactItem): String {
-        val alias = contactItem.contactData.alias
-        val fullName = contactItem.contactData.fullName
-        return when {
-            !alias.isNullOrBlank() -> alias
-            !fullName.isNullOrBlank() -> fullName
-            else -> contactItem.email
-        }
-    }
 }
