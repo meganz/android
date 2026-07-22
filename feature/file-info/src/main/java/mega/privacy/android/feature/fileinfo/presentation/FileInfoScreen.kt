@@ -431,7 +431,7 @@ private fun FileInfoDetails(
             )
         }
 
-        if (uiState.canEditDescription || uiState.descriptionText.isNotBlank()) {
+        if (uiState.canShowDescription) {
             NodeDescriptionField(
                 description = uiState.descriptionText,
                 isEditable = uiState.canEditDescription,

@@ -255,6 +255,31 @@ class FileInfoScreenTest {
     }
 
     @Test
+    fun `test that tags are displayed for a read-only node that has tags`() {
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.READ,
+                tags = listOf("marketing"),
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).assertExists()
+        composeRule.onNodeWithText("#marketing", useUnmergedTree = true).assertExists()
+    }
+
+    @Test
+    fun `test that the tags section is hidden for a read-only node without tags`() {
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.READ,
+                tags = emptyList(),
+            ),
+        )
+
+        composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).assertDoesNotExist()
+    }
+
+    @Test
     fun `test that the tags section is hidden when the node is in the rubbish bin`() {
         setContent(
             uiState = fileState.copy(

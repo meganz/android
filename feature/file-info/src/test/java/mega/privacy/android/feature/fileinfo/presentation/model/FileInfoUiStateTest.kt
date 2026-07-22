@@ -67,24 +67,77 @@ class FileInfoUiStateTest {
     }
 
     @ParameterizedTest
-    @EnumSource(value = AccessPermission::class, names = ["READ", "READWRITE", "FULL", "OWNER"])
-    fun `test that tags are shown for any accessible node`(permission: AccessPermission) {
+    @EnumSource(value = AccessPermission::class, names = ["FULL", "OWNER"])
+    fun `test that the description is shown for an editable node even without a description`(
+        permission: AccessPermission,
+    ) {
+        assertThat(FileInfoUiState(accessPermission = permission).canShowDescription).isTrue()
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AccessPermission::class, names = ["READ", "READWRITE"])
+    fun `test that the description is shown for a read-only node that has a description`(
+        permission: AccessPermission,
+    ) {
+        assertThat(
+            FileInfoUiState(accessPermission = permission, descriptionText = "notes").canShowDescription
+        ).isTrue()
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AccessPermission::class, names = ["READ", "READWRITE"])
+    fun `test that the description is not shown for a read-only node without a description`(
+        permission: AccessPermission,
+    ) {
+        assertThat(FileInfoUiState(accessPermission = permission).canShowDescription).isFalse()
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AccessPermission::class, names = ["FULL", "OWNER"])
+    fun `test that tags are shown for an editable node even without tags`(
+        permission: AccessPermission,
+    ) {
         assertThat(FileInfoUiState(accessPermission = permission).canShowTags).isTrue()
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AccessPermission::class, names = ["READ", "READWRITE", "FULL", "OWNER"])
+    fun `test that tags are shown for any accessible node that has tags`(
+        permission: AccessPermission,
+    ) {
+        assertThat(
+            FileInfoUiState(accessPermission = permission, tags = listOf("marketing")).canShowTags
+        ).isTrue()
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = AccessPermission::class, names = ["READ", "READWRITE"])
+    fun `test that tags are not shown for a read-only node without tags`(
+        permission: AccessPermission,
+    ) {
+        assertThat(FileInfoUiState(accessPermission = permission).canShowTags).isFalse()
     }
 
     @Test
     fun `test that tags are not shown for unknown access or in the rubbish bin or backups`() {
-        assertThat(FileInfoUiState(accessPermission = AccessPermission.UNKNOWN).canShowTags).isFalse()
         assertThat(
             FileInfoUiState(
-                accessPermission = AccessPermission.OWNER,
-                isNodeInRubbish = true
+                accessPermission = AccessPermission.UNKNOWN,
+                tags = listOf("marketing"),
             ).canShowTags
         ).isFalse()
         assertThat(
             FileInfoUiState(
                 accessPermission = AccessPermission.OWNER,
-                isNodeInBackups = true
+                isNodeInRubbish = true,
+                tags = listOf("marketing"),
+            ).canShowTags
+        ).isFalse()
+        assertThat(
+            FileInfoUiState(
+                accessPermission = AccessPermission.OWNER,
+                isNodeInBackups = true,
+                tags = listOf("marketing"),
             ).canShowTags
         ).isFalse()
     }

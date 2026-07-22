@@ -129,6 +129,13 @@ internal data class FileInfoUiState(
                         accessPermission == AccessPermission.OWNER)
 
     /**
+     * The description section is shown only when there is a description to display or the user can
+     * edit it ([canEditDescription]). A read-only node with no description shows nothing.
+     */
+    val canShowDescription: Boolean
+        get() = canEditDescription || descriptionText.isNotBlank()
+
+    /**
      * Tags can be edited only outside the rubbish bin / Backups and with write access.
      */
     val canEditTags: Boolean
@@ -137,10 +144,12 @@ internal data class FileInfoUiState(
                         accessPermission == AccessPermission.OWNER)
 
     /**
-     * The tags section is shown for any accessible node outside the rubbish bin / Backups; whether it
-     * is also editable is [canEditTags].
+     * The tags section is shown for an accessible node outside the rubbish bin / Backups, but only
+     * when it has tags to display or the user can add them ([canEditTags]). A read-only node with
+     * no tags shows nothing.
      */
     val canShowTags: Boolean
         get() = !isNodeInRubbish && !isNodeInBackups &&
-                accessPermission != AccessPermission.UNKNOWN
+                accessPermission != AccessPermission.UNKNOWN &&
+                (tags.isNotEmpty() || canEditTags)
 }
