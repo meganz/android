@@ -9,6 +9,7 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
@@ -290,6 +291,63 @@ class FileInfoScreenTest {
         )
 
         composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that the taken down banner is shown with the file warning and dispute action for a taken down file`() {
+        setContent(uiState = fileState.copy(isFile = true, isTakenDown = true))
+
+        composeRule.onNodeWithTag(FILE_INFO_TAKEN_DOWN_TAG).assertExists()
+        composeRule.onNodeWithText(
+            getString(sharedR.string.file_info_taken_down_file_warning),
+            useUnmergedTree = true,
+        ).assertExists()
+        composeRule.onNodeWithText(
+            getString(sharedR.string.file_info_taken_down_action),
+            useUnmergedTree = true,
+        ).assertExists()
+    }
+
+    @Test
+    fun `test that the taken down banner shows the folder warning for a taken down folder`() {
+        setContent(uiState = folderState.copy(isTakenDown = true))
+
+        composeRule.onNodeWithText(
+            getString(sharedR.string.file_info_taken_down_folder_warning),
+            useUnmergedTree = true,
+        ).assertExists()
+    }
+
+    @Test
+    fun `test that the taken down banner is hidden when the node is not taken down`() {
+        setContent(uiState = fileState.copy(isTakenDown = false))
+
+        composeRule.onNodeWithTag(FILE_INFO_TAKEN_DOWN_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that clicking the dispute action invokes onDisputeTakedown`() {
+        var disputed = false
+        setContent(
+            uiState = fileState.copy(isTakenDown = true),
+            onDisputeTakedown = { disputed = true },
+        )
+
+        composeRule.onNodeWithText(
+            getString(sharedR.string.file_info_taken_down_action),
+            useUnmergedTree = true,
+        ).performClick()
+
+        assertThat(disputed).isTrue()
+    }
+
+    @Test
+    fun `test that dismissing the taken down banner hides it`() {
+        setContent(uiState = fileState.copy(isTakenDown = true))
+
+        composeRule.onNodeWithContentDescription("Banner Cancel").performClick()
+
+        composeRule.onNodeWithTag(FILE_INFO_TAKEN_DOWN_TAG).assertDoesNotExist()
     }
 
     @Test
@@ -575,6 +633,7 @@ class FileInfoScreenTest {
         onLocationClick: () -> Unit = {},
         onNavigate: (NavKey) -> Unit = {},
         onDescriptionChange: (String) -> Unit = {},
+        onDisputeTakedown: () -> Unit = {},
     ) {
         composeRule.setContent {
             val configuration = Configuration(LocalConfiguration.current).apply {
@@ -594,6 +653,7 @@ class FileInfoScreenTest {
                         onLocationClick = onLocationClick,
                         onNavigate = onNavigate,
                         onDescriptionChange = onDescriptionChange,
+                        onDisputeTakedown = onDisputeTakedown,
                     )
                 }
             }

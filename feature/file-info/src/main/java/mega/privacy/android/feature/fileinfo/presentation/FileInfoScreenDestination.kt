@@ -2,11 +2,13 @@ package mega.privacy.android.feature.fileinfo.presentation
 
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
@@ -32,6 +34,8 @@ fun EntryProviderScope<NavKey>.fileInfoScreen(
                 factory.create(key.nodeHandle)
             }
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val context = LocalContext.current
+            val megaNavigator = rememberMegaNavigator()
 
             FileInfoScreen(
                 uiState = uiState,
@@ -50,6 +54,7 @@ fun EntryProviderScope<NavKey>.fileInfoScreen(
                 },
                 onNavigate = { navigationHandler.navigate(it) },
                 onDescriptionChange = viewModel::updateDescription,
+                onDisputeTakedown = { megaNavigator.openTakedownPolicyLink(context) },
             )
         }
     }

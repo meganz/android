@@ -55,6 +55,7 @@ import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoDetailRow
 import mega.privacy.android.feature.fileinfo.presentation.view.FileInfoMapView
 import mega.privacy.android.feature.fileinfo.presentation.view.PermissionsRow
 import mega.privacy.android.feature.fileinfo.presentation.view.TagsSection
+import mega.privacy.android.feature.fileinfo.presentation.view.TakenDownBanner
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
 import mega.privacy.android.navigation.destination.ContactInfoNavKey
@@ -88,6 +89,7 @@ internal fun FileInfoScreen(
     onLocationClick: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onDisputeTakedown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -114,6 +116,7 @@ internal fun FileInfoScreen(
                     onLocationClick = onLocationClick,
                     onNavigate = onNavigate,
                     onDescriptionChange = onDescriptionChange,
+                    onDisputeTakedown = onDisputeTakedown,
                 )
             }
         }
@@ -127,6 +130,7 @@ private fun FileInfoContent(
     onLocationClick: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onDisputeTakedown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FileInfoResponsiveLayout(
@@ -141,6 +145,7 @@ private fun FileInfoContent(
                 onLocationClick = onLocationClick,
                 onNavigate = onNavigate,
                 onDescriptionChange = onDescriptionChange,
+                onDisputeTakedown = onDisputeTakedown,
             )
         },
     )
@@ -262,6 +267,7 @@ private fun FileInfoDetails(
     onLocationClick: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     onDescriptionChange: (String) -> Unit,
+    onDisputeTakedown: () -> Unit,
 ) {
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
@@ -296,6 +302,13 @@ private fun FileInfoDetails(
     val sharedWithLabel = stringResource(sharedR.string.file_info_information_shared_with_label)
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        if (uiState.isTakenDown) {
+            TakenDownBanner(
+                isFile = uiState.isFile,
+                onDisputeClick = onDisputeTakedown,
+                modifier = Modifier.testTag(FILE_INFO_TAKEN_DOWN_TAG),
+            )
+        }
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             MegaText(
                 modifier = Modifier.testTag(FILE_INFO_NAME_TAG),
@@ -493,6 +506,7 @@ private fun FileInfoScreenFilePreview() {
             onLocationClick = {},
             onNavigate = {},
             onDescriptionChange = {},
+            onDisputeTakedown = {},
         )
     }
 }
@@ -521,6 +535,7 @@ private fun FileInfoScreenVideoPreview() {
             onLocationClick = {},
             onNavigate = {},
             onDescriptionChange = {},
+            onDisputeTakedown = {},
         )
     }
 }
@@ -548,6 +563,7 @@ private fun FileInfoScreenFolderPreview() {
             onLocationClick = {},
             onNavigate = {},
             onDescriptionChange = {},
+            onDisputeTakedown = {},
         )
     }
 }
@@ -582,6 +598,7 @@ private fun FileInfoScreenLandscapePreview() {
             onLocationClick = {},
             onNavigate = {},
             onDescriptionChange = {},
+            onDisputeTakedown = {},
         )
     }
 }
@@ -617,6 +634,7 @@ private fun FileInfoScreenTabletLandscapePreview() {
                 onLocationClick = {},
                 onNavigate = {},
                 onDescriptionChange = {},
+                onDisputeTakedown = {},
             )
         }
     }
@@ -647,6 +665,7 @@ private fun FileInfoScreenIncomingShareFolderPreview() {
             onLocationClick = {},
             onNavigate = {},
             onDescriptionChange = {},
+            onDisputeTakedown = {},
         )
     }
 }
@@ -669,3 +688,4 @@ internal const val FILE_INFO_CURRENT_VERSIONS_TAG = "file_info_screen:current_ve
 internal const val FILE_INFO_PREVIOUS_VERSIONS_TAG = "file_info_screen:previous_versions"
 internal const val FILE_INFO_DESCRIPTION_TAG = "file_info_screen:description"
 internal const val FILE_INFO_TAGS_TAG = "file_info_screen:tags"
+internal const val FILE_INFO_TAKEN_DOWN_TAG = "file_info_screen:taken_down"

@@ -71,6 +71,7 @@ private fun FileInfoScreenLoadingPreview() {
             onLocationClick = {},
             onNavigate = {},
             onDescriptionChange = {},
+            onDisputeTakedown = {},
         )
     }
 }

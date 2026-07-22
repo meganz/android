@@ -3077,8 +3077,6 @@
     <string name="add_contacts_phone_contacts_select">Select phone contacts</string>
     <!-- Add contacts picker: header of the section that lists the user's MEGA contacts, shown to separate them from the phone contacts section -->
     <string name="add_contacts_mega_contacts_section_title">MEGA contacts</string>
-    <!-- Add contacts picker (share flow): warning banner shown when the selection includes recipients whose credentials the user has not verified -->
-    <string name="add_contacts_unverified_contact_warning">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Create group chat: toolbar title of the group settings step where the group name and options are set -->
     <string name="create_group_chat_settings_title">New group</string>
     <!-- Create group chat: hint of the group name text field. The name is optional. -->
@@ -3323,50 +3321,6 @@
         <item quantity="one">%d version</item>
         <item quantity="other">%d versions</item>
     </plurals>
-    <!-- Contact info: title of the nickname row when the contact has no nickname yet -->
-    <string name="contact_info_set_nickname">Set nickname</string>
-    <!-- Contact info: title of the nickname row when the contact already has a nickname -->
-    <string name="contact_info_edit_nickname">Edit nickname</string>
-    <!-- Contact info: title of the row that opens the credential verification screen -->
-    <string name="contact_info_verify_credentials">Verify credentials</string>
-    <!-- Contact info: subtitle of the verify credentials row when the contact's credentials are verified -->
-    <string name="contact_info_credentials_verified">Verified</string>
-    <!-- Contact info: subtitle of the verify credentials row when the contact's credentials are not verified -->
-    <string name="contact_info_credentials_not_verified">Not verified</string>
-    <!-- Contact info: title of the row that shares the contact to a chat -->
-    <string name="contact_info_share_contact">Share contact</string>
-    <!-- Contact info: title of the row with the toggle to mute or unmute the chat with the contact -->
-    <string name="contact_info_chat_notifications">Chat notifications</string>
-    <!-- Contact info: subtitle of the chat notifications row when notifications are muted until turned back on -->
-    <string name="contact_info_notifications_muted">Off</string>
-    <!-- Contact info: title of the row that opens the list of files shared in the chat with the contact -->
-    <string name="contact_info_shared_files">Shared files</string>
-    <!-- Contact info: title of the row that opens the manage chat history screen -->
-    <string name="contact_info_manage_chat_history">Manage chat history</string>
-    <!-- Contact info: prefix of the manage chat history subtitle showing the retention time, e.g. "Automatically delete messages older than: 1 day" -->
-    <string name="contact_info_manage_chat_history_subtitle">Automatically delete messages older than:</string>
-    <!-- Contact info: chat history retention time of one year -->
-    <string name="contact_info_retention_time_year">1 year</string>
-    <!-- Contact info: chat history retention time in months. %1$d is the number of months -->
-    <plurals name="contact_info_retention_time_months">
-        <item quantity="one">%1$d month</item>
-        <item quantity="other">%1$d months</item>
-    </plurals>
-    <!-- Contact info: chat history retention time in weeks. %1$d is the number of weeks -->
-    <plurals name="contact_info_retention_time_weeks">
-        <item quantity="one">%1$d week</item>
-        <item quantity="other">%1$d weeks</item>
-    </plurals>
-    <!-- Contact info: chat history retention time in days. %1$d is the number of days -->
-    <plurals name="contact_info_retention_time_days">
-        <item quantity="one">%1$d day</item>
-        <item quantity="other">%1$d days</item>
-    </plurals>
-    <!-- Contact info: chat history retention time in hours. %1$d is the number of hours -->
-    <plurals name="contact_info_retention_time_hours">
-        <item quantity="one">%1$d hour</item>
-        <item quantity="other">%1$d hours</item>
-    </plurals>
     <!-- Create group chat: content description of the button used to add or change the group's image -->
     <string name="create_group_chat_image_content_description">Group photo</string>
     <!-- Create group chat: option to take a new photo with the camera for the group image -->
@@ -3413,18 +3367,6 @@
     <string name="subscription_quota_current_plan_transfer_usage_with_total">%1$s of %2$s used</string>
     <!-- Subtitle of the quota-warning upsell screen when storage is over the limit and the user was trying to upload -->
     <string name="subscription_quota_storage_over_upload_subtitle">Youve run out of storage space. Upgrade your plan to continue uploading</string>
-    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is out of storage. The text between [A] and [/A] is a link to mega.io -->
-    <string name="subscription_quota_storage_highest_plan_subtitle">Make room in Cloud drive, or manage your plan at [A]mega.io[/A] for more storage</string>
-    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
-    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">As a result, your download may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
-    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
-    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">As a result, media playback may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
-    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
-    <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">To continue your download, manage your plan at [A]mega.io[/A] for more transfer quota</string>
-    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
-    <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">To continue media playback, manage your plan at [A]mega.io[/A] for more transfer quota</string>
-    <!-- Text button on the quota-warning upsell screen shown to top-tier users, opening a support email to request a custom plan -->
-    <string name="subscription_quota_contact_support">Contact Support</string>
     <!-- Audio player: label for the mode-toggle button when the player is in podcast mode -->
     <string name="audio_player_podcast_mode_label">Podcast mode</string>
     <!-- Audio player: label for the mode-toggle button when the player is in music mode -->
@@ -3435,8 +3377,6 @@
     <string name="add_contacts_manual_email_add_action">Add email address</string>
     <!-- Add contacts picker (share flow): inline error shown under the email input when the typed email address is already part of the selection -->
     <string name="add_contacts_manual_email_already_added_error">Email address already added</string>
-    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
-    <string name="contacts_qr_scan_action">Scan QR code</string>
     <!-- Human-readable file type shown for image files (e.g. in the file info subtitle) -->
     <string name="file_type_name_image">Image</string>
     <!-- Human-readable file type shown for video files -->
@@ -3529,4 +3469,70 @@
     <string name="file_type_name_rar_compressed">RAR compressed</string>
     <!-- Human-readable file type shown for 7-Zip (.7z) archive files -->
     <string name="file_type_name_7zip_compressed">7-Zip compressed</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is out of storage. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_storage_highest_plan_subtitle">Make room in Cloud drive, or manage your plan at [A]mega.io[/A] for more storage</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">As a result, your download may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) is running low on transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">As a result, media playback may be interrupted. Manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during a download. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">To continue your download, manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Subtitle of the quota-warning upsell screen when a top-tier user (already on the highest plan) has exceeded their transfer quota during media streaming. The text between [A] and [/A] is a link to mega.io -->
+    <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">To continue media playback, manage your plan at [A]mega.io[/A] for more transfer quota</string>
+    <!-- Text button on the quota-warning upsell screen shown to top-tier users, opening a support email to request a custom plan -->
+    <string name="subscription_quota_contact_support">Contact Support</string>
+    <!-- Contact info: title of the nickname row when the contact has no nickname yet -->
+    <string name="contact_info_set_nickname">Set nickname</string>
+    <!-- Contact info: title of the nickname row when the contact already has a nickname -->
+    <string name="contact_info_edit_nickname">Edit nickname</string>
+    <!-- Contact info: title of the row that opens the credential verification screen -->
+    <string name="contact_info_verify_credentials">Verify credentials</string>
+    <!-- Contact info: subtitle of the verify credentials row when the contact's credentials are verified -->
+    <string name="contact_info_credentials_verified">Verified</string>
+    <!-- Contact info: subtitle of the verify credentials row when the contact's credentials are not verified -->
+    <string name="contact_info_credentials_not_verified">Not verified</string>
+    <!-- Contact info: title of the row that shares the contact to a chat -->
+    <string name="contact_info_share_contact">Share contact</string>
+    <!-- Contact info: title of the row with the toggle to mute or unmute the chat with the contact -->
+    <string name="contact_info_chat_notifications">Chat notifications</string>
+    <!-- Contact info: subtitle of the chat notifications row when notifications are muted until turned back on -->
+    <string name="contact_info_notifications_muted">Off</string>
+    <!-- Contact info: title of the row that opens the list of files shared in the chat with the contact -->
+    <string name="contact_info_shared_files">Shared files</string>
+    <!-- Contact info: title of the row that opens the manage chat history screen -->
+    <string name="contact_info_manage_chat_history">Manage chat history</string>
+    <!-- Contact info: prefix of the manage chat history subtitle showing the retention time, e.g. "Automatically delete messages older than: 1 day" -->
+    <string name="contact_info_manage_chat_history_subtitle">Automatically delete messages older than:</string>
+    <!-- Contact info: chat history retention time of one year -->
+    <string name="contact_info_retention_time_year">1 year</string>
+    <!-- Contact info: chat history retention time in months. %1$d is the number of months -->
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <!-- Contact info: chat history retention time in weeks. %1$d is the number of weeks -->
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+    <!-- Contact info: chat history retention time in days. %1$d is the number of days -->
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <!-- Contact info: chat history retention time in hours. %1$d is the number of hours -->
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <!-- Add contacts picker (share flow): warning banner shown when the selection includes recipients whose credentials the user has not verified -->
+    <string name="add_contacts_unverified_contact_warning">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>
