@@ -45,10 +45,15 @@ class GetLinkActionClickHandler @Inject constructor(
         } else {
             Analytics.tracker.trackEvent(LinkShareLinkForNodesMenuToolbarEvent)
         }
-        megaNavigator.openGetLinkActivity(
-            context = provider.context,
-            *nodes.map { it.id.longValue }.toLongArray()
-        )
+        val handles = nodes.map { it.id.longValue }
+        if (provider.navigationHandler != null) {
+            provider.navigationHandler.navigate(ShareLinkNavKey(handles = handles))
+        } else {
+            megaNavigator.openGetLinkActivity(
+                context = provider.context,
+                *handles.toLongArray()
+            )
+        }
         provider.viewModel.dismiss()
     }
 }

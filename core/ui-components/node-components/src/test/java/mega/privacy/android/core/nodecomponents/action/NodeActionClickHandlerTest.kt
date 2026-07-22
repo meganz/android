@@ -251,6 +251,22 @@ class NodeActionClickHandlerTest {
         addToAlbumLauncher = mockAddToAlbumLauncher
     )
 
+    private val mockMultipleNodesActionProviderNoHandler = MultipleNodesActionProvider(
+        viewModel = mockViewModel,
+        context = mockContext,
+        coroutineScope = testScope,
+        postMessage = { },
+        megaNavigator = mockMegaNavigator,
+        navigationHandler = null,
+        moveLauncher = mockMoveLauncher,
+        copyLauncher = mockCopyLauncher,
+        publicCopyLauncher = mockPublicCopyLauncher,
+        restoreLauncher = mockRestoreLauncher,
+        sendToChatLauncher = mockSendToChatLauncher,
+        hiddenNodesOnboardingLauncher = mockHiddenNodesOnboardingLauncher,
+        addToAlbumLauncher = mockAddToAlbumLauncher
+    )
+
     @get:Rule
     val analyticsRule = AnalyticsTestRule()
 
@@ -1019,12 +1035,23 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
-    fun `test ManageLinkAction multiple nodes handle calls openGetLinkActivity with handles array`() {
+    fun `test that ManageLinkAction multiple nodes handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = ManageLinkActionClickHandler()
         val menuAction = mock<ManageLinkMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L, 456L)))
+    }
+
+    @Test
+    fun `test that ManageLinkAction multiple nodes handle calls openGetLinkActivity when navigationHandler is null`() {
+        val action = ManageLinkActionClickHandler()
+        val menuAction = mock<ManageLinkMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProviderNoHandler)
 
         verify(mockMegaNavigator).openGetLinkActivity(
             context = mockContext,
@@ -1769,12 +1796,23 @@ class NodeActionClickHandlerTest {
 
     // GetLinkAction Tests (already exists, but adding multiple nodes test)
     @Test
-    fun `test GetLinkAction multiple nodes handle calls megaNavigator with handles array`() {
+    fun `test that GetLinkAction multiple nodes handle navigates via ShareLinkNavKey when navigationHandler is not null`() {
         val action = GetLinkActionClickHandler(mockMegaNavigator)
         val menuAction = mock<GetLinkMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
+
+        verify(mockNavigationHandler).navigate(ShareLinkNavKey(handles = listOf(123L, 456L)))
+    }
+
+    @Test
+    fun `test that GetLinkAction multiple nodes handle calls megaNavigator when navigationHandler is null`() {
+        val action = GetLinkActionClickHandler(mockMegaNavigator)
+        val menuAction = mock<GetLinkMenuAction>()
+        val nodes = listOf(mockFileNode, mockFolderNode)
+
+        action.handle(menuAction, nodes, mockMultipleNodesActionProviderNoHandler)
 
         verify(mockMegaNavigator).openGetLinkActivity(any<Context>(), anyLong(), anyLong())
     }

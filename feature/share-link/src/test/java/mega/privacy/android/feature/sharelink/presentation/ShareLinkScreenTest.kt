@@ -62,6 +62,24 @@ class ShareLinkScreenTest {
     }
 
     @Test
+    fun `test that the settings action is shown for a single node`() {
+        setContent(uiState = data)
+
+        composeRule.onNodeWithTag(ShareLinkSettingsAction.testTag, useUnmergedTree = true)
+            .assertExists()
+    }
+
+    @Test
+    fun `test that the settings action is hidden for multiple nodes`() {
+        val multiNode = data.copy(nodeLinks = data.nodeLinks + data.primary.copy(handle = 2L))
+
+        setContent(uiState = multiNode)
+
+        composeRule.onNodeWithTag(ShareLinkSettingsAction.testTag, useUnmergedTree = true)
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun `test that the loading placeholder is displayed in the Loading state`() {
         setContent(uiState = ShareLinkUiState.Loading)
 

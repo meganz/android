@@ -89,7 +89,7 @@ fun ShareLinkScreen(
                 subtitle = null,
                 navigationType = AppBarNavigationType.Close(onBack),
                 actions = buildList {
-                    if (uiState is ShareLinkUiState.Data) {
+                    if (uiState is ShareLinkUiState.Data && !uiState.isMultiNode) {
                         add(MenuActionWithClick(ShareLinkSettingsAction, onOpenSettings))
                     }
                 },
@@ -123,11 +123,18 @@ fun ShareLinkScreen(
             when (uiState) {
                 ShareLinkUiState.Loading -> ShareLinkLoading()
                 ShareLinkUiState.Error -> ShareLinkError()
-                is ShareLinkUiState.Data -> ShareLinkContent(
-                    uiState = uiState,
-                    onCopyLink = onCopyLink,
-                    onCopyKey = onCopyKey,
-                )
+                is ShareLinkUiState.Data -> if (uiState.isMultiNode) {
+                    MultiNodeContent(
+                        uiState = uiState,
+                        onCopyLink = onCopyLink,
+                    )
+                } else {
+                    ShareLinkContent(
+                        uiState = uiState,
+                        onCopyLink = onCopyLink,
+                        onCopyKey = onCopyKey,
+                    )
+                }
             }
         }
     }
@@ -201,53 +208,123 @@ private fun ShareLinkContent(
 }
 
 @Composable
+private fun MultiNodeContent(
+    uiState: ShareLinkUiState.Data,
+    onCopyLink: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val clipboard = LocalClipboard.current
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .testTag(SHARE_LINK_MULTI_NODE_LIST_TAG)
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        InlineInfoBanner(
+            modifier = Modifier.testTag(SHARE_LINK_ACCESS_BANNER_TAG),
+            title = stringResource(sharedR.string.share_link_access_banner_title),
+            body = pluralStringResource(
+                sharedR.plurals.share_link_access_banner_description,
+                uiState.nodeLinks.size,
+            ),
+            showCancelButton = false,
+        )
+
+        uiState.nodeLinks.forEach { node ->
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                NodeInfoRow(node = node)
+                ShareLinkDetails(
+                    link = node.link,
+                    onCopyLink = {
+                        coroutineScope.launch {
+                            clipboard.setClipEntry(
+                                ClipData.newPlainText(COPIED_LINK_LABEL, node.link).toClipEntry(),
+                            )
+                        }
+                        onCopyLink()
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun NodeHeader(
+    node: ShareLinkNodeItem,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        NodeInfoRow(
+            node = node,
+            modifier = Modifier.testTag(SHARE_LINK_NODE_HEADER_TAG),
+        )
+        SubtleDivider()
+    }
+}
+
+@Composable
+private fun NodeInfoRow(
     node: ShareLinkNodeItem,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
-    val subtitle = remember(node.sizeInBytes, node.modificationTime) {
-        buildList {
-            node.sizeInBytes?.let { add(formatFileSize(it, context)) }
-            node.modificationTime?.let { add(formatModifiedDate(locale, it)) }
-        }.joinToString(separator = " • ")
-    }
-    Column(modifier = modifier.fillMaxWidth()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag(SHARE_LINK_NODE_HEADER_TAG)
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Image(
-                modifier = Modifier.size(32.dp),
-                painter = painterResource(id = node.iconRes),
-                contentDescription = null,
+    val subtitle = when {
+        node.isFolder && node.childFolderCount != null && node.childFileCount != null ->
+            pluralStringResource(
+                sharedR.plurals.info_num_folders_and_files,
+                node.childFolderCount,
+                node.childFolderCount,
+            ) + pluralStringResource(
+                sharedR.plurals.info_num_files,
+                node.childFileCount,
+                node.childFileCount,
             )
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(2.dp),
-            ) {
+
+        else -> remember(node.sizeInBytes, node.modificationTime) {
+            buildList {
+                node.sizeInBytes?.let { add(formatFileSize(it, context)) }
+                node.modificationTime?.let { add(formatModifiedDate(locale, it)) }
+            }.joinToString(separator = " • ")
+        }
+    }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Image(
+            modifier = Modifier.size(32.dp),
+            painter = painterResource(id = node.iconRes),
+            contentDescription = null,
+        )
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+        ) {
+            MegaText(
+                text = node.name,
+                textColor = TextColor.Primary,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                style = AppTheme.typography.titleMedium,
+            )
+            if (subtitle.isNotEmpty()) {
                 MegaText(
-                    text = node.name,
-                    textColor = TextColor.Primary,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
-                    style = AppTheme.typography.titleMedium,
+                    text = subtitle,
+                    textColor = TextColor.Secondary,
+                    style = AppTheme.typography.bodyMedium,
                 )
-                if (subtitle.isNotEmpty()) {
-                    MegaText(
-                        text = subtitle,
-                        textColor = TextColor.Secondary,
-                        style = AppTheme.typography.bodyMedium,
-                    )
-                }
             }
         }
-        SubtleDivider()
     }
 }
 
@@ -346,6 +423,53 @@ private fun ShareLinkScreenDataPreview() {
     }
 }
 
+private val previewMultiNodeData = ShareLinkUiState.Data(
+    nodeLinks = listOf(
+        ShareLinkNodeItem(
+            handle = 1L,
+            name = "Documents",
+            isFolder = true,
+            iconRes = iconPackR.drawable.ic_folder_medium_solid,
+            sizeInBytes = null,
+            modificationTime = null,
+            childFolderCount = 6,
+            childFileCount = 12,
+            link = "https://mega.nz/folder/abc123#folderKey",
+            linkWithoutKey = "https://mega.nz/folder/abc123",
+            key = "folderKey",
+        ),
+        ShareLinkNodeItem(
+            handle = 2L,
+            name = "Presentation.pdf",
+            isFolder = false,
+            iconRes = iconPackR.drawable.ic_pdf_medium_solid,
+            sizeInBytes = 10L * 1024 * 1024,
+            modificationTime = 1_749_000_000L,
+            childFolderCount = null,
+            childFileCount = null,
+            link = "https://mega.nz/file/def456#fileKey",
+            linkWithoutKey = "https://mega.nz/file/def456",
+            key = "fileKey",
+        ),
+    ),
+    accountType = null,
+)
+
+@CombinedThemePreviews
+@Composable
+private fun ShareLinkScreenMultiNodePreview() {
+    AndroidThemeForPreviews {
+        ShareLinkScreen(
+            uiState = previewMultiNodeData,
+            onBack = {},
+            onOpenSettings = {},
+            onShareLink = {},
+            onCopyLink = {},
+            onCopyKey = {},
+        )
+    }
+}
+
 @CombinedThemePreviews
 @Composable
 private fun ShareLinkScreenLoadingPreview() {
@@ -379,6 +503,7 @@ private fun ShareLinkScreenErrorPreview() {
 internal const val SHARE_LINK_APP_BAR_TAG = "share_link_screen:app_bar"
 internal const val SHARE_LINK_SHARE_BUTTON_TAG = "share_link_screen:button_share"
 internal const val SHARE_LINK_NODE_HEADER_TAG = "share_link_screen:node_header"
+internal const val SHARE_LINK_MULTI_NODE_LIST_TAG = "share_link_screen:multi_node_list"
 internal const val SHARE_LINK_ACCESS_BANNER_TAG = "share_link_screen:access_banner"
 internal const val SHARE_LINK_LOADING_TAG = "share_link_screen:loading"
 internal const val SHARE_LINK_ERROR_TAG = "share_link_screen:error"

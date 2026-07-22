@@ -43,11 +43,15 @@ class ManageLinkActionClickHandler @Inject constructor() : SingleNodeAction, Mul
             Analytics.tracker.trackEvent(LinkGetLinkForNodesMenuToolbarEvent)
         }
 
-        val handles = nodes.map { it.id.longValue }.toLongArray()
-        provider.megaNavigator.openGetLinkActivity(
-            context = provider.context,
-            *handles
-        )
+        val handles = nodes.map { it.id.longValue }
+        if (provider.navigationHandler != null) {
+            provider.navigationHandler.navigate(ShareLinkNavKey(handles = handles))
+        } else {
+            provider.megaNavigator.openGetLinkActivity(
+                context = provider.context,
+                *handles.toLongArray()
+            )
+        }
         provider.viewModel.dismiss()
     }
 }
