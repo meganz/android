@@ -112,7 +112,10 @@ fun QuotaWarningUpgradeScreen(
     }
 
     val title = if (message.titleTakesPercentage) {
-        stringResource(message.titleId, currentUsagePercentage(uiState, message.metric).toInt())
+        stringResource(
+            message.titleId,
+            currentUsagePercentage(uiState, message.metric, isProUser, message.level).toInt()
+        )
     } else {
         stringResource(message.titleId)
     }
@@ -123,7 +126,7 @@ fun QuotaWarningUpgradeScreen(
             (uiState.currentPlan ?: AccountType.FREE).toUIAccountType().textValue
         ),
         currentPlanLabel = stringResource(sharedR.string.account_upgrade_account_pro_plan_info_current_plan_label),
-        usagePercentage = currentUsagePercentage(uiState, message.metric),
+        usagePercentage = currentUsagePercentage(uiState, message.metric, isProUser, message.level),
         usageLevel = message.level,
         usageText = currentUsageText(uiState, message.metric, isProUser, context),
     )
@@ -430,11 +433,21 @@ private fun QuotaWarningBottomBar(
     }
 }
 
-private fun currentUsagePercentage(state: QuotaWarningUpgradeState, metric: QuotaMetric): Float =
-    when (metric) {
-        QuotaMetric.Storage -> state.storageUsedPercentage.toFloat()
-        QuotaMetric.Transfer -> state.transferUsedPercentage.toFloat()
+private fun currentUsagePercentage(
+    state: QuotaWarningUpgradeState,
+    metric: QuotaMetric,
+    isProUser: Boolean,
+    level: QuotaUsageLevel,
+): Float = when (metric) {
+    QuotaMetric.Storage -> state.storageUsedPercentage.toFloat()
+    QuotaMetric.Transfer -> if (isProUser) {
+        state.transferUsedPercentage.toFloat()
+    } else {
+        // Free users have no known transfer total, so the bar is fixed:
+        // 80% while running low, 100% once exceeded.
+        if (level == QuotaUsageLevel.Error) 100f else 80f
     }
+}
 
 @Composable
 private fun currentUsageText(
@@ -772,7 +785,7 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
     private val transferCurrentFree = CurrentCardData(
         planName = "Free",
         currentPlanLabel = "Current plan",
-        usagePercentage = 90f,
+        usagePercentage = 80f,
         usageLevel = QuotaUsageLevel.Warning,
         usageText = "1 GB used",
     )
