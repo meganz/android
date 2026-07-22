@@ -511,6 +511,30 @@ class DefaultNotificationsRepositoryTest {
         }
 
         @Test
+        fun `test that getChatDoNotDisturbTime returns correct value`() = runTest {
+            val chatId = 123L
+            val timestamp = 1234567890L
+            val settings = mock<MegaPushNotificationSettings> {
+                on { getChatDnd(chatId) }.thenReturn(timestamp)
+            }
+
+            whenever(megaApiGateway.getPushNotificationSettings(any())).thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock { on { megaPushNotificationSettings }.thenReturn(settings) },
+                    mock { on { errorCode }.thenReturn(MegaError.API_OK) }
+                )
+            }
+            whenever(megaApiGateway.copyMegaPushNotificationsSettings(settings)).thenReturn(settings)
+
+            underTest.updatePushNotificationSettings()
+
+            val result = underTest.getChatDoNotDisturbTime(chatId)
+
+            assertThat(result).isEqualTo(timestamp)
+        }
+
+        @Test
         fun `test that setChatEnabled updates settings correctly`() = runTest {
             val chatId = 123L
             val enabled = true

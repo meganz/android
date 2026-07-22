@@ -258,6 +258,11 @@ internal class DefaultNotificationsRepository @Inject constructor(
             _pushNotificationSettings.value.isChatDndEnabled(chatId)
         }
 
+    override suspend fun getChatDoNotDisturbTime(chatId: Long): Long =
+        withContext(dispatcher) {
+            _pushNotificationSettings.value.getChatDnd(chatId)
+        }
+
     override suspend fun setChatDoNotDisturb(chatId: Long, timestamp: Long) =
         withContext(dispatcher) {
             val updatedSettings = _pushNotificationSettings.value.apply {
