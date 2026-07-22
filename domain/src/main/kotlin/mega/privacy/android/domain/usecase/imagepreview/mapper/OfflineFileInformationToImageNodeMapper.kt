@@ -64,11 +64,18 @@ class OfflineFileInformationToImageNodeMapper @Inject constructor() {
                 { _, _, _ -> flowOf() }
             override val latitude = -1.0
             override val longitude = -1.0
-            override val serializedData = "offlineFile"
+            override val serializedData = OFFLINE_SERIALIZED_DATA_FLAG
             override val isAvailableOffline: Boolean = true
             override val versionCount: Int = -1
             override val description: String? = null
             override val tags: List<String>? = null
         }
+    }
+
+    companion object {
+        /**
+         * Flag to indicate offline files
+         */
+        const val OFFLINE_SERIALIZED_DATA_FLAG = "offlineFile"
     }
 }

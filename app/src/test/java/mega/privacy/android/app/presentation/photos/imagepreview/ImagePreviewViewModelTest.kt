@@ -10,6 +10,7 @@ import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.StateEventWithContentConsumed
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -35,11 +36,13 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.MoveRequestResult
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionWithActionResult
+import mega.privacy.android.domain.entity.node.TypedImageNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -60,6 +63,7 @@ import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
+import mega.privacy.android.domain.usecase.imagepreview.mapper.OfflineFileInformationToImageNodeMapper
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
@@ -91,8 +95,10 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
+import java.io.File
 import kotlin.time.Duration
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
@@ -885,6 +891,64 @@ class ImagePreviewViewModelTest {
                 val state = expectMostRecentItem()
                 assertThat(state.transferEvent.triggeredContent()).isInstanceOf(TransferTriggerEvent.CopyOfflineNode::class.java)
             }
+        }
+
+    @Test
+    internal fun `test that monitorImageResult loads offline node from its full size path via getImageFromFileUseCase`() =
+        runTest {
+            val fullSizePath =
+                "/storage/emulated/0/MEGA offline/Health/Мое лечение/СНИЛС.jpg"
+            val imageNode = mock<ImageNode> {
+                on { serializedData } doReturn OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG
+                on { this.fullSizePath } doReturn fullSizePath
+            }
+            val expected = ImageResult(
+                fullSizeUri = "file://$fullSizePath",
+                isFullyLoaded = true,
+            )
+            whenever(getImageFromFileUseCase(File(fullSizePath))).thenReturn(expected)
+
+            val result = underTest.monitorImageResult(imageNode).toList()
+
+            assertThat(result).containsExactly(expected)
+            verify(getImageFromFileUseCase).invoke(File(fullSizePath))
+            verifyNoInteractions(addImageTypeUseCase, getImageUseCase)
+        }
+
+    @Test
+    internal fun `test that monitorImageResult does not build an invalid uri for an offline node without a full size path`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { serializedData } doReturn OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG
+                on { this.fullSizePath } doReturn null
+            }
+
+            val result = underTest.monitorImageResult(imageNode).toList()
+
+            assertThat(result).isEmpty()
+            verifyNoInteractions(
+                getImageFromFileUseCase,
+                addImageTypeUseCase,
+                getImageUseCase,
+            )
+        }
+
+    @Test
+    internal fun `test that monitorImageResult routes a non-offline node through addImageTypeUseCase and getImageUseCase`() =
+        runTest {
+            val imageNode = mock<ImageNode> {
+                on { serializedData } doReturn "someSerializedData"
+            }
+            val typedNode = mock<TypedImageNode>()
+            val expected = ImageResult(isFullyLoaded = true)
+            whenever(addImageTypeUseCase(imageNode)).thenReturn(typedNode)
+            whenever(getImageUseCase(any(), any(), any(), any())).thenReturn(flowOf(expected))
+
+            val result = underTest.monitorImageResult(imageNode).toList()
+
+            assertThat(result).containsExactly(expected)
+            verify(addImageTypeUseCase).invoke(imageNode)
+            verifyNoInteractions(getImageFromFileUseCase)
         }
 
     @Test

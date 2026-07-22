@@ -68,6 +68,7 @@ import mega.privacy.android.domain.usecase.imagepreview.GetImageFromFileUseCase
 import mega.privacy.android.domain.usecase.imagepreview.GetImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableImageUseCase
 import mega.privacy.android.domain.usecase.imagepreview.IsEditableVideoUseCase
+import mega.privacy.android.domain.usecase.imagepreview.mapper.OfflineFileInformationToImageNodeMapper
 import mega.privacy.android.domain.usecase.login.IsUserLoggedInUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.AddImageTypeUseCase
@@ -445,19 +446,26 @@ class ImagePreviewViewModel @Inject constructor(
     }
 
     suspend fun monitorImageResult(imageNode: ImageNode): Flow<ImageResult> {
-        return if (imageNode.serializedData?.contains("local") == true) {
-            flow {
+        return when {
+            imageNode.serializedData?.contains("local") == true -> flow {
                 val file = File(imageNode.previewPath ?: return@flow)
                 emit(getImageFromFileUseCase(file))
             }
-        } else {
-            val typedNode = addImageTypeUseCase(imageNode)
-            getImageUseCase(
-                node = typedNode,
-                fullSize = true,
-                highPriority = true,
-                resetDownloads = {},
-            )
+
+            imageNode.serializedData == OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG -> flow {
+                val file = File(imageNode.fullSizePath ?: return@flow)
+                emit(getImageFromFileUseCase(file))
+            }
+
+            else -> {
+                val typedNode = addImageTypeUseCase(imageNode)
+                getImageUseCase(
+                    node = typedNode,
+                    fullSize = true,
+                    highPriority = true,
+                    resetDownloads = {},
+                )
+            }
         }.catch { Timber.e("Failed to load image: $it") }
     }
 
