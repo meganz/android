@@ -72,6 +72,7 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaEventUseCase
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
@@ -80,6 +81,9 @@ import mega.privacy.android.navigation.contract.queue.dialog.AppDialogsEventQueu
 import mega.privacy.android.navigation.destination.CreateAccountNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.navigation.destination.LoginNavKey
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -125,6 +129,12 @@ class MegaActivity : FragmentActivity() {
      */
     @Inject
     lateinit var intentActionHandler: MegaActivityIntentActionHandler
+
+    /**
+     * Monitor transfer over quota event
+     */
+    @Inject
+    lateinit var monitorTransferOverQuotaEventUseCase: MonitorTransferOverQuotaEventUseCase
 
     private val passcodeViewModel: PasscodeCheckViewModel by viewModels()
 
@@ -349,6 +359,18 @@ class MegaActivity : FragmentActivity() {
                                     onConsumed = snackbarEventsViewModel::consumeEvent,
                                     action = { snackbarHostState.show(it.attributes) }
                                 )
+
+                                LaunchedEffect(Unit) {
+                                    monitorTransferOverQuotaEventUseCase().collect {
+                                        navigationHandler.navigate(
+                                            QuotaWarningUpgradeNavKey(
+                                                type = QuotaWarningType.Transfer,
+                                                trigger = QuotaWarningTrigger.Download,
+                                            ),
+                                            navOptions { dropIfAlreadyShown = true },
+                                        )
+                                    }
+                                }
 
 
                                 CompositionLocalProvider(

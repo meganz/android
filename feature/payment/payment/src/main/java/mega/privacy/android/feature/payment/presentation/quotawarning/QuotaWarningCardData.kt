@@ -32,6 +32,7 @@ internal data class CurrentCardData(
  * @property usageLevel severity level driving the usage bar colour
  * @property usageText usage help text (e.g. "Storage: 19 GB out of 200 GB")
  * @property subscriptionToBuy the subscription launched when the upgrade button is tapped, null when unavailable
+ * @property offer discount data when the recommended subscription carries an active offer, null otherwise
  */
 internal data class RecommendedCardData(
     val planName: String,
@@ -43,4 +44,23 @@ internal data class RecommendedCardData(
     val usageLevel: QuotaUsageLevel,
     val usageText: String,
     val subscriptionToBuy: Subscription?,
+    val offer: RecommendedOfferData? = null,
+)
+
+/**
+ * Discount data for the recommended-plan card when the recommended subscription carries an active
+ * offer. When present, the card renders as a promotional offer card instead of the regular one.
+ *
+ * @property priceText the discounted price shown as the main price (e.g. "€4.99/month")
+ * @property originalPriceText the pre-discount price shown with a strikethrough (e.g. "€9.99")
+ * @property discountDescriptionText the discount explanation (e.g. "Billed at ... for the first year")
+ * @property discountBadgeText the promotional badge text (e.g. "Special offer · 50% off")
+ * @property monthlyPriceText per-month discounted price shown above the total on yearly plans, null otherwise
+ */
+internal data class RecommendedOfferData(
+    val priceText: String,
+    val originalPriceText: String,
+    val discountDescriptionText: String,
+    val discountBadgeText: String,
+    val monthlyPriceText: String?,
 )

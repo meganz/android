@@ -169,7 +169,7 @@ fun OfferPriceCard(
 }
 
 @Composable
-private fun DiscountBadge(
+internal fun DiscountBadge(
     text: String,
     modifier: Modifier = Modifier,
 ) {

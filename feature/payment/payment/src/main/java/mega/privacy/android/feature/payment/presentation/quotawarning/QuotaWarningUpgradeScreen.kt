@@ -52,11 +52,14 @@ import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.feature.payment.components.QuotaCurrentPlanCard
+import mega.privacy.android.feature.payment.components.QuotaOfferPlanCard
 import mega.privacy.android.feature.payment.components.QuotaRecommendedPlanCard
 import mega.privacy.android.feature.payment.components.QuotaUsageLevel
 import mega.privacy.android.feature.payment.components.QuotaWarningSkeleton
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.extensions.toUIAccountType
+import mega.privacy.android.feature.payment.presentation.upgrade.billedDescription
+import mega.privacy.android.feature.payment.presentation.upgrade.getCampaignName
 import mega.privacy.android.icon.pack.R as IconPackR
 import mega.privacy.android.navigation.payment.QuotaWarningTrigger
 import mega.privacy.android.navigation.payment.QuotaWarningType
@@ -336,17 +339,34 @@ private fun QuotaWarningDataContent(
                 usageText = currentCard.usageText,
             )
             if (recommended != null) {
-                QuotaRecommendedPlanCard(
-                    planName = recommended.planName,
-                    monthlyPriceText = recommended.monthlyPriceText,
-                    yearlyTotalText = recommended.yearlyTotalText,
-                    storageText = recommended.storageText,
-                    transferText = recommended.transferText,
-                    badgeLabel = stringResource(sharedR.string.subscription_quota_best_for_you),
-                    usagePercentage = recommended.usagePercentage,
-                    usageLevel = recommended.usageLevel,
-                    usageText = recommended.usageText,
-                )
+                val offer = recommended.offer
+                if (offer != null) {
+                    QuotaOfferPlanCard(
+                        planName = recommended.planName,
+                        priceText = offer.priceText,
+                        originalPriceText = offer.originalPriceText,
+                        discountDescriptionText = offer.discountDescriptionText,
+                        discountBadgeText = offer.discountBadgeText,
+                        storageText = recommended.storageText,
+                        transferText = recommended.transferText,
+                        usagePercentage = recommended.usagePercentage,
+                        usageLevel = recommended.usageLevel,
+                        usageText = recommended.usageText,
+                        monthlyPriceText = offer.monthlyPriceText,
+                    )
+                } else {
+                    QuotaRecommendedPlanCard(
+                        planName = recommended.planName,
+                        monthlyPriceText = recommended.monthlyPriceText,
+                        yearlyTotalText = recommended.yearlyTotalText,
+                        storageText = recommended.storageText,
+                        transferText = recommended.transferText,
+                        badgeLabel = stringResource(sharedR.string.subscription_quota_best_for_you),
+                        usagePercentage = recommended.usagePercentage,
+                        usageLevel = recommended.usageLevel,
+                        usageText = recommended.usageText,
+                    )
+                }
             }
         }
     }
@@ -506,6 +526,8 @@ private fun recommendedCardData(
         )
     }
 
+    val offer = offerCardData(subscription, useYearly, locale)
+
     return RecommendedCardData(
         planName = stringResource(subscription.accountType.toUIAccountType().textValue),
         monthlyPriceText = monthlyPriceText,
@@ -517,6 +539,66 @@ private fun recommendedCardData(
         usageText = usageText,
         subscriptionToBuy = subscription.getSubscription(isMonthly = !useYearly)
             ?: subscription.getSubscription(isMonthly = useYearly),
+        offer = offer,
+    )
+}
+
+/**
+ * Builds the discount data for the recommended plan when its subscription (for the shown billing
+ * cycle) carries an active offer, or null otherwise. Prices follow the same monthly/yearly wording
+ * as the redesigned subscription page's offer cards.
+ */
+@Composable
+private fun offerCardData(
+    subscription: LocalisedSubscription,
+    useYearly: Boolean,
+    locale: Locale,
+): RecommendedOfferData? {
+    val isMonthly = !useYearly
+    val offerSubscription = subscription.getSubscription(isMonthly)
+    if (offerSubscription?.discountedAmountMonthly == null) return null
+
+    val discountedMonthly =
+        subscription.localiseDiscountedPriceMonthlyCurrencyCode(locale, isMonthly)?.price.orEmpty()
+    val discountedYearly =
+        subscription.localiseDiscountedPriceYearlyCurrencyCode(locale, isMonthly)?.price.orEmpty()
+    val originalPrice = subscription.localisePriceCurrencyCode(locale, isMonthly).price
+
+    val priceText: String
+    val monthlyPriceText: String?
+    val billedDiscountedPrice: String
+    val billedOriginalPrice: String
+    if (isMonthly) {
+        priceText =
+            stringResource(sharedR.string.subscription_revamp_price_per_month, discountedMonthly)
+        monthlyPriceText = null
+        billedDiscountedPrice = priceText
+        billedOriginalPrice =
+            stringResource(sharedR.string.subscription_revamp_price_per_month, originalPrice)
+    } else {
+        priceText =
+            stringResource(sharedR.string.subscription_revamp_price_per_year, discountedYearly)
+        monthlyPriceText =
+            stringResource(sharedR.string.subscription_revamp_price_per_month, discountedMonthly)
+        billedDiscountedPrice = discountedYearly
+        billedOriginalPrice = originalPrice
+    }
+
+    return RecommendedOfferData(
+        priceText = priceText,
+        originalPriceText = originalPrice,
+        discountDescriptionText = billedDescription(
+            offerPeriod = offerSubscription.offerPeriod,
+            isMonthly = isMonthly,
+            discountedPrice = billedDiscountedPrice,
+            originalPrice = billedOriginalPrice,
+        ),
+        discountBadgeText = getCampaignName(
+            context = LocalContext.current,
+            discountName = offerSubscription.discountName,
+            discountPercentage = offerSubscription.discountedPercentage ?: 0,
+        ),
+        monthlyPriceText = monthlyPriceText,
     )
 }
 
@@ -671,6 +753,22 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
         subscriptionToBuy = null,
     )
 
+    private val storageRecommendedOffer = storageRecommended.copy(
+        planName = "Pro I",
+        monthlyPriceText = "€4.99/month",
+        yearlyTotalText = "€29.94 charged yearly",
+        storageText = "2 TB cloud storage",
+        transferText = "2 TB transfer",
+        usageText = "Storage: 19 GB out of 2 TB",
+        offer = RecommendedOfferData(
+            priceText = "€29.94 charged yearly",
+            originalPriceText = "€59.88",
+            discountDescriptionText = "Billed at €29.94 for the first year, €119.88 charged yearly after",
+            discountBadgeText = "Special offer · 50% off",
+            monthlyPriceText = "€4.99/month",
+        ),
+    )
+
     private val transferCurrentFree = CurrentCardData(
         planName = "Free",
         currentPlanLabel = "Current plan",
@@ -727,6 +825,14 @@ private class QuotaWarningPreviewProvider : PreviewParameterProvider<QuotaWarnin
             isLoading = false,
             currentCard = storageCurrentFull,
             recommended = storageRecommended,
+        ),
+        QuotaWarningPreviewState(
+            title = "Your storage is 80% full",
+            subtitle = "Upgrade your plan before you run out of space",
+            showLearnMore = false,
+            isLoading = false,
+            currentCard = storageCurrentAlmostFull,
+            recommended = storageRecommendedOffer,
         ),
         QuotaWarningPreviewState(
             title = "Your transfer quota is running low",

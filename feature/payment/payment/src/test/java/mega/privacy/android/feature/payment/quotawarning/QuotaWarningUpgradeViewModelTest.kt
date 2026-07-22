@@ -194,6 +194,89 @@ class QuotaWarningUpgradeViewModelTest {
     }
 
     @Test
+    fun `test that a discounted plan covering usage is preferred when it is cheaper than the default`() =
+        runTest {
+            val essential = subscription(AccountType.ESSENTIAL, storage = 100, amount = 4.99f)
+            val proII = subscription(
+                AccountType.PRO_II,
+                storage = 2048,
+                amount = 9.99f,
+                discountedAmountMonthly = 2.99f,
+                discountedPercentage = 70,
+            )
+            val detail = accountDetail(storageUsed = 50 * BYTES_IN_GB)
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+            wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+                Subscriptions(
+                    monthlySubscriptions = listOf(essential, proII),
+                    yearlySubscriptions = emptyList(),
+                )
+            )
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().recommendedSubscription?.accountType)
+                    .isEqualTo(AccountType.PRO_II)
+            }
+        }
+
+    @Test
+    fun `test that a cheaper discounted plan is ignored when it does not cover usage`() = runTest {
+        val essential = subscription(
+            AccountType.ESSENTIAL,
+            storage = 100,
+            amount = 4.99f,
+            discountedAmountMonthly = 1.99f,
+            discountedPercentage = 60,
+        )
+        val proI = subscription(AccountType.PRO_I, storage = 400, amount = 4.99f)
+        val detail = accountDetail(storageUsed = 200 * BYTES_IN_GB)
+        whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+        wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+            Subscriptions(
+                monthlySubscriptions = listOf(essential, proI),
+                yearlySubscriptions = emptyList(),
+            )
+        )
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem().recommendedSubscription?.accountType)
+                .isEqualTo(AccountType.PRO_I)
+        }
+    }
+
+    @Test
+    fun `test that a discounted plan is ignored when its post-offer price is not cheaper than the default`() =
+        runTest {
+            val essential = subscription(AccountType.ESSENTIAL, storage = 100, amount = 4.99f)
+            val proII = subscription(
+                AccountType.PRO_II,
+                storage = 2048,
+                amount = 9.99f,
+                discountedAmountMonthly = 6.99f,
+                discountedPercentage = 30,
+            )
+            val detail = accountDetail(storageUsed = 50 * BYTES_IN_GB)
+            whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
+            wheneverBlocking { getSubscriptionsUseCase() }.thenReturn(
+                Subscriptions(
+                    monthlySubscriptions = listOf(essential, proII),
+                    yearlySubscriptions = emptyList(),
+                )
+            )
+            initViewModel()
+            advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().recommendedSubscription?.accountType)
+                    .isEqualTo(AccountType.ESSENTIAL)
+            }
+        }
+
+    @Test
     fun `test that recommended subscription is null when no plans are available`() = runTest {
         val detail = accountDetail(storageUsed = 10 * BYTES_IN_GB)
         whenever(monitorAccountDetailUseCase()).thenReturn(flowOf(detail))
@@ -469,13 +552,23 @@ class QuotaWarningUpgradeViewModelTest {
         }
     }
 
-    private fun subscription(accountType: AccountType, storage: Int) = Subscription(
+    private fun subscription(
+        accountType: AccountType,
+        storage: Int,
+        amount: Float = 4.99f,
+        discountedAmountMonthly: Float? = null,
+        discountedPercentage: Int? = null,
+    ) = Subscription(
         sku = "sku_${accountType.name}_$storage",
         accountType = accountType,
         handle = 1L,
         storage = storage,
         transfer = 0,
-        amount = CurrencyAmount(4.99f, Currency("EUR")),
+        amount = CurrencyAmount(amount, Currency("EUR")),
+        discountedAmountMonthly = discountedAmountMonthly?.let {
+            CurrencyAmount(it, Currency("EUR"))
+        },
+        discountedPercentage = discountedPercentage,
     )
 
     companion object {

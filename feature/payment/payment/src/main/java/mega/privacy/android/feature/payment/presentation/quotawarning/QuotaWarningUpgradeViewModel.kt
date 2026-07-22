@@ -162,6 +162,10 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
      * Smallest plan whose storage covers current usage (largest if none does), so upgrading clears
      * the over-quota state regardless of the current tier. Plans are merged across the monthly and
      * yearly lists so a plan offered in only one cycle is still considered.
+     *
+     * Special case: when a discounted plan also covers current usage and its post-offer price
+     * undercuts that default recommendation, the discounted plan is recommended instead (the
+     * cheapest such offer wins), so the user is shown the better-value deal.
      */
     private fun recommendedSubscription(
         storageUsed: Long?,
@@ -180,9 +184,46 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
             }
             .sortedBy { it.storage }
         val usedBytes = storageUsed ?: 0L
-        return plansBySize.firstOrNull { it.storage.toLong() * BYTES_IN_GB > usedBytes }
+        val default = plansBySize.firstOrNull { it.coversUsage(usedBytes) }
             ?: plansBySize.lastOrNull()
+            ?: return null
+        return cheaperDiscountedAlternative(plansBySize, usedBytes, default) ?: default
     }
+
+    /**
+     * The cheapest discounted plan that also covers current usage and whose post-offer price
+     * undercuts [default], or null when no such better-value offer exists.
+     */
+    private fun cheaperDiscountedAlternative(
+        plansBySize: List<LocalisedSubscription>,
+        usedBytes: Long,
+        default: LocalisedSubscription,
+    ): LocalisedSubscription? {
+        val defaultPrice = default.effectiveMonthlyPrice() ?: return null
+        return plansBySize
+            .filter { it.hasDiscount && it.coversUsage(usedBytes) }
+            .mapNotNull { plan -> plan.effectiveMonthlyPrice()?.let { plan to it } }
+            .filter { (_, price) -> price < defaultPrice }
+            .minByOrNull { (_, price) -> price }
+            ?.first
+    }
+
+    /**
+     * Whether this plan's storage quota exceeds current usage, so upgrading to it clears the
+     * over-quota state. [usedBytes] is in bytes; plan storage is expressed in GB.
+     */
+    private fun LocalisedSubscription.coversUsage(usedBytes: Long): Boolean =
+        storage.toLong() * BYTES_IN_GB > usedBytes
+
+    /**
+     * The lowest monthly-equivalent price of the plan across its available billing cycles, using the
+     * discounted amount where present. Null when no price is available. Amounts share the account
+     * currency and plan prices differ by whole currency units, so the raw Float value is safe to compare.
+     */
+    private fun LocalisedSubscription.effectiveMonthlyPrice(): Float? = listOfNotNull(
+        monthlySubscription?.let { (it.discountedAmountMonthly ?: it.amount).value },
+        yearlySubscription?.let { it.discountedAmountMonthly?.value ?: (it.amount.value / 12) },
+    ).minOrNull()
 
     private companion object {
         private const val BYTES_IN_GB = 1024L * 1024L * 1024L

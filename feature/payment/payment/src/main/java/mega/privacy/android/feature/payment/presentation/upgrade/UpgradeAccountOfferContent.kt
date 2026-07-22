@@ -433,7 +433,7 @@ private fun OfferPlanCardItem(
  * reads as "the first year".
  */
 @Composable
-private fun billedDescription(
+internal fun billedDescription(
     offerPeriod: OfferPeriod?,
     isMonthly: Boolean,
     discountedPrice: String,
@@ -453,7 +453,7 @@ private fun billedDescription(
  * Normalises an [OfferPeriod] to a (count, inYears) pair, collapsing whole-year month spans (e.g.
  * 12 months) to years so a one-year offer reads as "year" rather than "12 months". Null for no offer.
  */
-private fun normalizeOfferPeriod(offerPeriod: OfferPeriod?): Pair<Int, Boolean>? =
+internal fun normalizeOfferPeriod(offerPeriod: OfferPeriod?): Pair<Int, Boolean>? =
     when (offerPeriod) {
         is OfferPeriod.Year -> offerPeriod.value to true
         is OfferPeriod.Month ->

@@ -88,7 +88,7 @@ fun HomeScreens(
                             trigger = QuotaWarningTrigger.General,
                         ),
                         navOptions {
-                            popUpTo(QuotaWarningUpgradeNavKey::class) { inclusive = true }
+                            dropIfAlreadyShown = true
                         }
                     )
                 } else {

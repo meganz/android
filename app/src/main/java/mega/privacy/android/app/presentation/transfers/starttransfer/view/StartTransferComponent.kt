@@ -193,7 +193,7 @@ internal fun StartTransferComponent(
             }
         }
 
-        if (areTransferOverQuotaWarningsAllowed) {
+        if (areTransferOverQuotaWarningsAllowed && !uiState.isQuotaWarningUpsellEnabled) {
             TransferOverQuotaDialog()
         }
     }
