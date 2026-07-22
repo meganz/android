@@ -7,6 +7,7 @@ import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.NativeClipboard
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -50,6 +51,71 @@ class ShareLinkScreenTest {
         ),
         accountType = null,
     )
+
+    private val multiNodeData = ShareLinkUiState.Data(
+        nodeLinks = listOf(
+            ShareLinkNodeItem(
+                handle = 1L,
+                name = "Documents",
+                isFolder = true,
+                iconRes = iconPackR.drawable.ic_folder_medium_solid,
+                sizeInBytes = null,
+                modificationTime = null,
+                childFolderCount = 6,
+                childFileCount = 12,
+                link = "https://mega.nz/folder/abc123#folderKey",
+                linkWithoutKey = "https://mega.nz/folder/abc123",
+                key = "folderKey",
+            ),
+            ShareLinkNodeItem(
+                handle = 2L,
+                name = "Presentation.pdf",
+                isFolder = false,
+                iconRes = iconPackR.drawable.ic_pdf_medium_solid,
+                sizeInBytes = 10L * 1024 * 1024,
+                modificationTime = 1_749_000_000L,
+                childFolderCount = null,
+                childFileCount = null,
+                link = "https://mega.nz/file/def456#fileKey",
+                linkWithoutKey = "https://mega.nz/file/def456",
+                key = "fileKey",
+            ),
+        ),
+        accountType = null,
+    )
+
+    @Test
+    fun `test that every shared node and one access banner are displayed in the multi-node state`() {
+        setContent(uiState = multiNodeData)
+
+        composeRule.onNodeWithTag(SHARE_LINK_MULTI_NODE_LIST_TAG).assertIsDisplayed()
+        composeRule.onNodeWithText("Documents").assertIsDisplayed()
+        composeRule.onNodeWithText("Presentation.pdf").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithTag(SHARE_LINK_ACCESS_BANNER_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that folder content info is displayed for a folder node in the multi-node state`() {
+        setContent(uiState = multiNodeData)
+
+        val folderInfo = context.resources.getQuantityString(
+            sharedR.plurals.info_num_folders_and_files, 6, 6,
+        ) + context.resources.getQuantityString(sharedR.plurals.info_num_files, 12, 12)
+        composeRule.onNodeWithText(folderInfo).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that tapping a node's copy icon copies that node's link to the clipboard`() {
+        val clipboard = FakeClipboard()
+        setContent(uiState = multiNodeData, clipboard = clipboard)
+
+        composeRule.onAllNodesWithContentDescription(context.getString(sharedR.string.general_copy))[0]
+            .performClick()
+        composeRule.waitForIdle()
+
+        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text)
+            .isEqualTo(multiNodeData.nodeLinks[0].link)
+    }
 
     @Test
     fun `test that the node header, link access banner and link field are displayed in the Data state`() {

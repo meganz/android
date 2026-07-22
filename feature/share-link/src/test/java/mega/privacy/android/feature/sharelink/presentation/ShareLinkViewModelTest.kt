@@ -34,6 +34,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
@@ -57,17 +58,19 @@ class ShareLinkViewModelTest {
         whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
         whenever(passwordCache.monitor(any())).thenReturn(flowOf(null))
         whenever(separateKeyCache.monitor(any())).thenReturn(flowOf(false))
-        underTest = ShareLinkViewModel(
-            args = ShareLinkViewModel.Args(handles = listOf(NODE_HANDLE)),
-            getNodeByIdUseCase = getNodeByIdUseCase,
-            exportNodesUseCase = exportNodesUseCase,
-            monitorAccountDetailUseCase = monitorAccountDetailUseCase,
-            splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
-            fileTypeIconMapper = fileTypeIconMapper,
-            passwordCache = passwordCache,
-            separateKeyCache = separateKeyCache,
-        )
+        underTest = buildViewModel(listOf(NODE_HANDLE))
     }
+
+    private fun buildViewModel(handles: List<Long>) = ShareLinkViewModel(
+        args = ShareLinkViewModel.Args(handles = handles),
+        getNodeByIdUseCase = getNodeByIdUseCase,
+        exportNodesUseCase = exportNodesUseCase,
+        monitorAccountDetailUseCase = monitorAccountDetailUseCase,
+        splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
+        fileTypeIconMapper = fileTypeIconMapper,
+        passwordCache = passwordCache,
+        separateKeyCache = separateKeyCache,
+    )
 
     @AfterEach
     fun tearDown() {
@@ -287,6 +290,99 @@ class ShareLinkViewModelTest {
             }
         }
 
+    @Test
+    fun `test that uiState is Data with one nodeLink per shared handle in order`() = runTest {
+        val folder = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "Documents"
+            on { exportedData } doReturn ExportedData("https://mega.nz/folder/fid#fkey", 0L)
+            on { childFolderCount } doReturn 6
+            on { childFileCount } doReturn 12
+        }
+        val file = mock<TypedFileNode> {
+            on { id } doReturn NodeId(SECOND_HANDLE)
+            on { name } doReturn "report.pdf"
+            on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(folder)
+        whenever(getNodeByIdUseCase(NodeId(SECOND_HANDLE))).thenReturn(file)
+
+        val underTest = buildViewModel(listOf(NODE_HANDLE, SECOND_HANDLE))
+        underTest.uiState.test {
+            val data = awaitData()
+            assertThat(data.isMultiNode).isTrue()
+            assertThat(data.nodeLinks.map { it.name })
+                .containsExactly("Documents", "report.pdf").inOrder()
+            assertThat(data.nodeLinks.map { it.link }).containsExactly(
+                "https://mega.nz/folder/fid#fkey",
+                "https://mega.nz/file/abc#key123",
+            ).inOrder()
+            assertThat(data.nodeLinks[0].childFolderCount).isEqualTo(6)
+            assertThat(data.nodeLinks[0].childFileCount).isEqualTo(12)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verifyNoInteractions(exportNodesUseCase)
+    }
+
+    @Test
+    fun `test that only nodes without a public link are batch exported`() = runTest {
+        val exported = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "a.pdf"
+            on { exportedData } doReturn ExportedData("https://mega.nz/file/exists#k", 0L)
+            on { type } doReturn PdfFileTypeInfo
+        }
+        val pending = mock<TypedFileNode> {
+            on { id } doReturn NodeId(SECOND_HANDLE)
+            on { name } doReturn "b.pdf"
+            on { exportedData } doReturn null
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(exported)
+        whenever(getNodeByIdUseCase(NodeId(SECOND_HANDLE))).thenReturn(pending)
+        whenever(exportNodesUseCase(listOf(SECOND_HANDLE), CALLER_NAME))
+            .thenReturn(mapOf(SECOND_HANDLE to "https://mega.nz/file/new#nk"))
+
+        val underTest = buildViewModel(listOf(NODE_HANDLE, SECOND_HANDLE))
+        underTest.uiState.test {
+            val data = awaitData()
+            assertThat(data.nodeLinks.map { it.link }).containsExactly(
+                "https://mega.nz/file/exists#k",
+                "https://mega.nz/file/new#nk",
+            ).inOrder()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(exportNodesUseCase).invoke(listOf(SECOND_HANDLE), CALLER_NAME)
+    }
+
+    @Test
+    fun `test that a node whose link cannot be resolved is dropped from nodeLinks`() = runTest {
+        val exported = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "a.pdf"
+            on { exportedData } doReturn ExportedData("https://mega.nz/file/exists#k", 0L)
+            on { type } doReturn PdfFileTypeInfo
+        }
+        val pending = mock<TypedFileNode> {
+            on { id } doReturn NodeId(SECOND_HANDLE)
+            on { name } doReturn "b.pdf"
+            on { exportedData } doReturn null
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(exported)
+        whenever(getNodeByIdUseCase(NodeId(SECOND_HANDLE))).thenReturn(pending)
+        whenever(exportNodesUseCase(listOf(SECOND_HANDLE), CALLER_NAME)).thenReturn(emptyMap())
+
+        val underTest = buildViewModel(listOf(NODE_HANDLE, SECOND_HANDLE))
+        underTest.uiState.test {
+            val data = awaitData()
+            assertThat(data.nodeLinks.map { it.name }).containsExactly("a.pdf")
+            assertThat(data.isMultiNode).isFalse()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private suspend fun ReceiveTurbine<ShareLinkUiState>.awaitData(
         predicate: (ShareLinkUiState.Data) -> Boolean = { true },
     ): ShareLinkUiState.Data {
@@ -298,6 +394,7 @@ class ShareLinkViewModelTest {
 
     private companion object {
         const val NODE_HANDLE = 123L
+        const val SECOND_HANDLE = 456L
         const val CALLER_NAME = "ShareLinkViewModel"
         const val ENCRYPTED_LINK = "https://mega.nz/#P!enc"
         val FILE_ICON_RES = iconPackR.drawable.ic_pdf_medium_solid
