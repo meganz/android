@@ -23,6 +23,7 @@ import mega.privacy.android.app.presentation.extensions.getStorageState
 import mega.privacy.android.app.presentation.videosection.mapper.VideoPlaylistUIEntityMapper
 import mega.privacy.android.app.presentation.videosection.model.VideoPlaylistUIEntity
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
@@ -320,7 +321,7 @@ internal class AddToAlbumViewModel @Inject constructor(
         }.onSuccess {
             state.update {
                 it.copy(
-                    mediaHolderName = album.title,
+                    mediaHolderName = album.title.truncateMiddle(),
                     completionType = completionType,
                     numAddedItems = numAddedItems,
                     additionType = 0,
@@ -453,7 +454,7 @@ internal class AddToAlbumViewModel @Inject constructor(
 
         state.update {
             it.copy(
-                mediaHolderName = playlist.title,
+                mediaHolderName = playlist.title.truncateMiddle(),
                 completionType = completionType,
                 numAddedItems = numAddedItems,
                 additionType = 1,

@@ -83,6 +83,7 @@ import mega.privacy.android.feature.photos.model.AlbumSortOption
 import mega.privacy.android.feature.photos.model.PhotoUiState
 import mega.privacy.android.feature.photos.presentation.albums.content.model.AlbumContentSelectionAction
 import mega.privacy.android.core.sharedcomponents.dialog.EnterAlbumNameDialog
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.feature.photos.presentation.albums.dialog.RemoveAlbumConfirmationDialog
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import mega.privacy.android.feature.photos.presentation.albums.view.AlbumDynamicContentGrid
@@ -734,7 +735,7 @@ internal fun AlbumOptionsBottomSheet(
                     .wrapContentHeight()
             ) {
                 SheetActionHeader(
-                    title = albumUiState?.title?.text,
+                    title = albumUiState?.title?.text?.truncateMiddle(),
                     leadingElement = {
                         AsyncImage(
                             model = request,

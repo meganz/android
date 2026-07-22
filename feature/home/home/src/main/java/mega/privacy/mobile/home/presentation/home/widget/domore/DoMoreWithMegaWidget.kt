@@ -30,6 +30,7 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.core.sharedcomponents.button.DoMoreWithMegaItemButton
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.navigation.Flagged
 import mega.privacy.android.domain.featuretoggle.ApiFeatures

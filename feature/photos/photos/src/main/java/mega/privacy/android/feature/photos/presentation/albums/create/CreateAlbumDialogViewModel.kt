@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.core.sharedcomponents.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
@@ -118,7 +119,7 @@ class CreateAlbumDialogViewModel @Inject constructor(
                         albumCreatedEvent = triggered(
                             CreateAlbumDialogResult(
                                 albumId = albumId.id,
-                                albumName = finalName,
+                                albumName = finalName.truncateMiddle(),
                             )
                         ),
                     )
