@@ -1,11 +1,8 @@
 package mega.privacy.android.feature.settings.presentation.view
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,18 +10,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
-import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaScaffold
-import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.divider.StrongDivider
 import mega.android.core.ui.components.settings.SettingsOptionsItem
+import mega.android.core.ui.components.settings.SkeletonPreferenceItem
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
-import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
-import mega.android.core.ui.theme.AppTheme
-import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.domain.entity.preference.SortingPreference
 import mega.privacy.android.domain.entity.preference.ViewModePreference
 import mega.privacy.android.feature.settings.presentation.model.SortingAndViewModeSettingsUiState
@@ -80,72 +73,35 @@ private fun SettingsContent(
         SettingsOptionsItem(
             key = SORTING_PREFERENCE_TAG,
             title = stringResource(sharedR.string.settings_sorting_preference_title),
-            values = SortingPreference.values().toList(),
+            values = SortingPreference.entries,
             selectedValue = sortingPreference,
+            footerText = stringResource(sharedR.string.settings_sorting_preference_description),
             valueToString = { if (it == SortingPreference.PerFolder) perFolderLabel else allFoldersLabel },
         ) { _, value ->
             onSetSortingPreference(value)
         }
-        PreferenceDescription(stringResource(sharedR.string.settings_sorting_preference_description))
         StrongDivider(modifier = Modifier.fillMaxWidth())
         SettingsOptionsItem(
             key = VIEW_MODE_PREFERENCE_TAG,
             title = stringResource(sharedR.string.settings_view_mode_preference_title),
-            values = ViewModePreference.values().toList(),
+            values = ViewModePreference.entries,
             selectedValue = viewModePreference,
+            footerText = stringResource(sharedR.string.settings_view_mode_preference_description),
             valueToString = { if (it == ViewModePreference.PerFolder) perFolderLabel else allFoldersLabel },
         ) { _, value ->
             onSetViewModePreference(value)
         }
-        PreferenceDescription(stringResource(sharedR.string.settings_view_mode_preference_description))
         StrongDivider(modifier = Modifier.fillMaxWidth())
     }
-}
-
-@Composable
-private fun PreferenceDescription(text: String) {
-    // Matches core-ui SettingsWithFooter styling (that helper is internal and
-    // SettingsOptionsItem does not expose a footerText param).
-    MegaText(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .padding(top = 5.dp, bottom = 16.dp),
-        text = text,
-        textColor = TextColor.Secondary,
-        style = AppTheme.typography.bodyMedium,
-    )
 }
 
 @Composable
 private fun LoadingSkeleton(modifier: Modifier) {
     Column(modifier = modifier.testTag(SORTING_AND_VIEW_MODE_SETTINGS_SKELETON_TAG)) {
         repeat(2) {
-            SkeletonPreferenceItem()
+            SkeletonPreferenceItem(showFooter = true)
             StrongDivider(modifier = Modifier.fillMaxWidth())
         }
-    }
-}
-
-@Composable
-private fun SkeletonPreferenceItem() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .height(16.dp)
-                .shimmerEffect(),
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.7f)
-                .height(12.dp)
-                .shimmerEffect(),
-        )
     }
 }
 
