@@ -156,6 +156,7 @@ internal class SaveScannedDocumentsActivity : AppCompatActivity() {
     private fun redirectBackToChat(uriToUpload: Uri) {
         val intent = Intent().apply {
             setDataAndType(uriToUpload, contentResolver.getType(uriToUpload))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         setResult(RESULT_OK, intent)
         finish()

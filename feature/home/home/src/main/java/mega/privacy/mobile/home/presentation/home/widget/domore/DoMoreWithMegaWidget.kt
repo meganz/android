@@ -40,15 +40,15 @@ import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
+import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.CameraBackupPermissionsNavKey
+import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
+import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
 import mega.privacy.android.navigation.destination.CreateScheduledMeetingNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey
 import mega.privacy.android.navigation.destination.DriveSyncNavKey.Companion.SYNC_TAB_INDEX
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
-import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
-import mega.privacy.android.navigation.destination.AlbumContentNavKey
-import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
-import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
 import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.navigation.destination.LegacySettingsCameraUploadsActivityNavKey
 import mega.privacy.android.shared.resources.R as sharedR

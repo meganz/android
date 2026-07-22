@@ -6,6 +6,7 @@ import de.palm.composestateevents.consumed
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
+import java.io.File
 
 /**
  * The UI State for Save Scanned Documents
@@ -40,7 +41,7 @@ internal data class SaveScannedDocumentsUiState(
     val scanDestination: ScanDestination = ScanDestination.CloudDrive,
     val snackbarMessage: StateEventWithContent<ScanFilenameValidationStatus> = consumed(),
     val soloImageUri: Uri? = null,
-    val uploadScansEvent: StateEventWithContent<Uri> = consumed(),
+    val uploadScansEvent: StateEventWithContent<File> = consumed(),
     val isCloudExplorerAvailable: Boolean = false,
 ) {
 

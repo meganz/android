@@ -191,7 +191,7 @@ internal class SaveScannedDocumentsViewModel @AssistedInject constructor(
                         }.onSuccess { renamedFile ->
                             logDocumentScanEvent(uiState.scanFileType, uiState.scanDestination)
                             _uiState.update { state ->
-                                state.copy(uploadScansEvent = triggered(renamedFile.toUri()))
+                                state.copy(uploadScansEvent = triggered(renamedFile))
                             }
                         }.onFailure { exception ->
                             Timber.e("Unable to upload the scan/s due to a renaming issue:\n ${exception.printStackTrace()}")

@@ -23,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -31,6 +32,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import mega.privacy.android.analytics.Analytics
@@ -42,6 +44,7 @@ import mega.privacy.android.app.presentation.documentscanner.groups.SaveScannedD
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
 import mega.privacy.android.domain.entity.documentscanner.ScanFilenameValidationStatus
@@ -62,6 +65,7 @@ import mega.privacy.android.shared.original.core.ui.utils.showAutoDurationSnackb
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
+import timber.log.Timber
 
 /**
  * A Composable that holds views displaying the main Save Scanned Documents screen
@@ -95,6 +99,7 @@ internal fun SaveScannedDocumentsView(
 ) {
     val resources = LocalResources.current
     val activity = LocalActivity.current
+    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val onBackPressedDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
 
@@ -136,7 +141,12 @@ internal fun SaveScannedDocumentsView(
     EventEffect(
         event = uiState.uploadScansEvent,
         onConsumed = { onUploadScansEventConsumed() },
-        action = { uriToUpload ->
+        action = { file ->
+            val uriToUpload = runCatching {
+                FileUtil.getUriForFile(context, file)
+            }.onSuccess {
+                Timber.d("Scan Document Path: ${it.host}:${it.path}")
+            }.getOrDefault(file.toUri())
             when {
                 uiState.originatedFromChat -> {
                     Analytics.tracker.trackEvent(
@@ -282,6 +292,7 @@ internal fun navigateToFileExplorer(
     canSelectScanFileType: Boolean,
 ) {
     val intent = Intent(activity, FileExplorerActivity::class.java).apply {
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         putExtra(Intent.EXTRA_STREAM, uriToUpload)
         putExtra(FileExplorerActivity.EXTRA_SCAN_FILE_TYPE, scanFileType.ordinal)
         putExtra(FileExplorerActivity.EXTRA_HAS_MULTIPLE_SCANS, !canSelectScanFileType)

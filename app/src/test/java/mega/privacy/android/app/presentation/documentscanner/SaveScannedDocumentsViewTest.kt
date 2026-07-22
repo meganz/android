@@ -1,14 +1,18 @@
 package mega.privacy.android.app.presentation.documentscanner
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.core.net.toUri
 import androidx.navigation3.runtime.NavKey
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
+import java.io.File
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.app.presentation.documentscanner.groups.SAVE_SCANNED_DOCUMENTS_DESTINATION_GROUP_CHIP_CHAT
@@ -24,8 +28,9 @@ import mega.privacy.android.app.presentation.documentscanner.groups.SAVE_SCANNED
 import mega.privacy.android.app.presentation.documentscanner.model.SaveScannedDocumentsUiState
 import mega.privacy.android.app.presentation.documentscanner.model.ScanDestination
 import mega.privacy.android.app.presentation.documentscanner.model.ScanFileType
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.data.extensions.toUriPath
 import mega.privacy.android.domain.entity.node.NodeSourceType
-import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingImageToChatEvent
 import mega.privacy.mobile.analytics.event.DocumentScannerUploadingPDFToChatEvent
@@ -177,7 +182,10 @@ internal class SaveScannedDocumentsViewTest {
 
     @Test
     fun `test that onBackToChat is invoked with the upload uri when originated from chat`() {
-        val uriToUpload = mock<Uri>()
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val file = File(context.cacheDir, "scanned.pdf")
+        val expectedUri = runCatching { FileUtil.getUriForFile(context, file) }
+            .getOrDefault(file.toUri())
         val onBackToChat = mock<(Uri) -> Unit>()
 
         composeTestRule.setContent {
@@ -185,7 +193,7 @@ internal class SaveScannedDocumentsViewTest {
                 uiState = SaveScannedDocumentsUiState(
                     originatedFromChat = true,
                     scanDestination = ScanDestination.Chat,
-                    uploadScansEvent = triggered(uriToUpload),
+                    uploadScansEvent = triggered(file),
                 ),
                 onFilenameChanged = {},
                 onFilenameConfirmed = {},
@@ -201,22 +209,22 @@ internal class SaveScannedDocumentsViewTest {
 
         composeTestRule.waitForIdle()
 
-        verify(onBackToChat).invoke(uriToUpload)
+        verify(onBackToChat).invoke(expectedUri)
     }
 
     @Test
     fun `test that onNavigate is invoked with UploadScannedDocumentNavKey when cloud explorer is available`() {
-        val uploadUriString = "/data/user/0/app_location/cache/scanned.pdf"
-        val uriToUpload = mock<Uri> {
-            on { toString() } doReturn uploadUriString
-        }
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val file = File(context.cacheDir, "scanned.pdf")
+        val expectedUri = runCatching { FileUtil.getUriForFile(context, file) }
+            .getOrDefault(file.toUri())
         val onNavigate = mock<(List<NavKey>) -> Unit>()
 
         composeTestRule.setContent {
             SaveScannedDocumentsView(
                 uiState = SaveScannedDocumentsUiState(
                     isCloudExplorerAvailable = true,
-                    uploadScansEvent = triggered(uriToUpload),
+                    uploadScansEvent = triggered(file),
                 ),
                 onFilenameChanged = {},
                 onFilenameConfirmed = {},
@@ -235,7 +243,7 @@ internal class SaveScannedDocumentsViewTest {
         verify(onNavigate).invoke(
             listOf(
                 UploadScannedDocumentNavKey(
-                    uriPath = UriPath(uploadUriString),
+                    uriPath = expectedUri.toUriPath(),
                     nodeSourceType = NodeSourceType.CLOUD_DRIVE,
                     hasMultipleScans = true,
                 )
@@ -245,7 +253,7 @@ internal class SaveScannedDocumentsViewTest {
 
     @Test
     fun `test that the PDF to chat analytics event is tracked when originated from chat and scan file type is PDF`() {
-        val uriToUpload = mock<Uri>()
+        val file = File("scanned.pdf")
 
         composeTestRule.setContent {
             SaveScannedDocumentsView(
@@ -253,7 +261,7 @@ internal class SaveScannedDocumentsViewTest {
                     originatedFromChat = true,
                     scanFileType = ScanFileType.Pdf,
                     scanDestination = ScanDestination.Chat,
-                    uploadScansEvent = triggered(uriToUpload),
+                    uploadScansEvent = triggered(file),
                 ),
                 onFilenameChanged = {},
                 onFilenameConfirmed = {},
@@ -275,7 +283,7 @@ internal class SaveScannedDocumentsViewTest {
 
     @Test
     fun `test that the image to chat analytics event is tracked when originated from chat and scan file type is JPG`() {
-        val uriToUpload = mock<Uri>()
+        val file = File("scanned.jpg")
         val soloImageUri = mock<Uri> {
             on { toString() } doReturn "/data/user/0/app_location/cache/test_solo_scan.jpg"
         }
@@ -287,7 +295,7 @@ internal class SaveScannedDocumentsViewTest {
                     scanFileType = ScanFileType.Jpg,
                     scanDestination = ScanDestination.Chat,
                     soloImageUri = soloImageUri,
-                    uploadScansEvent = triggered(uriToUpload),
+                    uploadScansEvent = triggered(file),
                 ),
                 onFilenameChanged = {},
                 onFilenameConfirmed = {},
@@ -309,7 +317,7 @@ internal class SaveScannedDocumentsViewTest {
 
     @Test
     fun `test that no analytics event is tracked when not originated from chat`() {
-        val uriToUpload = mock<Uri>()
+        val file = File("scanned.pdf")
 
         composeTestRule.setContent {
             SaveScannedDocumentsView(
@@ -318,7 +326,7 @@ internal class SaveScannedDocumentsViewTest {
                     scanFileType = ScanFileType.Pdf,
                     scanDestination = ScanDestination.CloudDrive,
                     cloudDriveParentHandle = 1L,
-                    uploadScansEvent = triggered(uriToUpload),
+                    uploadScansEvent = triggered(file),
                 ),
                 onFilenameChanged = {},
                 onFilenameConfirmed = {},
