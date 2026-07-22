@@ -60,6 +60,7 @@ import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
 import mega.privacy.android.data.repository.PermissionRepositoryImpl
 import mega.privacy.android.data.repository.RegexRepositoryImpl
+import mega.privacy.android.data.repository.RemoteConfigRepositoryImpl
 import mega.privacy.android.data.repository.RemotePreferencesRepositoryImpl
 import mega.privacy.android.data.repository.SearchRepositoryImpl
 import mega.privacy.android.data.repository.SlideshowRepositoryImpl
@@ -127,6 +128,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.RegexRepository
+import mega.privacy.android.domain.repository.RemoteConfigRepository
 import mega.privacy.android.domain.repository.RemotePreferencesRepository
 import mega.privacy.android.domain.repository.SearchRepository
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -163,6 +165,9 @@ import kotlin.contracts.ExperimentalContracts
 internal abstract class RepositoryModule {
     @Binds
     abstract fun bindGeocoderRepository(repository: GeocoderRepositoryImpl): GeocoderRepository
+
+    @Binds
+    abstract fun bindRemoteConfigRepository(repository: RemoteConfigRepositoryImpl): RemoteConfigRepository
 
     @Binds
     abstract fun bindFolderPreferenceRepository(implementation: FolderPreferenceRepositoryImpl): FolderPreferenceRepository

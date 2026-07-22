@@ -635,6 +635,9 @@
             <meta-data
                 android:name="mega.privacy.android.app.initializer.SyncMonitorInitializer"
                 android:value="androidx.startup" />
+            <meta-data
+                android:name="mega.privacy.android.app.initializer.RemoteConfigInitializer"
+                android:value="androidx.startup" />
         </provider>
         <provider
             android:name=".providers.documentprovider.CloudDriveDocumentProvider"

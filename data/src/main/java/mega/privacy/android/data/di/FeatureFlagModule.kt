@@ -12,6 +12,7 @@ import mega.privacy.android.data.featuretoggle.persisted.PersistedFeatureFlagVal
 import mega.privacy.android.data.featuretoggle.persisted.PersistentFeatureFlagMemoryCache
 import mega.privacy.android.data.featuretoggle.remote.ABTestFeatureFlagValueProvider
 import mega.privacy.android.data.featuretoggle.remote.ApiFeatureFlagProvider
+import mega.privacy.android.data.featuretoggle.remote.FirebaseFeatureFlagValueProvider
 import mega.privacy.android.data.gateway.featuretoggle.PersistedFeatureFlagSnapshotGateway
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
@@ -40,6 +41,14 @@ internal abstract class FeatureFlagModule {
     @Binds
     @IntoSet
     abstract fun provideRemoteFeatureFlagValueProvider(ABTestFeatureFlagValueProvider: ABTestFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
+
+    /**
+     * Provide firebase remote config feature flag value provider
+     *
+     */
+    @Binds
+    @IntoSet
+    abstract fun provideFirebaseFeatureFlagValueProvider(firebaseFeatureFlagValueProvider: FirebaseFeatureFlagValueProvider): @JvmSuppressWildcards FeatureFlagValueProvider
 
     /**
      * Provide persisted feature flag value provider

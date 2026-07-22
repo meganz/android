@@ -14,6 +14,7 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.featuretoggle.qualifier.DefaultFeatureFlagProviders
 import mega.privacy.android.feature_flags.ABTestFeatures
 import mega.privacy.android.feature_flags.AppFeatures
+import mega.privacy.android.feature_flags.FirebaseABTestFeatures
 
 /**
  * Feature flag module
@@ -53,6 +54,16 @@ abstract class FeatureFlagModule {
             ABTestFeatures.entries.toSet()
 
         /**
+         * Provide firebase remote config features
+         *
+         * @return Firebase remote config features
+         */
+        @Provides
+        @ElementsIntoSet
+        fun provideFirebaseABTestFeatures(): Set<@JvmSuppressWildcards Feature> =
+            FirebaseABTestFeatures.entries.toSet()
+
+        /**
          * Provide api features
          *
          * @return Api features
@@ -81,6 +92,15 @@ abstract class FeatureFlagModule {
             ABTestFeatures.Companion
 
         /**
+         * Provide firebase remote config feature flag default value provider
+         *
+         */
+        @Provides
+        @IntoSet
+        fun provideFirebaseABTestFeaturesFlagDefaultValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            FirebaseABTestFeatures.Companion
+
+        /**
          * Provide api feature flag default value provider
          *
          */
@@ -100,6 +120,12 @@ abstract class FeatureFlagModule {
         @DefaultFeatureFlagProviders
         fun provideAbTestFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             ABTestFeatures.Companion
+
+        @Provides
+        @IntoSet
+        @DefaultFeatureFlagProviders
+        fun provideFirebaseABTestFeaturesAsDefaultFlagProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
+            FirebaseABTestFeatures.Companion
 
         @Provides
         @IntoSet

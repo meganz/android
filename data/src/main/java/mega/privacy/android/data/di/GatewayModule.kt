@@ -14,6 +14,7 @@ import mega.privacy.android.data.facade.ClipboardFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.FileManagementPreferencesFacade
+import mega.privacy.android.data.facade.FirebaseRemoteConfigFacade
 import mega.privacy.android.data.facade.HttpConnectionFacade
 import mega.privacy.android.data.facade.MediaRecorderFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
@@ -52,6 +53,7 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.NotificationsGateway
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.gateway.QAAccountCacheGateway
+import mega.privacy.android.data.gateway.RemoteConfigGateway
 import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
@@ -307,6 +309,10 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindNotificationGateway(implementation: NotificationsFacade): NotificationsGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindRemoteConfigGateway(implementation: FirebaseRemoteConfigFacade): RemoteConfigGateway
 
     @Binds
     @Singleton

@@ -35,6 +35,7 @@ firebase-analytics = { module = "com.google.firebase:firebase-analytics"}
 firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribution", version.ref = "firebase-app-distribution" }
 firebase-crashlytics-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 firebase-perf = { group = "com.google.firebase", name = "firebase-perf" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
