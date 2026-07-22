@@ -591,7 +591,7 @@ internal class FileExplorerViewModelTest {
         whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn isFeatureFlagEnabled
         initViewModel()
 
-        underTest.initCloudExplorerState(123L)
+        underTest.initCloudExplorerState(longArrayOf(123L))
         testScheduler.advanceUntilIdle()
 
         underTest.uiState.test {
@@ -757,7 +757,7 @@ internal class FileExplorerViewModelTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
             initViewModel()
 
-            underTest.initCloudExplorerState(123L)
+            underTest.initCloudExplorerState(longArrayOf(123L))
             testScheduler.advanceUntilIdle()
 
             underTest.uiState.test {
@@ -781,12 +781,27 @@ internal class FileExplorerViewModelTest {
         }
 
     @Test
+    fun `test that initCloudExplorerState leaves disabledTargetId null when the move handles array is empty`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
+            initViewModel()
+
+            underTest.initCloudExplorerState(longArrayOf())
+            testScheduler.advanceUntilIdle()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().disabledTargetId).isNull()
+            }
+            verifyNoInteractions(getNodeByIdUseCase)
+        }
+
+    @Test
     fun `test that initCloudExplorerState does not resolve disabledTargetId when the feature flag is disabled`() =
         runTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn false
             initViewModel()
 
-            underTest.initCloudExplorerState(123L)
+            underTest.initCloudExplorerState(longArrayOf(123L))
             testScheduler.advanceUntilIdle()
 
             underTest.uiState.test {
@@ -802,7 +817,7 @@ internal class FileExplorerViewModelTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
             initViewModel()
 
-            underTest.initCloudExplorerState(123L)
+            underTest.initCloudExplorerState(longArrayOf(123L))
             testScheduler.advanceUntilIdle()
 
             underTest.uiState.test {
@@ -817,7 +832,7 @@ internal class FileExplorerViewModelTest {
             whenever(getFeatureFlagValueUseCase(AppFeatures.CloudExplorer)) doReturn true
             initViewModel()
 
-            underTest.initCloudExplorerState(123L)
+            underTest.initCloudExplorerState(longArrayOf(123L))
             testScheduler.advanceUntilIdle()
 
             underTest.uiState.test {

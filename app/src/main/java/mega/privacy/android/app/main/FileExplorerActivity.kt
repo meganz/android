@@ -514,7 +514,7 @@ class FileExplorerActivity : PasscodeActivity(), MegaRequestListenerInterface,
             customToolbar = binding.appBarLayoutExplorer
         )
         setContentView(binding.root)
-        viewModel.initCloudExplorerState(intent.getLongArrayExtra("MOVE_FROM")?.get(0))
+        viewModel.initCloudExplorerState(intent.getLongArrayExtra("MOVE_FROM"))
         credentials = runBlocking {
             runCatching {
                 getAccountCredentialsUseCase()
