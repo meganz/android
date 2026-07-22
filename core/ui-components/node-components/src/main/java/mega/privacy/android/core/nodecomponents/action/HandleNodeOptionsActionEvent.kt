@@ -3,6 +3,7 @@ package mega.privacy.android.core.nodecomponents.action
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,15 +30,20 @@ import mega.privacy.android.domain.entity.node.NameCollision
 import mega.privacy.android.domain.entity.node.NodeNameCollisionType
 import mega.privacy.android.domain.entity.node.NodeNameCollisionsResult
 import mega.privacy.android.domain.entity.node.publiclink.PublicCopyCollisionResult
-import mega.privacy.android.domain.entity.node.publiclink.PublicNodeNameCollisionResult
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
+import mega.privacy.android.navigation.contract.NavOptions
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
-import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
+import mega.privacy.android.navigation.destination.QuotaWarningUpgradeNavKey
 import mega.privacy.android.navigation.extensions.rememberMegaNavigator
 import mega.privacy.android.navigation.extensions.rememberMegaResultContract
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
+import mega.privacy.android.shared.nodes.dialog.sharefolder.ShareHiddenNodeWarningDialog
 import mega.privacy.android.shared.resources.R as sharedResR
-import timber.log.Timber
 
 /**
  * Handles node option events and triggers appropriate actions based on the event.
@@ -62,7 +68,7 @@ internal fun HandleNodeOptionsActionEvent(
     onRestoreNodes: (nodes: Map<Long, Long>) -> Unit,
     onCopyPublicLinkFiles: (targetHandle: Long) -> Unit,
     onTransfer: (TransferTriggerEvent) -> Unit,
-    onNavigate: (NavKey) -> Unit,
+    onNavigate: (NavKey, navOptions: NavOptions?) -> Unit,
     onRestoreSuccess: (RestoreData) -> Unit,
     onShareHiddenNodeWarningConfirmed: (List<Long>) -> Unit,
     consumeNameCollisionResult: () -> Unit,
@@ -178,7 +184,7 @@ internal fun HandleNodeOptionsActionEvent(
         onConsumed = consumeRenameNodeRequest
     ) { nodeId ->
         onActionTriggered()
-        onNavigate(RenameNodeDialogNavKey(nodeId.longValue))
+        onNavigate(RenameNodeDialogNavKey(nodeId.longValue), null)
     }
 
     EventEffect(
@@ -186,7 +192,7 @@ internal fun HandleNodeOptionsActionEvent(
         onConsumed = consumeNavigationEvent,
         action = {
             onActionTriggered()
-            onNavigate(it)
+            onNavigate(it, null)
         }
     )
 
@@ -206,7 +212,8 @@ internal fun HandleNodeOptionsActionEvent(
                     nodes = nodeHandles,
                     contacts = contactData.joinToString(separator = ","),
                     isFromBackups = isFromBackups,
-                )
+                ),
+                null,
             )
         },
     )
@@ -216,7 +223,7 @@ internal fun HandleNodeOptionsActionEvent(
         onConsumed = consumeShareFolderDialogEvent,
         action = { handles ->
             val nodes = nodeHandlesToJsonMapper(handles)
-            onNavigate(ShareFolderDialogNavKey(nodes))
+            onNavigate(ShareFolderDialogNavKey(nodes), null)
         }
     )
 
@@ -237,7 +244,8 @@ internal fun HandleNodeOptionsActionEvent(
             onNavigate(
                 AddContactToShareNavKey(
                     nodeHandle = handles.toList(),
-                )
+                ),
+                null
             )
         }
     )
@@ -267,27 +275,44 @@ internal fun HandleNodeOptionsActionEvent(
         )
     }
 
-    if (isOverQuota != null) {
-        StorageStatusDialogViewM3(
-            storageState = if (isOverQuota == true) StorageState.Red else StorageState.Orange,
-            preWarning = isOverQuota == false,
-            overQuotaAlert = true,
-            onUpgradeClick = {
-                megaNavigator.openUpgradeAccount(context = context)
-            },
-            onCustomizedPlanClick = { email, accountType ->
-                megaNavigator.openAskForCustomizedPlan(
-                    context = context,
-                    email = email,
-                    accountType = accountType
+    isOverQuota?.let { overQuota ->
+        FeatureFlagGate(
+            feature = ApiFeatures.QuotaWarningUpsellScreen,
+            disabled = {
+                StorageStatusDialogViewM3(
+                    storageState = if (overQuota) StorageState.Red else StorageState.Orange,
+                    preWarning = !overQuota,
+                    overQuotaAlert = true,
+                    onUpgradeClick = {
+                        megaNavigator.openUpgradeAccount(context = context)
+                    },
+                    onCustomizedPlanClick = { email, accountType ->
+                        megaNavigator.openAskForCustomizedPlan(
+                            context = context,
+                            email = email,
+                            accountType = accountType
+                        )
+                    },
+                    onAchievementsClick = {
+                        megaNavigator.openAchievements(context = context)
+                    },
+                    onClose = {
+                        isOverQuota = null
+                    },
                 )
             },
-            onAchievementsClick = {
-                megaNavigator.openAchievements(context = context)
-            },
-            onClose = {
-                isOverQuota = null
-            },
+            enabled = {
+                LaunchedEffect(Unit) {
+                    onNavigate(
+                        QuotaWarningUpgradeNavKey(
+                            type = QuotaWarningType.Storage,
+                            trigger = QuotaWarningTrigger.Upload,
+                        ),
+                        navOptions { dropIfAlreadyShown = true },
+                    )
+                    isOverQuota = null
+                }
+            }
         )
     }
 }

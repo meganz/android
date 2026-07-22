@@ -18,6 +18,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,8 +48,12 @@ import mega.privacy.android.app.presentation.folderlink.view.UnavailableLinkView
 import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.legacy.core.ui.controls.dialogs.LoadingDialog
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
@@ -203,27 +208,42 @@ internal fun FileLinkView(
     }
 
     showQuotaExceededDialog.value?.let {
-        StorageStatusDialogView(
-            modifier = Modifier.padding(horizontal = 24.dp),
-            usePlatformDefaultWidth = false,
-            storageState = it,
-            preWarning = it != StorageState.Red,
-            overQuotaAlert = true,
-            onUpgradeClick = {
-                context.megaNavigator.openUpgradeAccount(
-                    context = context,
+        FeatureFlagGate(
+            feature = ApiFeatures.QuotaWarningUpsellScreen,
+            disabled = {
+                StorageStatusDialogView(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    usePlatformDefaultWidth = false,
+                    storageState = it,
+                    preWarning = it != StorageState.Red,
+                    overQuotaAlert = true,
+                    onUpgradeClick = {
+                        context.megaNavigator.openUpgradeAccount(
+                            context = context,
+                        )
+                    },
+                    onCustomizedPlanClick = { email, accountType ->
+                        AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
+                    },
+                    onAchievementsClick = {
+                        context.startActivity(
+                            Intent(context, MyAccountActivity::class.java)
+                                .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
+                        )
+                    },
+                    onClose = { showQuotaExceededDialog.value = null }
                 )
             },
-            onCustomizedPlanClick = { email, accountType ->
-                AlertsAndWarnings.askForCustomizedPlan(context, email, accountType)
+            enabled = {
+                LaunchedEffect(Unit) {
+                    showQuotaExceededDialog.value = null
+                    context.megaNavigator.openQuotaWarningUpsell(
+                        context = context,
+                        type = QuotaWarningType.Storage,
+                        trigger = QuotaWarningTrigger.Upload,
+                    )
+                }
             },
-            onAchievementsClick = {
-                context.startActivity(
-                    Intent(context, MyAccountActivity::class.java)
-                        .setAction(IntentConstants.ACTION_OPEN_ACHIEVEMENTS)
-                )
-            },
-            onClose = { showQuotaExceededDialog.value = null }
         )
     }
 

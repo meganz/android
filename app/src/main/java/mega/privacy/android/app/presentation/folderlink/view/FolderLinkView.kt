@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,8 +74,13 @@ import mega.privacy.android.app.presentation.transfers.widget.TransfersWidget
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.icon.pack.R as iconPackR
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
+import mega.privacy.android.navigation.megaNavigator
+import mega.privacy.android.navigation.payment.QuotaWarningTrigger
+import mega.privacy.android.navigation.payment.QuotaWarningType
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.original.core.ui.controls.buttons.DebouncedButtonContainer
 import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
@@ -316,12 +322,29 @@ internal fun FolderLinkView(
                         }
                     }
 
-                    if (state.storageStatusDialogState != null) {
-                        StorageStatusDialogView(
-                            state = state.storageStatusDialogState,
-                            dismissClickListener = onStorageStatusDialogDismiss,
-                            actionButtonClickListener = onStorageDialogActionButtonClick,
-                            achievementButtonClickListener = onStorageDialogAchievementButtonClick,
+                    val storageStatusDialogState = state.storageStatusDialogState
+                    if (storageStatusDialogState != null) {
+                        FeatureFlagGate(
+                            feature = ApiFeatures.QuotaWarningUpsellScreen,
+                            disabled = {
+                                StorageStatusDialogView(
+                                    state = storageStatusDialogState,
+                                    dismissClickListener = onStorageStatusDialogDismiss,
+                                    actionButtonClickListener = onStorageDialogActionButtonClick,
+                                    achievementButtonClickListener = onStorageDialogAchievementButtonClick,
+                                )
+                            },
+                            enabled = {
+                                val context = LocalContext.current
+                                LaunchedEffect(Unit) {
+                                    onStorageStatusDialogDismiss()
+                                    context.megaNavigator.openQuotaWarningUpsell(
+                                        context = context,
+                                        type = QuotaWarningType.Storage,
+                                        trigger = QuotaWarningTrigger.Upload,
+                                    )
+                                }
+                            },
                         )
                     }
                 }
