@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,16 +28,30 @@ import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.feature.contact.info.model.ContactInfoUiState
+import mega.privacy.android.shared.contact.model.AvatarData
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
- * Contact info screen. Skeleton for the Compose contact info UI: shows a shimmer placeholder
- * while the contact is being resolved, then the resolved contact's name and email.
+ * Contact info screen: shows a shimmer placeholder while the contact is being resolved, then the
+ * resolved contact's info sections via [ContactInfoContent].
  *
  * @param state
  * @param onNavigateBack invoked when the user navigates back.
+ * @param onSendMessageClick
+ * @param onStartAudioCallClick
+ * @param onStartVideoCallClick
+ * @param onNicknameClick
+ * @param onVerifyCredentialsClick
+ * @param onShareContactClick
+ * @param onSharedFoldersClick
+ * @param onNotificationToggled invoked with the new checked value when the notifications toggle
+ * is switched.
+ * @param onSharedFilesClick
+ * @param onManageChatHistoryClick
+ * @param onRemoveContactClick
  * @param modifier
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,6 +59,17 @@ import mega.privacy.android.shared.resources.R as sharedR
 internal fun ContactInfoScreen(
     state: ContactInfoUiState,
     onNavigateBack: () -> Unit,
+    onSendMessageClick: () -> Unit,
+    onStartAudioCallClick: () -> Unit,
+    onStartVideoCallClick: () -> Unit,
+    onNicknameClick: () -> Unit,
+    onVerifyCredentialsClick: () -> Unit,
+    onShareContactClick: () -> Unit,
+    onSharedFoldersClick: () -> Unit,
+    onNotificationToggled: (Boolean) -> Unit,
+    onSharedFilesClick: () -> Unit,
+    onManageChatHistoryClick: () -> Unit,
+    onRemoveContactClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MegaScaffoldWithTopAppBarScrollBehavior(
@@ -65,26 +91,21 @@ internal fun ContactInfoScreen(
                     .testTag(CONTACT_INFO_LOADING_TAG),
             )
 
-            is ContactInfoUiState.Data -> Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                MegaText(
-                    modifier = Modifier.testTag(CONTACT_INFO_NAME_TAG),
-                    text = state.displayName,
-                    textColor = TextColor.Primary,
-                )
-                state.email?.let { email ->
-                    MegaText(
-                        modifier = Modifier.testTag(CONTACT_INFO_EMAIL_TAG),
-                        text = email,
-                        textColor = TextColor.Secondary,
-                    )
-                }
-            }
+            is ContactInfoUiState.Data -> ContactInfoContent(
+                modifier = Modifier.padding(padding),
+                state = state,
+                onSendMessageClick = onSendMessageClick,
+                onStartAudioCallClick = onStartAudioCallClick,
+                onStartVideoCallClick = onStartVideoCallClick,
+                onNicknameClick = onNicknameClick,
+                onVerifyCredentialsClick = onVerifyCredentialsClick,
+                onShareContactClick = onShareContactClick,
+                onSharedFoldersClick = onSharedFoldersClick,
+                onNotificationToggled = onNotificationToggled,
+                onSharedFilesClick = onSharedFilesClick,
+                onManageChatHistoryClick = onManageChatHistoryClick,
+                onRemoveContactClick = onRemoveContactClick,
+            )
         }
     }
 }
@@ -139,6 +160,17 @@ private fun ContactInfoScreenLoadingPreview() {
         ContactInfoScreen(
             state = ContactInfoUiState.Loading(closeEvent = consumed),
             onNavigateBack = {},
+            onSendMessageClick = {},
+            onStartAudioCallClick = {},
+            onStartVideoCallClick = {},
+            onNicknameClick = {},
+            onVerifyCredentialsClick = {},
+            onShareContactClick = {},
+            onSharedFoldersClick = {},
+            onNotificationToggled = {},
+            onSharedFilesClick = {},
+            onManageChatHistoryClick = {},
+            onRemoveContactClick = {},
         )
     }
 }
@@ -150,13 +182,34 @@ private fun ContactInfoScreenLoadedPreview() {
         ContactInfoScreen(
             state = ContactInfoUiState.Data(
                 displayName = "Alice Anderson",
+                nickname = "Ally",
                 email = "alice@example.com",
                 userHandle = 1L,
                 chatRoomId = 123L,
                 isFromContacts = true,
+                avatar = AvatarData.Initials(initials = "A", avatarColor = Color(0xFF2E7D32)),
+                userChatStatus = UserChatStatus.Online,
+                lastSeenMinutes = null,
+                areCredentialsVerified = true,
+                isNotificationEnabled = true,
+                retentionTimeSeconds = SECONDS_IN_DAY,
+                inSharesCount = 3,
+                enableCallButtons = true,
+                isOnline = true,
                 closeEvent = consumed,
             ),
             onNavigateBack = {},
+            onSendMessageClick = {},
+            onStartAudioCallClick = {},
+            onStartVideoCallClick = {},
+            onNicknameClick = {},
+            onVerifyCredentialsClick = {},
+            onShareContactClick = {},
+            onSharedFoldersClick = {},
+            onNotificationToggled = {},
+            onSharedFilesClick = {},
+            onManageChatHistoryClick = {},
+            onRemoveContactClick = {},
         )
     }
 }

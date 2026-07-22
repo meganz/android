@@ -3321,6 +3321,50 @@
         <item quantity="one">%d version</item>
         <item quantity="other">%d versions</item>
     </plurals>
+    <!-- Contact info: title of the nickname row when the contact has no nickname yet -->
+    <string name="contact_info_set_nickname">Set nickname</string>
+    <!-- Contact info: title of the nickname row when the contact already has a nickname -->
+    <string name="contact_info_edit_nickname">Edit nickname</string>
+    <!-- Contact info: title of the row that opens the credential verification screen -->
+    <string name="contact_info_verify_credentials">Verify credentials</string>
+    <!-- Contact info: subtitle of the verify credentials row when the contact's credentials are verified -->
+    <string name="contact_info_credentials_verified">Verified</string>
+    <!-- Contact info: subtitle of the verify credentials row when the contact's credentials are not verified -->
+    <string name="contact_info_credentials_not_verified">Not verified</string>
+    <!-- Contact info: title of the row that shares the contact to a chat -->
+    <string name="contact_info_share_contact">Share contact</string>
+    <!-- Contact info: title of the row with the toggle to mute or unmute the chat with the contact -->
+    <string name="contact_info_chat_notifications">Chat notifications</string>
+    <!-- Contact info: subtitle of the chat notifications row when notifications are muted until turned back on -->
+    <string name="contact_info_notifications_muted">Off</string>
+    <!-- Contact info: title of the row that opens the list of files shared in the chat with the contact -->
+    <string name="contact_info_shared_files">Shared files</string>
+    <!-- Contact info: title of the row that opens the manage chat history screen -->
+    <string name="contact_info_manage_chat_history">Manage chat history</string>
+    <!-- Contact info: prefix of the manage chat history subtitle showing the retention time, e.g. "Automatically delete messages older than: 1 day" -->
+    <string name="contact_info_manage_chat_history_subtitle">Automatically delete messages older than:</string>
+    <!-- Contact info: chat history retention time of one year -->
+    <string name="contact_info_retention_time_year">1 year</string>
+    <!-- Contact info: chat history retention time in months. %1$d is the number of months -->
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="one">%1$d month</item>
+        <item quantity="other">%1$d months</item>
+    </plurals>
+    <!-- Contact info: chat history retention time in weeks. %1$d is the number of weeks -->
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weeks</item>
+    </plurals>
+    <!-- Contact info: chat history retention time in days. %1$d is the number of days -->
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <!-- Contact info: chat history retention time in hours. %1$d is the number of hours -->
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
     <!-- Create group chat: content description of the button used to add or change the group's image -->
     <string name="create_group_chat_image_content_description">Group photo</string>
     <!-- Create group chat: option to take a new photo with the camera for the group image -->

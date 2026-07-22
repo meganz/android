@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.feature.contact.info.model.ContactInfoUiState
 import mega.privacy.android.shared.contact.extension.displayName
+import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
 import timber.log.Timber
 
 /**
@@ -39,6 +40,7 @@ import timber.log.Timber
  * @property getContactFromChatUseCase
  * @property getChatRoomByUserUseCase
  * @property isConnectedToInternetUseCase
+ * @property contactItemAvatarMapper
  */
 @HiltViewModel(assistedFactory = ContactInfoViewModel.Factory::class)
 internal class ContactInfoViewModel @AssistedInject constructor(
@@ -48,6 +50,7 @@ internal class ContactInfoViewModel @AssistedInject constructor(
     private val getContactFromChatUseCase: GetContactFromChatUseCase,
     private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase,
     private val isConnectedToInternetUseCase: IsConnectedToInternetUseCase,
+    private val contactItemAvatarMapper: ContactItemAvatarMapper,
 ) : ViewModel() {
 
     /**
@@ -75,10 +78,20 @@ internal class ContactInfoViewModel @AssistedInject constructor(
             resolved?.let {
                 ContactInfoUiState.Data(
                     displayName = it.contact.displayName(),
+                    nickname = it.contact.contactData.alias,
                     email = it.contact.email,
                     userHandle = it.contact.handle,
                     chatRoomId = it.chatRoomId,
                     isFromContacts = it.isFromContacts,
+                    avatar = contactItemAvatarMapper(it.contact),
+                    userChatStatus = it.contact.status,
+                    lastSeenMinutes = it.contact.lastSeen,
+                    areCredentialsVerified = it.contact.areCredentialsVerified,
+                    isNotificationEnabled = null,
+                    retentionTimeSeconds = null,
+                    inSharesCount = 0,
+                    enableCallButtons = true,
+                    isOnline = it.isOnline,
                     closeEvent = closeEvent,
                 )
             } ?: ContactInfoUiState.Loading(closeEvent = closeEvent)
@@ -103,23 +116,25 @@ internal class ContactInfoViewModel @AssistedInject constructor(
     }
 
     private suspend fun resolveContact(): ResolvedContact? {
-        val skipCache = isConnectedToInternetUseCase()
+        val isOnline = isConnectedToInternetUseCase()
         return when {
-            chatId != null -> getContactFromChatUseCase(chatId, skipCache)?.let { contact ->
+            chatId != null -> getContactFromChatUseCase(chatId, isOnline)?.let { contact ->
                 ResolvedContact(
                     contact = contact,
                     chatRoomId = chatId,
                     isFromContacts = false,
+                    isOnline = isOnline,
                 )
             }
 
-            email != null -> getContactFromEmailUseCase(email, skipCache)?.let { contact ->
+            email != null -> getContactFromEmailUseCase(email, isOnline)?.let { contact ->
                 ResolvedContact(
                     contact = contact,
                     chatRoomId = runCatching { getChatRoomByUserUseCase(contact.handle)?.chatId }
                         .onFailure { Timber.e(it, "Failed to get chat room for contact") }
                         .getOrNull(),
                     isFromContacts = true,
+                    isOnline = isOnline,
                 )
             }
 
@@ -134,9 +149,13 @@ internal class ContactInfoViewModel @AssistedInject constructor(
         closeEventChannel.trySend(consumed)
     }
 
+    private fun ContactItem.displayName(): String =
+        contactData.fullName ?: email
+
     private data class ResolvedContact(
         val contact: ContactItem,
         val chatRoomId: Long?,
         val isFromContacts: Boolean,
+        val isOnline: Boolean,
     )
 }

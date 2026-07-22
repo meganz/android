@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.contact.info
 
+import androidx.compose.ui.graphics.Color
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -17,10 +18,13 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.network.IsConnectedToInternetUseCase
 import mega.privacy.android.feature.contact.info.model.ContactInfoUiState
+import mega.privacy.android.shared.contact.mapper.ContactItemAvatarMapper
+import mega.privacy.android.shared.contact.model.AvatarData
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -35,6 +39,7 @@ class ContactInfoViewModelTest {
     private val getContactFromChatUseCase = mock<GetContactFromChatUseCase>()
     private val getChatRoomByUserUseCase = mock<GetChatRoomByUserUseCase>()
     private val isConnectedToInternetUseCase = mock<IsConnectedToInternetUseCase>()
+    private val contactItemAvatarMapper = mock<ContactItemAvatarMapper>()
 
     private val chatRoom = mock<ChatRoom> {
         on { this.chatId } doReturn CHAT_ID
@@ -43,6 +48,7 @@ class ContactInfoViewModelTest {
     @BeforeEach
     fun setUp() {
         whenever(isConnectedToInternetUseCase()).thenReturn(true)
+        whenever(contactItemAvatarMapper(any())).thenReturn(AVATAR)
         underTest = createViewModel(email = EMAIL, chatId = null)
     }
 
@@ -53,6 +59,7 @@ class ContactInfoViewModelTest {
             getContactFromChatUseCase,
             getChatRoomByUserUseCase,
             isConnectedToInternetUseCase,
+            contactItemAvatarMapper,
         )
     }
 
@@ -63,6 +70,7 @@ class ContactInfoViewModelTest {
         getContactFromChatUseCase = getContactFromChatUseCase,
         getChatRoomByUserUseCase = getChatRoomByUserUseCase,
         isConnectedToInternetUseCase = isConnectedToInternetUseCase,
+        contactItemAvatarMapper = contactItemAvatarMapper,
     )
 
     @Test
@@ -77,14 +85,35 @@ class ContactInfoViewModelTest {
         whenever(getChatRoomByUserUseCase(USER_HANDLE)).thenReturn(chatRoom)
 
         underTest.uiState.test {
-            val actual = awaitLoadedState()
-            assertThat(actual.displayName).isEqualTo(ALIAS)
+            val actual = awaitDataState()
+            assertThat(actual.displayName).isEqualTo(FULL_NAME)
+            assertThat(actual.nickname).isEqualTo(ALIAS)
             assertThat(actual.email).isEqualTo(EMAIL)
             assertThat(actual.userHandle).isEqualTo(USER_HANDLE)
             assertThat(actual.chatRoomId).isEqualTo(CHAT_ID)
             assertThat(actual.isFromContacts).isTrue()
+            assertThat(actual.avatar).isEqualTo(AVATAR)
+            assertThat(actual.userChatStatus).isEqualTo(UserChatStatus.Online)
+            assertThat(actual.lastSeenMinutes).isNull()
+            assertThat(actual.areCredentialsVerified).isFalse()
+            assertThat(actual.isOnline).isTrue()
         }
     }
+
+    @Test
+    fun `test that Loaded has explicit initial values for the fields not yet monitored`() =
+        runTest {
+            whenever(getContactFromEmailUseCase(EMAIL, true)).thenReturn(createContactItem())
+            whenever(getChatRoomByUserUseCase(USER_HANDLE)).thenReturn(chatRoom)
+
+            underTest.uiState.test {
+                val actual = awaitDataState()
+                assertThat(actual.isNotificationEnabled).isNull()
+                assertThat(actual.retentionTimeSeconds).isNull()
+                assertThat(actual.inSharesCount).isEqualTo(0)
+                assertThat(actual.enableCallButtons).isTrue()
+            }
+        }
 
     @Test
     fun `test that Loaded has null chatRoomId when no chat room exists for the contact`() =
@@ -93,7 +122,7 @@ class ContactInfoViewModelTest {
             whenever(getChatRoomByUserUseCase(USER_HANDLE)).thenReturn(null)
 
             underTest.uiState.test {
-                assertThat(awaitLoadedState().chatRoomId).isNull()
+                assertThat(awaitDataState().chatRoomId).isNull()
             }
         }
 
@@ -103,8 +132,8 @@ class ContactInfoViewModelTest {
         whenever(getContactFromChatUseCase(CHAT_ID, true)).thenReturn(createContactItem())
 
         underTest.uiState.test {
-            val actual = awaitLoadedState()
-            assertThat(actual.displayName).isEqualTo(ALIAS)
+            val actual = awaitDataState()
+            assertThat(actual.displayName).isEqualTo(FULL_NAME)
             assertThat(actual.email).isEqualTo(EMAIL)
             assertThat(actual.chatRoomId).isEqualTo(CHAT_ID)
             assertThat(actual.isFromContacts).isFalse()
@@ -112,22 +141,22 @@ class ContactInfoViewModelTest {
     }
 
     @Test
-    fun `test that displayName falls back to full name when alias is null`() = runTest {
+    fun `test that nickname is null when the contact has no alias`() = runTest {
         whenever(getContactFromEmailUseCase(EMAIL, true))
             .thenReturn(createContactItem(alias = null))
 
         underTest.uiState.test {
-            assertThat(awaitLoadedState().displayName).isEqualTo(FULL_NAME)
+            assertThat(awaitDataState().nickname).isNull()
         }
     }
 
     @Test
-    fun `test that displayName falls back to email when alias and full name are null`() = runTest {
+    fun `test that displayName falls back to email when full name is null`() = runTest {
         whenever(getContactFromEmailUseCase(EMAIL, true))
-            .thenReturn(createContactItem(alias = null, fullName = null))
+            .thenReturn(createContactItem(fullName = null))
 
         underTest.uiState.test {
-            assertThat(awaitLoadedState().displayName).isEqualTo(EMAIL)
+            assertThat(awaitDataState().displayName).isEqualTo(EMAIL)
         }
     }
 
@@ -182,11 +211,13 @@ class ContactInfoViewModelTest {
         whenever(getChatRoomByUserUseCase(USER_HANDLE)).thenReturn(chatRoom)
 
         underTest.uiState.test {
-            assertThat(awaitLoadedState().email).isEqualTo(EMAIL)
+            val actual = awaitDataState()
+            assertThat(actual.email).isEqualTo(EMAIL)
+            assertThat(actual.isOnline).isFalse()
         }
     }
 
-    private suspend fun ReceiveTurbine<ContactInfoUiState>.awaitLoadedState(): ContactInfoUiState.Data {
+    private suspend fun ReceiveTurbine<ContactInfoUiState>.awaitDataState(): ContactInfoUiState.Data {
         var item = awaitItem()
         while (item !is ContactInfoUiState.Data) {
             item = awaitItem()
@@ -221,5 +252,6 @@ class ContactInfoViewModelTest {
         private const val CHAT_ID = 123L
         private const val ALIAS = "Ally"
         private const val FULL_NAME = "Alice Anderson"
+        private val AVATAR = AvatarData.Initials(initials = "A", avatarColor = Color(0xFF2E7D32))
     }
 }

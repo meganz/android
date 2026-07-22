@@ -41,5 +41,16 @@ fun ContactInfoEntry(
     ContactInfoScreen(
         state = state,
         onNavigateBack = navigationHandler::back,
+        onSendMessageClick = {},
+        onStartAudioCallClick = {},
+        onStartVideoCallClick = {},
+        onNicknameClick = {},
+        onVerifyCredentialsClick = {},
+        onShareContactClick = {},
+        onSharedFoldersClick = {},
+        onNotificationToggled = {},
+        onSharedFilesClick = {},
+        onManageChatHistoryClick = {},
+        onRemoveContactClick = {},
     )
 }
