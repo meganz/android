@@ -60,10 +60,21 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                     val data = uiState as? ShareLinkUiState.Data ?: return@ShareLinkScreen
                     coroutineScope.launch {
                         snackbarQueue.queueMessage(
-                            resources.getQuantityString(
-                                sharedR.plurals.share_link_created_and_copied_snackbar,
-                                data.handles.size,
-                            )
+                            if (data.isMultiNode) {
+                                resources.getString(sharedR.string.general_link_copied_clipboard)
+                            } else {
+                                resources.getQuantityString(
+                                    sharedR.plurals.share_link_created_and_copied_snackbar,
+                                    data.handles.size,
+                                )
+                            }
+                        )
+                    }
+                },
+                onLinksCopied = {
+                    coroutineScope.launch {
+                        snackbarQueue.queueMessage(
+                            resources.getString(sharedR.string.general_links_copied_clipboard)
                         )
                     }
                 },

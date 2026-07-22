@@ -18,8 +18,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -63,8 +66,10 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onBack Invoked when the Close action is tapped.
  * @param onOpenSettings Invoked when the settings (gear) action is tapped.
  * @param onShareLink Invoked when the bottom "Share link" button is tapped.
- * @param onCopyLink Invoked when the copy icon on the link is tapped.
+ * @param onCopyLink Invoked when the copy icon on a link is tapped.
  * @param onCopyKey Invoked when the copy icon on the separate key card is tapped.
+ * @param onLinksCopied Invoked once when the multi-node screen opens and all links have been
+ * copied to the clipboard automatically.
  * @param modifier Modifier for the scaffold.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +81,7 @@ fun ShareLinkScreen(
     onShareLink: () -> Unit,
     onCopyLink: () -> Unit,
     onCopyKey: () -> Unit,
+    onLinksCopied: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val linkCount = (uiState as? ShareLinkUiState.Data)?.handles?.size ?: 1
@@ -127,6 +133,7 @@ fun ShareLinkScreen(
                     MultiNodeContent(
                         uiState = uiState,
                         onCopyLink = onCopyLink,
+                        onLinksCopied = onLinksCopied,
                     )
                 } else {
                     ShareLinkContent(
@@ -211,10 +218,28 @@ private fun ShareLinkContent(
 private fun MultiNodeContent(
     uiState: ShareLinkUiState.Data,
     onCopyLink: () -> Unit,
+    onLinksCopied: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val clipboard = LocalClipboard.current
     val coroutineScope = rememberCoroutineScope()
+
+    // Copy every link once when the screen first opens (parity with the legacy several-links
+    // screen). The rememberSaveable guard keeps it to one copy per screen open, surviving
+    // recomposition / config change / returning to this screen.
+    val linksCopied = rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        if (!linksCopied.value) {
+            linksCopied.value = true
+            clipboard.setClipEntry(
+                ClipData.newPlainText(
+                    COPIED_LINK_LABEL,
+                    uiState.nodeLinks.joinToString(separator = "\n") { it.link },
+                ).toClipEntry()
+            )
+            onLinksCopied()
+        }
+    }
 
     Column(
         modifier = modifier

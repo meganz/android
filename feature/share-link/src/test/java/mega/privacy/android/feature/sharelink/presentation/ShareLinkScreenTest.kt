@@ -118,6 +118,22 @@ class ShareLinkScreenTest {
     }
 
     @Test
+    fun `test that all links are copied to the clipboard once when the multi-node screen opens`() {
+        val clipboard = FakeClipboard()
+        var copiedCount = 0
+        setContent(
+            uiState = multiNodeData,
+            clipboard = clipboard,
+            onLinksCopied = { copiedCount++ },
+        )
+        composeRule.waitForIdle()
+
+        val expected = multiNodeData.nodeLinks.joinToString(separator = "\n") { it.link }
+        assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(expected)
+        assertThat(copiedCount).isEqualTo(1)
+    }
+
+    @Test
     fun `test that the node header, link access banner and link field are displayed in the Data state`() {
         setContent(uiState = data)
 
@@ -248,6 +264,7 @@ class ShareLinkScreenTest {
         onShareLink: () -> Unit = {},
         onCopyLink: () -> Unit = {},
         onCopyKey: () -> Unit = {},
+        onLinksCopied: () -> Unit = {},
         clipboard: Clipboard = FakeClipboard(),
     ) {
         composeRule.setContent {
@@ -259,6 +276,7 @@ class ShareLinkScreenTest {
                     onShareLink = onShareLink,
                     onCopyLink = onCopyLink,
                     onCopyKey = onCopyKey,
+                    onLinksCopied = onLinksCopied,
                 )
             }
         }
