@@ -253,6 +253,24 @@ class CreateGroupChatScreenTest {
         assertThat(result?.title).isEqualTo("My group")
     }
 
+    @Test
+    fun `test that the group name is capped at 28 characters when a longer name is typed`() {
+        var result: Result? = null
+        setScreen(
+            dataState(contact(1L, "Alice")),
+            onConfirm = { handles, title, isEkr, isChatLink, allowAdd, _ ->
+                result = Result(handles, title, isEkr, isChatLink, allowAdd)
+            },
+        )
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_NEXT_FAB_TAG).performClick()
+        composeTestRule.onNode(hasImeAction(ImeAction.Done)).performTextInput("a".repeat(40))
+        composeTestRule.onNodeWithTag(CREATE_GROUP_CHAT_CONFIRM_FAB_TAG).performClick()
+
+        assertThat(result?.title).isEqualTo("a".repeat(28))
+    }
+
     private fun goToSettings(vararg contacts: ContactItemUiState) {
         setScreen(dataState(*contacts))
         contacts.indices.forEach { index ->

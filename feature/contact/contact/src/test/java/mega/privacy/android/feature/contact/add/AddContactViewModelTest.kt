@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.contacts.LocalContact
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.call.MonitorParticipantsLimitWarningUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsFromUriUseCase
@@ -63,6 +64,7 @@ class AddContactViewModelTest {
     private val getContactsUseCase = mock<GetContactsUseCase>()
     private val getContactsToAddToChatUseCase = mock<GetContactsToAddToChatUseCase>()
     private val monitorParticipantsLimitWarningUseCase = mock<MonitorParticipantsLimitWarningUseCase>()
+    private val getContactVerificationWarningUseCase = mock<GetContactVerificationWarningUseCase>()
     private val getDeviceSdkVersionUseCase = mock<GetDeviceSdkVersionUseCase>()
     private val getLocalContactsUseCase = mock<GetLocalContactsUseCase>()
     private val getLocalContactsFromUriUseCase = mock<GetLocalContactsFromUriUseCase>()
@@ -87,6 +89,7 @@ class AddContactViewModelTest {
             getContactsUseCase,
             getContactsToAddToChatUseCase,
             monitorParticipantsLimitWarningUseCase,
+            getContactVerificationWarningUseCase,
             getDeviceSdkVersionUseCase,
             getLocalContactsUseCase,
             getLocalContactsFromUriUseCase,
@@ -108,6 +111,7 @@ class AddContactViewModelTest {
         getContactsUseCase = getContactsUseCase,
         getContactsToAddToChatUseCase = getContactsToAddToChatUseCase,
         monitorParticipantsLimitWarningUseCase = monitorParticipantsLimitWarningUseCase,
+        getContactVerificationWarningUseCase = getContactVerificationWarningUseCase,
         getDeviceSdkVersionUseCase = getDeviceSdkVersionUseCase,
         getLocalContactsUseCase = getLocalContactsUseCase,
         getLocalContactsFromUriUseCase = getLocalContactsFromUriUseCase,
@@ -287,6 +291,39 @@ class AddContactViewModelTest {
             assertThat(awaitDataState().showUserLimitWarning).isFalse()
         }
         verifyNoInteractions(monitorParticipantsLimitWarningUseCase)
+    }
+
+    @Test
+    fun `test that contact verification warning flag is exposed when the use case returns true`() =
+        runTest {
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+            whenever(getContactVerificationWarningUseCase()).thenReturn(true)
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().isContactVerificationWarningEnabled).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that contact verification warning flag is false when the use case returns false`() =
+        runTest {
+            stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+            whenever(getContactVerificationWarningUseCase()).thenReturn(false)
+
+            underTest.uiState.test {
+                assertThat(awaitDataState().isContactVerificationWarningEnabled).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that contact verification warning flag is false when the use case fails`() = runTest {
+        stubContactsFlow(listOf(createContactItem(handle = 1L, email = "a@test.com")))
+        whenever(getContactVerificationWarningUseCase())
+            .thenAnswer { throw RuntimeException("failed") }
+
+        underTest.uiState.test {
+            assertThat(awaitDataState().isContactVerificationWarningEnabled).isFalse()
+        }
     }
 
     @Test

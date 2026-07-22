@@ -3077,6 +3077,8 @@
     <string name="add_contacts_phone_contacts_select">Select phone contacts</string>
     <!-- Add contacts picker: header of the section that lists the user's MEGA contacts, shown to separate them from the phone contacts section -->
     <string name="add_contacts_mega_contacts_section_title">MEGA contacts</string>
+    <!-- Add contacts picker (share flow): warning banner shown when the selection includes recipients whose credentials the user has not verified -->
+    <string name="add_contacts_unverified_contact_warning">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Create group chat: toolbar title of the group settings step where the group name and options are set -->
     <string name="create_group_chat_settings_title">New group</string>
     <!-- Create group chat: hint of the group name text field. The name is optional. -->

@@ -20,6 +20,8 @@ sealed interface AddContactUiState {
      * @property contacts MEGA contacts to display, already filtered by [query].
      * @property query Current search query, or null when not searching.
      * @property showUserLimitWarning Whether to show the call user-limit warning (meeting flow only).
+     * @property isContactVerificationWarningEnabled Whether the account-level contact-verification
+     * warning is enabled. Gates the unverified-recipient warning surfaced by the share flow.
      * @property phoneContactsSection State of the collapsible phone-contacts section.
      * @property phoneContactsPickedEvent One-shot event carrying the emails newly added by the system
      * picker so the screen can auto-select them. Only fired on the post-17 picker path.
@@ -33,6 +35,7 @@ sealed interface AddContactUiState {
         val contacts: ImmutableList<ContactItemUiState>,
         val query: String?,
         val showUserLimitWarning: Boolean,
+        val isContactVerificationWarningEnabled: Boolean,
         val phoneContactsSection: PhoneContactsSection,
         val phoneContactsPickedEvent: StateEventWithContent<List<String>>,
         val scannedContactDialog: ScannedContactDialog?,

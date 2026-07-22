@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -36,6 +37,7 @@ import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
 import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import mega.privacy.android.domain.entity.uri.UriPath
 import mega.privacy.android.domain.usecase.call.MonitorParticipantsLimitWarningUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactVerificationWarningUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsToAddToChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetLocalContactsFromUriUseCase
@@ -76,6 +78,7 @@ import timber.log.Timber
  * @property getContactsUseCase
  * @property getContactsToAddToChatUseCase
  * @property monitorParticipantsLimitWarningUseCase
+ * @property getContactVerificationWarningUseCase
  * @property getDeviceSdkVersionUseCase
  * @property getLocalContactsUseCase
  * @property getLocalContactsFromUriUseCase
@@ -95,6 +98,7 @@ class AddContactViewModel @AssistedInject constructor(
     private val getContactsUseCase: GetContactsUseCase,
     private val getContactsToAddToChatUseCase: GetContactsToAddToChatUseCase,
     private val monitorParticipantsLimitWarningUseCase: MonitorParticipantsLimitWarningUseCase,
+    private val getContactVerificationWarningUseCase: GetContactVerificationWarningUseCase,
     private val getDeviceSdkVersionUseCase: GetDeviceSdkVersionUseCase,
     private val getLocalContactsUseCase: GetLocalContactsUseCase,
     private val getLocalContactsFromUriUseCase: GetLocalContactsFromUriUseCase,
@@ -159,6 +163,14 @@ class AddContactViewModel @AssistedInject constructor(
             flowOf(false)
         }
 
+    private fun contactVerificationWarningSource(): Flow<Boolean> = flow {
+        emit(
+            runCatching { getContactVerificationWarningUseCase() }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(false)
+        )
+    }
+
     /**
      * Resolves a selected MEGA contact handle back to its email. Retained from the full
      * (unfiltered) contact list so a selected contact still resolves even when it has
@@ -183,16 +195,17 @@ class AddContactViewModel @AssistedInject constructor(
                     .sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.ui.displayName })
                     .also { indexed -> handleToEmail = indexed.associate { it.ui.handle to it.data.email } }
             },
-            userLimitWarningSource(),
+            combine(userLimitWarningSource(), contactVerificationWarningSource(), ::Pair),
             phoneContactsSource(),
             combine(pickedEvents, scanState, ::Pair),
-        ) { query, indexed: List<IndexedContact>, showUserLimitWarning, phoneSection, (pickedEvent, scan) ->
+        ) { query, indexed: List<IndexedContact>, (showUserLimitWarning, verificationWarningEnabled), phoneSection, (pickedEvent, scan) ->
             val visible =
                 if (query.isNullOrBlank()) indexed else indexed.filter { it.matches(query) }
             AddContactUiState.Data(
                 contacts = visible.map { it.ui }.toImmutableList(),
                 query = query,
                 showUserLimitWarning = showUserLimitWarning,
+                isContactVerificationWarningEnabled = verificationWarningEnabled,
                 phoneContactsSection = phoneSection.filteredBy(query),
                 phoneContactsPickedEvent = pickedEvent,
                 scannedContactDialog = scan.dialog,

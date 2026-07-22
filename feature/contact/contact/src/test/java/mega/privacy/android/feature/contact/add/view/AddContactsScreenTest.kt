@@ -425,6 +425,108 @@ class AddContactsScreenTest {
         assertThat(confirmedEmails).containsExactly("guest@test.com")
     }
 
+    @Test
+    fun `test that the unverified contact warning is displayed when an unverified contact is selected`() {
+        setScreen(
+            dataState(
+                contact(1L, "Alice", isVerified = false),
+                isContactVerificationWarningEnabled = true,
+            ),
+            showUnverifiedContactWarning = true,
+        )
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_UNVERIFIED_WARNING_TAG).assertIsNotDisplayed()
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_UNVERIFIED_WARNING_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the unverified contact warning is displayed when a manual email is added`() {
+        setManualEmailScreen(
+            dataState(
+                contact(1L, "Alice", isVerified = true),
+                isContactVerificationWarningEnabled = true,
+            ),
+            showUnverifiedContactWarning = true,
+        )
+
+        typeEmailAndAdd("guest@test.com")
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_UNVERIFIED_WARNING_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the unverified contact warning is not displayed when verification is disabled`() {
+        setScreen(
+            dataState(
+                contact(1L, "Alice", isVerified = false),
+                isContactVerificationWarningEnabled = false,
+            ),
+            showUnverifiedContactWarning = true,
+        )
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_UNVERIFIED_WARNING_TAG).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that the unverified contact warning is not displayed when all selected contacts are verified`() {
+        setScreen(
+            dataState(
+                contact(1L, "Alice", isVerified = true),
+                isContactVerificationWarningEnabled = true,
+            ),
+            showUnverifiedContactWarning = true,
+        )
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_UNVERIFIED_WARNING_TAG).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that the unverified contact warning is not displayed when the capability is off`() {
+        setScreen(
+            dataState(
+                contact(1L, "Alice", isVerified = false),
+                isContactVerificationWarningEnabled = true,
+            ),
+        )
+
+        composeTestRule.onAllNodesWithTag(CONTACT_ITEM_VIEW_ROW)[0].performClick()
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_UNVERIFIED_WARNING_TAG).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that the empty state invite button fires the callback when provided`() {
+        var inviteClicked = false
+        setScreen(dataState(), onInviteContactsClick = { inviteClicked = true })
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_EMPTY_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_EMPTY_INVITE_TAG).performClick()
+
+        assertThat(inviteClicked).isTrue()
+    }
+
+    @Test
+    fun `test that the empty state invite button is not displayed when no callback is provided`() {
+        setScreen(dataState())
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_EMPTY_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_EMPTY_INVITE_TAG).assertIsNotDisplayed()
+    }
+
+    @Test
+    fun `test that the empty state invite button is not displayed when there are contacts`() {
+        setScreen(dataState(contact(1L, "Alice")), onInviteContactsClick = {})
+
+        composeTestRule.onNodeWithTag(ADD_CONTACTS_EMPTY_INVITE_TAG).assertIsNotDisplayed()
+    }
+
     private fun typeEmailAndAdd(email: String) {
         composeTestRule.onNode(
             hasSetTextAction() and hasAnyAncestor(hasTestTag(MANUAL_EMAIL_SECTION_TAG)),
@@ -438,6 +540,7 @@ class AddContactsScreenTest {
         isManualEmailValid: (String) -> Boolean = { it.contains("@") },
         megaContactHandleForEmail: (String) -> Long? = { null },
         onConfirm: (Set<Long>, Set<String>) -> Unit = { _, _ -> },
+        showUnverifiedContactWarning: Boolean = false,
     ) {
         composeTestRule.setContent {
             AddContactsScreen(
@@ -446,6 +549,7 @@ class AddContactsScreenTest {
                 onConfirm = onConfirm,
                 onBack = {},
                 allowManualEmailEntry = true,
+                showUnverifiedContactWarning = showUnverifiedContactWarning,
                 isManualEmailValid = isManualEmailValid,
                 megaContactHandleForEmail = megaContactHandleForEmail,
             )
@@ -459,6 +563,8 @@ class AddContactsScreenTest {
         onBack: () -> Unit = {},
         onScanQrClick: () -> Unit = {},
         onInviteScannedContactConfirmed: () -> Unit = {},
+        showUnverifiedContactWarning: Boolean = false,
+        onInviteContactsClick: (() -> Unit)? = null,
     ) {
         composeTestRule.setContent {
             AddContactsScreen(
@@ -468,6 +574,8 @@ class AddContactsScreenTest {
                 onBack = onBack,
                 onScanQrClick = onScanQrClick,
                 onInviteScannedContactConfirmed = onInviteScannedContactConfirmed,
+                showUnverifiedContactWarning = showUnverifiedContactWarning,
+                onInviteContactsClick = onInviteContactsClick,
             )
         }
     }
@@ -475,6 +583,7 @@ class AddContactsScreenTest {
     private fun dataState(
         vararg contacts: ContactItemUiState,
         showUserLimitWarning: Boolean = false,
+        isContactVerificationWarningEnabled: Boolean = false,
         phoneSection: PhoneContactsSection = PhoneContactsSection.Hidden,
         scannedContactDialog: ScannedContactDialog? = null,
         scannedContactSelectEvent: StateEventWithContent<Long> = consumed(),
@@ -482,6 +591,7 @@ class AddContactsScreenTest {
         contacts = contacts.toList().toImmutableList(),
         query = null,
         showUserLimitWarning = showUserLimitWarning,
+        isContactVerificationWarningEnabled = isContactVerificationWarningEnabled,
         phoneContactsSection = phoneSection,
         phoneContactsPickedEvent = consumed(),
         scannedContactDialog = scannedContactDialog,
@@ -503,6 +613,7 @@ class AddContactsScreenTest {
         handle: Long,
         displayName: String = "Contact $handle",
         email: String = "$handle@test.com",
+        isVerified: Boolean = false,
     ) = ContactItemUiState(
         handle = handle,
         displayName = displayName,
@@ -512,7 +623,7 @@ class AddContactsScreenTest {
             initials = displayName.first().toString(),
             avatarColor = Color(0xFF2E7D32),
         ),
-        isVerified = false,
+        isVerified = isVerified,
         email = email,
     )
 

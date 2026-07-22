@@ -152,6 +152,7 @@ internal fun SettingsStep(
                         text = groupName,
                         placeholder = stringResource(sharedR.string.create_group_chat_name_hint),
                         keyboardType = KeyboardType.Text,
+                        maxCharLimit = MAX_GROUP_NAME_LENGTH,
                         onValueChanged = { groupName = it },
                         imeAction = ImeAction.Done,
                         errorText = if (confirmAttempted && nameRequired) {
@@ -244,6 +245,11 @@ internal fun SettingsStep(
         }
     }
 }
+
+/**
+ * Maximum length of a group chat name, matching the limit enforced across MEGA clients.
+ */
+private const val MAX_GROUP_NAME_LENGTH = 28
 
 internal const val SETTINGS_SUFFIX = "_screen:settings"
 internal const val NAME_INPUT_SUFFIX = "_screen:name_input"

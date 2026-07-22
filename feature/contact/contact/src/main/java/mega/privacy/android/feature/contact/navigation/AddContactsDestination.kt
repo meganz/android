@@ -12,6 +12,7 @@ import mega.privacy.android.navigation.destination.AddChatParticipantsNavKey
 import mega.privacy.android.navigation.destination.AddContactToShareNavKey
 import mega.privacy.android.navigation.destination.AddContactsNavKey
 import mega.privacy.android.navigation.destination.AddMeetingParticipantsNavKey
+import mega.privacy.android.navigation.destination.InviteContactNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 
 /**
@@ -57,6 +58,7 @@ fun AddContactsEntry(
         onInviteScannedContactConfirmed = viewModel::onInviteScannedContactConfirmed,
         onScannedContactSelectConsumed = viewModel::onScannedContactSelectConsumed,
         onScannedContactInviteConsumed = viewModel::onScannedContactInviteConsumed,
+        onInviteContactsClick = { navigationHandler.navigate(InviteContactNavKey()) },
         initialSelectedHandles = preselectedHandles.toSet(),
     )
 }
@@ -100,7 +102,9 @@ fun AddContactToShareEntry(
         onInviteScannedContactConfirmed = viewModel::onInviteScannedContactConfirmed,
         onScannedContactSelectConsumed = viewModel::onScannedContactSelectConsumed,
         onScannedContactInviteConsumed = viewModel::onScannedContactInviteConsumed,
+        onInviteContactsClick = { navigationHandler.navigate(InviteContactNavKey()) },
         allowManualEmailEntry = true,
+        showUnverifiedContactWarning = true,
         isManualEmailValid = viewModel::isEmailValid,
         megaContactHandleForEmail = viewModel::handleForEmail,
     )
@@ -145,6 +149,7 @@ fun AddChatParticipantsEntry(
         onInviteScannedContactConfirmed = viewModel::onInviteScannedContactConfirmed,
         onScannedContactSelectConsumed = viewModel::onScannedContactSelectConsumed,
         onScannedContactInviteConsumed = viewModel::onScannedContactInviteConsumed,
+        onInviteContactsClick = { navigationHandler.navigate(InviteContactNavKey()) },
         titleRes = sharedR.string.add_participants_title,
     )
 }

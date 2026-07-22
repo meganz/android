@@ -41,6 +41,7 @@ class AddContactsScreenScreenshotTest {
                     contacts = persistentListOf(),
                     query = null,
                     showUserLimitWarning = false,
+                    isContactVerificationWarningEnabled = false,
                     phoneContactsSection = PhoneContactsSection.Hidden,
                     phoneContactsPickedEvent = consumed(),
                     scannedContactDialog = null,
@@ -198,6 +199,48 @@ class AddContactsScreenScreenshotTest {
     @PreviewTest
     @CombinedThemePreviews
     @Composable
+    fun AddContactsScreenEmptyWithInviteCta() {
+        AndroidThemeForPreviews {
+            AddContactsScreen(
+                state = AddContactUiState.Data(
+                    contacts = persistentListOf(),
+                    query = null,
+                    showUserLimitWarning = false,
+                    isContactVerificationWarningEnabled = false,
+                    phoneContactsSection = PhoneContactsSection.Hidden,
+                    phoneContactsPickedEvent = consumed(),
+                    scannedContactDialog = null,
+                    scannedContactSelectEvent = consumed(),
+                    scannedContactInviteEvent = consumed(),
+                ),
+                onSearchQueryChange = {},
+                onConfirm = { _, _ -> },
+                onBack = {},
+                onInviteContactsClick = {},
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun AddContactToShareScreenUnverifiedContactWarning() {
+        AndroidThemeForPreviews {
+            AddContactsScreen(
+                state = sampleData(isContactVerificationWarningEnabled = true),
+                onSearchQueryChange = {},
+                onConfirm = { _, _ -> },
+                onBack = {},
+                allowManualEmailEntry = true,
+                showUnverifiedContactWarning = true,
+                initialSelectedManualEmails = setOf("guest@example.com"),
+            )
+        }
+    }
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
     fun AddChatParticipantsScreen() {
         AndroidThemeForPreviews {
             AddContactsScreen(
@@ -227,6 +270,7 @@ class AddContactsScreenScreenshotTest {
 
     private fun sampleData(
         showUserLimitWarning: Boolean = false,
+        isContactVerificationWarningEnabled: Boolean = false,
         phoneSection: PhoneContactsSection = PhoneContactsSection.Hidden,
     ) = AddContactUiState.Data(
         contacts = listOf(
@@ -236,6 +280,7 @@ class AddContactsScreenScreenshotTest {
         ).toImmutableList(),
         query = null,
         showUserLimitWarning = showUserLimitWarning,
+        isContactVerificationWarningEnabled = isContactVerificationWarningEnabled,
         phoneContactsSection = phoneSection,
         phoneContactsPickedEvent = consumed(),
         scannedContactDialog = null,

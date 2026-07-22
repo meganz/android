@@ -44,6 +44,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.banner.TopWarningBanner
+import mega.android.core.ui.components.button.SecondaryFilledButton
 import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.fab.MegaFab
 import mega.android.core.ui.components.image.MegaIcon
@@ -96,6 +97,11 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onScannedContactSelectConsumed invoked once the scanned contact has been auto-selected.
  * @param onScannedContactInviteConsumed invoked once the invite feedback has been surfaced.
  * @param allowManualEmailEntry whether to surface the free-text email entry (share flow only).
+ * @param showUnverifiedContactWarning whether to warn when the selection includes recipients whose
+ * credentials are not verified (share flow only). Only takes effect while the account-level
+ * contact-verification setting carried by the state is enabled.
+ * @param onInviteContactsClick invoked when the invite CTA of the empty state is clicked, or null
+ * to hide the CTA (meeting flow).
  * @param isManualEmailValid returns whether a typed email is syntactically valid.
  * @param megaContactHandleForEmail resolves a typed email to the handle of a loaded MEGA contact
  * (case-insensitively), or null when no loaded contact has that email.
@@ -123,6 +129,8 @@ internal fun AddContactsScreen(
     onScannedContactSelectConsumed: () -> Unit = {},
     onScannedContactInviteConsumed: () -> Unit = {},
     allowManualEmailEntry: Boolean = false,
+    showUnverifiedContactWarning: Boolean = false,
+    onInviteContactsClick: (() -> Unit)? = null,
     isManualEmailValid: (String) -> Boolean = { false },
     megaContactHandleForEmail: (String) -> Long? = { null },
     initialSelectedHandles: Set<Long> = emptySet(),
@@ -268,6 +276,18 @@ internal fun AddContactsScreen(
                             showCancelButton = false,
                         )
                     }
+                    if (showUnverifiedContactWarning &&
+                        state.isContactVerificationWarningEnabled &&
+                        selectionState.containsUnverifiedRecipient(state.contacts)
+                    ) {
+                        TopWarningBanner(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag(ADD_CONTACTS_UNVERIFIED_WARNING_TAG),
+                            body = stringResource(sharedR.string.add_contacts_unverified_contact_warning),
+                            showCancelButton = false,
+                        )
+                    }
                     if (allowManualEmailEntry) {
                         ManualEmailEntrySection(
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -292,10 +312,22 @@ internal fun AddContactsScreen(
                                 .testTag(ADD_CONTACTS_EMPTY_TAG),
                             contentAlignment = Alignment.Center,
                         ) {
-                            MegaText(
-                                text = stringResource(sharedR.string.contacts_empty_title),
-                                textColor = TextColor.Secondary,
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(24.dp),
+                            ) {
+                                MegaText(
+                                    text = stringResource(sharedR.string.contacts_empty_title),
+                                    textColor = TextColor.Secondary,
+                                )
+                                onInviteContactsClick?.let { onClick ->
+                                    SecondaryFilledButton(
+                                        modifier = Modifier.testTag(ADD_CONTACTS_EMPTY_INVITE_TAG),
+                                        text = stringResource(sharedR.string.invite_contacts_action_label),
+                                        onClick = onClick,
+                                    )
+                                }
+                            }
                         }
                     } else {
                         LazyColumn(
@@ -347,6 +379,17 @@ internal fun AddContactsScreen(
         }
     }
 }
+
+/**
+ * Whether the current selection includes a recipient the user has not verified: manually typed
+ * and phone-contact emails are never MEGA-verified, and a selected MEGA contact counts when its
+ * credentials are not verified.
+ */
+private fun ContactSelectionState.containsUnverifiedRecipient(
+    contacts: List<ContactItemUiState>,
+): Boolean = selectedManualEmails.isNotEmpty() ||
+        selectedPhoneEmails.isNotEmpty() ||
+        contacts.any { it.handle in selectedHandles && !it.isVerified }
 
 /**
  * Resolve a typed email into a selection update: auto-select the matching loaded MEGA contact when
@@ -561,6 +604,9 @@ internal const val ADD_CONTACTS_LIST_TAG = "add_contacts_screen:list"
 internal const val ADD_CONTACTS_EMPTY_TAG = "add_contacts_screen:empty"
 internal const val ADD_CONTACTS_FAB_TAG = "add_contacts_screen:fab"
 internal const val ADD_CONTACTS_USER_LIMIT_WARNING_TAG = "add_contacts_screen:user_limit_warning"
+internal const val ADD_CONTACTS_UNVERIFIED_WARNING_TAG =
+    "add_contacts_screen:unverified_contact_warning"
+internal const val ADD_CONTACTS_EMPTY_INVITE_TAG = "add_contacts_screen:empty_invite_button"
 internal const val ADD_CONTACTS_SCAN_QR_TAG = "add_contacts_screen:scan_qr"
 internal const val PHONE_SECTION_HEADER_TAG = "add_contacts_screen:phone_section_header"
 internal const val PHONE_SECTION_CHEVRON_TAG = "add_contacts_screen:phone_section_chevron"
@@ -580,6 +626,7 @@ private class AddContactUiStateProvider : PreviewParameterProvider<AddContactUiS
             contacts = persistentListOf(),
             query = null,
             showUserLimitWarning = false,
+            isContactVerificationWarningEnabled = false,
             phoneContactsSection = PhoneContactsSection.Hidden,
             phoneContactsPickedEvent = de.palm.composestateevents.consumed(),
             scannedContactDialog = null,
@@ -609,6 +656,7 @@ private class AddContactUiStateProvider : PreviewParameterProvider<AddContactUiS
             ).toImmutableList(),
             query = null,
             showUserLimitWarning = false,
+            isContactVerificationWarningEnabled = false,
             phoneContactsSection = PhoneContactsSection.Hidden,
             phoneContactsPickedEvent = de.palm.composestateevents.consumed(),
             scannedContactDialog = null,
