@@ -1,8 +1,11 @@
 package mega.privacy.android.feature.sharelink.presentation
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -15,6 +18,7 @@ import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
+import mega.privacy.android.navigation.ExtraConstant.TYPE_TEXT_PLAIN
 import mega.privacy.android.navigation.destination.GetLinkNavKey
 import mega.privacy.android.navigation.destination.LinkSettingsNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
@@ -45,6 +49,7 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
             }
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val resources = LocalResources.current
+            val context = LocalContext.current
             val snackbarQueue = rememberSnackBarQueue()
             val coroutineScope = rememberCoroutineScope()
 
@@ -59,8 +64,13 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
                 onOpenSettings = {
                     navigationHandler.navigate(LinkSettingsNavKey(handles = key.handles))
                 },
-                // The system share sheet is wired in AND-24045.
-                onShareLink = {},
+                onShareLink = { linksText ->
+                    val data = uiState as? ShareLinkUiState.Data
+                    context.shareLinksAsPlainText(
+                        text = linksText,
+                        subject = data?.takeUnless { it.isMultiNode }?.primary?.name,
+                    )
+                },
                 onCopyLink = {
                     val data = uiState as? ShareLinkUiState.Data ?: return@ShareLinkScreen
                     coroutineScope.launch {
@@ -135,6 +145,23 @@ fun EntryProviderScope<NavKey>.linkSettingsScreen(
             onSave = viewModel::onSave,
         )
     }
+}
+
+/**
+ * Opens the system share sheet with the given link [text] as plain text.
+ *
+ * @param subject Optional subject (the node name for a single node) used by share targets that
+ * support one, such as email.
+ */
+private fun Context.shareLinksAsPlainText(text: String, subject: String?) {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = TYPE_TEXT_PLAIN
+        putExtra(Intent.EXTRA_TEXT, text)
+        subject?.let { putExtra(Intent.EXTRA_SUBJECT, it) }
+    }
+    startActivity(
+        Intent.createChooser(shareIntent, getString(sharedR.string.general_share))
+    )
 }
 
 /** MEGA security help page opened from the "Separate link and key" learn-more link. */

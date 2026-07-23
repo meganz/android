@@ -327,7 +327,7 @@ class ShareLinkScreenTest {
         uiState: ShareLinkUiState,
         onBack: () -> Unit = {},
         onOpenSettings: () -> Unit = {},
-        onShareLink: () -> Unit = {},
+        onShareLink: (String) -> Unit = {},
         onCopyLink: () -> Unit = {},
         onCopyKey: () -> Unit = {},
         onLinksCopied: () -> Unit = {},

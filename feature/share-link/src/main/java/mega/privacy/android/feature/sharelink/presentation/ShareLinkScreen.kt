@@ -66,7 +66,9 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param uiState The current [ShareLinkUiState].
  * @param onBack Invoked when the Close action is tapped.
  * @param onOpenSettings Invoked when the settings (gear) action is tapped.
- * @param onShareLink Invoked when the bottom "Share link" button is tapped.
+ * @param onShareLink Invoked with the shareable link text when the bottom "Share link" button is
+ * tapped: the single link (the key-less link when the key is shared separately) or, for multiple
+ * nodes, every link joined by newlines.
  * @param onCopyLink Invoked when the copy icon on a link is tapped.
  * @param onCopyKey Invoked when the copy icon on the separate key card is tapped.
  * @param onLinksCopied Invoked once when the multi-node screen opens and all links have been
@@ -81,13 +83,13 @@ fun ShareLinkScreen(
     uiState: ShareLinkUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onShareLink: () -> Unit,
+    onShareLink: (String) -> Unit,
     onCopyLink: () -> Unit,
     onCopyKey: () -> Unit,
+    modifier: Modifier = Modifier,
     onLinksCopied: () -> Unit = {},
     onSensitiveWarningConfirmed: () -> Unit = {},
     onSensitiveWarningDismissed: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     val linkCount = (uiState as? ShareLinkUiState.Data)?.handles?.size ?: 1
 
@@ -118,7 +120,7 @@ fun ShareLinkScreen(
                                     .fillMaxWidth()
                                     .testTag(SHARE_LINK_SHARE_BUTTON_TAG),
                                 text = shareText,
-                                onClick = onShareLink,
+                                onClick = { onShareLink(uiState.shareableLinksText()) },
                             )
                         },
                     ),
@@ -571,6 +573,17 @@ private fun ShareLinkScreenErrorPreview() {
         )
     }
 }
+
+/**
+ * The link text placed on the system share sheet: for multiple nodes every link joined by
+ * newlines; for a single node the link, or the key-less link when the key is shared separately.
+ */
+private fun ShareLinkUiState.Data.shareableLinksText(): String =
+    if (isMultiNode) {
+        nodeLinks.joinToString(separator = "\n") { it.link }
+    } else {
+        primary.linkWithoutKey?.takeIf { isKeySeparate } ?: primary.link
+    }
 
 internal const val SHARE_LINK_APP_BAR_TAG = "share_link_screen:app_bar"
 internal const val SHARE_LINK_SHARE_BUTTON_TAG = "share_link_screen:button_share"
