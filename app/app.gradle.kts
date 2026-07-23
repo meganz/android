@@ -239,6 +239,8 @@ dependencies {
     implementation(project(":resources:string-resources"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:contact:contact"))
+    implementation(project(":feature:media-player:media-player"))
+    implementation(project(":feature:media-player:media-player-snowflake-components"))
     implementation(project(":feature:transfers:transfers"))
     implementation(project(":feature:transfers:transfers-snowflake-components"))
     implementation(project(":feature:payment:payment-snowflake-components"))

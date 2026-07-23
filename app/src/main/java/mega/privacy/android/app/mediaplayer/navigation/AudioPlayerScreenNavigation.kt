@@ -3,6 +3,9 @@ package mega.privacy.android.app.mediaplayer.navigation
 import android.os.Parcelable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.EntryProviderScope
@@ -19,6 +22,7 @@ import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsA
 import mega.privacy.android.core.nodecomponents.sheet.options.DarkNodeOptionsBottomSheetNavKey
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
+import mega.privacy.android.feature.mediaplayer.components.PlaybackSpeedBottomSheet
 import mega.privacy.android.navigation.contract.NavigationHandler
 
 /**
@@ -72,6 +76,7 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
         )
 
         val isPodcastMode by viewModel.isPodcastMode.collectAsStateWithLifecycle()
+        var showSpeedSheet by remember { mutableStateOf(false) }
 
         AudioPlayerScreen(
             uiState = uiState,
@@ -92,9 +97,22 @@ internal fun EntryProviderScope<NavKey>.audioPlayerScreen(
             onToggleMode = viewModel::togglePlayerMode,
             onSeekForward15 = viewModel::seekForward15,
             onSeekBackward15 = viewModel::seekBackward15,
-            onSpeedClicked = {},
+            onSpeedClicked = { showSpeedSheet = true },
             onSleepTimerClicked = {},
         )
+
+        if (showSpeedSheet) {
+            val currentSpeed = (uiState as? AudioPlayerUiState.Data)?.currentPlaybackSpeed ?: 1f
+            PlaybackSpeedBottomSheet(
+                currentSpeed = currentSpeed,
+                isDark = true, // audio player UI is always dark-themed
+                onSpeedSelected = { speed ->
+                    viewModel.setPlaybackSpeed(speed)
+                    showSpeedSheet = false
+                },
+                onDismiss = { showSpeedSheet = false },
+            )
+        }
     }
 }
 
