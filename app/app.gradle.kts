@@ -440,6 +440,12 @@ dependencies {
     }
     androidTestImplementation(testlib.espresso.intents)
     androidTestImplementation(testlib.compose.junit)
+    androidTestImplementation(project(":data-test"))
+    androidTestImplementation(lib.logging.timber)
+    androidTestImplementation(androidx.work.test)
+    androidTestImplementation(androidx.hilt.work)
+    androidTestImplementation(testlib.uiautomator)
+    androidTestImplementation(project(":core:analytics:analytics-tracker"))
 
     kspAndroidTest(google.hilt.android.compiler)
     debugImplementation(androidx.fragment.test)
