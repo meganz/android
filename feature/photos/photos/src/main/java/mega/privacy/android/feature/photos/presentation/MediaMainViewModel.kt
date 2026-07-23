@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.feature_flags.AppFeatures
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,7 +26,7 @@ class MediaMainViewModel @Inject constructor(
     private fun getTimelineRevampFlag() {
         viewModelScope.launch {
             runCatching {
-                val isEnabled = getFeatureFlagValueUseCase(AppFeatures.TimelineRevamp)
+                val isEnabled = getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)
                 uiState.update {
                     it.copy(isTimelineRevampEnabled = isEnabled)
                 }

@@ -29,6 +29,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -48,7 +49,6 @@ import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTime
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
-import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeCompactSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeDefaultSelectedEvent
 import mega.privacy.mobile.analytics.event.MediaScreenGridSizeLargeSelectedEvent
@@ -125,7 +125,7 @@ class TimelineTabViewModel @Inject constructor(
         flow {
             // When revamp flag is on, we prevent monitorPhotos() because this is a heavy operation
             val isRevampEnabled = runCatching {
-                getFeatureFlagValueUseCase(AppFeatures.TimelineRevamp)
+                getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)
             }.getOrDefault(false)
             if (!isRevampEnabled) {
                 emitAll(monitorPhotos().distinctUntilChanged())

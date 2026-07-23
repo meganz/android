@@ -325,6 +325,15 @@ enum class ApiFeatures(
         experimentName = "svms",
         description = "Enable the Sorting and view mode settings",
         defaultValue = false,
+    ),
+
+    /**
+     * Flag to enable media timeline pagination with fast scroller support
+     */
+    MediaTimelinePagination(
+        experimentName = "amtp",
+        description = "Enable media timeline pagination with fast scroller",
+        defaultValue = false,
     );
 
     companion object : FeatureFlagValueProvider {

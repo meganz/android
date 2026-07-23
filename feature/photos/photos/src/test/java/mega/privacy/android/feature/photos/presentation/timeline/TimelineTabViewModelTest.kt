@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.photos.FilterMediaType
 import mega.privacy.android.domain.entity.photos.FilterMediaType.Companion.toMediaTypeValue
 import mega.privacy.android.domain.entity.photos.TimelinePhotosRequest
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.GetDeviceCurrentTimeUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
@@ -33,7 +34,6 @@ import mega.privacy.android.feature.photos.model.TimelineGridSize
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.TimelineFilterRequest
-import mega.privacy.android.feature_flags.AppFeatures
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -174,7 +174,7 @@ class TimelineTabViewModelTest {
     @Test
     fun `test that uiState does not monitor timeline media when timeline revamp is enabled`() =
         runTest {
-            whenever(getFeatureFlagValueUseCase(AppFeatures.TimelineRevamp)) doReturn true
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.MediaTimelinePagination)) doReturn true
 
             underTest.uiState.test {
                 assertThat(awaitItem().displayedPhotos).isEmpty()

@@ -142,14 +142,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     CloudExplorer(
         "Enable Cloud explorer revamp with ComposeUI and single activity",
         false
-    ),
-
-    /**
-     * Feature flag to control the timeline pagination
-     */
-    TimelineRevamp(
-        "Enable pagination and lazy loading in timeline",
-        false
     );
 
     companion object : FeatureFlagValueProvider {
