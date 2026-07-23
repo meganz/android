@@ -858,10 +858,8 @@ class FileProviderActivity : AppCompatActivity(), MegaRequestListenerInterface,
             sb.append(fifthPin?.text)
             sb.append(sixthPin?.text)
             pin = sb.toString()
-            Timber.d("PIN: %s", pin)
             if (!isErrorShown && pin != null) {
                 verify2faProgressBar?.visibility = View.VISIBLE
-                Timber.d("lastEmail: %s lastPasswd: %s", lastEmail, lastPassword)
                 megaApi.multiFactorAuthLogin(
                     lastEmail,
                     lastPassword,
