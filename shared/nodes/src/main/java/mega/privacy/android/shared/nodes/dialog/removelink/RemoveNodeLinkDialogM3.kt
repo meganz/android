@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.dialog.removelink
+package mega.privacy.android.shared.nodes.dialog.removelink
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

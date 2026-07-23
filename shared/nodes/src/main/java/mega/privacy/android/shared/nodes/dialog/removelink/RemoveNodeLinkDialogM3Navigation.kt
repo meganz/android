@@ -1,15 +1,13 @@
-package mega.privacy.android.core.nodecomponents.dialog.removelink
+package mega.privacy.android.shared.nodes.dialog.removelink
 
-import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.compose.ui.window.DialogProperties
 import kotlinx.serialization.Serializable
-import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 
 @Serializable
-data class RemoveNodeLinkDialogNavKey(val nodes: String) : NavKey
+data class RemoveNodeLinkDialogNavKey(val handles: List<Long>) : NavKey
 
 fun EntryProviderScope<NavKey>.removeNodeLinkDialogM3(
     onDismiss: () -> Unit,
@@ -21,10 +19,8 @@ fun EntryProviderScope<NavKey>.removeNodeLinkDialogM3(
             )
         )
     ) { key ->
-        val mapper = remember { NodeHandlesToJsonMapper() }
-
         RemoveNodeLinkDialogM3(
-            nodes = mapper(key.nodes),
+            nodes = key.handles,
             onDismiss = onDismiss,
         )
     }

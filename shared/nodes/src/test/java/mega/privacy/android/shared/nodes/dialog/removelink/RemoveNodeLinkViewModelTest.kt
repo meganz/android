@@ -1,15 +1,14 @@
-package mega.privacy.android.core.nodecomponents.dialog.removelink
+package mega.privacy.android.shared.nodes.dialog.removelink
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.core.nodecomponents.mapper.RemovePublicLinkResultMapper
-import mega.privacy.android.core.sharedcomponents.snackbar.SnackBarHandler
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.ResultCount
 import mega.privacy.android.domain.usecase.node.DisableExportNodesUseCase
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -26,14 +25,14 @@ class RemoveNodeLinkViewModelTest {
 
     private val disableExportNodesUseCase: DisableExportNodesUseCase = mock()
     private val removePublicLinkResultMapper: RemovePublicLinkResultMapper = mock()
-    private val snackBarHandler: SnackBarHandler = mock()
+    private val snackbarEventQueue: SnackbarEventQueue = mock()
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
 
     private val underTest = RemoveNodeLinkViewModel(
         applicationScope = applicationScope,
         disableExportNodesUseCase = disableExportNodesUseCase,
         removePublicLinkResultMapper = removePublicLinkResultMapper,
-        snackBarHandler = snackBarHandler
+        snackbarEventQueue = snackbarEventQueue
     )
 
     private val handles = listOf(
@@ -62,8 +61,7 @@ class RemoveNodeLinkViewModelTest {
         reset(
             disableExportNodesUseCase,
             removePublicLinkResultMapper,
-            snackBarHandler
+            snackbarEventQueue
         )
     }
 }
-

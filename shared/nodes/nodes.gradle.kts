@@ -65,6 +65,7 @@ dependencies {
     implementation(google.guava)
     implementation(androidx.material3)
     implementation(androidx.navigation3.runtime)
+    implementation(androidx.navigation3.ui)
     implementation(lib.coil3)
     implementation(lib.coil.compose)
 

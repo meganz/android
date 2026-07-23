@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkViewModel
+import mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkViewModel
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.shared.original.core.ui.theme.OriginalTheme
@@ -17,7 +17,7 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param modifier [Modifier]
  * @param nodesList
  * @param onDismiss
- * @param viewModel [mega.privacy.android.core.nodecomponents.dialog.removelink.RemoveNodeLinkViewModel]
+ * @param viewModel [mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkViewModel]
  */
 @Composable
 fun RemoveNodeLinkDialog(

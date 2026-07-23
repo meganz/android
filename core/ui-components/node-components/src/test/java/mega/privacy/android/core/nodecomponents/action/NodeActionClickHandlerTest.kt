@@ -126,6 +126,7 @@ import mega.privacy.android.navigation.destination.FileInfoNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
+import mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkDialogNavKey
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.After
 import org.junit.Before
@@ -1536,20 +1537,22 @@ class NodeActionClickHandlerTest {
     // RemoveLinkAction Tests
     @Test
     fun `test RemoveLinkAction canHandle returns true for RemoveLinkMenuAction`() {
-        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
+        val action = RemoveLinkActionClickHandler()
         val menuAction = mock<RemoveLinkMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
     }
 
     @Test
-    fun `test RemoveLinkAction single node handle calls nodeHandlesToJsonMapper`() {
-        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
+    fun `test that RemoveLinkAction single node handle navigates via RemoveNodeLinkDialogNavKey`() {
+        val action = RemoveLinkActionClickHandler()
         val menuAction = mock<RemoveLinkMenuAction>()
 
-        whenever(mockNodeHandlesToJsonMapper(anyList())).thenReturn("test")
-
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockSingleNodeActionProvider.viewModel).navigateWithNavKey(
+            RemoveNodeLinkDialogNavKey(handles = listOf(123L))
+        )
     }
 
     // GetLinkAction Tests
@@ -1819,16 +1822,16 @@ class NodeActionClickHandlerTest {
 
     // RemoveLinkAction Tests (already exists, but adding multiple nodes test)
     @Test
-    fun `test RemoveLinkAction multiple nodes handle calls nodeHandlesToJsonMapper`() {
-        val action = RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper)
+    fun `test that RemoveLinkAction multiple nodes handle navigates via RemoveNodeLinkDialogNavKey`() {
+        val action = RemoveLinkActionClickHandler()
         val menuAction = mock<RemoveLinkMenuAction>()
         val nodes = listOf(mockFileNode, mockFolderNode)
 
-        whenever(mockNodeHandlesToJsonMapper(anyList())).thenReturn("test")
-
         action.handle(menuAction, nodes, mockMultipleNodesActionProvider)
 
-        verify(mockNodeHandlesToJsonMapper).invoke(listOf(123L, 456L))
+        verify(mockMultipleNodesActionProvider.viewModel).navigateWithNavKey(
+            RemoveNodeLinkDialogNavKey(handles = listOf(123L, 456L))
+        )
     }
 
     // SendToChatAction Tests (already exists, but adding multiple nodes test for completeness)
@@ -1967,7 +1970,7 @@ class NodeActionClickHandlerTest {
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(RemoveShareActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
-        assertThat(RemoveLinkActionClickHandler(mockNodeHandlesToJsonMapper).canHandle(wrongAction)).isFalse()
+        assertThat(RemoveLinkActionClickHandler().canHandle(wrongAction)).isFalse()
         assertThat(GetLinkActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
         assertThat(UnhideActionClickHandler(mockIsHiddenNodesOnboardedUseCase).canHandle(wrongAction)).isFalse()
         assertThat(

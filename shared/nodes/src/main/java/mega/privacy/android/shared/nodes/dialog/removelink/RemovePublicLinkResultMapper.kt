@@ -1,4 +1,4 @@
-package mega.privacy.android.core.nodecomponents.mapper
+package mega.privacy.android.shared.nodes.dialog.removelink
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
