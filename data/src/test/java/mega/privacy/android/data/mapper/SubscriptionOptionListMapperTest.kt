@@ -28,6 +28,8 @@ internal class SubscriptionOptionListMapperTest {
         on { getAndroidID(0) }.thenReturn("com.mega.pro1.monthly")
         on { hasMobileOffers(0) }.thenReturn(false)
         on { getMobileOfferLabel(0) }.thenReturn("World Backup Day Sale")
+        on { getMobileOfferExpiryTimestamp(0) }.thenReturn(1787464050)
+        on { getMobileOfferFlags(0) }.thenReturn(5)
     }
 
     private val currency = mock<MegaCurrency> {
@@ -51,6 +53,8 @@ internal class SubscriptionOptionListMapperTest {
         sku = "com.mega.pro1.monthly",
         hasOffer = false,
         discountName = "World Backup Day Sale",
+        offerValidUntil = 1787464050,
+        offerFlags = 5,
     )
 
     private val underTest = SubscriptionOptionListMapper(
@@ -61,8 +65,26 @@ internal class SubscriptionOptionListMapperTest {
     @Test
     fun `test that subscription option is mapped correctly to the list of subscription options`() {
         whenever(accountTypeMapper(1)).thenReturn(subscriptionOption.accountType)
+        whenever(pricing.getMobileOfferExpiryTimestamp(0)).thenReturn(1787464050)
+        whenever(pricing.getMobileOfferFlags(0)).thenReturn(5)
         val actual = underTest(request)
         assertThat(actual.size).isEqualTo(1)
         assertThat(actual).isEqualTo(listOf(subscriptionOption))
+    }
+
+    @Test
+    fun `test that offerValidUntil is null when the mobile offer has no expiry`() {
+        whenever(accountTypeMapper(1)).thenReturn(subscriptionOption.accountType)
+        whenever(pricing.getMobileOfferExpiryTimestamp(0)).thenReturn(0)
+        val actual = underTest(request)
+        assertThat(actual.single().offerValidUntil).isNull()
+    }
+
+    @Test
+    fun `test that offerFlags is null when the mobile offer has no flags`() {
+        whenever(accountTypeMapper(1)).thenReturn(subscriptionOption.accountType)
+        whenever(pricing.getMobileOfferFlags(0)).thenReturn(0)
+        val actual = underTest(request)
+        assertThat(actual.single().offerFlags).isNull()
     }
 }

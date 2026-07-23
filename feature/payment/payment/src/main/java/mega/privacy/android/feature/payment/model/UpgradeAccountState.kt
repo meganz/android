@@ -25,8 +25,8 @@ import kotlin.time.Duration.Companion.seconds
  * A plan that has both a start and an expiry time is a one-off (non-recurring) purchase.
  * @property isCurrentPlanExpiring whether the current plan expires within the next 30 days, driving the
  * "Expiring" badge on the current plan card
- * @property offerValidUntil expiry timestamp of the active discount offer in seconds, null when there is no
- * time-limited offer. Drives the offer countdown; currently always null until surfaced from the SDK/backend.
+ * @property offerValidUntil expiry timestamp of the active discount offer in seconds (utqa "mo.e"), null when
+ * there is no time-limited discount offer. Drives the revamp offer-header countdown.
  * @constructor Create default Upgrade Account state
  */
 data class UpgradeAccountState(

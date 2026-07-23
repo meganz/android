@@ -47,6 +47,8 @@ class SubscriptionMapper @Inject constructor(
             offerPeriod = offerDetail?.offerPeriod,
             sku = plan.sku,
             discountName = plan.discountName,
+            offerValidUntil = plan.offerValidUntil,
+            offerFlags = plan.offerFlags,
         )
     }
 }

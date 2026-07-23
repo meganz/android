@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.AccountSubscriptionCycle
-import mega.privacy.android.domain.entity.SubscriptionStatus
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.billing.Pricing
 import mega.privacy.android.domain.exception.LocalPricingNotAvailableException
@@ -28,6 +27,7 @@ import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
 import mega.privacy.android.domain.usecase.billing.IsSubscriptionFeatureAvailableUseCase
 import mega.privacy.android.domain.usecase.environment.GetCurrentTimeInMillisUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.UpgradeAccountState
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
 import mega.privacy.android.feature.payment.presentation.upgrade.UpgradeAccountViewModel.Companion.EXPIRING_SOON_THRESHOLD
@@ -119,7 +119,12 @@ class UpgradeAccountViewModel @AssistedInject constructor(
                         subscription.monthlySubscription?.amount?.value
                             ?: subscription.yearlySubscription?.amount?.value?.let { it / 12 }
                     }
-                    _state.update { it.copy(localisedSubscriptionsList = localisedSubscriptions) }
+                    _state.update {
+                        it.copy(
+                            localisedSubscriptionsList = localisedSubscriptions,
+                            offerValidUntil = resolveOfferValidUntil(localisedSubscriptions),
+                        )
+                    }
                 }.onFailure { error ->
                     Timber.w(error, "Failed to get subscriptions")
                     if (error is LocalPricingNotAvailableException) {
@@ -128,6 +133,19 @@ class UpgradeAccountViewModel @AssistedInject constructor(
                 }
         }
     }
+
+    /**
+     * Resolves the offer-countdown expiry (utqa "mo.e") that drives the revamp offer header
+     * countdown. Only discounted plans are considered, matching how the offer content is selected;
+     * the timestamps are campaign-wide, so the latest is used when plans disagree. Returns null when
+     * no discounted plan carries an expiry, which hides the countdown.
+     */
+    private fun resolveOfferValidUntil(subscriptions: List<LocalisedSubscription>): Long? =
+        subscriptions
+            .flatMap { listOfNotNull(it.monthlySubscription, it.yearlySubscription) }
+            .filter { it.hasOffer }
+            .mapNotNull { it.offerValidUntil }
+            .maxOrNull()
 
     /**
      * Load current subscription plan information.

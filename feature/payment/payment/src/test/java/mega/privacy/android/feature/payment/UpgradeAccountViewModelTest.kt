@@ -845,6 +845,43 @@ class UpgradeAccountViewModelTest {
         }
 
 
+    @Test
+    fun `test that offerValidUntil is populated from the discounted offer expiry`() = runTest {
+        val offerExpiry = 1_787_464_050L
+        val offerSubscription = subscriptionProIMonthly.copy(
+            offerValidUntil = offerExpiry,
+            discountedAmountMonthly = CurrencyAmount(5.99f, Currency("EUR")),
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(listOf(offerSubscription), emptyList())
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel(isUpgradeAccount = false)
+        underTest.state.map { it.offerValidUntil }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(offerExpiry)
+        }
+    }
+
+    @Test
+    fun `test that offerValidUntil is null when the plan has an expiry but no discount`() = runTest {
+        val offerSubscription = subscriptionProIMonthly.copy(
+            offerValidUntil = 1_787_464_050L,
+            discountedAmountMonthly = null,
+        )
+        whenever(getPricing(any())).thenReturn(Pricing(emptyList()))
+        whenever(getSubscriptionsUseCase()).thenReturn(
+            Subscriptions(listOf(offerSubscription), emptyList())
+        )
+        wheneverBlocking { getFeatureFlagValueUseCase(any()) }.thenReturn(false)
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.AgeSignalsCheckEnabled)).thenReturn(false)
+        initViewModel(isUpgradeAccount = false)
+        underTest.state.map { it.offerValidUntil }.test {
+            Truth.assertThat(awaitItem()).isNull()
+        }
+    }
+
     private val subscriptionProIMonthly = Subscription(
         sku = "mega.android.pro1.onemonth",
         accountType = AccountType.PRO_I,

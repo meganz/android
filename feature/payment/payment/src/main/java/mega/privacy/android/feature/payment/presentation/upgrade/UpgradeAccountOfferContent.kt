@@ -38,6 +38,7 @@ import mega.privacy.android.shared.resources.R as sharedR
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * The [LocalisedSubscription]s that carry an active discount for [isMonthly] and are not the user's
@@ -307,7 +308,7 @@ private fun OfferCountdownSection(validUntil: Long?, locale: Locale) {
         while (true) {
             now = System.currentTimeMillis()
             if (validUntil * 1000L - now <= 0L) break
-            delay(60_000L)
+            delay(30.seconds)
         }
     }
     val remainingMillis = validUntil * 1000L - now

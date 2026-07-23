@@ -31,6 +31,10 @@ internal class SubscriptionOptionListMapper @Inject constructor(
             currency = currencyMapper(request.currency.currencyName.orEmpty()),
             hasOffer = request.pricing.hasMobileOffers(it),
             discountName = request.pricing.getMobileOfferLabel(it),
+            offerValidUntil = request.pricing.getMobileOfferExpiryTimestamp(it)
+                .takeIf { expiry -> expiry > 0 },
+            offerFlags = request.pricing.getMobileOfferFlags(it)
+                .takeIf { flags -> flags > 0 },
         )
     }
 }
