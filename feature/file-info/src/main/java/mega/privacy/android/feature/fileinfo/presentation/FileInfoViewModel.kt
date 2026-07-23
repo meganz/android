@@ -224,11 +224,13 @@ internal class FileInfoViewModel @AssistedInject constructor(
                 ?.dropLast(1) // the node's own name
                 .orEmpty()
                 .let { segments ->
-                    // Incoming-share paths prefix the share root with the owner "email:".
-                    if (sourceType == NodeSourceType.INCOMING_SHARES) {
-                        segments.stripOwnerEmailPrefix()
-                    } else {
-                        segments
+                    when (sourceType) {
+                        // Incoming-share paths prefix the share root with the owner "email:".
+                        NodeSourceType.INCOMING_SHARES -> segments.stripOwnerEmailPrefix()
+                        // Rubbish-bin paths start with the SDK "//bin" root marker, which the
+                        // localized "Rubbish bin" root label already represents.
+                        NodeSourceType.RUBBISH_BIN -> segments.stripRubbishBinRoot()
+                        else -> segments
                     }
                 }
                 .filter { it.isNotBlank() }
@@ -319,6 +321,9 @@ internal class FileInfoViewModel @AssistedInject constructor(
                 drop(1)
     }
 
+    private fun List<String>.stripRubbishBinRoot(): List<String> =
+        if (firstOrNull() == RUBBISH_BIN_PATH_ROOT) drop(1) else this
+
     /**
      * Creates, updates, or clears (empty string) the node description. The change is reflected back
      * in state through [monitorNodeUpdates].
@@ -335,3 +340,6 @@ internal class FileInfoViewModel @AssistedInject constructor(
         fun create(nodeHandle: Long): FileInfoViewModel
     }
 }
+
+// The MEGA SDK reports rubbish-bin paths under the "//bin" root marker.
+private const val RUBBISH_BIN_PATH_ROOT = "bin"

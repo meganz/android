@@ -371,6 +371,52 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
+    fun `test that the bin root marker is stripped from the rubbish bin location folders`() =
+        runTest {
+            val node = mockFileNode()
+            val nodeLocation = NodeLocation(
+                node = node,
+                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                ancestorIds = listOf(NodeId(10L)),
+            )
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(getNodePathByIdUseCase(NodeId(NODE_HANDLE)))
+                .thenReturn("//bin/Marketing/file.txt")
+            whenever(getNodeLocationByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(nodeLocation)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            with(underTest.uiState.value) {
+                assertThat(nodeSourceType).isEqualTo(NodeSourceType.RUBBISH_BIN)
+                assertThat(locationFolders).containsExactly("Marketing").inOrder()
+            }
+        }
+
+    @Test
+    fun `test that the location folders are empty for a node directly in the rubbish bin`() =
+        runTest {
+            val node = mockFileNode()
+            val nodeLocation = NodeLocation(
+                node = node,
+                nodeSourceType = NodeSourceType.RUBBISH_BIN,
+                ancestorIds = emptyList(),
+            )
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+            whenever(getNodePathByIdUseCase(NodeId(NODE_HANDLE)))
+                .thenReturn("//bin/file.txt")
+            whenever(getNodeLocationByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(nodeLocation)
+
+            initViewModel()
+            advanceUntilIdle()
+
+            with(underTest.uiState.value) {
+                assertThat(nodeSourceType).isEqualTo(NodeSourceType.RUBBISH_BIN)
+                assertThat(locationFolders).isEmpty()
+            }
+        }
+
+    @Test
     fun `test that the source type is null when the location cannot be resolved`() =
         runTest {
             val node = mockFileNode()
