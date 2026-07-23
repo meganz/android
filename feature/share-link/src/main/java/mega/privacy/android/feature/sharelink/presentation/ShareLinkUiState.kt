@@ -26,6 +26,18 @@ sealed interface ShareLinkUiState {
     data object Error : ShareLinkUiState
 
     /**
+     * The selection contains hidden/sensitive nodes; the export is held while a warning dialog is
+     * shown. Confirming resumes the export, cancelling abandons it.
+     *
+     * @property type Which hidden-items warning to show.
+     * @property nodeCount Number of nodes being shared, for the warning's singular/plural copy.
+     */
+    data class SensitiveWarning(
+        val type: SensitiveWarningType,
+        val nodeCount: Int,
+    ) : ShareLinkUiState
+
+    /**
      * Loaded state with the shared nodes and their public links.
      *
      * @property nodeLinks One entry per shared node, in selection order.
@@ -72,6 +84,18 @@ sealed interface ShareLinkUiState {
  * @property linkWithoutKey The public link with the decryption key stripped, or null.
  * @property key The decryption key split from the link, or null.
  */
+/**
+ * The kind of hidden/sensitive-items warning to show before creating links, mirroring the legacy
+ * get-link flow. [Items] wins over [Folder] when a selection triggers both.
+ */
+enum class SensitiveWarningType {
+    /** One or more selected nodes are themselves hidden (or inherit hidden). */
+    Items,
+
+    /** A selected folder contains hidden descendants. */
+    Folder,
+}
+
 @Stable
 data class ShareLinkNodeItem(
     val handle: Long,

@@ -7,8 +7,11 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -19,7 +22,10 @@ import mega.privacy.android.feature.sharelink.session.ShareLinkSeparateKeyCache
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
@@ -45,9 +51,18 @@ class ShareLinkViewModel @AssistedInject constructor(
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
     private val splitLinkAndKeyUseCase: SplitLinkAndKeyUseCase,
     private val fileTypeIconMapper: FileTypeIconMapper,
+    private val hasSensitiveInheritedUseCase: HasSensitiveInheritedUseCase,
+    private val hasSensitiveDescendantUseCase: HasSensitiveDescendantUseCase,
     private val passwordCache: ShareLinkPasswordCache,
     private val separateKeyCache: ShareLinkSeparateKeyCache,
 ) : ViewModel() {
+
+    /**
+     * Resume latch for the hidden-items warning: the load suspends here after emitting
+     * [ShareLinkUiState.SensitiveWarning] and resumes when the user confirms (true) or cancels
+     * (false). Internal plumbing, not UI state.
+     */
+    private val exportApproval = MutableStateFlow<Boolean?>(null)
 
     /**
      * Share link UI state.
@@ -100,6 +115,12 @@ class ShareLinkViewModel @AssistedInject constructor(
             val nodes = args.handles.mapNotNull { handle -> getNodeByIdUseCase(NodeId(handle)) }
             if (nodes.isEmpty()) error("No nodes found for ${args.handles}")
 
+            sensitiveWarningFor(nodes)?.let { warning ->
+                emit(ShareLinkUiState.SensitiveWarning(warning, args.handles.size))
+                val approved = exportApproval.filterNotNull().first()
+                if (!approved) return@runCatching null
+            }
+
             val pendingHandles = nodes
                 .filter { it.exportedData?.publicLink.isNullOrEmpty() }
                 .map { it.id.longValue }
@@ -129,15 +150,50 @@ class ShareLinkViewModel @AssistedInject constructor(
                 )
             }
         }.onSuccess { nodeLinks ->
-            if (nodeLinks.isEmpty()) {
-                emit(ShareLinkUiState.Error)
-            } else {
-                emit(ShareLinkUiState.Data(nodeLinks = nodeLinks, accountType = null))
+            when {
+                nodeLinks == null -> Unit // Sensitive-items warning cancelled; the screen navigates back.
+                nodeLinks.isEmpty() -> emit(ShareLinkUiState.Error)
+                else -> emit(ShareLinkUiState.Data(nodeLinks = nodeLinks, accountType = null))
             }
         }.onFailure { throwable ->
             Timber.e(throwable, "Failed to load or create the share links")
             emit(ShareLinkUiState.Error)
         }
+    }
+
+    /**
+     * Determines whether the [nodes] about to be exported need a hidden/sensitive-items warning.
+     * Mirrors the legacy get-link check: an already-exported node is skipped; a node that is itself
+     * hidden (or inherits hidden) triggers [SensitiveWarningType.Items] (which wins), and a folder
+     * with hidden descendants triggers [SensitiveWarningType.Folder].
+     */
+    private suspend fun sensitiveWarningFor(nodes: List<TypedNode>): SensitiveWarningType? {
+        var warning: SensitiveWarningType? = null
+        for (node in nodes) {
+            if (node.exportedData != null) continue
+            when {
+                node.isMarkedSensitive || hasSensitiveInheritedUseCase(node.id) ->
+                    return SensitiveWarningType.Items
+
+                node is FolderNode && hasSensitiveDescendantUseCase(node.id) ->
+                    warning = SensitiveWarningType.Folder
+            }
+        }
+        return warning
+    }
+
+    /**
+     * Confirms the hidden-items warning; the held export proceeds.
+     */
+    fun onSensitiveWarningConfirmed() {
+        exportApproval.value = true
+    }
+
+    /**
+     * Dismisses the hidden-items warning; the export is abandoned and the screen navigates back.
+     */
+    fun onSensitiveWarningDismissed() {
+        exportApproval.value = false
     }
 
     /**

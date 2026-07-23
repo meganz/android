@@ -50,6 +50,11 @@ fun EntryProviderScope<NavKey>.shareLinkScreen(
 
             ShareLinkScreen(
                 uiState = uiState,
+                onSensitiveWarningConfirmed = viewModel::onSensitiveWarningConfirmed,
+                onSensitiveWarningDismissed = {
+                    viewModel.onSensitiveWarningDismissed()
+                    navigationHandler.back()
+                },
                 onBack = navigationHandler::back,
                 onOpenSettings = {
                     navigationHandler.navigate(LinkSettingsNavKey(handles = key.handles))

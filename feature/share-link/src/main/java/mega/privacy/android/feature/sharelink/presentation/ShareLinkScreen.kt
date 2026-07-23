@@ -41,6 +41,7 @@ import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.banner.InlineInfoBanner
 import mega.android.core.ui.components.button.AnchoredButtonGroup
+import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.divider.SubtleDivider
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -70,6 +71,8 @@ import mega.privacy.android.shared.resources.R as sharedR
  * @param onCopyKey Invoked when the copy icon on the separate key card is tapped.
  * @param onLinksCopied Invoked once when the multi-node screen opens and all links have been
  * copied to the clipboard automatically.
+ * @param onSensitiveWarningConfirmed Invoked when the user confirms the hidden-items warning.
+ * @param onSensitiveWarningDismissed Invoked when the user cancels the hidden-items warning.
  * @param modifier Modifier for the scaffold.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +85,8 @@ fun ShareLinkScreen(
     onCopyLink: () -> Unit,
     onCopyKey: () -> Unit,
     onLinksCopied: () -> Unit = {},
+    onSensitiveWarningConfirmed: () -> Unit = {},
+    onSensitiveWarningDismissed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val linkCount = (uiState as? ShareLinkUiState.Data)?.handles?.size ?: 1
@@ -129,6 +134,16 @@ fun ShareLinkScreen(
             when (uiState) {
                 ShareLinkUiState.Loading -> ShareLinkLoading()
                 ShareLinkUiState.Error -> ShareLinkError()
+                is ShareLinkUiState.SensitiveWarning -> {
+                    ShareLinkLoading()
+                    SensitiveItemsWarningDialog(
+                        type = uiState.type,
+                        nodeCount = uiState.nodeCount,
+                        onConfirm = onSensitiveWarningConfirmed,
+                        onDismiss = onSensitiveWarningDismissed,
+                    )
+                }
+
                 is ShareLinkUiState.Data -> if (uiState.isMultiNode) {
                     MultiNodeContent(
                         uiState = uiState,
@@ -146,6 +161,38 @@ fun ShareLinkScreen(
         }
     }
 
+}
+
+@Composable
+private fun SensitiveItemsWarningDialog(
+    type: SensitiveWarningType,
+    nodeCount: Int,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val description = when (type) {
+        SensitiveWarningType.Items -> if (nodeCount > 1) {
+            sharedR.string.share_hidden_item_links_description
+        } else {
+            sharedR.string.share_hidden_item_link_description
+        }
+
+        SensitiveWarningType.Folder -> if (nodeCount > 1) {
+            sharedR.string.share_hidden_folders_description
+        } else {
+            sharedR.string.share_hidden_folder_description
+        }
+    }
+    BasicDialog(
+        modifier = Modifier.testTag(SHARE_LINK_SENSITIVE_WARNING_TAG),
+        title = stringResource(sharedR.string.hidden_items),
+        description = stringResource(description),
+        positiveButtonText = stringResource(sharedR.string.button_continue),
+        onPositiveButtonClicked = onConfirm,
+        negativeButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
+        onNegativeButtonClicked = onDismiss,
+        onDismiss = onDismiss,
+    )
 }
 
 @Composable
@@ -529,6 +576,7 @@ internal const val SHARE_LINK_APP_BAR_TAG = "share_link_screen:app_bar"
 internal const val SHARE_LINK_SHARE_BUTTON_TAG = "share_link_screen:button_share"
 internal const val SHARE_LINK_NODE_HEADER_TAG = "share_link_screen:node_header"
 internal const val SHARE_LINK_MULTI_NODE_LIST_TAG = "share_link_screen:multi_node_list"
+internal const val SHARE_LINK_SENSITIVE_WARNING_TAG = "share_link_screen:sensitive_warning"
 internal const val SHARE_LINK_ACCESS_BANNER_TAG = "share_link_screen:access_banner"
 internal const val SHARE_LINK_LOADING_TAG = "share_link_screen:loading"
 internal const val SHARE_LINK_ERROR_TAG = "share_link_screen:error"

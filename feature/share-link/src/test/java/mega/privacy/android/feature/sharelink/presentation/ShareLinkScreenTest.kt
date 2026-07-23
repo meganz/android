@@ -257,6 +257,72 @@ class ShareLinkScreenTest {
         assertThat(clipboard.clipEntry?.clipData?.getItemAt(0)?.text).isEqualTo(data.primary.key)
     }
 
+    @Test
+    fun `test that the sensitive-items warning dialog is shown for the SensitiveWarning state`() {
+        setContent(uiState = ShareLinkUiState.SensitiveWarning(SensitiveWarningType.Items, 1))
+
+        composeRule.onNodeWithTag(SHARE_LINK_SENSITIVE_WARNING_TAG).assertIsDisplayed()
+        composeRule.onNodeWithText(context.getString(sharedR.string.hidden_items)).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the sensitive-items warning is absent in the Loading state`() {
+        setContent(uiState = ShareLinkUiState.Loading)
+
+        composeRule.onNodeWithTag(SHARE_LINK_SENSITIVE_WARNING_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that confirming the sensitive-items warning invokes onSensitiveWarningConfirmed`() {
+        var confirmed = false
+        setContent(
+            uiState = ShareLinkUiState.SensitiveWarning(SensitiveWarningType.Items, 1),
+            onSensitiveWarningConfirmed = { confirmed = true },
+        )
+
+        composeRule.onNodeWithText(context.getString(sharedR.string.button_continue)).performClick()
+
+        assertThat(confirmed).isTrue()
+    }
+
+    @Test
+    fun `test that cancelling the sensitive-items warning invokes onSensitiveWarningDismissed`() {
+        var dismissed = false
+        setContent(
+            uiState = ShareLinkUiState.SensitiveWarning(SensitiveWarningType.Items, 1),
+            onSensitiveWarningDismissed = { dismissed = true },
+        )
+
+        composeRule.onNodeWithText(context.getString(sharedR.string.general_dialog_cancel_button))
+            .performClick()
+
+        assertThat(dismissed).isTrue()
+    }
+
+    @Test
+    fun `test that the single-item warning uses the singular description`() {
+        setContent(uiState = ShareLinkUiState.SensitiveWarning(SensitiveWarningType.Items, 1))
+
+        composeRule.onNodeWithText(context.getString(sharedR.string.share_hidden_item_link_description))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the multi-item warning uses the plural description`() {
+        setContent(uiState = ShareLinkUiState.SensitiveWarning(SensitiveWarningType.Items, 3))
+
+        composeRule.onNodeWithText(context.getString(sharedR.string.share_hidden_item_links_description))
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that the folder warning uses the folder description`() {
+        setContent(uiState = ShareLinkUiState.SensitiveWarning(SensitiveWarningType.Folder, 1))
+
+        composeRule.onNodeWithText(context.getString(sharedR.string.share_hidden_folder_description))
+            .assertIsDisplayed()
+    }
+
     private fun setContent(
         uiState: ShareLinkUiState,
         onBack: () -> Unit = {},
@@ -265,6 +331,8 @@ class ShareLinkScreenTest {
         onCopyLink: () -> Unit = {},
         onCopyKey: () -> Unit = {},
         onLinksCopied: () -> Unit = {},
+        onSensitiveWarningConfirmed: () -> Unit = {},
+        onSensitiveWarningDismissed: () -> Unit = {},
         clipboard: Clipboard = FakeClipboard(),
     ) {
         composeRule.setContent {
@@ -277,6 +345,8 @@ class ShareLinkScreenTest {
                     onCopyLink = onCopyLink,
                     onCopyKey = onCopyKey,
                     onLinksCopied = onLinksCopied,
+                    onSensitiveWarningConfirmed = onSensitiveWarningConfirmed,
+                    onSensitiveWarningDismissed = onSensitiveWarningDismissed,
                 )
             }
         }

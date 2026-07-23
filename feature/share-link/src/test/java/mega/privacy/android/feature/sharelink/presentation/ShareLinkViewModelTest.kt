@@ -18,6 +18,8 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
+import mega.privacy.android.domain.usecase.HasSensitiveInheritedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -48,6 +51,8 @@ class ShareLinkViewModelTest {
     private val monitorAccountDetailUseCase = mock<MonitorAccountDetailUseCase>()
     private val splitLinkAndKeyUseCase = mock<SplitLinkAndKeyUseCase>()
     private val fileTypeIconMapper = mock<FileTypeIconMapper>()
+    private val hasSensitiveInheritedUseCase = mock<HasSensitiveInheritedUseCase>()
+    private val hasSensitiveDescendantUseCase = mock<HasSensitiveDescendantUseCase>()
     private val passwordCache = mock<ShareLinkPasswordCache>()
     private val separateKeyCache = mock<ShareLinkSeparateKeyCache>()
 
@@ -58,6 +63,8 @@ class ShareLinkViewModelTest {
         whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
         whenever(passwordCache.monitor(any())).thenReturn(flowOf(null))
         whenever(separateKeyCache.monitor(any())).thenReturn(flowOf(false))
+        whenever { hasSensitiveInheritedUseCase(any()) }.thenReturn(false)
+        whenever { hasSensitiveDescendantUseCase(any()) }.thenReturn(false)
         underTest = buildViewModel(listOf(NODE_HANDLE))
     }
 
@@ -68,6 +75,8 @@ class ShareLinkViewModelTest {
         monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         splitLinkAndKeyUseCase = splitLinkAndKeyUseCase,
         fileTypeIconMapper = fileTypeIconMapper,
+        hasSensitiveInheritedUseCase = hasSensitiveInheritedUseCase,
+        hasSensitiveDescendantUseCase = hasSensitiveDescendantUseCase,
         passwordCache = passwordCache,
         separateKeyCache = separateKeyCache,
     )
@@ -80,6 +89,8 @@ class ShareLinkViewModelTest {
             monitorAccountDetailUseCase,
             splitLinkAndKeyUseCase,
             fileTypeIconMapper,
+            hasSensitiveInheritedUseCase,
+            hasSensitiveDescendantUseCase,
             passwordCache,
             separateKeyCache,
         )
@@ -380,6 +391,136 @@ class ShareLinkViewModelTest {
             assertThat(data.nodeLinks.map { it.name }).containsExactly("a.pdf")
             assertThat(data.isMultiNode).isFalse()
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that a sensitive node holds the export behind a warning until confirmed`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "secret.pdf"
+            on { exportedData } doReturn null
+            on { isMarkedSensitive } doReturn true
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(exportNodesUseCase(listOf(NODE_HANDLE), CALLER_NAME))
+            .thenReturn(mapOf(NODE_HANDLE to "https://mega.nz/file/new#k"))
+
+        underTest.uiState.test {
+            val warning = awaitWarning()
+            assertThat(warning.type).isEqualTo(SensitiveWarningType.Items)
+            verify(exportNodesUseCase, never()).invoke(any(), any())
+
+            underTest.onSensitiveWarningConfirmed()
+
+            assertThat(awaitData()).isInstanceOf(ShareLinkUiState.Data::class.java)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(exportNodesUseCase).invoke(listOf(NODE_HANDLE), CALLER_NAME)
+    }
+
+    @Test
+    fun `test that an inherited-sensitive node triggers the Items warning`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "inherited.pdf"
+            on { exportedData } doReturn null
+            on { isMarkedSensitive } doReturn false
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(hasSensitiveInheritedUseCase(NodeId(NODE_HANDLE))).thenReturn(true)
+
+        underTest.uiState.test {
+            assertThat(awaitWarning().type).isEqualTo(SensitiveWarningType.Items)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that a folder with sensitive descendants triggers the Folder warning`() = runTest {
+        val folder = mock<TypedFolderNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "Documents"
+            on { exportedData } doReturn null
+            on { isMarkedSensitive } doReturn false
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(folder)
+        whenever(hasSensitiveDescendantUseCase(NodeId(NODE_HANDLE))).thenReturn(true)
+
+        underTest.uiState.test {
+            val warning = awaitWarning()
+            assertThat(warning.type).isEqualTo(SensitiveWarningType.Folder)
+            assertThat(warning.nodeCount).isEqualTo(1)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that dismissing the warning abandons the export`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "secret.pdf"
+            on { exportedData } doReturn null
+            on { isMarkedSensitive } doReturn true
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+        underTest.uiState.test {
+            awaitWarning()
+
+            underTest.onSensitiveWarningDismissed()
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(exportNodesUseCase, never()).invoke(any(), any())
+    }
+
+    @Test
+    fun `test that a non-sensitive selection exports without a warning`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "public.pdf"
+            on { exportedData } doReturn null
+            on { isMarkedSensitive } doReturn false
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+        whenever(exportNodesUseCase(listOf(NODE_HANDLE), CALLER_NAME))
+            .thenReturn(mapOf(NODE_HANDLE to "https://mega.nz/file/new#k"))
+
+        underTest.uiState.test {
+            awaitData()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(exportNodesUseCase).invoke(listOf(NODE_HANDLE), CALLER_NAME)
+    }
+
+    @Test
+    fun `test that an already-exported sensitive node does not trigger a warning`() = runTest {
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(NODE_HANDLE)
+            on { name } doReturn "shared.pdf"
+            on { exportedData } doReturn ExportedData("https://mega.nz/file/abc#key123", 0L)
+            on { isMarkedSensitive } doReturn true
+            on { type } doReturn PdfFileTypeInfo
+        }
+        whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+        underTest.uiState.test {
+            assertThat(awaitData().primary.link).isEqualTo("https://mega.nz/file/abc#key123")
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(exportNodesUseCase, never()).invoke(any(), any())
+    }
+
+    private suspend fun ReceiveTurbine<ShareLinkUiState>.awaitWarning(): ShareLinkUiState.SensitiveWarning {
+        while (true) {
+            val item = awaitItem()
+            if (item is ShareLinkUiState.SensitiveWarning) return item
         }
     }
 
