@@ -219,7 +219,7 @@
     <!-- menu item -->
     <string name="file_properties_shared_folder_change_permissions">更改權限</string>
     <!-- when listing all the contacts that shares a folder -->
-    <string name="file_properties_shared_folder_select_contact">共享者</string>
+    <string name="file_properties_shared_folder_select_contact">共享對象</string>
     <!-- shows the owner of an incoming shared folder -->
     <string name="file_properties_owner">擁有者</string>
     <!-- positive button on dialog to invite a contact -->
@@ -1436,7 +1436,7 @@
     <string name="file_properties_folder_previous_versions">之前的版本</string>
     <!-- Number of versioned files inside a folder shown on the screen info of the folder, version items -->
     <plurals name="number_of_versions_inside_folder">
-        <item quantity="other">%1$d個版本檔案</item>
+        <item quantity="other">%1$d個版本化檔案</item>
     </plurals>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">

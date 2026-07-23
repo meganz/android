@@ -2577,14 +2577,14 @@
     <string name="notifications_payment_info_section">Informazioni di pagamento</string>
     <plurals name="general_selection_num_selected">
         <item quantity="one">%1$d selezionato</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">%1$d selezionato</item>
     </plurals>
     <string name="contacts_groups_empty_title">Nessun gruppo</string>
     <string name="public_link_auth_alert_description_external_file">Mantieni questo file al sicuro e accedi a esso in qualsiasi momento.</string>
     <plurals name="notifications_history_updated_items_subtitle">
         <item quantity="one">[A]%1$s [/A][B]aggiornato %2$d elemento.[/B]</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">[A]%1$s [/A][B]aggiornati %2$d elementi.[/B]</item>
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">Cancella cronologia</string>
@@ -2598,12 +2598,12 @@
     <string name="notifications_payment_reminder_expired_section">Il piano Pro è scaduto</string>
     <plurals name="notifications_payment_reminder_will_expire">
         <item quantity="one">Il tuo piano Pro scade tra %1$d giorno</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">Il tuo piano Pro scade tra %1$d giorni</item>
     </plurals>
     <plurals name="notifications_payment_reminder_expired">
         <item quantity="one">Il tuo piano Pro è scaduto %1$d giorno fa</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">Il tuo piano Pro è scaduto %1$d giorni fa</item>
     </plurals>
     <string name="chat_settings_link_preview_summary">Genera un\’anteprima dei link che invii nella chat. Nota che il recupero di queste anteprime non è protetto dalla criptografia a conoscenza zero.</string>
@@ -2748,12 +2748,5 @@
     </plurals>
     <string name="contact_info_retention_time_year">1 anno</string>
     <string name="add_contacts_unverified_contact_warning">Alcuni dei contatti con cui stai condividendo informazioni non sono stati verificati da te. Per aumentare la sicurezza, ti raccomandiamo di verificare le loro credenziali in Contatti. Tocca sui tre pallini affianco il contatto che vuoi verificare e poi tocca su Info.</string>
-    <!-- Warning banner shown in the file info screen when a file has been taken down -->
-    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
-    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
-    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
-    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
-    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
-    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
-    <string name="contacts_qr_scan_action">Scan QR code</string>
+    <string name="contacts_qr_scan_action">Scansiona il codice QR</string>
 </resources>

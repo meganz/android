@@ -2223,15 +2223,15 @@
     <string name="upgrade_account_successful_essential_yearly">Yıllık Essential aboneliğiniz için teşekkür ederiz</string>
     <plurals name="move_node_general_snackbar_fail">
         <item quantity="one">%d öğe taşınamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="move_node_general_snackbar_success">
         <item quantity="one">%d öğe başarıyla taşındı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="move_node_snackbar_concat_success">
         <item quantity="one">%d öğe başarıyla taşındı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="move_node_snackbar_concat_fail">
         <item quantity="one">%d öğe taşınamadı</item>
@@ -2239,71 +2239,71 @@
     </plurals>
     <plurals name="count_items_moved_to_rubbish">
         <item quantity="one">%d öğe çöpe taşındı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="count_items_failed_move_to_rubbish">
         <item quantity="one">%d öğe çöpe taşınamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="items_moved_and_one_failed_to_rubbish">
         <item quantity="one">%d öğe çöpe taşındı, 1 öğe taşınamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="one_moved_and_items_failed_to_rubbish">
         <item quantity="one">1 öğe çöpe taşındı, %d öğe taşınamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_success">
         <item quantity="one">%d öğe çöpten kaldırıldı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_fail">
         <item quantity="one">%d öğe çöpten kaldırılamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_concat_success">
         <item quantity="one">%d öğe çöpten kaldırıldı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="rubbish_remove_items_snackbar_concat_fail">
         <item quantity="one">%d öğe çöpten kaldırılamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="copy_node_general_snackbar_fail">
         <item quantity="one">%d öğe kopyalanamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="copy_node_general_snackbar_success">
         <item quantity="one">%d öğe başarıyla kopyalandı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="copy_node_snackbar_concat_success">
         <item quantity="one">%d öğe başarıyla kopyalandı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="copy_node_snackbar_concat_fail">
         <item quantity="one">%d öğe kopyalanamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="cloud_drive_sharing_folder_snackbar_failed">
         <item quantity="one">%d klasör paylaşılamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="cloud_drive_sharing_folder_snackbar_success">
         <item quantity="one">%d klasör başarıyla paylaşıldı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="cloud_drive_sharing_folder_snackbar_concat_failed">
         <item quantity="one">%d klasör paylaşılamadı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="count_items_failed_restore_from_rubbish">
         <item quantity="one">%d öğe çöpten geri yüklenemedi</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="count_items_restored_from_rubbish">
         <item quantity="one">%d öğe çöpten geri yüklendi</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <string name="search_pdf_placeholder">Belgede ara</string>
     <string name="pdf_viewer_search_placeholder">Belgede ara</string>
@@ -2319,11 +2319,11 @@
     <string name="label_file_size_exabytes">%s&#160;EB</string>
     <plurals name="num_of_folders_num_of_files">
         <item quantity="one">%d klasör&#160;·&#160;</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <plurals name="general_num_shared_with_count">
         <item quantity="one">%d kişiyle paylaşıldı</item>
-        <item quantity="other"/>
+        <item quantity="other"></item>
     </plurals>
     <string name="link_password_dialog_message">Bu bağlantıyı açmak için şifreyi girin.\nŞifreniz yok mu? Bağlantı sahibiyle iletişime geçin.</string>
     <string name="pdf_viewer_error_no_network">İnternet bağlantısı yok. Dosyayı açmak için lütfen yeniden bağlanın.</string>
@@ -2697,12 +2697,5 @@
         <item quantity="other">%1$d saat</item>
     </plurals>
     <string name="add_contacts_unverified_contact_warning">Bilgi paylaştığınız bazı kişiler sizin tarafınızdan doğrulanmadı. Ek güvenlik sağlamak için, kimlik bilgilerini kişilerde doğrulamanızı öneririz. Doğrulamak istediğiniz kişinin yanındaki üç noktaya ve ardından Bilgi’ye dokunun.</string>
-    <!-- Warning banner shown in the file info screen when a file has been taken down -->
-    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
-    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
-    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
-    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
-    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
-    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
-    <string name="contacts_qr_scan_action">Scan QR code</string>
+    <string name="contacts_qr_scan_action">QR kodunu tara</string>
 </resources>

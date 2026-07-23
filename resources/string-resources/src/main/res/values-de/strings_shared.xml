@@ -2813,12 +2813,5 @@
     <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">Verwalten Sie Ihr Paket auf [A]mega.io[/A], um mehr Transfervolumen zu erhalten und Ihren Download fortzusetzen</string>
     <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">Verwalten Sie Ihr Paket auf [A]mega.io[/A], um mehr Transfervolumen zu erhalten und die Medienwiedergabe fortzusetzen</string>
     <string name="subscription_quota_contact_support">Support kontaktieren</string>
-    <!-- Warning banner shown in the file info screen when a file has been taken down -->
-    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
-    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
-    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
-    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
-    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
-    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
-    <string name="contacts_qr_scan_action">Scan QR code</string>
+    <string name="contacts_qr_scan_action">QR-Code scannen</string>
 </resources>

@@ -2661,7 +2661,7 @@
         <item quantity="one">تمت إضافة عنصر واحد إلى قائمة التشغيل %1$d</item>
         <item quantity="two">تمت إضافة عنصر واحد إلى قوائم تشغيل %1$d</item>
         <item quantity="few">تمت إضافة عنصر واحد إلى قوائم تشغيل %1$d</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">تمت إضافة عنصر واحد إلى قوائم تشغيل %1$d</item>
     </plurals>
     <string name="rewarded_ad_dialog_title">استمر بعد الإعلان</string>
@@ -2861,7 +2861,7 @@
         <item quantity="one">[A]%1$s [/A][B]تم تحديث %2$d العنصر.[/B]</item>
         <item quantity="two">[A]%1$s [/A][B]تم تحديث %2$d العناصر.[/B]</item>
         <item quantity="few">[A]%1$s [/A][B]تم تحديث %2$d العناصر.[/B]</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">[A]%1$s [/A][B]تم تحديث %2$d العناصر.[/B]</item>
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">مسح السجل</string>
@@ -2875,7 +2875,7 @@
         <item quantity="one">تنتهي خطة Pro خلال %1$d يوم</item>
         <item quantity="two">تنتهي خطة Pro خلال %1$d يومًا</item>
         <item quantity="few">تنتهي خطة Pro خلال %1$d يومًا</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">تنتهي خطة Pro خلال %1$d يومًا</item>
     </plurals>
     <plurals name="notifications_payment_reminder_expired">
@@ -2883,7 +2883,7 @@
         <item quantity="one">انتهت خطة Pro منذ %1$d يوم</item>
         <item quantity="two">انتهت خطة Pro منذ %1$d يومًا</item>
         <item quantity="few">انتهت خطة Pro منذ %1$d يومًا</item>
-        <item quantity="many"/>
+        <item quantity="many"></item>
         <item quantity="other">انتهت خطة Pro منذ %1$d يومًا</item>
     </plurals>
     <string name="chat_settings_link_preview_summary">ينشئ معاينة للروابط التي ترسلها في المحادثة. ملاحظة: استرجاع هذه المعاينات ليس محميًا بتشفير عديم المعرفة.</string>
@@ -3128,12 +3128,5 @@
     </plurals>
     <string name="contact_info_retention_time_year">1 سنة</string>
     <string name="add_contacts_unverified_contact_warning">لم تتحقق من بعض جهات الاتصال التي تشارك المعلومات معها. لضمان أمان إضافي نوصيك بالتحقق من بيانات الاعتماد الخاصة بهم في جهات الاتصال. اضغط على النقاط الثلاث بجوار جهة الاتصال التي تريد التحقق منها وانقر فوق معلومات.</string>
-    <!-- Warning banner shown in the file info screen when a file has been taken down -->
-    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
-    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
-    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
-    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
-    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
-    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
-    <string name="contacts_qr_scan_action">Scan QR code</string>
+    <string name="contacts_qr_scan_action">مسح رمز الاستجابة السريعة QR ضوئياً</string>
 </resources>

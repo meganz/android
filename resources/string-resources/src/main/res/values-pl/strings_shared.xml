@@ -3063,12 +3063,8 @@
     <string name="file_type_name_rar_compressed">Skompresowany w formacie RAR</string>
     <string name="file_type_name_7zip_compressed">Skompresowane przez 7-Zip</string>
     <string name="subscription_quota_storage_highest_plan_subtitle">Zwolnij miejsce w dysku w chmurze lub zarządzaj swoim planem na [A]mega.io[/A], aby mieć więcej miejsca</string>
-    <!-- Warning banner shown in the file info screen when a file has been taken down -->
-    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
-    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
-    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
-    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
-    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
-    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
-    <string name="contacts_qr_scan_action">Scan QR code</string>
+    <string name="file_info_taken_down_file_warning">Ten plik został usunięty zgodnie z naszą polityką usuwania.</string>
+    <string name="file_info_taken_down_folder_warning">Ten folder został usunięty zgodnie z naszą polityką usuwania treści.</string>
+    <string name="file_info_taken_down_action">Polityka Usuwania Treści</string>
+    <string name="contacts_qr_scan_action">Skanowanie kodu QR</string>
 </resources>
