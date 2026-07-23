@@ -2532,4 +2532,57 @@
     </plurals>
     <string name="password_placeholder">กรอกรหัสผ่าน</string>
     <string name="new_chat_title">แชทใหม่</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">ยังไม่ได้ส่งคำเชิญ</string>
+    <string name="contacts_qr_invalid_code_dialog_body">คิวอาร์โค้ดหรือรายชื่อผู้ติดต่อไม่ถูกต้อง ลองสแกนโค้ดที่ถูกต้องหรือเปิดลิงก์ที่ถูกต้องอีกครั้ง</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="other">%1$d เดือน</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="other">%1$d วัน</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="other">%1$d ชั่วโมง</item>
+    </plurals>
+    <string name="file_info_information_owner_label">เจ้าของ</string>
+    <string name="file_info_information_permissions_label">สิทธิ์</string>
+    <string name="file_info_information_no_location">ไม่มีข้อมูลเกี่ยวกับตำแหน่งที่ตั้ง</string>
+    <string name="file_info_information_current_versions_label">เวอร์ชันปัจจุบัน</string>
+    <string name="file_info_information_previous_versions_label">เวอร์ชันก่อนหน้า</string>
+    <string name="file_info_information_shared_with_label">แชร์กับ</string>
+    <string name="subscription_quota_transfer_over_title">เกินโควต้าการถ่ายโอนแล้ว</string>
+    <string name="file_type_name_video">วิดีโอ</string>
+    <string name="file_type_name_audio">เสียง</string>
+    <string name="contact_info_set_nickname">ตั้งชื่อเล่น</string>
+    <string name="contact_info_edit_nickname">แก้ไขชื่อเล่น</string>
+    <string name="contact_info_verify_credentials">ตรวจสอบข้อมูลประจำตัว</string>
+    <string name="contact_info_credentials_verified">ตรวจสอบแล้ว</string>
+    <string name="contact_info_credentials_not_verified">ไม่ผ่านการตรวจสอบ</string>
+    <string name="contact_info_share_contact">แชร์ผู้ติดต่อ</string>
+    <string name="contact_info_chat_notifications">การแจ้งเตือนแชท</string>
+    <string name="contact_info_notifications_muted">ปิด</string>
+    <string name="contact_info_shared_files">ไฟล์ที่ใช้ร่วมกัน</string>
+    <string name="contact_info_manage_chat_history">จัดการประวัติแชท</string>
+    <string name="contact_info_manage_chat_history_subtitle">ลบข้อความที่เก่ากว่าโดยอัตโนมัติ:</string>
+    <string name="contact_info_retention_time_year">1 ปี</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="other">%1$d เดือน</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="other">%1$d สัปดาห์</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="other">%1$d วัน</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="other">%1$d ชั่วโมง</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">ผู้ติดต่อบางรายที่คุณแชร์ข้อมูลด้วยยังไม่ได้รับการตรวจสอบจากคุณ เพื่อความปลอดภัยมากยิ่งขึ้น เราขอแนะนำให้คุณตรวจสอบข้อมูลประจำตัวของพวกเขาในรายชื่อติดต่อ โดยแตะที่จุดสามจุดถัดจากรายชื่อติดต่อที่คุณต้องการตรวจสอบและแตะที่ข้อมูล</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

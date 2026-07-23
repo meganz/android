@@ -2531,4 +2531,57 @@
     <string name="password_placeholder">암호 입력</string>
     <string name="new_chat_title">새 대화</string>
     <string name="create_group_chat_link_requires_name_error">대화 링크를 받으려면 그룹 이름을 입력하세요</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">초대장 발송되지 않음</string>
+    <string name="contacts_qr_invalid_code_dialog_body">QR 코드 또는 연락처 링크가 잘못 되었습니다. 올바른 코드를 스캔하거나 올바른 링크를 여세요.</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="other">%1$d개월</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="other">%1$d일</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="other">%1$d시간</item>
+    </plurals>
+    <string name="file_info_information_owner_label">소유자</string>
+    <string name="file_info_information_permissions_label">권한</string>
+    <string name="file_info_information_no_location">위치 정보 없음</string>
+    <string name="file_info_information_current_versions_label">현재 버전</string>
+    <string name="file_info_information_previous_versions_label">이전 버전</string>
+    <string name="file_info_information_shared_with_label">공유된 사람</string>
+    <string name="subscription_quota_transfer_over_title">전송 할당량 초과됨</string>
+    <string name="file_type_name_video">동영상</string>
+    <string name="file_type_name_audio">음성</string>
+    <string name="contact_info_set_nickname">별명 설정</string>
+    <string name="contact_info_edit_nickname">별명 수정</string>
+    <string name="contact_info_verify_credentials">자격 증명 인증 중</string>
+    <string name="contact_info_credentials_verified">인증됨</string>
+    <string name="contact_info_credentials_not_verified">인증되지 않음</string>
+    <string name="contact_info_share_contact">연락처 공유</string>
+    <string name="contact_info_chat_notifications">대화 알림</string>
+    <string name="contact_info_notifications_muted">끔</string>
+    <string name="contact_info_shared_files">공유된 파일</string>
+    <string name="contact_info_manage_chat_history">대화 기록 관리</string>
+    <string name="contact_info_manage_chat_history_subtitle">다음보다 오래된 메시지를 자동 삭제:</string>
+    <string name="contact_info_retention_time_year">1년</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="other">%1$d개월</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="other">%1$d주</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="other">%1$d일</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="other">%1$d시간</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">정보를 공유하는 연락처 중 일부가 당신에 의해 인증되지 않았습니다. 추가적인 보안을 적용하려면, 연락처에서 그들의 자격 증명을 인증할 것을 권장합니다. 인증하려는 연락처 옆의 점 3개를 탭하고 정보를 탭하세요.</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

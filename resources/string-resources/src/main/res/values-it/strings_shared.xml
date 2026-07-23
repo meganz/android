@@ -2577,14 +2577,14 @@
     <string name="notifications_payment_info_section">Informazioni di pagamento</string>
     <plurals name="general_selection_num_selected">
         <item quantity="one">%1$d selezionato</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">%1$d selezionato</item>
     </plurals>
     <string name="contacts_groups_empty_title">Nessun gruppo</string>
     <string name="public_link_auth_alert_description_external_file">Mantieni questo file al sicuro e accedi a esso in qualsiasi momento.</string>
     <plurals name="notifications_history_updated_items_subtitle">
         <item quantity="one">[A]%1$s [/A][B]aggiornato %2$d elemento.[/B]</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">[A]%1$s [/A][B]aggiornati %2$d elementi.[/B]</item>
     </plurals>
     <string name="home_cwlo_clear_history_dialog_title">Cancella cronologia</string>
@@ -2598,12 +2598,12 @@
     <string name="notifications_payment_reminder_expired_section">Il piano Pro è scaduto</string>
     <plurals name="notifications_payment_reminder_will_expire">
         <item quantity="one">Il tuo piano Pro scade tra %1$d giorno</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">Il tuo piano Pro scade tra %1$d giorni</item>
     </plurals>
     <plurals name="notifications_payment_reminder_expired">
         <item quantity="one">Il tuo piano Pro è scaduto %1$d giorno fa</item>
-        <item quantity="many"></item>
+        <item quantity="many"/>
         <item quantity="other">Il tuo piano Pro è scaduto %1$d giorni fa</item>
     </plurals>
     <string name="chat_settings_link_preview_summary">Genera un\’anteprima dei link che invii nella chat. Nota che il recupero di queste anteprime non è protetto dalla criptografia a conoscenza zero.</string>
@@ -2689,4 +2689,71 @@
     <string name="password_strength_strong">Password sicura</string>
     <string name="password_placeholder">Inserisci la password</string>
     <string name="new_chat_title">Nuova chat</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">Invito non spedito</string>
+    <string name="contacts_qr_invalid_code_dialog_body">Il codice QR o il link di contatto non è valido. Prova a scansionare un codice valido o ad aprire un link valido.</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="one">%1$d mese</item>
+        <item quantity="many">%1$d mesi</item>
+        <item quantity="other">%1$d mesi</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="one">%1$d giorno</item>
+        <item quantity="many">%1$d di giorni</item>
+        <item quantity="other">%1$d giorni</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="one">%1$d ora</item>
+        <item quantity="many">%1$d ore</item>
+        <item quantity="other">%1$d ore</item>
+    </plurals>
+    <string name="file_info_information_no_location">Nessuna informazione sulla posizione</string>
+    <string name="file_info_information_owner_label">Proprietario</string>
+    <string name="file_info_information_permissions_label">Permessi</string>
+    <string name="file_info_information_current_versions_label">Versioni correnti</string>
+    <string name="file_info_information_shared_with_label">Condiviso con</string>
+    <string name="file_info_information_previous_versions_label">Versioni precedenti</string>
+    <string name="subscription_quota_transfer_over_title">Quota di trasferimento superata</string>
+    <string name="file_type_name_video">Video</string>
+    <string name="file_type_name_audio">Audio</string>
+    <string name="contact_info_edit_nickname">Modifica il soprannome</string>
+    <string name="contact_info_verify_credentials">Verifica credenziali</string>
+    <string name="contact_info_chat_notifications">Notifiche delle chat</string>
+    <string name="contact_info_credentials_verified">Verificato</string>
+    <string name="contact_info_share_contact">Condividi contatto</string>
+    <string name="contact_info_manage_chat_history">Gestisci la cronologia delle chat</string>
+    <string name="contact_info_shared_files">File condivisi</string>
+    <string name="contact_info_manage_chat_history_subtitle">Elimina automaticamente i messaggi più vecchi di:</string>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="one">%1$d giorno</item>
+        <item quantity="many">%1$d di giorni</item>
+        <item quantity="other">%1$d giorni</item>
+    </plurals>
+    <string name="contact_info_set_nickname">Imposta un soprannome</string>
+    <string name="contact_info_notifications_muted">Off</string>
+    <string name="contact_info_credentials_not_verified">Non verificato</string>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="one">%1$d ora</item>
+        <item quantity="many">%1$d ore</item>
+        <item quantity="other">%1$d ore</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="one">%1$d settimana</item>
+        <item quantity="many">%1$d settimane</item>
+        <item quantity="other">%1$d settimane</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="one">%1$d mese</item>
+        <item quantity="many">%1$d mesi</item>
+        <item quantity="other">%1$d mesi</item>
+    </plurals>
+    <string name="contact_info_retention_time_year">1 anno</string>
+    <string name="add_contacts_unverified_contact_warning">Alcuni dei contatti con cui stai condividendo informazioni non sono stati verificati da te. Per aumentare la sicurezza, ti raccomandiamo di verificare le loro credenziali in Contatti. Tocca sui tre pallini affianco il contatto che vuoi verificare e poi tocca su Info.</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

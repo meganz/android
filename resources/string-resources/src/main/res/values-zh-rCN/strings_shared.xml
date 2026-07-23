@@ -2515,10 +2515,10 @@
     <string name="document_scanner_review_retake_page">重新拍摄</string>
     <string name="subscription_revamp_current_plan_upgrade_on_web">在我们的 [A]定价页面[/A] 上升级您当前的订阅。</string>
     <string name="add_tags_placeholder_label">#添加标签</string>
-    <string name="password_strength_very_weak">非常弱</string>
+    <string name="password_strength_very_weak">非常弱的密码</string>
     <string name="password_strength_weak">低强度密码</string>
-    <string name="password_strength_medium">中</string>
-    <string name="password_strength_good">很好</string>
+    <string name="password_strength_medium">中等强度的密码</string>
+    <string name="password_strength_good">高强度的密码</string>
     <string name="password_strength_strong">高强度密码</string>
     <string name="subscription_offer_special_offer_badge">特别优惠</string>
     <string name="subscription_offer_get_plan_button">以%2$s获取%1$s</string>
@@ -2540,4 +2540,103 @@
     </plurals>
     <string name="password_placeholder">输入密码</string>
     <string name="new_chat_title">新建聊天</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">邀请未发送</string>
+    <string name="contacts_qr_invalid_code_dialog_body">二维码或联系人链接无效。尝试扫描有效条码或打开有效链接。</string>
+    <string name="create_group_chat_link_requires_name_error">输入群组名称以获取聊天链接</string>
+    <string name="home_do_more_with_mega_album_created_message">相册“%1$s”已创建</string>
+    <string name="home_do_more_with_mega_see_album_action">查看相册</string>
+    <string name="campaign_name_with_discount_up_to">%1$s：最高可享受 %2$d%% 的折扣</string>
+    <string name="subscription_revamp_price_per_year">%1$s/年</string>
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="other">前%1$d个月按%2$s计费，之后每年收取%3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="other">在前 %1$d 年内按 %2$s 收费，之后每年收取 %3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="other">在前%1$d个月按%2$s计费，之后%3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="other">在最初的 %1$d 年按 %2$s 收费，之后 %3$s</item>
+    </plurals>
+    <plurals name="general_share_link_count_title">
+        <item quantity="other">%1$d个链接</item>
+    </plurals>
+    <string name="contacts_qr_already_contact_dialog_body">邀请没有发送。 %1$s 已在您的联系人列表中。</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_title">二维码扫描器尚未就绪</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_body">二维码扫描器仍在下载中。请稍后再试。</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="other">%1$d个月</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="other">%1$d天</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="other">%1$d小时</item>
+    </plurals>
+    <string name="share_link_separate_key_title">分离链接和密钥</string>
+    <string name="share_link_separate_key_subtitle">该链接不包含解密密钥。为提高安全性，请通过其他渠道发送密钥。</string>
+    <plurals name="share_link_access_banner_description_with_key">
+        <item quantity="other">任何拥有这些链接和密钥的人都可以查看并下载您的数据</item>
+    </plurals>
+    <string name="subscription_revamp_current_plan_expiring_badge">即将到期</string>
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="other">%1$d 分钟</item>
+    </plurals>
+    <string name="general_pro_label">Pro</string>
+    <string name="file_info_information_map_label">地图</string>
+    <string name="file_info_information_outgoing_share">传出的共享</string>
+    <string name="file_info_information_incoming_share">传入的共享</string>
+    <string name="file_info_information_type_folder">文件夹</string>
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="other">%d 个联系人</item>
+    </plurals>
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="other">%d 个文件历史版本</item>
+    </plurals>
+    <plurals name="file_info_information_num_versions">
+        <item quantity="other">%d 个历史版本</item>
+    </plurals>
+    <string name="file_info_information_owner_label">所有者</string>
+    <string name="file_info_information_permissions_label">权限</string>
+    <string name="file_info_information_no_location">没有位置信息</string>
+    <string name="file_info_information_current_versions_label">当前版本</string>
+    <string name="file_info_information_previous_versions_label">以前的版本</string>
+    <string name="file_info_information_shared_with_label">共享者</string>
+    <string name="subscription_quota_transfer_over_title">已超出传输流量上限</string>
+    <string name="file_type_name_video">视频</string>
+    <string name="file_type_name_audio">语音</string>
+    <string name="contact_info_set_nickname">设置昵称</string>
+    <string name="contact_info_edit_nickname">编辑昵称</string>
+    <string name="contact_info_verify_credentials">验证凭证</string>
+    <string name="contact_info_credentials_verified">已验证</string>
+    <string name="contact_info_credentials_not_verified">未验证</string>
+    <string name="contact_info_share_contact">分享联系人</string>
+    <string name="contact_info_chat_notifications">聊天通知</string>
+    <string name="contact_info_notifications_muted">关闭</string>
+    <string name="contact_info_shared_files">已分享文件</string>
+    <string name="contact_info_manage_chat_history">管理聊天记录</string>
+    <string name="contact_info_manage_chat_history_subtitle">自动删除早于以下时间的消息：</string>
+    <string name="contact_info_retention_time_year">1年</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="other">%1$d个月</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="other">%1$d周</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="other">%1$d天</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="other">%1$d小时</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">某些您与之共享信息的联系人尚未经过您的验证。为确保额外的安全性，我们建议您在联系人中验证他们的凭据。点按您要验证的联系人旁边的三个点，然后点按信息。</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

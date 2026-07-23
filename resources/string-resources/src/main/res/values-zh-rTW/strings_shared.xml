@@ -2509,10 +2509,10 @@
     <string name="settings_view_mode_preference_description">對每個資料夾套用檢視模式，或對所有資料夾使用相同檢視模式。</string>
     <string name="add_contacts_phone_contacts_allow_access">允許存取聯絡人</string>
     <string name="add_contacts_phone_contacts_select">選取手機聯絡人</string>
-    <string name="password_strength_very_weak">非常弱</string>
-    <string name="password_strength_weak">低強度密碼</string>
-    <string name="password_strength_medium">普通</string>
-    <string name="password_strength_good">好</string>
+    <string name="password_strength_very_weak">安全強度極低的密碼</string>
+    <string name="password_strength_weak">安全強度低的密碼</string>
+    <string name="password_strength_medium">中等強度密碼</string>
+    <string name="password_strength_good">安全密碼</string>
     <string name="password_strength_strong">高強度密碼</string>
     <plurals name="subscription_offer_countdown_minutes">
         <item quantity="other">分</item>
@@ -2539,4 +2539,69 @@
     <string name="document_scanner_review_empty">尚未掃描任何頁面</string>
     <string name="password_placeholder">輸入密碼</string>
     <string name="new_chat_title">新的對話</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">邀請未發送</string>
+    <string name="contacts_qr_invalid_code_dialog_body">二維條碼或聯絡人連結無效。嘗試掃描有效條碼或開啟有效連結。</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="other">%1$d個月</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="other">%1$d天</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="other">%1$d小時</item>
+    </plurals>
+    <string name="file_info_information_owner_label">擁有者</string>
+    <string name="file_info_information_permissions_label">權限</string>
+    <string name="file_info_information_no_location">沒有位置資訊</string>
+    <string name="file_info_information_current_versions_label">目前的版本</string>
+    <string name="file_info_information_previous_versions_label">之前的版本</string>
+    <string name="file_info_information_shared_with_label">共用對象</string>
+    <string name="subscription_quota_transfer_over_title">已超出傳輸配額</string>
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="other">%d個版本化檔案</item>
+    </plurals>
+    <plurals name="file_info_information_num_versions">
+        <item quantity="other">%d個版本</item>
+    </plurals>
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="other">%d個聯絡人</item>
+    </plurals>
+    <string name="file_info_information_type_folder">資料夾</string>
+    <string name="file_info_information_incoming_share">內收共享</string>
+    <string name="file_info_information_outgoing_share">外發共享</string>
+    <string name="file_type_name_video">影片</string>
+    <string name="file_type_name_audio">音訊</string>
+    <string name="contact_info_set_nickname">設定暱稱</string>
+    <string name="contact_info_edit_nickname">編輯暱稱</string>
+    <string name="contact_info_verify_credentials">驗證憑證</string>
+    <string name="contact_info_credentials_verified">已驗證</string>
+    <string name="contact_info_credentials_not_verified">未驗證</string>
+    <string name="contact_info_share_contact">共享聯絡人</string>
+    <string name="contact_info_chat_notifications">對話訊息通知</string>
+    <string name="contact_info_notifications_muted">關閉</string>
+    <string name="contact_info_shared_files">共享的檔案</string>
+    <string name="contact_info_manage_chat_history">管理對話記錄</string>
+    <string name="contact_info_manage_chat_history_subtitle">自動清除超過此時間的訊息：</string>
+    <string name="contact_info_retention_time_year">1年</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="other">%1$d個月</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="other">%1$d週</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="other">%1$d天</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="other">%1$d小時</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">與您共享資訊的某些聯絡人尚未經過您的驗證。為了確保額外的安全性，我們建議您在聯絡人中驗證他們的憑證。點選您要驗證的聯絡人旁邊的三個小圓點，然後點選「資訊」。</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

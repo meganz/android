@@ -3528,7 +3528,7 @@
     <!-- Add contacts picker (share flow): warning banner shown when the selection includes recipients whose credentials the user has not verified -->
     <string name="add_contacts_unverified_contact_warning">Some of the contacts you’re sharing information with haven’t been verified by you. To ensure extra security, we recommend that you verify their credentials in Contacts. Tap on the three dots next to the contact you want to verify and tap Info.</string>
     <!-- Audio player: title of the playback-speed bottom sheet -->
-    <string name="audio_player_playback_speed_title">Playback Speed</string>
+    <string name="audio_player_playback_speed_title">Playback speed</string>
     <!-- Warning banner shown in the file info screen when a file has been taken down -->
     <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
     <!-- Warning banner shown in the file info screen when a folder has been taken down -->

@@ -2542,4 +2542,180 @@
     <string name="password_placeholder">パスワードを入力</string>
     <string name="new_chat_title">新しいチャット</string>
     <string name="create_group_chat_link_requires_name_error">チャットリンクを取得するには、グループ名を入力してください。</string>
+    <string name="home_do_more_with_mega_album_created_message">アルバム「%1$s」が作成されました</string>
+    <string name="home_do_more_with_mega_see_album_action">アルバムを見る</string>
+    <string name="campaign_name_with_discount_up_to">%1$s：最大%2$d%%お得</string>
+    <string name="subscription_revamp_price_per_year">%1$s/年</string>
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="other">最初の%1$dか月間は%2$s、その後は毎年%3$sが請求されます</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="other">最初の%1$d年間は%2$s、その後は毎年%3$sが請求されます</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="other">最初の%1$dか月間は%2$s、それ以降は%3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="other">最初の%1$d年間は%2$s、それ以降は%3$s</item>
+    </plurals>
+    <plurals name="general_share_link_count_title">
+        <item quantity="other">%1$dリンク</item>
+    </plurals>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">招待状が送信されませんでした</string>
+    <string name="contacts_qr_invalid_code_dialog_body">QRコードまたは連絡先リンクが無効です。有効なコードをスキャンするか、有効なリンクを開いてみてください。</string>
+    <string name="contacts_qr_already_contact_dialog_body">招待状は送信されていません。%1$sさんはすでに連絡先に入っています。</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_title">QRコードスキャナーが準備できていません</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_body">QRコードスキャナーは現在ダウンロード中です。数秒後にもう一度お試しください。</string>
+    <string name="share_link_separate_key_title">リンクとキーを分ける</string>
+    <string name="share_link_separate_key_subtitle">リンクに復号キーは含まれません。セキュリティを高めるため、キーは別の手段で共有してください。</string>
+    <plurals name="share_link_access_banner_description_with_key">
+        <item quantity="other">このリンク（複数）とキー（複数）を持つ人なら誰でも、データを閲覧・ダウンロードできます</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="other">%1$dか月</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="other">%1$d日</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="other">%1$d時間</item>
+    </plurals>
+    <string name="subscription_revamp_current_plan_expiring_badge">期限間近</string>
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="other">%1$d分</item>
+    </plurals>
+    <string name="general_pro_label">Pro</string>
+    <string name="file_info_information_map_label">地図</string>
+    <string name="file_info_information_outgoing_share">送信共有</string>
+    <string name="file_info_information_incoming_share">受信共有</string>
+    <string name="file_info_information_type_folder">フォルダ</string>
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="other">%d件の連絡先</item>
+    </plurals>
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="other">%d個のバージョン管理されたファイル</item>
+    </plurals>
+    <plurals name="file_info_information_num_versions">
+        <item quantity="other">%d個のバージョン</item>
+    </plurals>
+    <string name="file_info_information_shared_with_label">共有先</string>
+    <string name="file_info_information_owner_label">所有者</string>
+    <string name="file_info_information_permissions_label">権限</string>
+    <string name="file_info_information_current_versions_label">現在のバージョン</string>
+    <string name="file_info_information_previous_versions_label">以前のバージョン</string>
+    <string name="file_info_information_no_location">位置情報がありません</string>
+    <string name="create_group_chat_image_content_description">グループ写真</string>
+    <string name="create_group_chat_image_take_photo">写真を撮る</string>
+    <string name="create_group_chat_image_choose_from_gallery">ギャラリーから選択</string>
+    <string name="subscription_quota_transfer_over_title">転送容量を超えました</string>
+    <string name="subscription_quota_storage_almost_full_title">ストレージの%1$dを使用しています</string>
+    <string name="subscription_quota_storage_almost_full_subtitle">空き容量がなくなる前にプランをアップグレード</string>
+    <string name="subscription_quota_storage_over_subtitle">プランをアップグレードしてストレージを増やし、さらにファイルをアップロードしましょう</string>
+    <string name="subscription_quota_transfer_low_title">転送容量が残りわずかです</string>
+    <string name="subscription_quota_transfer_percentage_used_title">転送枠の%1$d%%をご利用中です</string>
+    <string name="subscription_quota_transfer_low_download_subtitle">そのため、ダウンロードが途中で止まってしまうことがあります。プランをアップグレードすると、転送容量を増やせます。</string>
+    <string name="subscription_quota_transfer_low_streaming_subtitle">そのため、メディア再生が中断される可能性があります。プランをアップグレードすると、転送容量を増やせます。</string>
+    <string name="subscription_quota_transfer_over_download_subtitle">ダウンロードを継続するには、プランをアップグレードして転送容量を増やしてください。</string>
+    <string name="subscription_quota_transfer_over_streaming_subtitle">メディア再生を継続するには、プランをアップグレードして転送容量を増やしてください。</string>
+    <string name="subscription_quota_current_plan_storage_usage">%2$s中%1$s使用</string>
+    <string name="subscription_quota_current_plan_transfer_usage">%1$sを使用中</string>
+    <string name="subscription_quota_recommended_storage_usage">%2$s中%1$sを使用</string>
+    <string name="subscription_quota_recommended_transfer_usage">%2$s中%1$sを使用</string>
+    <string name="subscription_quota_best_for_you">お客様に最適なプラン</string>
+    <string name="subscription_quota_charged_yearly">年額%1$s</string>
+    <string name="subscription_quota_upgrade_button">%1$sにアップグレード</string>
+    <string name="subscription_quota_view_all_plans">すべてのプランを表示</string>
+    <string name="subscription_quota_current_plan_transfer_usage_with_total">%2$s中%1$s使用</string>
+    <string name="subscription_quota_storage_over_upload_subtitle">ストレージ容量がなくなりました。アップロードを継続するにはプランをアップグレードしてください。</string>
+    <string name="audio_player_podcast_mode_label">ポッドキャストモード</string>
+    <string name="audio_player_music_mode_label">ミュージックモード</string>
+    <string name="add_contacts_manual_email_placeholder">メールアドレスを入力</string>
+    <string name="add_contacts_manual_email_add_action">メールアドレスを追加</string>
+    <string name="add_contacts_manual_email_already_added_error">このメールアドレスはすでに追加されています</string>
+    <string name="file_type_name_video">動画</string>
+    <string name="file_type_name_audio">音声</string>
+    <string name="file_type_name_image">画像</string>
+    <string name="file_type_name_compressed">圧縮ファイル</string>
+    <string name="file_type_name_text">テキスト</string>
+    <string name="file_type_name_vector">ベクター画像</string>
+    <string name="file_type_name_mpeg4_video">MPEG-4ビデオ</string>
+    <string name="file_type_name_mp3_audio">MP3オーディオ</string>
+    <string name="file_type_name_png_image">PNG画像</string>
+    <string name="file_type_name_jpeg_image">JPEG画像</string>
+    <string name="file_type_name_gif_image">GIF画像</string>
+    <string name="file_type_name_heic_image">HEIC画像</string>
+    <string name="file_type_name_zip_compressed">ZIP圧縮ファイル</string>
+    <string name="file_type_name_pdf_document">PDFドキュメント</string>
+    <string name="file_type_name_raw">RAW画像</string>
+    <string name="file_type_name_word">Wordドキュメント</string>
+    <string name="file_type_name_excel">Excelスプレッドシート</string>
+    <string name="file_type_name_spreadsheet">スプレッドシート</string>
+    <string name="file_type_name_powerpoint">PowerPointプレゼンテーション</string>
+    <string name="file_type_name_keynote">Keynoteプレゼンテーション</string>
+    <string name="file_type_name_numbers">Numbersスプレッドシート</string>
+    <string name="file_type_name_pages">Pagesドキュメント</string>
+    <string name="file_type_name_openoffice">OpenOfficeドキュメント</string>
+    <string name="file_type_name_photoshop">Adobe Photoshop</string>
+    <string name="file_type_name_illustrator">Adobe Illustrator</string>
+    <string name="file_type_name_indesign">Adobe InDesign</string>
+    <string name="file_type_name_premiere">Adobe Premiere</string>
+    <string name="file_type_name_aftereffects">Adobe After Effects</string>
+    <string name="file_type_name_xd">Adobe XD</string>
+    <string name="file_type_name_cad">CADファイル</string>
+    <string name="file_type_name_font">フォント</string>
+    <string name="file_type_name_executable">実行可能ファイル</string>
+    <string name="file_type_name_disk_image">ディスクイメージ</string>
+    <string name="file_type_name_torrent">トレントファイル</string>
+    <string name="file_type_name_three_d">3Dファイル</string>
+    <string name="file_type_name_web">Webファイル</string>
+    <string name="file_type_name_url">URL</string>
+    <string name="file_type_name_generic">%1$sファイル</string>
+    <string name="file_type_name_quicktime_video">QuickTimeビデオ</string>
+    <string name="file_type_name_avi_video">AVIビデオ</string>
+    <string name="file_type_name_mkv_video">MKVビデオ</string>
+    <string name="file_type_name_wav_audio">WAVオーディオ</string>
+    <string name="file_type_name_m4a_audio">M4Aオーディオ</string>
+    <string name="file_type_name_webp_image">WebP画像</string>
+    <string name="file_type_name_rar_compressed">RAR圧縮ファイル</string>
+    <string name="file_type_name_7zip_compressed">7-Zip圧縮ファイル</string>
+    <string name="subscription_quota_storage_highest_plan_subtitle">クラウドドライブの空き容量を増やすか、[A]mega.io[/A]でプランを管理してストレージ容量を増やしてください。</string>
+    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">このままでは、ダウンロードが中断される可能性があります。追加の転送量については、[A]mega.io[/A] でプランをご確認ください。</string>
+    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">このままでは、メディア再生が中断される可能性があります。追加の転送量については、[A]mega.io[/A] でプランをご確認ください。</string>
+    <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">ダウンロードを継続するには、追加の転送量について、[A]mega.io[/A] でプランをご確認ください。</string>
+    <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">メディア再生を継続するには、追加の転送量について、[A]mega.io[/A] でプランをご確認ください。</string>
+    <string name="subscription_quota_contact_support">サポートにお問い合わせ</string>
+    <string name="contact_info_credentials_not_verified">認証されていません</string>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="other">%1$d時間</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="other">%1$d週</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="other">%1$dか月</item>
+    </plurals>
+    <string name="contact_info_retention_time_year">1年</string>
+    <string name="contact_info_set_nickname">ニックネームを設定</string>
+    <string name="contact_info_edit_nickname">ニックネームを編集</string>
+    <string name="contact_info_verify_credentials">認証情報の認証</string>
+    <string name="contact_info_credentials_verified">認証済み</string>
+    <string name="contact_info_share_contact">連絡先を共有</string>
+    <string name="contact_info_chat_notifications">チャット通知</string>
+    <string name="contact_info_notifications_muted">オフ</string>
+    <string name="contact_info_shared_files">共有ファイル</string>
+    <string name="contact_info_manage_chat_history">チャット履歴を管理</string>
+    <string name="contact_info_manage_chat_history_subtitle">以下より古いメッセージを自動的に削除：</string>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="other">%1$d日</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">情報を共有している連絡先の一部は、あなたによって認証されていません。さらなるセキュリティを確保するために、連絡先で認証情報を確認することをお勧めします。認証したい連絡先の横にある3つの点をタップし、「情報」をタップします。</string>
+    <string name="audio_player_playback_speed_title">再生速度</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

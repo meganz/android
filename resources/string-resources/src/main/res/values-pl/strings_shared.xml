@@ -2845,4 +2845,230 @@
     <string name="password_placeholder">Wprowadź hasło</string>
     <string name="new_chat_title">Nowy czat</string>
     <string name="create_group_chat_link_requires_name_error">Wprowadź nazwę grupy, aby uzyskać link do czatu</string>
+    <string name="home_do_more_with_mega_album_created_message">Utworzono album \’%1$s\’</string>
+    <string name="home_do_more_with_mega_see_album_action">Zobacz album</string>
+    <string name="campaign_name_with_discount_up_to">%1$s: Aż do %2$d%% zniżki</string>
+    <string name="subscription_revamp_price_per_year">%1$s-roczny</string>
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="one">Pobrano %2$s za pierwsze %1$d miesiące, a %3$s będą pobierane rocznie po tym</item>
+        <item quantity="few">Pobrano %2$s za pierwsze %1$d miesiące, a %3$s będą pobierane rocznie po tym</item>
+        <item quantity="many">Pobrano %2$s za pierwsze %1$d miesiące, a %3$s będą pobierane rocznie po tym</item>
+        <item quantity="other">Pobrano %2$s za pierwsze %1$d miesiące, a %3$s będą pobierane rocznie po tym</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="one">Opłata wynosi %2$s za pierwsze %1$d lata, a %3$s będzie pobierana co roku po tym.</item>
+        <item quantity="few">Opłata wynosi %2$s za pierwsze %1$d lata, a %3$s będzie pobierana co roku po tym.</item>
+        <item quantity="many">Opłata wynosi %2$s za pierwsze %1$d lata, a %3$s będzie pobierana co roku po tym.</item>
+        <item quantity="other">Opłata wynosi %2$s za pierwsze %1$d lata, a %3$s będzie pobierana co roku po tym.</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="one">Fakturowane na kwotę %2$s za pierwsze %1$d miesiące, %3$s po</item>
+        <item quantity="few">Fakturowane na kwotę %2$s za pierwsze %1$d miesiące, %3$s po</item>
+        <item quantity="many">Fakturowane na kwotę %2$s za pierwsze %1$d miesiące, %3$s po</item>
+        <item quantity="other">Fakturowane na kwotę %2$s za pierwsze %1$d miesiące, %3$s po</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="one">Faktury wystawiane na kwotę %2$s przez pierwsze %1$d lata, %3$s po</item>
+        <item quantity="few">Faktury wystawiane na kwotę %2$s przez pierwsze %1$d lata, %3$s po</item>
+        <item quantity="many">Faktury wystawiane na kwotę %2$s przez pierwsze %1$d lata, %3$s po</item>
+        <item quantity="other">Faktury wystawiane na kwotę %2$s przez pierwsze %1$d lata, %3$s po</item>
+    </plurals>
+    <plurals name="general_share_link_count_title">
+        <item quantity="one">%1$d link</item>
+        <item quantity="few">%1$d linki</item>
+        <item quantity="many">%1$d linki</item>
+        <item quantity="other">%1$d linki</item>
+    </plurals>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">Zaproszenie nie zostało wysłane</string>
+    <string name="contacts_qr_invalid_code_dialog_body">Kod QR lub łącze kontaktowe są nieprawidłowe. Spróbuj zeskanować prawidłowy kod lub otworzyć prawidłowy link.</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="one">%1$d miesiąc</item>
+        <item quantity="few">%1$d miesiące</item>
+        <item quantity="many">%1$d miesiące</item>
+        <item quantity="other">%1$d miesiące</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="one">%1$d dzień</item>
+        <item quantity="few">%1$d dni</item>
+        <item quantity="many">%1$d dni</item>
+        <item quantity="other">%1$d dni</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="one">%1$d godzina</item>
+        <item quantity="few">%1$d godzin</item>
+        <item quantity="many">%1$d godzin</item>
+        <item quantity="other">%1$d godzin</item>
+    </plurals>
+    <string name="file_info_information_owner_label">Właściciel</string>
+    <string name="file_info_information_permissions_label">Prawa dostępu</string>
+    <string name="file_info_information_no_location">Brak informacji o lokalizacji</string>
+    <string name="file_info_information_current_versions_label">Aktualne wersja</string>
+    <string name="file_info_information_previous_versions_label">Poprzednie wersje</string>
+    <string name="file_info_information_shared_with_label">Udostępnione do</string>
+    <string name="contacts_qr_already_contact_dialog_body">Zaproszenie nie zostało wysłane. %1$s jest już na twojej liście kontaktów.</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_title">Skaner QR nie jest gotowy</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_body">Skaner QR nadal się pobiera. Spróbuj ponownie za kilka sekund.</string>
+    <string name="share_link_separate_key_title">Oddziel link od klucza</string>
+    <string name="share_link_separate_key_subtitle">Link nie będzie zawierał klucza do deszyfrowania. Udostępnij klucz za pomocą innego kanału dla dodatkowego bezpieczeństwa.</string>
+    <string name="subscription_quota_transfer_over_title">Przekroczono limit transferu</string>
+    <string name="file_type_name_video">Film</string>
+    <string name="file_type_name_audio">Dzwięk</string>
+    <plurals name="share_link_access_banner_description_with_key">
+        <item quantity="one">Wszyscy, którzy mają ten link i klucz, mogą przeglądać i pobierać twoje dane</item>
+        <item quantity="few">Wszyscy, którzy mają te linki i klucze, mogą przeglądać i pobierać twoje dane</item>
+        <item quantity="many">Wszyscy, którzy mają te linki i klucze, mogą przeglądać i pobierać twoje dane</item>
+        <item quantity="other">Wszyscy, którzy mają te linki i klucze, mogą przeglądać i pobierać twoje dane</item>
+    </plurals>
+    <string name="subscription_revamp_current_plan_expiring_badge">Wygasający</string>
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="one">%1$d minuta</item>
+        <item quantity="few">%1$d minuty</item>
+        <item quantity="many">%1$d minut</item>
+        <item quantity="other">%1$d minut</item>
+    </plurals>
+    <string name="general_pro_label">Pro</string>
+    <string name="file_info_information_map_label">Mapa</string>
+    <string name="file_info_information_outgoing_share">Udostępnienie wychodzące</string>
+    <string name="file_info_information_incoming_share">Przychodzące udostępnienie</string>
+    <string name="file_info_information_type_folder">Folder</string>
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="one">%d kontakt</item>
+        <item quantity="few">%d kontakty</item>
+        <item quantity="many">%d kontakty</item>
+        <item quantity="other">%d kontakty</item>
+    </plurals>
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="one">%d wersjonowany plik</item>
+        <item quantity="few">%d wersjonowane pliki</item>
+        <item quantity="many">%d wersjonowanych pliki</item>
+        <item quantity="other">%d wersjonowanych pliki</item>
+    </plurals>
+    <plurals name="file_info_information_num_versions">
+        <item quantity="one">%d wersja</item>
+        <item quantity="few">%d wersje</item>
+        <item quantity="many">%d wersji</item>
+        <item quantity="other">%d wersji</item>
+    </plurals>
+    <string name="create_group_chat_image_content_description">Zdjęcie grupowe</string>
+    <string name="create_group_chat_image_take_photo">Zrób zdjęcie</string>
+    <string name="create_group_chat_image_choose_from_gallery">Wybierz z galerii</string>
+    <string name="subscription_quota_storage_almost_full_title">Twoje miejsce przechowywania %1$d%% jest pełne</string>
+    <string name="subscription_quota_storage_almost_full_subtitle">Zaktualizuj swój plan, zanim zabraknie Ci miejsca</string>
+    <string name="subscription_quota_storage_over_subtitle">Zaktualizuj swój plan, aby uzyskać więcej miejsca na dane i móc przesyłać więcej plików</string>
+    <string name="subscription_quota_transfer_low_title">Twój limit transferu się wyczerpuje</string>
+    <string name="subscription_quota_transfer_percentage_used_title">Zużyłeś %1$d%% z Twojego limitu transferu</string>
+    <string name="subscription_quota_transfer_low_download_subtitle">W rezultacie pobieranie może zostać przerwane. Zaktualizuj swój plan, aby uzyskać większy limit transferu.</string>
+    <string name="subscription_quota_transfer_low_streaming_subtitle">W rezultacie odtwarzanie mediów może zostać przerwane. Zaktualizuj swój plan, aby uzyskać większy limit transferu.</string>
+    <string name="subscription_quota_transfer_over_download_subtitle">Aby kontynuować pobieranie, zaktualizuj swój plan, aby uzyskać większy limit transferu.</string>
+    <string name="subscription_quota_transfer_over_streaming_subtitle">Aby kontynuować odtwarzanie multimediów, zaktualizuj swój plan, aby uzyskać większy limit transferu.</string>
+    <string name="subscription_quota_current_plan_storage_usage">Użyto %1$s z %2$s</string>
+    <string name="subscription_quota_current_plan_transfer_usage">zużyto %1$s</string>
+    <string name="subscription_quota_recommended_storage_usage">Zużyto %1$s z %2$s</string>
+    <string name="subscription_quota_recommended_transfer_usage">Użyto %1$s z %2$s</string>
+    <string name="subscription_quota_best_for_you">Najlepsze dla Ciebie</string>
+    <string name="subscription_quota_charged_yearly">%1$s pobierane rocznie</string>
+    <string name="subscription_quota_upgrade_button">Zaktualizuj do %1$s</string>
+    <string name="subscription_quota_view_all_plans">Zobacz wszystkie plany</string>
+    <string name="subscription_quota_current_plan_transfer_usage_with_total">Użyto %1$s z %2$s</string>
+    <string name="subscription_quota_storage_over_upload_subtitle">Brak miejsca na koncie. Zaktualizuj plan, aby kontynuować przesyłanie</string>
+    <string name="audio_player_podcast_mode_label">Tryb podcastowy</string>
+    <string name="audio_player_music_mode_label">Tryb muzyczny</string>
+    <string name="add_contacts_manual_email_placeholder">Wprowadź adres e-mail</string>
+    <string name="add_contacts_manual_email_add_action">Dodaj adres e‑mail</string>
+    <string name="add_contacts_manual_email_already_added_error">Adres e-mail został już dodany</string>
+    <string name="file_type_name_image">Obraz</string>
+    <string name="file_type_name_compressed">Skompresowany</string>
+    <string name="file_type_name_text">Tekst</string>
+    <string name="file_type_name_vector">Wektor</string>
+    <string name="file_type_name_mpeg4_video">wideo MPEG-4</string>
+    <string name="file_type_name_mp3_audio">Dźwięk MP3</string>
+    <string name="file_type_name_png_image">Obraz PNG</string>
+    <string name="file_type_name_jpeg_image">Obraz JPEG</string>
+    <string name="file_type_name_gif_image">Obraz GIF</string>
+    <string name="file_type_name_heic_image">Obraz HEIC</string>
+    <string name="file_type_name_zip_compressed">Skompresowany ZIP</string>
+    <string name="file_type_name_pdf_document">Dokument PDF</string>
+    <string name="file_type_name_raw">Obraz RAW</string>
+    <string name="file_type_name_word">Dokument Word</string>
+    <string name="file_type_name_excel">Arkusz Excel</string>
+    <string name="contact_info_set_nickname">Ustaw pseudonim</string>
+    <string name="contact_info_edit_nickname">Edytuj nazwę użytkownika</string>
+    <string name="contact_info_verify_credentials">Weryfikacja uprawnień</string>
+    <string name="contact_info_credentials_verified">Zweryfikowany</string>
+    <string name="contact_info_credentials_not_verified">Nie zweryfikowany</string>
+    <string name="contact_info_share_contact">Udostępnij kontakt</string>
+    <string name="contact_info_chat_notifications">Powiadomienia Chat</string>
+    <string name="contact_info_notifications_muted">Wyłącz</string>
+    <string name="contact_info_shared_files">Współdzielone pliki</string>
+    <string name="contact_info_manage_chat_history">Zarządzaj historią czatu</string>
+    <string name="contact_info_manage_chat_history_subtitle">Automatycznie usuwaj wiadomości starsze niż:</string>
+    <string name="contact_info_retention_time_year">1 rok</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="one">%1$d miesiąc</item>
+        <item quantity="few">%1$d miesiące</item>
+        <item quantity="many">%1$d miesiące</item>
+        <item quantity="other">%1$d miesiące</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="one">%1$d tydzień</item>
+        <item quantity="few">%1$d tygodni</item>
+        <item quantity="many">%1$d tygodni</item>
+        <item quantity="other">%1$d tygodni</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="one">%1$d dzień</item>
+        <item quantity="few">%1$d dni</item>
+        <item quantity="many">%1$d dni</item>
+        <item quantity="other">%1$d dni</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="one">%1$d godzina</item>
+        <item quantity="few">%1$d godzin</item>
+        <item quantity="many">%1$d godzin</item>
+        <item quantity="other">%1$d godzin</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">Niektóre kontakty, którym udostępniasz informacje, nie zostały przez Ciebie zweryfikowane. Aby zapewnić dodatkowe bezpieczeństwo, zalecamy zweryfikowanie ich poświadczeń w aplikacji Kontakty. Wybierz trzy kropki obok kontaktu, który chcesz zweryfikować, a następnie wybierz opcję Informacje.</string>
+    <string name="file_type_name_powerpoint">Prezentacja PowerPoint</string>
+    <string name="file_type_name_spreadsheet">Arkusz kalkulacyjny</string>
+    <string name="file_type_name_numbers">Arkusz kalkulacyjny Numbers</string>
+    <string name="file_type_name_pages">Dokument Pages</string>
+    <string name="file_type_name_openoffice">Dokument OpenOffice</string>
+    <string name="file_type_name_photoshop">Adobe Photoshop</string>
+    <string name="file_type_name_illustrator">Adobe Illustrator</string>
+    <string name="file_type_name_indesign">Adobe InDesign</string>
+    <string name="file_type_name_premiere">Adobe Premiere</string>
+    <string name="file_type_name_aftereffects">Adobe After Effects</string>
+    <string name="file_type_name_xd">Adobe XD</string>
+    <string name="file_type_name_cad">plik CAD</string>
+    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">W związku z tym pobieranie może zostać przerwane. Zarządzaj swoim planem na [A]mega.io[/A], aby uzyskać dodatkowy limit transferu</string>
+    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">W związku z tym odtwarzanie multimediów może zostać przerwane. Zarządzaj swoim planem na [A]mega.io[/A], aby uzyskać większy limit transferu</string>
+    <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">Aby kontynuować pobieranie, zarządzaj swoim planem na [A]mega.io[/A], aby uzyskać dodatkowy limit transferu</string>
+    <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">Aby kontynuować odtwarzanie multimediów, zarządzaj swoim planem na [A]mega.io[/A], aby uzyskać dodatkowy limit transferu</string>
+    <string name="subscription_quota_contact_support">Kontakt do obsługi klienta</string>
+    <string name="file_type_name_executable">Wykonywalny</string>
+    <string name="file_type_name_three_d">Plik 3D</string>
+    <string name="file_type_name_generic">%1$s plik</string>
+    <string name="file_type_name_url">URL</string>
+    <string name="file_type_name_keynote">Prezentacja Keynote</string>
+    <string name="file_type_name_font">Czcionka</string>
+    <string name="file_type_name_disk_image">Obraz dysku</string>
+    <string name="file_type_name_torrent">Torrent</string>
+    <string name="file_type_name_web">Plik internetowy</string>
+    <string name="file_type_name_quicktime_video">Wideo QuickTime</string>
+    <string name="file_type_name_avi_video">Wideo AVI</string>
+    <string name="file_type_name_mkv_video">Wideo MKV</string>
+    <string name="file_type_name_wav_audio">Dźwięk WAV</string>
+    <string name="file_type_name_m4a_audio">Dźwięk M4A</string>
+    <string name="file_type_name_webp_image">Obraz WebP</string>
+    <string name="file_type_name_rar_compressed">Skompresowany w formacie RAR</string>
+    <string name="file_type_name_7zip_compressed">Skompresowane przez 7-Zip</string>
+    <string name="subscription_quota_storage_highest_plan_subtitle">Zwolnij miejsce w dysku w chmurze lub zarządzaj swoim planem na [A]mega.io[/A], aby mieć więcej miejsca</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

@@ -2642,4 +2642,190 @@
         <item quantity="other">Minuten</item>
     </plurals>
     <string name="create_group_chat_link_requires_name_error">Voer een groepsnaam in om een chatlink te krijgen</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">Uitnodiging niet verstuurd</string>
+    <string name="contacts_qr_invalid_code_dialog_body">De QR-code of contactlink is ongeldig. Probeer een geldige code te scannen of een geldige link te openen.</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="one">%1$d maand</item>
+        <item quantity="other">%1$d maanden</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dagen</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="one">%1$d uur</item>
+        <item quantity="other">%1$d uren</item>
+    </plurals>
+    <string name="file_info_information_owner_label">Eigenaar</string>
+    <string name="file_info_information_permissions_label">Toestemmingen</string>
+    <string name="file_info_information_no_location">Geen lokatie informatie</string>
+    <string name="file_info_information_current_versions_label">Huidige versies</string>
+    <string name="file_info_information_previous_versions_label">Vorige Versies</string>
+    <string name="file_info_information_shared_with_label">Gedeeld met</string>
+    <string name="subscription_quota_transfer_over_title">Overdracht tegoed overschreden</string>
+    <string name="file_type_name_video">Video</string>
+    <string name="file_type_name_audio">Audio</string>
+    <string name="home_do_more_with_mega_album_created_message">Album \“%1$s\“ aangemaakt</string>
+    <string name="home_do_more_with_mega_see_album_action">Album bekijken</string>
+    <string name="campaign_name_with_discount_up_to">%1$s: Bespaar tot %2$d%% korting</string>
+    <string name="subscription_revamp_price_per_year">%1$s/jaar</string>
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="one">Eerste %1$d maand gefactureerd op %2$s, daarna %3$s jaarlijks in rekening gebracht</item>
+        <item quantity="other">Eerste %1$d maanden gefactuureerd op %2$s, daarna %3$s jaarlijks in rekening gebracht</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="one">Gefactureerd op%2$s voor het eerste jaar,%3$s daarna jaarlijks in rekening gebracht</item>
+        <item quantity="other">Gefactuureerd op %2$s voor de eerste %1$d jaren,%3$s daarna jaarlijks in rekening gebracht</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="one">Gefactuureerd op %2$s voor de eerste maand, %3$s daarna</item>
+        <item quantity="other">Gefactuureerd op %2$s voor de eerste%1$d maanden, %3$s daarna</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="one">Gefactuureerd op %2$s voor het eerste jaar,%3$s daarna</item>
+        <item quantity="other">Gefactuureerd op %2$s voor de eerste %1$d jaren,%3$s daarna</item>
+    </plurals>
+    <plurals name="general_share_link_count_title">
+        <item quantity="one">%1$dlink</item>
+        <item quantity="other">%1$dlinks</item>
+    </plurals>
+    <string name="contacts_qr_already_contact_dialog_body">De uitnodiging is niet verzonden. %1$s staat al in uw contactenlijst.</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_title">QR scanner niet gereed</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_body">De QR-scanner is nog aan het downloaden. Probeer het over een paar seconden opnieuw.</string>
+    <string name="share_link_separate_key_title">Aparte schakel en sleutel</string>
+    <string name="share_link_separate_key_subtitle">De link bevat niet de decoderingssleutel. Deel de sleutel via een ander kanaal voor extra beveiliging.</string>
+    <plurals name="share_link_access_banner_description_with_key">
+        <item quantity="one">Iedereen met deze link en sleutel kan uw gegevens bekijken en downloaden</item>
+        <item quantity="other">Iedereen die over deze links en sleutels beschikt, kan uw gegevens bekijken en downloaden.</item>
+    </plurals>
+    <string name="subscription_revamp_current_plan_expiring_badge">Verlopen</string>
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="one">%1$dminuut</item>
+        <item quantity="other">%1$dminuten</item>
+    </plurals>
+    <string name="general_pro_label">Pro</string>
+    <string name="file_info_information_map_label">Map</string>
+    <string name="file_info_information_outgoing_share">Uitgaande deling</string>
+    <string name="file_info_information_incoming_share">Binnenkomende deling</string>
+    <string name="file_info_information_type_folder">Map</string>
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="one">%dcontact</item>
+        <item quantity="other">%dcontacten</item>
+    </plurals>
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="one">%dbestand met versiebeheer</item>
+        <item quantity="other">%dbestanden met versiebeheer</item>
+    </plurals>
+    <plurals name="file_info_information_num_versions">
+        <item quantity="one">%dversie</item>
+        <item quantity="other">%dversies</item>
+    </plurals>
+    <string name="create_group_chat_image_content_description">Groepsfoto</string>
+    <string name="create_group_chat_image_take_photo">Neem foto</string>
+    <string name="create_group_chat_image_choose_from_gallery">Kiezen vanuit gallerij</string>
+    <string name="subscription_quota_storage_almost_full_title">Uw opslag is %1$d%%vol</string>
+    <string name="subscription_quota_storage_almost_full_subtitle">Upgrade uw abonnement voordat uw opslagruimte op is</string>
+    <string name="subscription_quota_storage_over_subtitle">Upgrade uw abonnement voor meer opslagruimte en om meer bestanden te uploaden</string>
+    <string name="subscription_quota_transfer_low_title">Uw overdrachtstegoed raakt bijna op</string>
+    <string name="subscription_quota_transfer_percentage_used_title">U heeft %1$d%% van uw overdrachtstegoed verbruikt</string>
+    <string name="subscription_quota_transfer_low_download_subtitle">Hierdoor kan uw download worden onderbroken. Upgrade uw abonnement voor meer overdrachtscapaciteit.</string>
+    <string name="subscription_quota_transfer_low_streaming_subtitle">Hierdoor kan het afspelen van media worden onderbroken. Upgrade uw abonnement voor meer overdrachtscapaciteit.</string>
+    <string name="subscription_quota_transfer_over_download_subtitle">Upgrade uw abonnement om meer overdrachtscapaciteit te krijgen en uw download voort te zetten.</string>
+    <string name="subscription_quota_transfer_over_streaming_subtitle">Upgrade uw abonnement voor meer overdrachtscapaciteit om het afspelen van media voort te zetten.</string>
+    <string name="subscription_quota_current_plan_storage_usage">%1$svan%2$sverbruikt</string>
+    <string name="subscription_quota_current_plan_transfer_usage">%1$sverbruikt</string>
+    <string name="subscription_quota_recommended_storage_usage">%1$svan%2$sverbruikt</string>
+    <string name="subscription_quota_recommended_transfer_usage">%1$svan%2$sverbruikt</string>
+    <string name="subscription_quota_best_for_you">Aanbevolen voor u</string>
+    <string name="subscription_quota_charged_yearly">%1$sjaarlijks in rekening gebracht</string>
+    <string name="subscription_quota_upgrade_button">Upgrade naar%1$s</string>
+    <string name="subscription_quota_view_all_plans">Bekijk alle abonnementen</string>
+    <string name="subscription_quota_current_plan_transfer_usage_with_total">%1$svan%2$sverbruikt</string>
+    <string name="subscription_quota_storage_over_upload_subtitle">U heeft geen opslagruimte meer. Upgrade uw abonnement om door te gaan met uploaden</string>
+    <string name="audio_player_podcast_mode_label">Podcast modus</string>
+    <string name="audio_player_music_mode_label">Muziek modus</string>
+    <string name="add_contacts_manual_email_placeholder">Voer e-mail adres in</string>
+    <string name="add_contacts_manual_email_add_action">E-mail adres toevoegen</string>
+    <string name="add_contacts_manual_email_already_added_error">E-mail al toegevoegd</string>
+    <string name="file_type_name_image">afbeelding</string>
+    <string name="file_type_name_compressed">Gecomprimeerd</string>
+    <string name="file_type_name_text">Tekst</string>
+    <string name="file_type_name_vector">Vector</string>
+    <string name="file_type_name_mpeg4_video">MPEG-4 video</string>
+    <string name="file_type_name_mp3_audio">MP3 audio</string>
+    <string name="file_type_name_png_image">PNG afbeelding</string>
+    <string name="file_type_name_jpeg_image">JPEG afbeelding</string>
+    <string name="file_type_name_gif_image">Gif afbeelding</string>
+    <string name="file_type_name_heic_image">HEIC afbeelding</string>
+    <string name="file_type_name_zip_compressed">Zip-gecomprimeerd</string>
+    <string name="file_type_name_pdf_document">PDF document</string>
+    <string name="file_type_name_raw">Ruwe afbeelding</string>
+    <string name="file_type_name_word">Word document</string>
+    <string name="file_type_name_excel">Excel spreadsheet</string>
+    <string name="file_type_name_spreadsheet">Spreadsheet</string>
+    <string name="file_type_name_powerpoint">PowerPoint presentatie</string>
+    <string name="file_type_name_keynote">Keynote-presentatie</string>
+    <string name="file_type_name_numbers">Numbers-spreadsheet</string>
+    <string name="file_type_name_pages">Pages document</string>
+    <string name="file_type_name_openoffice">OpenOffice document</string>
+    <string name="file_type_name_photoshop">Adobe Photoshop</string>
+    <string name="file_type_name_illustrator">Adobe Illustrator</string>
+    <string name="file_type_name_indesign">Adobe InDesign</string>
+    <string name="file_type_name_premiere">Adobe Premiere</string>
+    <string name="file_type_name_aftereffects">Adobe After Effects</string>
+    <string name="file_type_name_xd">Adobe XD</string>
+    <string name="file_type_name_cad">CAD bestand</string>
+    <string name="file_type_name_font">Lettertype</string>
+    <string name="file_type_name_executable">Uitvoerbaar</string>
+    <string name="file_type_name_disk_image">Schijf afbeelding</string>
+    <string name="file_type_name_torrent">Torrent</string>
+    <string name="file_type_name_three_d">3D bestand</string>
+    <string name="file_type_name_web">Web bestand</string>
+    <string name="file_type_name_url">URL</string>
+    <string name="file_type_name_generic">%1$sbestand</string>
+    <string name="file_type_name_quicktime_video">QuickTime video</string>
+    <string name="file_type_name_avi_video">AVI video</string>
+    <string name="file_type_name_mkv_video">MKV video</string>
+    <string name="file_type_name_wav_audio">WAV audio</string>
+    <string name="file_type_name_m4a_audio">M4A audio</string>
+    <string name="file_type_name_webp_image">WebP image</string>
+    <string name="file_type_name_rar_compressed">RAR gecomprimeerd</string>
+    <string name="file_type_name_7zip_compressed">7-Zip gecomprimeerd</string>
+    <string name="contact_info_set_nickname">Bijnaam Instellen</string>
+    <string name="contact_info_edit_nickname">Bijnaam Wijzigen</string>
+    <string name="contact_info_verify_credentials">Verifieer aanmeldgegevens</string>
+    <string name="contact_info_credentials_verified">Geverifieerd</string>
+    <string name="contact_info_credentials_not_verified">Niet geverifieerd</string>
+    <string name="contact_info_share_contact">Contact delen</string>
+    <string name="contact_info_chat_notifications">Gespreksmeldingen</string>
+    <string name="contact_info_notifications_muted">Uit</string>
+    <string name="contact_info_shared_files">Gedeelde bestanden</string>
+    <string name="contact_info_manage_chat_history">Beheer gespreksgeschiedenis</string>
+    <string name="contact_info_manage_chat_history_subtitle">Automatisch berichten verwijderen ouder dan:</string>
+    <string name="contact_info_retention_time_year">1 jaar</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="one">%1$d maand</item>
+        <item quantity="other">%1$d maanden</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="one">%1$d week</item>
+        <item quantity="other">%1$d weken</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dagen</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="one">%1$d uur</item>
+        <item quantity="other">%1$d uren</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">Sommige contacten met wie u informatie deelt, zijn niet door u geverifieerd. Om extra veiligheid te garanderen, raden we u aan hun inloggegevens te verifiëren in Contacten. Tik op de drie puntjes naast het contact dat u wilt verifiëren en tik op Info.</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

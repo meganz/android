@@ -2620,7 +2620,7 @@
     <string name="general_file_type">Тип файла</string>
     <string name="more_options">Дополнительные параметры</string>
     <plurals name="viewed_links_remove_selected_links_dialog_title">
-        <item quantity="one"></item>
+        <item quantity="one"/>
         <item quantity="few">Очистить просмотренные ссылки?</item>
         <item quantity="many">Очистить просмотренные ссылки?</item>
         <item quantity="other">Очистить просмотренные ссылки?</item>
@@ -2645,7 +2645,7 @@
     <string name="chat_explorer_read_only_chat_warning">Этот разговор доступен только для чтения.</string>
     <string name="contacts_empty_title">Контакты не найдены.</string>
     <plurals name="general_number_participants">
-        <item quantity="one"></item>
+        <item quantity="one"/>
         <item quantity="few">%1$d участники</item>
         <item quantity="many">%1$d участники</item>
         <item quantity="other">%1$d участники</item>
@@ -2659,7 +2659,7 @@
     <string name="contacts_action_remove_contact">Удалить контакт</string>
     <string name="cloud_drive_inactivity_banner_title">Ваш аккаунт был неактивен слишком долго.</string>
     <plurals name="cloud_drive_inactivity_banner_message">
-        <item quantity="one"></item>
+        <item quantity="one"/>
         <item quantity="few">Поскольку ваш аккаунт был неактивен более %1$d месяцев, ваши файлы были удалены в соответствии с нашей политикой бездействия.</item>
         <item quantity="many">Поскольку ваш аккаунт был неактивен более %1$d месяцев, ваши файлы были удалены в соответствии с нашей политикой бездействия.</item>
         <item quantity="other">Поскольку ваш аккаунт был неактивен более %1$d месяцев, ваши файлы были удалены в соответствии с нашей политикой бездействия.</item>
@@ -2685,7 +2685,7 @@
     <string name="home_do_more_with_mega_create_album">Создать альбом</string>
     <string name="notifications_payment_info_section">Платёжная информация</string>
     <plurals name="general_selection_num_selected">
-        <item quantity="one"></item>
+        <item quantity="one"/>
         <item quantity="few">%1$d Выбрано</item>
         <item quantity="many">%1$d Выбрано</item>
         <item quantity="other">%1$d Выбрано</item>
@@ -2693,7 +2693,7 @@
     <string name="contacts_groups_empty_title">Нет групп</string>
     <string name="public_link_auth_alert_description_external_file">Храните этот файл в безопасности и имейте к нему доступ в любое время.</string>
     <plurals name="notifications_history_updated_items_subtitle">
-        <item quantity="one"></item>
+        <item quantity="one"/>
         <item quantity="few">[A]%1$s [/A][B]обновленные %2$d элементы.[/B]</item>
         <item quantity="many">[A]%1$s [/A][B]обновленные %2$d элементы.[/B]</item>
         <item quantity="other">[A]%1$s [/A][B]обновленные %2$d элементы.[/B]</item>
@@ -2708,13 +2708,13 @@
     <string name="notifications_payment_failed_title">Платеж за план %1$s не выполнен</string>
     <string name="notifications_payment_reminder_expired_section">План Pro истёк</string>
     <plurals name="notifications_payment_reminder_will_expire">
-        <item quantity="one"></item>
+        <item quantity="one"/>
         <item quantity="few">Ваш план Pro истекает через %1$d дней</item>
         <item quantity="many">Ваш план Pro истекает через %1$d дней</item>
         <item quantity="other">Ваш план Pro истекает через %1$d дней</item>
     </plurals>
     <plurals name="notifications_payment_reminder_expired">
-        <item quantity="one"></item>
+        <item quantity="one"/>
         <item quantity="few">Ваш план Pro истёк %1$d дней назад</item>
         <item quantity="many">Ваш план Pro истёк %1$d дней назад</item>
         <item quantity="other">Ваш план Pro истёк %1$d дней назад</item>
@@ -2804,4 +2804,78 @@
     <string name="password_strength_strong">Надёжный пароль</string>
     <string name="password_placeholder">Введите пароль</string>
     <string name="new_chat_title">Новый чат</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">Приглашение не отправлено</string>
+    <string name="contacts_qr_invalid_code_dialog_body">QR-код или ссылка недействительна. Попробуйте просканировать правильный код или открыть действительную ссылку.</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="one">%1$d месяц</item>
+        <item quantity="few">%1$d месяца</item>
+        <item quantity="many">%1$d месяцев</item>
+        <item quantity="other">%1$d месяцев</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дней</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="one">%1$d час</item>
+        <item quantity="few">%1$d часа</item>
+        <item quantity="many">%1$d часов</item>
+        <item quantity="other">%1$d часов</item>
+    </plurals>
+    <string name="file_info_information_owner_label">Владелец</string>
+    <string name="file_info_information_permissions_label">Права</string>
+    <string name="file_info_information_no_location">Нет информации о местоположении</string>
+    <string name="file_info_information_current_versions_label">Текущие версии</string>
+    <string name="file_info_information_previous_versions_label">Предыдущие версии</string>
+    <string name="file_info_information_shared_with_label">Общий доступ с</string>
+    <string name="subscription_quota_transfer_over_title">Превышен лимит передачи данных</string>
+    <string name="file_type_name_video">Видео</string>
+    <string name="file_type_name_audio">Аудио</string>
+    <string name="contact_info_set_nickname">Задать псевдоним</string>
+    <string name="contact_info_edit_nickname">Изменить псевдоним</string>
+    <string name="contact_info_verify_credentials">Подтверждение учётных данных</string>
+    <string name="contact_info_credentials_verified">Проверены</string>
+    <string name="contact_info_credentials_not_verified">Не проверены</string>
+    <string name="contact_info_share_contact">Поделиться контактом</string>
+    <string name="contact_info_chat_notifications">Уведомления чата</string>
+    <string name="contact_info_notifications_muted">Выкл</string>
+    <string name="contact_info_shared_files">Общие файлы</string>
+    <string name="contact_info_manage_chat_history">Управление историей чата</string>
+    <string name="contact_info_manage_chat_history_subtitle">Автоматически удалять сообщения старше:</string>
+    <string name="contact_info_retention_time_year">1 год</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="one">%1$d месяц</item>
+        <item quantity="few">%1$d месяца</item>
+        <item quantity="many">%1$d месяцев</item>
+        <item quantity="other">%1$d месяцев</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="one">%1$d неделя</item>
+        <item quantity="few">%1$d недели</item>
+        <item quantity="many">%1$d недель</item>
+        <item quantity="other">%1$d недель</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дней</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="one">%1$d час</item>
+        <item quantity="few">%1$d часа</item>
+        <item quantity="many">%1$d часов</item>
+        <item quantity="other">%1$d часов</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">Некоторые контакты, с которыми вы делитесь информацией, не были вами подтверждены. Чтобы обеспечить дополнительную безопасность, мы рекомендуем вам подтвердить их учетные данные в «Контактах». Нажмите на три точки рядом с контактом, который хотите подтвердить, затем нажмите «Информация».</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

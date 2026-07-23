@@ -2476,4 +2476,57 @@
     <string name="password_strength_good">Bagus</string>
     <string name="password_placeholder">Masukkan password</string>
     <string name="new_chat_title">Obrolan baru</string>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">Undangan tidak terkirim</string>
+    <string name="contacts_qr_invalid_code_dialog_body">Kode QR atau tautan kontak tidak valid. Cobalah untuk memindai kode yang valid atau membuka tautan yang valid.</string>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="other">%1$d bulan</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="other">%1$d hari</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="other">%1$d jam</item>
+    </plurals>
+    <string name="file_info_information_no_location">Tidak ada informasi lokasi</string>
+    <string name="file_info_information_owner_label">Pemilik</string>
+    <string name="file_info_information_permissions_label">Izin</string>
+    <string name="file_info_information_current_versions_label">Versi saat ini</string>
+    <string name="file_info_information_shared_with_label">Berbagi dengan</string>
+    <string name="file_info_information_previous_versions_label">Versi sebelumnya</string>
+    <string name="subscription_quota_transfer_over_title">Kuota transfer telah terlewati</string>
+    <string name="file_type_name_video">Video</string>
+    <string name="file_type_name_audio">Audio</string>
+    <string name="contact_info_edit_nickname">Atur nama panggilan</string>
+    <string name="contact_info_verify_credentials">Verifikasi kredential</string>
+    <string name="contact_info_chat_notifications">Notifikasi obrolan</string>
+    <string name="contact_info_credentials_verified">Terverifikasi</string>
+    <string name="contact_info_share_contact">Bagikan kontak</string>
+    <string name="contact_info_manage_chat_history">Kelola riwayat obrolan</string>
+    <string name="contact_info_shared_files">File bersama</string>
+    <string name="contact_info_manage_chat_history_subtitle">Secara otomatis menghapus pesan yang lebih lama dari:</string>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="other">%1$d hari</item>
+    </plurals>
+    <string name="contact_info_set_nickname">Setel nama panggilan</string>
+    <string name="contact_info_notifications_muted">Mati</string>
+    <string name="contact_info_credentials_not_verified">Tidak diverifikasi</string>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="other">%1$d jam</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="other">%1$d minggu</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="other">%1$d bulan</item>
+    </plurals>
+    <string name="contact_info_retention_time_year">1 tahun</string>
+    <string name="add_contacts_unverified_contact_warning">Beberapa kontak yang anda bagikan informasi belum diverifikasi oleh anda. Untuk memastikan keamanan ekstra, kami menyarankan anda memverifikasi kredensial mereka di Kontak. Ketuk tiga titik di sebelah kontak yang ingin anda verifikasi dan ketuk Info.</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>

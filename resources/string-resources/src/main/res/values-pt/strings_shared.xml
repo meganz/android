@@ -2743,4 +2743,213 @@
     <string name="password_placeholder">Digite a senha</string>
     <string name="new_chat_title">Novo chat</string>
     <string name="create_group_chat_link_requires_name_error">Digite o nome do grupo para obter um link do chat</string>
+    <string name="home_do_more_with_mega_album_created_message">Álbum “%1$s” criado</string>
+    <string name="home_do_more_with_mega_see_album_action">Ver álbum</string>
+    <string name="campaign_name_with_discount_up_to">%1$s: até %2$d%% de desconto</string>
+    <string name="subscription_revamp_price_per_year">%1$s por ano</string>
+    <plurals name="subscription_offer_billed_yearly_months">
+        <item quantity="one">Pagamento de %2$s durante o primeiro mês, e depois pagamento anual de %3$s</item>
+        <item quantity="many">Pagamento de %2$s durante os primeiros %1$d de meses, e depois pagamento anual de %3$s</item>
+        <item quantity="other">Pagamento de %2$s durante os primeiros %1$d meses, e depois pagamento anual de %3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_yearly_years">
+        <item quantity="one">Pagamento de %2$s durante o primeiro ano, e depois pagamento anual de %3$s</item>
+        <item quantity="many">Pagamento de %2$s durante os primeiros %1$d de anos, e depois pagamento anual de %3$s</item>
+        <item quantity="other">Pagamento de %2$s durante os primeiros %1$d anos, e depois pagamento anual de %3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_months">
+        <item quantity="one">Pagamento de %2$s durante o primeiro mês, e depois %3$s</item>
+        <item quantity="many">Pagamento de %2$s durante os primeiros %1$d de meses, e depois %3$s</item>
+        <item quantity="other">Pagamento de %2$s durante os primeiros %1$d meses, e depois %3$s</item>
+    </plurals>
+    <plurals name="subscription_offer_billed_monthly_years">
+        <item quantity="one">Pagamento de %2$s durante o primeiro ano, e depois %3$s</item>
+        <item quantity="many">Pagamento de %2$s durante os primeiros %1$d de anos, e depois %3$s</item>
+        <item quantity="other">Pagamento de %2$s durante os primeiros %1$d anos, e depois %3$s</item>
+    </plurals>
+    <plurals name="general_share_link_count_title">
+        <item quantity="one">%1$d link</item>
+        <item quantity="many">%1$d de links</item>
+        <item quantity="other">%1$d links</item>
+    </plurals>
+    <string name="contacts_qr_invitation_not_sent_dialog_title">Convite não enviado</string>
+    <string name="contacts_qr_invalid_code_dialog_body">O código QR ou o link de contato é inválido. Tente escanear um código válido ou acessar um link válido.</string>
+    <string name="contacts_qr_already_contact_dialog_body">O convite não foi enviado. %1$s já está na sua lista de contatos.</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_title">O leitor de códigos QR não está pronto</string>
+    <string name="contacts_qr_scanner_not_ready_dialog_body">O download do leitor de códigos QR ainda não foi concluído. Tente novamente daqui a alguns segundos.</string>
+    <string name="share_link_separate_key_title">Separar o link e a chave</string>
+    <string name="share_link_separate_key_subtitle">O link não vai incluir a chave de decodificação. Compartilhe a chave usando outro canal para maior segurança.</string>
+    <plurals name="share_link_access_banner_description_with_key">
+        <item quantity="one">Qualquer pessoa com o link e a chave pode visualizar e fazer download dos dados</item>
+        <item quantity="many">Qualquer pessoa com os links e as chaves pode visualizar e fazer download dos dados</item>
+        <item quantity="other">Qualquer pessoa com os links e as chaves pode visualizar e fazer download dos dados</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_months">
+        <item quantity="one">%1$d mês</item>
+        <item quantity="many">%1$d meses</item>
+        <item quantity="other">%1$d meses</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_days">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="many">%1$d de dias</item>
+        <item quantity="other">%1$d dias</item>
+    </plurals>
+    <plurals name="subscription_revamp_current_plan_period_hours">
+        <item quantity="one">%1$d hora</item>
+        <item quantity="many">%1$d horas</item>
+        <item quantity="other">%1$d horas</item>
+    </plurals>
+    <string name="file_info_information_owner_label">Proprietário</string>
+    <string name="file_info_information_permissions_label">Permissão</string>
+    <string name="file_info_information_no_location">Não há informação de localização</string>
+    <string name="file_info_information_current_versions_label">Versões atuais</string>
+    <string name="file_info_information_previous_versions_label">Versões anteriores</string>
+    <string name="file_info_information_shared_with_label">Compartilhado com</string>
+    <string name="subscription_revamp_current_plan_expiring_badge">Prestes a expirar</string>
+    <plurals name="subscription_revamp_current_plan_period_minutes">
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="many">%1$d de minuto</item>
+        <item quantity="other">%1$d minutos</item>
+    </plurals>
+    <string name="general_pro_label">Pro</string>
+    <string name="file_info_information_map_label">Mapa</string>
+    <string name="file_info_information_outgoing_share">Pasta compartilhada por mim</string>
+    <string name="file_info_information_incoming_share">Pasta compartilhada comigo</string>
+    <string name="file_info_information_type_folder">Pasta</string>
+    <plurals name="file_info_information_num_contacts">
+        <item quantity="one">%d contato</item>
+        <item quantity="many">%d de contatos</item>
+        <item quantity="other">%d contatos</item>
+    </plurals>
+    <string name="subscription_quota_transfer_over_title">Cota de transferência excedida</string>
+    <plurals name="file_info_information_num_versions">
+        <item quantity="one">%d versão</item>
+        <item quantity="many">%d de versões</item>
+        <item quantity="other">%d versões</item>
+    </plurals>
+    <string name="create_group_chat_image_content_description">Foto do grupo</string>
+    <string name="create_group_chat_image_take_photo">Tirar foto</string>
+    <string name="file_type_name_video">Vídeo</string>
+    <string name="file_type_name_audio">Áudio</string>
+    <plurals name="file_info_information_num_versioned_files">
+        <item quantity="one">%d arquivo com versões</item>
+        <item quantity="many">%d de arquivos com versões</item>
+        <item quantity="other">%d arquivos com versões</item>
+    </plurals>
+    <string name="create_group_chat_image_choose_from_gallery">Selecionar da galeria</string>
+    <string name="subscription_quota_storage_almost_full_title">O seu armazenamento está %1$d%% cheio</string>
+    <string name="subscription_quota_storage_almost_full_subtitle">Faça upgrade do seu plano antes de ficar sem espaço de armazenamento</string>
+    <string name="subscription_quota_storage_over_subtitle">Faça upgrade do seu plano para ter mais espaço de armazenamento e fazer o upload de mais arquivos</string>
+    <string name="subscription_quota_transfer_low_title">A sua cota de transferência está acabando</string>
+    <string name="subscription_quota_transfer_percentage_used_title">Você usou %1$d%% da sua cota de transferência</string>
+    <string name="subscription_quota_transfer_low_download_subtitle">O seu download pode ser interrompido. Faça o upgrade do seu plano para obter mais cota de transferência.</string>
+    <string name="subscription_quota_transfer_low_streaming_subtitle">A reprodução de mídia pode ser interrompida. Faça o upgrade do seu plano para obter mais cota de transferência.</string>
+    <string name="subscription_quota_transfer_over_download_subtitle">Para continuar o download, faça upgrade do seu plano e obtenha mais cota de transferência.</string>
+    <string name="subscription_quota_transfer_over_streaming_subtitle">Para continuar a reprodução, faça o upgrade do seu plano e obtenha mais cota de transferência.</string>
+    <string name="subscription_quota_current_plan_storage_usage">%1$s de %2$s usados</string>
+    <string name="subscription_quota_current_plan_transfer_usage">%1$s usado</string>
+    <string name="subscription_quota_recommended_storage_usage">%1$s de %2$s usados</string>
+    <string name="subscription_quota_recommended_transfer_usage">%1$s de %2$s usados</string>
+    <string name="subscription_quota_best_for_you">Ideal para você</string>
+    <string name="subscription_quota_charged_yearly">Pagamento anual de %1$s</string>
+    <string name="subscription_quota_upgrade_button">Fazer upgrade para o plano %1$s</string>
+    <string name="subscription_quota_view_all_plans">Ver todos os planos</string>
+    <string name="subscription_quota_current_plan_transfer_usage_with_total">%1$s de %2$s usados</string>
+    <string name="subscription_quota_storage_over_upload_subtitle">Você ficou sem espaço de armazenamento. Faça o upgrade do seu plano para continuar fazendo upload</string>
+    <string name="audio_player_podcast_mode_label">Modo podcast</string>
+    <string name="audio_player_music_mode_label">Modo música</string>
+    <string name="add_contacts_manual_email_placeholder">Digite o(s) email(s)</string>
+    <string name="add_contacts_manual_email_add_action">Adicionar o(s) email(s)</string>
+    <string name="add_contacts_manual_email_already_added_error">O email já foi adicionado</string>
+    <string name="file_type_name_image">Imagem</string>
+    <string name="file_type_name_compressed">Compactado</string>
+    <string name="file_type_name_text">Texto</string>
+    <string name="file_type_name_vector">Vetor</string>
+    <string name="file_type_name_mpeg4_video">Vídeo MPEG-4</string>
+    <string name="file_type_name_mp3_audio">Áudio MP3</string>
+    <string name="file_type_name_png_image">Imagem PNG</string>
+    <string name="file_type_name_jpeg_image">Imagem JPEG</string>
+    <string name="file_type_name_gif_image">Imagem GIF</string>
+    <string name="file_type_name_heic_image">Imagem HEIC</string>
+    <string name="file_type_name_zip_compressed">Arquivo comprimido ZIP</string>
+    <string name="file_type_name_pdf_document">Documento PDF</string>
+    <string name="file_type_name_raw">Imagem RAW</string>
+    <string name="file_type_name_word">Documento do Word</string>
+    <string name="file_type_name_excel">Planilha do Excel</string>
+    <string name="file_type_name_spreadsheet">Planilha</string>
+    <string name="file_type_name_powerpoint">Apresentação do PowerPoint</string>
+    <string name="file_type_name_keynote">Apresentação do Keynote</string>
+    <string name="file_type_name_numbers">Planilha do Numbers</string>
+    <string name="file_type_name_pages">Documento do Pages</string>
+    <string name="file_type_name_openoffice">Documento do OpenOffice</string>
+    <string name="file_type_name_photoshop">Adobe Photoshop</string>
+    <string name="file_type_name_illustrator">Adobe Illustrator</string>
+    <string name="file_type_name_indesign">Adobe InDesign</string>
+    <string name="file_type_name_premiere">Adobe Premiere</string>
+    <string name="file_type_name_aftereffects">Adobe After Effects</string>
+    <string name="file_type_name_xd">Adobe XD</string>
+    <string name="file_type_name_cad">Arquivo CAD</string>
+    <string name="file_type_name_font">Fonte</string>
+    <string name="file_type_name_executable">Executável</string>
+    <string name="file_type_name_disk_image">Imagem de disco</string>
+    <string name="file_type_name_torrent">Torrent</string>
+    <string name="file_type_name_three_d">Arquivo 3D</string>
+    <string name="file_type_name_web">Arquivo da Web</string>
+    <string name="file_type_name_url">URL</string>
+    <string name="file_type_name_generic">Arquivo %1$s</string>
+    <string name="file_type_name_quicktime_video">Vídeo do QuickTime</string>
+    <string name="file_type_name_avi_video">Vídeo AVI</string>
+    <string name="file_type_name_mkv_video">Vídeo MKV</string>
+    <string name="file_type_name_wav_audio">Áudio WAV</string>
+    <string name="file_type_name_m4a_audio">Áudio M4A</string>
+    <string name="file_type_name_webp_image">Imagem WebP</string>
+    <string name="file_type_name_rar_compressed">Arquivo comprimido RAR</string>
+    <string name="file_type_name_7zip_compressed">Arquivo comprimido 7-Zip</string>
+    <string name="contact_info_set_nickname">Definir apelido</string>
+    <string name="contact_info_edit_nickname">Editar apelido</string>
+    <string name="contact_info_verify_credentials">Validar credenciais</string>
+    <string name="contact_info_credentials_verified">Verificado</string>
+    <string name="contact_info_credentials_not_verified">Verificação pendente</string>
+    <string name="contact_info_share_contact">Compartilhar o contato</string>
+    <string name="contact_info_chat_notifications">Notificações de chat</string>
+    <string name="contact_info_notifications_muted">Desativadas</string>
+    <string name="contact_info_shared_files">Arquivos compartilhados</string>
+    <string name="contact_info_manage_chat_history">Gerenciar o histórico do chat</string>
+    <string name="contact_info_manage_chat_history_subtitle">Excluir automaticamente mensagens com mais de:</string>
+    <string name="contact_info_retention_time_year">1 ano</string>
+    <plurals name="contact_info_retention_time_months">
+        <item quantity="one">%1$d mês</item>
+        <item quantity="many">%1$d meses</item>
+        <item quantity="other">%1$d meses</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_weeks">
+        <item quantity="one">%1$d semana</item>
+        <item quantity="many">%1$d semanas</item>
+        <item quantity="other">%1$d semanas</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_days">
+        <item quantity="one">%1$d dia</item>
+        <item quantity="many">%1$d de dias</item>
+        <item quantity="other">%1$d dias</item>
+    </plurals>
+    <plurals name="contact_info_retention_time_hours">
+        <item quantity="one">%1$d hora</item>
+        <item quantity="many">%1$d horas</item>
+        <item quantity="other">%1$d horas</item>
+    </plurals>
+    <string name="add_contacts_unverified_contact_warning">Você não verificou alguns dos contatos com os quais você está compartilhando informações. Como medida de segurança, recomendamos que você verifique as credenciais dos mesmos em Contatos. Toque nos três pontos ao lado do contato que quiser verificar e toque em Info.</string>
+    <string name="subscription_quota_storage_highest_plan_subtitle">Libere espaço na sua Nuvem de arquivos ou gerencie o seu plano em [A]mega.io[/A] para obter mais armazenamento</string>
+    <string name="subscription_quota_transfer_low_download_highest_plan_subtitle">O seu download pode ser interrompido. Gerencie o seu plano em [A]mega.io[/A] para obter mais cota de transferência</string>
+    <string name="subscription_quota_transfer_low_streaming_highest_plan_subtitle">A reprodução de mídia pode ser interrompida. Gerencie o seu plano em [A]mega.io[/A] para obter mais cota de transferência</string>
+    <string name="subscription_quota_transfer_over_download_highest_plan_subtitle">Para continuar o download, gerencie o seu plano em [A]mega.io[/A] para obter mais cota de transferência</string>
+    <string name="subscription_quota_transfer_over_streaming_highest_plan_subtitle">Para continuar reproduzindo mídia, gerencie o seu plano em [A]mega.io[/A] para obter mais cota de transferência</string>
+    <string name="subscription_quota_contact_support">Contatar o suporte</string>
+    <!-- Warning banner shown in the file info screen when a file has been taken down -->
+    <string name="file_info_taken_down_file_warning">This file has been taken down in accordance with our takedown policy.</string>
+    <!-- Warning banner shown in the file info screen when a folder has been taken down -->
+    <string name="file_info_taken_down_folder_warning">This folder has been taken down in accordance with our takedown policy.</string>
+    <!-- Action button on the taken-down warning banner; opens the takedown guidance policy web page -->
+    <string name="file_info_taken_down_action">Takedown Guidance Policy</string>
+    <!-- Label of the toolbar action that opens the QR code scanner on the contact pickers -->
+    <string name="contacts_qr_scan_action">Scan QR code</string>
 </resources>
