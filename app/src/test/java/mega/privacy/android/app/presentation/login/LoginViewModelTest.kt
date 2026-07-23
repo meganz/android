@@ -33,6 +33,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.account.AccountBlockedType
+import mega.privacy.android.domain.entity.analytics.FirebaseAnalyticsEvent
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.login.GoogleSignInResult
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -47,6 +48,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
+import mega.privacy.android.domain.usecase.analytics.SendFirebaseAnalyticsEventUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.MonitorUserCredentialsUseCase
@@ -135,6 +137,7 @@ internal class LoginViewModelTest {
     private val decodeGoogleIdTokenUseCase: DecodeGoogleIdTokenUseCase = mock()
     private val createAccountUseCase: CreateAccountUseCase = mock()
     private val clearPersistedFeatureFlagsUseCase = mock<ClearPersistedFeatureFlagsUseCase>()
+    private val sendFirebaseAnalyticsEventUseCase = mock<SendFirebaseAnalyticsEventUseCase>()
 
     @BeforeEach
     fun setUp() = runTest {
@@ -178,6 +181,7 @@ internal class LoginViewModelTest {
             decodeGoogleIdTokenUseCase = decodeGoogleIdTokenUseCase,
             createAccountUseCase = createAccountUseCase,
             clearPersistedFeatureFlagsUseCase = clearPersistedFeatureFlagsUseCase,
+            sendFirebaseAnalyticsEventUseCase = sendFirebaseAnalyticsEventUseCase,
         )
     }
 
@@ -581,6 +585,7 @@ internal class LoginViewModelTest {
                 eq(password),
                 any()
             )
+            verify(sendFirebaseAnalyticsEventUseCase).invoke(FirebaseAnalyticsEvent.CreateNewAccount)
         }
 
     @Test
@@ -592,6 +597,7 @@ internal class LoginViewModelTest {
 
             assertFalse(result)
             verifyNoInteractions(loginUseCase)
+            verifyNoInteractions(sendFirebaseAnalyticsEventUseCase)
         }
 
     @ParameterizedTest(name = "test that checkTemporalCredentials returns false when credentials are invalid: {0}")
@@ -606,6 +612,7 @@ internal class LoginViewModelTest {
 
         assertFalse(result)
         verifyNoInteractions(loginUseCase)
+        verifyNoInteractions(sendFirebaseAnalyticsEventUseCase)
     }
 
     @Test

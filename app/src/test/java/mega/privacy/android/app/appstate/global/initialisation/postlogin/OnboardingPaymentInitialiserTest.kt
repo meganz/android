@@ -3,7 +3,9 @@ package mega.privacy.android.app.appstate.global.initialisation.postlogin
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.usecase.account.ShouldShowUpgradeAccountUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.GetLastRegisteredEmailUseCase
+import mega.privacy.android.feature_flags.FirebaseABTestFeatures
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.destination.UpgradeAccountNavKey
@@ -25,6 +27,7 @@ class OnboardingPaymentInitialiserTest {
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val getLastRegisteredEmailUseCase = mock<GetLastRegisteredEmailUseCase>()
     private val navigationEventQueue = mock<NavigationEventQueue>()
+    private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
 
     @BeforeAll
     fun setUp() {
@@ -32,6 +35,7 @@ class OnboardingPaymentInitialiserTest {
             shouldShowUpgradeAccountUseCase = shouldShowUpgradeAccountUseCase,
             getCurrentUserEmail = getCurrentUserEmail,
             getLastRegisteredEmailUseCase = getLastRegisteredEmailUseCase,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             navigationEventQueue = navigationEventQueue,
         )
     }
@@ -42,6 +46,7 @@ class OnboardingPaymentInitialiserTest {
             shouldShowUpgradeAccountUseCase,
             getCurrentUserEmail,
             getLastRegisteredEmailUseCase,
+            getFeatureFlagValueUseCase,
             navigationEventQueue
         )
     }
@@ -72,32 +77,61 @@ class OnboardingPaymentInitialiserTest {
         }
 
     @Test
-    fun `test that nav event is emitted with isNewAccount true when emails match`() = runTest {
-        val email = "test@example.com"
+    fun `test that nav event is emitted with isNewAccount true when emails match and ab test flag is enabled`() =
+        runTest {
+            val email = "test@example.com"
 
-        shouldShowUpgradeAccountUseCase.stub {
-            on { invoke() }.thenReturn(true)
-        }
-        getCurrentUserEmail.stub {
-            on { invoke() }.thenReturn(email)
-        }
-        getLastRegisteredEmailUseCase.stub {
-            on { invoke() }.thenReturn(email)
+            shouldShowUpgradeAccountUseCase.stub {
+                on { invoke() }.thenReturn(true)
+            }
+            getCurrentUserEmail.stub {
+                on { invoke() }.thenReturn(email)
+            }
+            getLastRegisteredEmailUseCase.stub {
+                on { invoke() }.thenReturn(email)
+            }
+            getFeatureFlagValueUseCase.stub {
+                on { invoke(FirebaseABTestFeatures.ShowPaywallAfterSignup) }.thenReturn(true)
+            }
+
+            underTest("session", false)
+
+            verify(shouldShowUpgradeAccountUseCase).invoke()
+            verify(getCurrentUserEmail).invoke()
+            verify(getLastRegisteredEmailUseCase).invoke()
+            verify(getFeatureFlagValueUseCase).invoke(FirebaseABTestFeatures.ShowPaywallAfterSignup)
+            verify(navigationEventQueue).emit(
+                UpgradeAccountNavKey(
+                    isNewAccount = true,
+                    isUpgrade = false
+                ),
+                priority = NavPriority.Priority(10)
+            )
         }
 
-        underTest("session", false)
+    @Test
+    fun `test that no event is emitted when emails match and ab test flag is disabled`() =
+        runTest {
+            val email = "test@example.com"
 
-        verify(shouldShowUpgradeAccountUseCase).invoke()
-        verify(getCurrentUserEmail).invoke()
-        verify(getLastRegisteredEmailUseCase).invoke()
-        verify(navigationEventQueue).emit(
-            UpgradeAccountNavKey(
-                isNewAccount = true,
-                isUpgrade = false
-            ),
-            priority = NavPriority.Priority(10)
-        )
-    }
+            shouldShowUpgradeAccountUseCase.stub {
+                on { invoke() }.thenReturn(true)
+            }
+            getCurrentUserEmail.stub {
+                on { invoke() }.thenReturn(email)
+            }
+            getLastRegisteredEmailUseCase.stub {
+                on { invoke() }.thenReturn(email)
+            }
+            getFeatureFlagValueUseCase.stub {
+                on { invoke(FirebaseABTestFeatures.ShowPaywallAfterSignup) }.thenReturn(false)
+            }
+
+            underTest("session", false)
+
+            verify(getFeatureFlagValueUseCase).invoke(FirebaseABTestFeatures.ShowPaywallAfterSignup)
+            verifyNoInteractions(navigationEventQueue)
+        }
 
     @Test
     fun `test that nav event is emitted with isNewAccount false when emails do not match`() =
@@ -120,6 +154,7 @@ class OnboardingPaymentInitialiserTest {
             verify(shouldShowUpgradeAccountUseCase).invoke()
             verify(getCurrentUserEmail).invoke()
             verify(getLastRegisteredEmailUseCase).invoke()
+            verifyNoInteractions(getFeatureFlagValueUseCase)
             verify(navigationEventQueue).emit(
                 UpgradeAccountNavKey(
                     isNewAccount = false,
@@ -127,6 +162,30 @@ class OnboardingPaymentInitialiserTest {
                 ),
                 priority = NavPriority.Priority(10)
             )
+        }
+
+    @Test
+    fun `test that no event is emitted when getFeatureFlagValueUseCase throws exception`() =
+        runTest {
+            val email = "test@example.com"
+
+            shouldShowUpgradeAccountUseCase.stub {
+                on { invoke() }.thenReturn(true)
+            }
+            getCurrentUserEmail.stub {
+                on { invoke() }.thenReturn(email)
+            }
+            getLastRegisteredEmailUseCase.stub {
+                on { invoke() }.thenReturn(email)
+            }
+            getFeatureFlagValueUseCase.stub {
+                on { invoke(FirebaseABTestFeatures.ShowPaywallAfterSignup) }
+                    .thenThrow(RuntimeException("Test error"))
+            }
+
+            underTest("session", false)
+
+            verifyNoInteractions(navigationEventQueue)
         }
 
     @Test

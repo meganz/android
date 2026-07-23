@@ -42,6 +42,7 @@ import mega.privacy.android.app.utils.ConstantsUrl.recoveryUrlWithEmail
 import mega.privacy.android.domain.entity.AccountBlockedEvent
 import mega.privacy.android.domain.entity.account.AccountBlockedType
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.analytics.FirebaseAnalyticsEvent
 import mega.privacy.android.domain.entity.camerauploads.CameraUploadsRestartMode
 import mega.privacy.android.domain.entity.login.megaPassword
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.exception.account.CreateAccountException
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.account.CheckRecoveryKeyUseCase
+import mega.privacy.android.domain.usecase.analytics.SendFirebaseAnalyticsEventUseCase
 import mega.privacy.android.domain.usecase.account.ClearUserCredentialsUseCase
 import mega.privacy.android.domain.usecase.account.CreateAccountUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountBlockedUseCase
@@ -135,6 +137,7 @@ class LoginViewModel @Inject constructor(
     private val decodeGoogleIdTokenUseCase: DecodeGoogleIdTokenUseCase,
     private val createAccountUseCase: CreateAccountUseCase,
     private val clearPersistedFeatureFlagsUseCase: ClearPersistedFeatureFlagsUseCase,
+    private val sendFirebaseAnalyticsEventUseCase: SendFirebaseAnalyticsEventUseCase,
 ) : ViewModel() {
     private val is2FARequited = savedStateHandle[IS_2FA_REQUIRED] ?: false
 
@@ -529,6 +532,8 @@ class LoginViewModel @Inject constructor(
     fun checkTemporalCredentials(): Boolean {
         val ephemeralCredentials = ephemeralCredentialManager.getEphemeralCredential()
         return if (ephemeralCredentials != null && !ephemeralCredentials.email.isNullOrEmpty() && !ephemeralCredentials.password.isNullOrEmpty()) {
+            // Required for Firebase A/B testing
+            sendFirebaseAnalyticsEventUseCase(FirebaseAnalyticsEvent.CreateNewAccount)
             performLogin(ephemeralCredentials.email, ephemeralCredentials.password)
             true
         } else {

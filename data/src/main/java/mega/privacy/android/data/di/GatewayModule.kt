@@ -14,6 +14,7 @@ import mega.privacy.android.data.facade.ClipboardFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.FileManagementPreferencesFacade
+import mega.privacy.android.data.facade.FirebaseAnalyticsFacade
 import mega.privacy.android.data.facade.FirebaseRemoteConfigFacade
 import mega.privacy.android.data.facade.HttpConnectionFacade
 import mega.privacy.android.data.facade.MediaRecorderFacade
@@ -46,6 +47,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.FirebaseAnalyticsGateway
 import mega.privacy.android.data.gateway.HttpConnectionGateway
 import mega.privacy.android.data.gateway.MediaRecorderGateway
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -313,6 +315,10 @@ internal abstract class GatewayModule {
     @Binds
     @Singleton
     abstract fun bindRemoteConfigGateway(implementation: FirebaseRemoteConfigFacade): RemoteConfigGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindFirebaseAnalyticsGateway(implementation: FirebaseAnalyticsFacade): FirebaseAnalyticsGateway
 
     @Binds
     @Singleton

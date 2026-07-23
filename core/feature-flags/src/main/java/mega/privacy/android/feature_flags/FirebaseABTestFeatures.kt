@@ -28,11 +28,13 @@ enum class FirebaseABTestFeatures(
      *
      * Controls whether the upgrade/paywall screen is shown right after signup completes.
      * The goal is to measure the impact on revenue and retention.
+     *
+     * Default is true to keep the current behaviour
      */
     ShowPaywallAfterSignup(
         remoteConfigKey = "show_paywall_after_signup",
         description = "Show the upgrade/paywall screen right after signup completes",
-        defaultValue = false,
+        defaultValue = true,
     );
 
     companion object : FeatureFlagValueProvider {

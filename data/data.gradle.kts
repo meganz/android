@@ -68,6 +68,7 @@ dependencies {
     implementation(platform(google.firebase.bom))
     implementation(google.firebase.perf)
     implementation(google.firebase.config)
+    implementation(google.firebase.analytics)
 
     // Logging
     implementation(lib.bundles.logging)
