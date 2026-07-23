@@ -56,6 +56,18 @@ class RemoveNodeLinkViewModelTest {
         verify(disableExportNodesUseCase).invoke(nodeIds)
     }
 
+    @Test
+    fun `test that the mapped result message is posted to the snackbar when disableExport succeeds`() =
+        runTest {
+            val result = ResultCount(successCount = 2, errorCount = 0)
+            whenever(disableExportNodesUseCase(handles.map { NodeId(it) })).thenReturn(result)
+            whenever(removePublicLinkResultMapper(result)).thenReturn(MESSAGE)
+
+            underTest.disableExport(handles)
+
+            verify(snackbarEventQueue).queueMessage(MESSAGE)
+        }
+
     @AfterEach
     fun resetMock() {
         reset(
@@ -63,5 +75,9 @@ class RemoveNodeLinkViewModelTest {
             removePublicLinkResultMapper,
             snackbarEventQueue
         )
+    }
+
+    private companion object {
+        const val MESSAGE = "Links removed"
     }
 }
