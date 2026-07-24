@@ -54,6 +54,18 @@ internal class MegaChatApiFacade @Inject constructor(
     override val initState: Int
         get() = chatApi.initState
 
+    /**
+     * Whether the chat engine is in a state where call queries are safe. Querying the SDK for
+     * calls while the chat is not initialized (e.g. after logout) dereferences a null native
+     * pointer and crashes the process, so the call getters are gated on this.
+     */
+    private val isChatInitialized: Boolean
+        get() = chatApi.initState.let { state ->
+            state == MegaChatApi.INIT_ONLINE_SESSION ||
+                    state == MegaChatApi.INIT_OFFLINE_SESSION ||
+                    state == MegaChatApi.INIT_ANONYMOUS
+        }
+
     override fun init(session: String?): Int =
         chatApi.init(session)
 
@@ -308,16 +320,16 @@ internal class MegaChatApiFacade @Inject constructor(
         chatApi.getChatListItems(mask, filter)
 
     override fun getChatCall(chatId: Long): MegaChatCall? =
-        chatApi.getChatCall(chatId)
+        if (isChatInitialized) chatApi.getChatCall(chatId) else null
 
     override fun getChatCallByCallId(callId: Long): MegaChatCall? =
-        chatApi.getChatCallByCallId(callId)
+        if (isChatInitialized) chatApi.getChatCallByCallId(callId) else null
 
     override fun getChatCalls(state: Int): MegaHandleList? =
-        chatApi.getChatCalls(state)
+        if (isChatInitialized) chatApi.getChatCalls(state) else null
 
     override fun getChatCallIds(): MegaHandleList? =
-        chatApi.chatCallsIds
+        if (isChatInitialized) chatApi.chatCallsIds else null
 
     override fun startChatCall(
         chatId: Long,

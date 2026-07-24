@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.appstate.MegaActivity
+import mega.privacy.android.app.meeting.CallService
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -29,6 +30,7 @@ class ChatLogoutHandler @Inject constructor(
 ) {
     fun handleChatLogout(isLoggingIn: Boolean) {
         sharingScope.launch {
+            stopCallService()
             runCatching { localLogoutAppUseCase() }
                 .onFailure { Timber.d(it) }
 
@@ -49,5 +51,16 @@ class ChatLogoutHandler @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Stops the ongoing-call foreground service on logout. Its "call in progress" notification
+     * otherwise survives logout and, when tapped, re-enters the meeting flow against a torn-down
+     * chat engine, crashing the process (AND-19389).
+     */
+    private fun stopCallService() {
+        runCatching {
+            context.stopService(Intent(context, CallService::class.java))
+        }.onFailure { Timber.w(it, "Failed to stop CallService on logout") }
     }
 }

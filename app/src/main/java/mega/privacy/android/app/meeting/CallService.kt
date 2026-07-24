@@ -680,6 +680,7 @@ class CallService : LifecycleService() {
      * Service ends
      */
     override fun onDestroy() {
+        stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
 
         callChangesObserver.setOpenCallChatId(MEGACHAT_INVALID_HANDLE)

@@ -256,6 +256,7 @@ class MeetingActivity : PasscodeActivity() {
         intent = newIntent
 
         initIntent()
+        if (isFinishing) return
         initActionBar()
         initNavigation()
     }
@@ -274,6 +275,7 @@ class MeetingActivity : PasscodeActivity() {
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         initIntent()
+        if (isFinishing) return
 
         binding = ActivityMeetingBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -423,10 +425,22 @@ class MeetingActivity : PasscodeActivity() {
     private fun initIntent() {
         intent?.let {
             Timber.d("Intent action: $it")
-            val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE).let { chatId ->
-                meetingViewModel.updateChatRoomId(chatId)
-                chatId
+
+            isGuest = it.getBooleanExtra(MEETING_IS_GUEST, false)
+            meetingAction = it.action
+            val chatId = it.getLongExtra(MEETING_CHAT_ID, MEGACHAT_INVALID_HANDLE)
+
+            if (meetingAction != MEETING_ACTION_RINGING &&
+                ((!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere())
+            ) {
+                if (chatId != MEGACHAT_INVALID_HANDLE) {
+                    MegaApplication.getChatManagement().removeNotificationShown(chatId)
+                }
+                finish()
+                return
             }
+
+            meetingViewModel.updateChatRoomId(chatId)
 
             if (it.action == CallNotificationIntentService.ANSWER) {
                 it.extras?.let { extra ->
@@ -478,23 +492,6 @@ class MeetingActivity : PasscodeActivity() {
 
             // Cancel current notification if needed
             notificationManager.cancel(chatId.toInt())
-
-            isGuest = it.getBooleanExtra(
-                MEETING_IS_GUEST,
-                false
-            )
-
-            meetingAction = it.action
-            if (meetingAction != MEETING_ACTION_RINGING && ((!isGuest && shouldRefreshSessionDueToSDK()) || shouldRefreshSessionDueToKarere())) {
-                meetingViewModel.state.value.chatId.let { currentChatId ->
-                    if (currentChatId != MEGACHAT_INVALID_HANDLE) {
-                        //Notification of this call should be displayed again
-                        MegaApplication.getChatManagement().removeNotificationShown(currentChatId)
-                    }
-                }
-
-                return
-            }
 
             meetingViewModel.setAction(meetingAction)
         }
