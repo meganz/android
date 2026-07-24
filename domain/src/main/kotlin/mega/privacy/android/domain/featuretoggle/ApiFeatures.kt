@@ -37,7 +37,7 @@ enum class ApiFeatures(
      * Enables file info revamp
      */
     FileInfoRevamp(
-        "ff_aflin",
+        "aflin",
         "Enable file info revamp",
         false,
     ),
@@ -56,7 +56,7 @@ enum class ApiFeatures(
      * Enables video editor
      */
     VideoEditor(
-        "ff_vdedt",
+        "vdedt",
         "Enable video editor",
         false,
     ),
