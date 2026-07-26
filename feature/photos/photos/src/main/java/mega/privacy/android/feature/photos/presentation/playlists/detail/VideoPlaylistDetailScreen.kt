@@ -317,6 +317,9 @@ internal fun VideoPlaylistDetailScreen(
                     onConsumed = resetUpdateTitleSuccessEvent,
                     action = {
                         resetShowRenameVideoPlaylistDialog()
+                        snackbarHostState?.showAutoDurationSnackbar(
+                            resources.getString(sharedR.string.context_correctly_renamed)
+                        )
                     }
                 )
 

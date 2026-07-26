@@ -3,7 +3,7 @@ package mega.privacy.android.feature.photos.presentation.playlists.detail
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
@@ -12,6 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.navigation3.runtime.NavKey
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.triggered
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.feature.photos.presentation.playlists.VideoPlaylistEditState
@@ -24,6 +25,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.robolectric.annotation.Config
 import kotlin.time.Duration.Companion.seconds
 
@@ -200,6 +202,21 @@ class VideoPlaylistDetailScreenTest {
         )
 
         VIDEO_PLAYLIST_DETAIL_RENAME_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that resetShowRenameVideoPlaylistDialog is called when updateTitleSuccessEvent is triggered`() {
+        val resetShowRenameVideoPlaylistDialog = mock<() -> Unit>()
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                updateTitleSuccessEvent = triggered
+            ),
+            resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
+        )
+
+        composeTestRule.waitForIdle()
+
+        verify(resetShowRenameVideoPlaylistDialog).invoke()
     }
 
     @Test

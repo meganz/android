@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
@@ -221,6 +221,21 @@ class VideoPlaylistsScreenTest {
         setComposeContent()
 
         VIDEO_PLAYLISTS_TAB_CREATE_VIDEO_PLAYLIST_DIALOG_TEST_TAG.assertIsNotDisplayedWithTag()
+    }
+
+    @Test
+    fun `test that resetShowRenameVideoPlaylistDialog is called when updateTitleSuccessEvent is triggered`() {
+        val resetShowRenameVideoPlaylistDialog = mock<() -> Unit>()
+        setComposeContent(
+            videoPlaylistEditState = VideoPlaylistEditState(
+                updateTitleSuccessEvent = triggered
+            ),
+            resetShowRenameVideoPlaylistDialog = resetShowRenameVideoPlaylistDialog,
+        )
+
+        composeTestRule.waitForIdle()
+
+        verify(resetShowRenameVideoPlaylistDialog).invoke()
     }
 
     @Test

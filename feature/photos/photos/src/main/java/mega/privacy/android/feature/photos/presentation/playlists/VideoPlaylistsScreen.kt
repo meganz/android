@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -22,7 +21,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
-import kotlinx.coroutines.launch
 import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.android.core.ui.components.dialogs.BasicDialog
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyColumn
@@ -82,10 +80,7 @@ fun VideoPlaylistsTabRoute(
         resetErrorMessage = viewModel::resetEditVideoPlaylistErrorMessage,
         resetShowCreateVideoPlaylistDialog = viewModel::resetShowCreateVideoPlaylist,
         resetShowRenameVideoPlaylistDialog = viewModel::resetShowUpdateVideoPlaylist,
-        resetUpdateTitleSuccessEvent = {
-            viewModel.resetUpdateTitleSuccessEvent()
-            viewModel.resetShowUpdateVideoPlaylist()
-        },
+        resetUpdateTitleSuccessEvent = viewModel::resetUpdateTitleSuccessEvent,
         resetCreateVideoPlaylistSuccessEvent = {
             viewModel.resetCreateVideoPlaylistSuccessEvent()
             viewModel.resetShowCreateVideoPlaylist()
@@ -131,7 +126,6 @@ internal fun VideoPlaylistsTabScreen(
     val lazyListState = rememberLazyListState()
     val resources = LocalResources.current
     val snackBarHostState = LocalSnackBarHostState.current
-    val coroutineScope = rememberCoroutineScope()
 
     var showSortBottomSheet by rememberSaveable { mutableStateOf(false) }
     val sortBottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -176,12 +170,11 @@ internal fun VideoPlaylistsTabScreen(
                 event = videoPlaylistEditState.updateTitleSuccessEvent,
                 onConsumed = resetUpdateTitleSuccessEvent,
                 action = {
-                    coroutineScope.launch {
-                        snackBarHostState?.showAutoDurationSnackbar(
-                            resources.getString(sharedR.string.context_correctly_renamed)
-                        )
-                    }
                     selectedVideoPlaylist = null
+                    resetShowRenameVideoPlaylistDialog()
+                    snackBarHostState?.showAutoDurationSnackbar(
+                        resources.getString(sharedR.string.context_correctly_renamed)
+                    )
                 }
             )
 
