@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.menu.MenuActionWithIcon
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.usecase.MonitorThemeModeUseCase
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
@@ -165,7 +166,7 @@ class AlbumsTabViewModel @Inject constructor(
                 if (selectedAlbums.size == 1) {
                     snackbarEventQueue.queueMessage(
                         sharedR.string.delete_singular_album_confirmation_message,
-                        selectedAlbums.firstOrNull()?.title.orEmpty()
+                        selectedAlbums.firstOrNull()?.title?.truncateMiddle().orEmpty()
                     )
                 } else {
                     snackbarEventQueue.queueMessage(

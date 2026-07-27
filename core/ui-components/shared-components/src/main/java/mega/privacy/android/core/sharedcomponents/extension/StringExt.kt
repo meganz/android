@@ -8,7 +8,7 @@ package mega.privacy.android.core.sharedcomponents.extension
  * @param maxLength the length above which the string is truncated.
  * @param edgeLength the number of leading and trailing characters to keep when truncating.
  */
-fun String.truncateMiddle(maxLength: Int = 40, edgeLength: Int = 10): String =
+fun String.truncateMiddle(maxLength: Int = 20, edgeLength: Int = 8): String =
     if (length > maxLength) {
         "${take(edgeLength)}...${takeLast(edgeLength)}"
     } else {

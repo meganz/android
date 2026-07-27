@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.analytics.Analytics
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.media.MediaAlbum
@@ -423,7 +424,7 @@ class AlbumContentViewModel @AssistedInject constructor(
             }.onSuccess {
                 snackbarEventQueue.queueMessage(
                     sharedResR.string.delete_singular_album_confirmation_message,
-                    albumTitle
+                    albumTitle.truncateMiddle()
                 )
                 _state.update {
                     it.copy(deleteAlbumSuccessEvent = triggered)

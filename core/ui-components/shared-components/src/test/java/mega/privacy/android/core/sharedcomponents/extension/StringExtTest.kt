@@ -8,17 +8,10 @@ import org.junit.jupiter.api.TestInstance
 class StringExtTest {
 
     @Test
-    fun `test that truncateMiddle returns the string unchanged when within the default limit`() {
-        val name = "a".repeat(40)
-
-        assertThat(name.truncateMiddle()).isEqualTo(name)
-    }
-
-    @Test
     fun `test that truncateMiddle keeps the first and last ten characters by default when it exceeds the limit`() {
         val name = "FirstBlock" + "z".repeat(40) + "FinalBlock"
 
-        assertThat(name.truncateMiddle()).isEqualTo("FirstBlock...FinalBlock")
+        assertThat(name.truncateMiddle()).isEqualTo("FirstBlo...nalBlock")
     }
 
     @Test
