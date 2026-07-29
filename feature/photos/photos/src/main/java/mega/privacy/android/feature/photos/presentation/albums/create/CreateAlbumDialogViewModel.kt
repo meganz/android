@@ -21,9 +21,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.core.coroutine.asUiStateFlow
 import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.core.sharedcomponents.mapper.AlbumNameValidationExceptionMessageMapper
-import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
-import mega.privacy.android.domain.usecase.media.MonitorMediaAlbumsUseCase
+import mega.privacy.android.domain.usecase.media.MonitorUserAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
@@ -43,7 +42,7 @@ class CreateAlbumDialogViewModel @Inject constructor(
     @ApplicationContext context: Context,
     private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     private val validateAndCreateUserAlbumUseCase: ValidateAndCreateUserAlbumUseCase,
-    monitorMediaAlbumsUseCase: MonitorMediaAlbumsUseCase,
+    monitorUserAlbumNamesUseCase: MonitorUserAlbumNamesUseCase,
     private val albumNameValidationExceptionMessageMapper: AlbumNameValidationExceptionMessageMapper,
 ) : ViewModel() {
 
@@ -54,15 +53,10 @@ class CreateAlbumDialogViewModel @Inject constructor(
 
     val uiState: StateFlow<CreateAlbumDialogState> by lazy {
         combine(
-            monitorMediaAlbumsUseCase()
+            monitorUserAlbumNamesUseCase()
                 .catch {
                     Timber.e(it)
                     emit(emptyList())
-                }
-                .map { albums ->
-                    albums
-                        .filterIsInstance<MediaAlbum.User>()
-                        .map { it.title }
                 }
                 .onEach { names ->
                     userAlbumNames.update { names }

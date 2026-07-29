@@ -12,10 +12,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.sharedcomponents.mapper.AlbumNameValidationExceptionMessageMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
-import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.exception.account.AlbumNameValidationException
-import mega.privacy.android.domain.usecase.media.MonitorMediaAlbumsUseCase
+import mega.privacy.android.domain.usecase.media.MonitorUserAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.media.ValidateAndCreateUserAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
@@ -42,7 +41,7 @@ class CreateAlbumDialogViewModelTest {
     private val context = mock<Context>()
     private val getNextDefaultAlbumNameUseCase = mock<GetNextDefaultAlbumNameUseCase>()
     private val validateAndCreateUserAlbumUseCase = mock<ValidateAndCreateUserAlbumUseCase>()
-    private val monitorMediaAlbumsUseCase = mock<MonitorMediaAlbumsUseCase>()
+    private val monitorUserAlbumNamesUseCase = mock<MonitorUserAlbumNamesUseCase>()
     private val albumNameValidationExceptionMessageMapper =
         mock<AlbumNameValidationExceptionMessageMapper>()
 
@@ -54,12 +53,12 @@ class CreateAlbumDialogViewModelTest {
             context,
             getNextDefaultAlbumNameUseCase,
             validateAndCreateUserAlbumUseCase,
-            monitorMediaAlbumsUseCase,
+            monitorUserAlbumNamesUseCase,
             albumNameValidationExceptionMessageMapper,
         )
         whenever(context.getString(sharedResR.string.create_new_album_input_album_name_placeholder))
             .thenReturn(defaultName)
-        whenever(monitorMediaAlbumsUseCase()).thenReturn(flowOf(emptyList()))
+        whenever(monitorUserAlbumNamesUseCase()).thenReturn(flowOf(emptyList()))
         whenever(getNextDefaultAlbumNameUseCase(any(), any())).thenReturn(defaultName)
     }
 
@@ -68,7 +67,7 @@ class CreateAlbumDialogViewModelTest {
             context = context,
             getNextDefaultAlbumNameUseCase = getNextDefaultAlbumNameUseCase,
             validateAndCreateUserAlbumUseCase = validateAndCreateUserAlbumUseCase,
-            monitorMediaAlbumsUseCase = monitorMediaAlbumsUseCase,
+            monitorUserAlbumNamesUseCase = monitorUserAlbumNamesUseCase,
             albumNameValidationExceptionMessageMapper = albumNameValidationExceptionMessageMapper,
         )
     }
@@ -86,8 +85,8 @@ class CreateAlbumDialogViewModelTest {
     @Test
     fun `test that placeholder reflects the suggestion computed from the monitored albums`() =
         runTest {
-            whenever(monitorMediaAlbumsUseCase())
-                .thenReturn(flowOf(listOf(userAlbum(1L, defaultName))))
+            whenever(monitorUserAlbumNamesUseCase())
+                .thenReturn(flowOf(listOf(defaultName)))
             whenever(getNextDefaultAlbumNameUseCase(defaultName, listOf(defaultName)))
                 .thenReturn("New album (1)")
 
@@ -99,8 +98,8 @@ class CreateAlbumDialogViewModelTest {
     @Test
     fun `test that createAlbum re-fetches the default name from the latest albums when input is blank`() =
         runTest {
-            whenever(monitorMediaAlbumsUseCase())
-                .thenReturn(flowOf(listOf(userAlbum(1L, defaultName))))
+            whenever(monitorUserAlbumNamesUseCase())
+                .thenReturn(flowOf(listOf(defaultName)))
             whenever(getNextDefaultAlbumNameUseCase(defaultName, listOf(defaultName)))
                 .thenReturn("New album (1)")
             whenever(validateAndCreateUserAlbumUseCase(any())).thenReturn(AlbumId(10L))
@@ -196,13 +195,4 @@ class CreateAlbumDialogViewModelTest {
 
         assertThat(underTest.uiState.value.albumCreatedEvent).isEqualTo(consumed())
     }
-
-    private fun userAlbum(id: Long, title: String) = MediaAlbum.User(
-        id = AlbumId(id),
-        title = title,
-        cover = null,
-        creationTime = 0L,
-        modificationTime = 0L,
-        isExported = false,
-    )
 }
