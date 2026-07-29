@@ -32,6 +32,9 @@ class NodeDescriptionFieldTest {
         placeholder: String = "Add description",
         charLimit: Int = DEFAULT_NODE_DESCRIPTION_CHAR_LIMIT,
         onDescriptionChange: (String) -> Unit = {},
+        onFocused: () -> Unit = {},
+        onConfirmed: () -> Unit = {},
+        onCharLimitReached: () -> Unit = {},
     ) {
         composeRule.setContent {
             AndroidThemeForPreviews {
@@ -42,6 +45,9 @@ class NodeDescriptionFieldTest {
                     placeholder = placeholder,
                     onDescriptionChange = onDescriptionChange,
                     charLimit = charLimit,
+                    onFocused = onFocused,
+                    onConfirmed = onConfirmed,
+                    onCharLimitReached = onCharLimitReached,
                 )
             }
         }
@@ -127,6 +133,49 @@ class NodeDescriptionFieldTest {
         composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG).performImeAction()
 
         assertThat(invoked).isFalse()
+    }
+
+    @Test
+    fun `test that onFocused is invoked once when the field gains focus`() {
+        var focusedCount = 0
+        setContent(description = "Hello", onFocused = { focusedCount++ })
+
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG).performClick()
+
+        assertThat(focusedCount).isEqualTo(1)
+    }
+
+    @Test
+    fun `test that onConfirmed is invoked when Done is pressed even if the text is unchanged`() {
+        var confirmed = false
+        setContent(description = "Same text", onConfirmed = { confirmed = true })
+
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG).performClick()
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG).performImeAction()
+
+        assertThat(confirmed).isTrue()
+    }
+
+    @Test
+    fun `test that onCharLimitReached is invoked when input exceeds the char limit`() {
+        var limitReached = false
+        setContent(charLimit = 5, onCharLimitReached = { limitReached = true })
+
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG)
+            .performTextInput("1234567890")
+
+        assertThat(limitReached).isTrue()
+    }
+
+    @Test
+    fun `test that onCharLimitReached is not invoked when input stays within the char limit`() {
+        var limitReached = false
+        setContent(charLimit = 5, onCharLimitReached = { limitReached = true })
+
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG)
+            .performTextInput("12345")
+
+        assertThat(limitReached).isFalse()
     }
 
     @Test

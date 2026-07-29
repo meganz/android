@@ -50,6 +50,9 @@ import mega.android.core.ui.tokens.theme.DSTokens
  * @param onDescriptionChange invoked with the new value when the keyboard "Done" action is pressed
  * @param modifier modifier for the field/section
  * @param charLimit the maximum number of characters allowed
+ * @param onFocused invoked when the editable field gains focus
+ * @param onConfirmed invoked when the keyboard "Done" action is pressed, whether or not the value changed
+ * @param onCharLimitReached invoked when an input would exceed [charLimit]
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -61,6 +64,9 @@ fun NodeDescriptionField(
     onDescriptionChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     charLimit: Int = DEFAULT_NODE_DESCRIPTION_CHAR_LIMIT,
+    onFocused: () -> Unit = {},
+    onConfirmed: () -> Unit = {},
+    onCharLimitReached: () -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -93,10 +99,20 @@ fun NodeDescriptionField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .bringIntoViewRequester(bringIntoViewRequester)
-                    .onFocusChanged { isFocused = it.isFocused }
+                    .onFocusChanged {
+                        if (it.isFocused && !isFocused) {
+                            onFocused()
+                        }
+                        isFocused = it.isFocused
+                    }
                     .testTag(NODE_DESCRIPTION_TEXT_FIELD_TAG),
                 value = text,
-                onValueChange = { text = it.take(charLimit) },
+                onValueChange = {
+                    if (it.length > charLimit) {
+                        onCharLimitReached()
+                    }
+                    text = it.take(charLimit)
+                },
                 placeholder = {
                     MegaText(
                         text = placeholder,
@@ -113,6 +129,7 @@ fun NodeDescriptionField(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
+                        onConfirmed()
                         if (text != description) {
                             onDescriptionChange(text)
                         }

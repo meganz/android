@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":core:navigation-contract"))
     implementation(project(":navigation"))
     implementation(project(":domain"))
+    implementation(project(":core:analytics:analytics-tracker"))
     implementation(project(":core:formatter"))
     implementation(project(":core:ui-components:node-components"))
     implementation(project(":shared:contact"))
@@ -52,6 +53,7 @@ dependencies {
 
     testImplementation(project(":core-test"))
     testImplementation(project(":core-ui-test"))
+    testImplementation(project(":core:analytics:analytics-test"))
     testImplementation(platform(testlib.junit5.bom))
     testImplementation(testlib.bundles.ui.test)
     testImplementation(testlib.bundles.unit.test)

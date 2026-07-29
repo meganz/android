@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.mapper.DurationInSecondsTextMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.domain.entity.ImageFileTypeInfo
@@ -47,10 +48,14 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
 import mega.privacy.android.feature.fileinfo.presentation.model.FileInfoUiState
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.contact.extension.displayName
 import mega.privacy.android.shared.nodes.extension.getIcon
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.mapper.FileTypeNameMapper
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisplayedEvent
 import timber.log.Timber
 
 @HiltViewModel(assistedFactory = FileInfoViewModel.Factory::class)
@@ -73,6 +78,7 @@ internal class FileInfoViewModel @AssistedInject constructor(
     private val getPreviewUseCase: GetPreviewUseCase,
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper,
     private val nodeDestinationMapper: NodeDestinationMapper,
+    private val snackbarEventQueue: SnackbarEventQueue,
     @Assisted private val nodeHandle: Long,
 ) : ViewModel() {
 
@@ -326,11 +332,33 @@ internal class FileInfoViewModel @AssistedInject constructor(
 
     /**
      * Creates, updates, or clears (empty string) the node description. The change is reflected back
-     * in state through [monitorNodeUpdates].
+     * in state through [monitorNodeUpdates]; a confirmation snackbar is queued on success.
      */
     fun updateDescription(description: String) {
         viewModelScope.launch {
+            val previousDescription = _uiState.value.descriptionText
             runCatching { setNodeDescriptionUseCase(nodeId, description) }
+                .onSuccess {
+                    when {
+                        previousDescription.isEmpty() && description.isNotEmpty() -> {
+                            Analytics.tracker.trackEvent(
+                                NodeInfoDescriptionAddedMessageDisplayedEvent
+                            )
+                            snackbarEventQueue.queueMessage(
+                                sharedR.string.file_info_information_snackbar_description_added
+                            )
+                        }
+
+                        previousDescription.isNotEmpty() -> {
+                            Analytics.tracker.trackEvent(
+                                NodeInfoDescriptionUpdatedMessageDisplayedEvent
+                            )
+                            snackbarEventQueue.queueMessage(
+                                sharedR.string.file_info_information_snackbar_description_updated
+                            )
+                        }
+                    }
+                }
                 .onFailure { Timber.e(it, "Failed to update description for $nodeHandle") }
         }
     }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import androidx.navigation3.runtime.NavKey
 import mega.android.core.ui.model.LocalizedText
+import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.core.nodecomponents.mapper.NodeDestinationMapper
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -45,12 +46,17 @@ import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetPreviewUseCase
 import java.io.File
 import mega.privacy.android.feature.fileinfo.presentation.model.Coordinates
+import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
 import mega.privacy.android.shared.nodes.mapper.FileTypeNameMapper
+import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionAddedMessageDisplayedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionUpdatedMessageDisplayedEvent
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -85,6 +91,7 @@ internal class FileInfoViewModelTest {
     private val getPreviewUseCase: GetPreviewUseCase = mock()
     private val durationInSecondsTextMapper: DurationInSecondsTextMapper = mock()
     private val nodeDestinationMapper: NodeDestinationMapper = mock()
+    private val snackbarEventQueue: SnackbarEventQueue = mock()
 
     private val fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/heic", extension = "heic")
 
@@ -110,6 +117,7 @@ internal class FileInfoViewModelTest {
             getPreviewUseCase = getPreviewUseCase,
             durationInSecondsTextMapper = durationInSecondsTextMapper,
             nodeDestinationMapper = nodeDestinationMapper,
+            snackbarEventQueue = snackbarEventQueue,
             nodeHandle = nodeHandle,
         )
     }
@@ -135,6 +143,7 @@ internal class FileInfoViewModelTest {
             getPreviewUseCase,
             durationInSecondsTextMapper,
             nodeDestinationMapper,
+            snackbarEventQueue,
         )
         whenever(monitorNodeUpdatesById(any())).thenReturn(emptyFlow())
         whenever(fileTypeIconMapper(any(), any())).thenReturn(FILE_ICON_RES)
@@ -566,6 +575,81 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
+    fun `test that updateDescription tracks the added event when the previous description is empty`() =
+        runTest {
+            val node = mockFileNode(description = null)
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+            initViewModel()
+            advanceUntilIdle()
+            underTest.updateDescription("a new description")
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events)
+                .contains(NodeInfoDescriptionAddedMessageDisplayedEvent)
+        }
+
+    @Test
+    fun `test that updateDescription tracks the updated event when the previous description is not empty`() =
+        runTest {
+            val node = mockFileNode(description = "a description")
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+            initViewModel()
+            advanceUntilIdle()
+            underTest.updateDescription("a new description")
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events)
+                .contains(NodeInfoDescriptionUpdatedMessageDisplayedEvent)
+        }
+
+    @Test
+    fun `test that updateDescription queues the added snackbar message when the previous description is empty`() =
+        runTest {
+            val node = mockFileNode(description = null)
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+            initViewModel()
+            advanceUntilIdle()
+            underTest.updateDescription("a new description")
+            advanceUntilIdle()
+
+            verify(snackbarEventQueue)
+                .queueMessage(sharedR.string.file_info_information_snackbar_description_added)
+        }
+
+    @Test
+    fun `test that updateDescription queues the updated snackbar message when the previous description is not empty`() =
+        runTest {
+            val node = mockFileNode(description = "a description")
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+            initViewModel()
+            advanceUntilIdle()
+            underTest.updateDescription("a new description")
+            advanceUntilIdle()
+
+            verify(snackbarEventQueue)
+                .queueMessage(sharedR.string.file_info_information_snackbar_description_updated)
+        }
+
+    @Test
+    fun `test that updateDescription tracks no event and queues no message when the description stays empty`() =
+        runTest {
+            val node = mockFileNode(description = null)
+            whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
+
+            initViewModel()
+            advanceUntilIdle()
+            underTest.updateDescription("")
+            advanceUntilIdle()
+
+            assertThat(analyticsExtension.events).isEmpty()
+            verifyNoInteractions(snackbarEventQueue)
+        }
+
+    @Test
     fun `test that description is editable for an owner outside rubbish and backups`() = runTest {
         val node = mockFileNode()
         whenever(getNodeByIdUseCase(NodeId(NODE_HANDLE))).thenReturn(node)
@@ -776,5 +860,9 @@ internal class FileInfoViewModelTest {
         const val NODE_HANDLE = 99113034474275L
         const val FILE_ICON_RES = 12345
         val FILE_TYPE_NAME = LocalizedText.StringRes(54321)
+
+        @JvmField
+        @RegisterExtension
+        val analyticsExtension = AnalyticsTestExtension()
     }
 }

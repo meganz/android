@@ -38,6 +38,7 @@ import mega.android.core.ui.components.surface.BoxSurface
 import mega.android.core.ui.components.surface.SurfaceColor
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
+import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -45,6 +46,7 @@ import mega.android.core.ui.theme.AppTheme
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
 import mega.android.core.ui.theme.values.TextColor
+import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -68,6 +70,11 @@ import mega.privacy.android.shared.nodes.components.ThumbnailLayoutType
 import mega.privacy.android.shared.nodes.model.NodeSubtitleText
 import mega.privacy.android.shared.nodes.model.text
 import mega.privacy.android.shared.resources.R as sharedR
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionCharacterLimitEvent
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionConfirmedEvent
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionEnteredEvent
+import mega.privacy.mobile.analytics.event.NodeInfoScreenEvent
+import mega.privacy.mobile.analytics.event.NodeInfoTagsEnteredEvent
 
 /**
  * File Info screen showing the node thumbnail, name, type and size.
@@ -92,6 +99,9 @@ internal fun FileInfoScreen(
     onDisputeTakedown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    LaunchedOnceEffect(Unit) {
+        Analytics.tracker.trackEvent(NodeInfoScreenEvent)
+    }
     MegaScaffoldWithTopAppBarScrollBehavior(
         modifier = modifier.testTag(FILE_INFO_SCREEN_TAG),
         topBar = {
@@ -452,6 +462,15 @@ private fun FileInfoDetails(
                 placeholder = stringResource(sharedR.string.file_info_information_description_placeholder),
                 onDescriptionChange = onDescriptionChange,
                 modifier = Modifier.testTag(FILE_INFO_DESCRIPTION_TAG),
+                onFocused = {
+                    Analytics.tracker.trackEvent(NodeInfoDescriptionEnteredEvent)
+                },
+                onConfirmed = {
+                    Analytics.tracker.trackEvent(NodeInfoDescriptionConfirmedEvent)
+                },
+                onCharLimitReached = {
+                    Analytics.tracker.trackEvent(NodeInfoDescriptionCharacterLimitEvent)
+                },
             )
         }
 
@@ -459,7 +478,10 @@ private fun FileInfoDetails(
             TagsSection(
                 tags = uiState.tags,
                 canEdit = uiState.canEditTags,
-                onClick = { onNavigate(TagsNavKey(nodeHandle)) },
+                onClick = {
+                    Analytics.tracker.trackEvent(NodeInfoTagsEnteredEvent)
+                    onNavigate(TagsNavKey(nodeHandle))
+                },
                 modifier = Modifier.testTag(FILE_INFO_TAGS_TAG),
             )
         }

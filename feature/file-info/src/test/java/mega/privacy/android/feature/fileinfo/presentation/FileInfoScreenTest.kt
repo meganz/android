@@ -22,6 +22,7 @@ import mega.android.core.ui.model.LocalizedText
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.devicetype.DeviceType
 import mega.android.core.ui.theme.devicetype.LocalDeviceType
+import mega.privacy.android.analytics.test.AnalyticsTestRule
 import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import androidx.navigation3.runtime.NavKey
@@ -33,6 +34,10 @@ import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.FileContactInfoNavKey
 import mega.privacy.android.navigation.destination.TagsNavKey
 import mega.privacy.android.navigation.destination.VersionsFileNavKey
+import mega.privacy.android.shared.nodes.components.NODE_DESCRIPTION_TEXT_FIELD_TAG
+import mega.privacy.mobile.analytics.event.NodeInfoDescriptionEnteredEvent
+import mega.privacy.mobile.analytics.event.NodeInfoScreenEvent
+import mega.privacy.mobile.analytics.event.NodeInfoTagsEnteredEvent
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,6 +47,9 @@ class FileInfoScreenTest {
 
     @get:Rule
     val composeRule = createComposeRule()
+
+    @get:Rule
+    val analyticsRule = AnalyticsTestRule()
 
     private val fileState = FileInfoUiState(
         isLoading = false,
@@ -361,6 +369,33 @@ class FileInfoScreenTest {
         composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).performScrollTo().performClick()
 
         assertThat(navKey).isEqualTo(TagsNavKey(NODE_HANDLE))
+    }
+
+    @Test
+    fun `test that the node info screen event is tracked when the screen is shown`() {
+        setContent(uiState = fileState)
+
+        assertThat(analyticsRule.events).contains(NodeInfoScreenEvent)
+    }
+
+    @Test
+    fun `test that the tags entered event is tracked when the tags section is clicked`() {
+        setContent(uiState = fileState.copy(accessPermission = AccessPermission.OWNER))
+
+        composeRule.onNodeWithTag(FILE_INFO_TAGS_TAG).performScrollTo().performClick()
+
+        assertThat(analyticsRule.events).contains(NodeInfoTagsEnteredEvent)
+    }
+
+    @Test
+    fun `test that the description entered event is tracked when the description field is focused`() {
+        setContent(uiState = fileState.copy(accessPermission = AccessPermission.OWNER))
+
+        composeRule.onNodeWithTag(NODE_DESCRIPTION_TEXT_FIELD_TAG)
+            .performScrollTo()
+            .performClick()
+
+        assertThat(analyticsRule.events).contains(NodeInfoDescriptionEnteredEvent)
     }
 
     @Test
