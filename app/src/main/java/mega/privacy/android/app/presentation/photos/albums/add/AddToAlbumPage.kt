@@ -48,7 +48,6 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.photos.Album.UserAlbum
 import mega.privacy.android.feature.photos.presentation.timeline.component.AlbumListSkeletonView
 import mega.privacy.android.icon.pack.R as iconPackR
-import mega.privacy.android.shared.original.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.shared.original.core.ui.controls.text.LongTextBehaviour
 import mega.privacy.android.shared.original.core.ui.controls.text.MegaText
 import mega.privacy.android.shared.original.core.ui.theme.extensions.body3
@@ -99,12 +98,6 @@ internal fun AddToAlbumPage(
             .fillMaxSize()
             .background(MaterialTheme.colors.surface),
         content = {
-            TextMegaButton(
-                text = stringResource(id = R.string.photos_album_creation_dialog_input_placeholder),
-                onClick = { onSetupNewAlbum(defaultAlbumName) },
-                contentPadding = PaddingValues(horizontal = 16.dp)
-            )
-
             if (isLoading) {
                 AlbumListSkeletonView()
             } else if (albums.isEmpty()) {
