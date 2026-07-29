@@ -770,6 +770,31 @@ internal class TextEditorComposeViewModelTest {
         }
 
     @Test
+    fun `test that connectivity drop during load does not error when reading a local file`() =
+        runTest {
+            val connectivity = MutableStateFlow(true)
+            whenever(monitorConnectivityUseCase()).thenReturn(connectivity)
+            val hangingFlow = flow<List<String>> { awaitCancellation() }
+            doReturn(hangingFlow)
+                .whenever(getTextContentForTextEditorUseCase)
+                .invoke(any<Long>(), anyOrNull(), any())
+            initUnderTest(
+                nodeHandle = -1L,
+                mode = TextEditorMode.View,
+                localPath = "/data/user/0/app/files/MEGA Offline/file.txt",
+            )
+            advanceUntilIdle()
+            assertThat(underTest.uiState.value.isLoading).isTrue()
+
+            connectivity.value = false
+            advanceUntilIdle()
+
+            val state = underTest.uiState.value
+            assertThat(state.isNoInternetError).isFalse()
+            assertThat(state.isLoading).isTrue()
+        }
+
+    @Test
     fun `test that connectivity drop after load does not trigger error`() = runTest {
         val connectivity = MutableStateFlow(true)
         whenever(monitorConnectivityUseCase()).thenReturn(connectivity)

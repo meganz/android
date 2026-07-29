@@ -9,13 +9,15 @@ import androidx.compose.ui.res.stringResource
 import mega.privacy.android.core.formatter.formatFileSize
 import mega.privacy.android.core.formatter.formatModifiedDate
 import mega.privacy.android.shared.nodes.mapper.FileTypeIconMapper
+import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.ImageFileTypeInfo
+import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailData
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailRequest
 import mega.privacy.android.domain.entity.node.thumbnail.ThumbnailUriRequest
 import mega.privacy.android.domain.entity.offline.OfflineFileInformation
 import mega.privacy.android.domain.entity.uri.UriPath
-import mega.privacy.android.feature.clouddrive.R
 import mega.privacy.android.shared.resources.R as SharedR
 
 @Composable
@@ -105,15 +107,23 @@ private fun formatModifiedDate(offlineFileInformation: OfflineFileInformation): 
 /**
  * Resolves the [ThumbnailData] to hand to Coil for an offline node.
  *
- * Prefers a locally-known URI (image-as-thumbnail or cached thumbnail file) and falls back
- * to a [ThumbnailRequest] keyed by node handle so [mega.privacy.android.app.fetcher.MegaThumbnailFetcher]
- * can lazily resolve the thumbnail (local cache first, server on miss) per visible row.
+ * Prefers local sources so thumbnails render without a network connection: a cached thumbnail
+ * URI first, then the locally-stored original file for image/video nodes (Coil decodes it on
+ * device). Only when no local source is available does it fall back to a [ThumbnailRequest]
+ * keyed by node handle, which [mega.privacy.android.app.fetcher.MegaThumbnailFetcher] resolves
+ * from the SDK (requires connectivity).
  */
 val OfflineFileInformation.thumbnailData: ThumbnailData?
     get() {
         if (isFolder) return null
         return thumbnail?.let { ThumbnailUriRequest(UriPath(it)) }
+            ?: absolutePath
+                .takeIf { it.isNotEmpty() && fileTypeInfo.isMedia() }
+                ?.let { ThumbnailUriRequest(UriPath(it)) }
             ?: handle.toLongOrNull()
                 ?.takeIf { it != -1L }
                 ?.let { ThumbnailRequest(NodeId(it)) }
     }
+
+private fun FileTypeInfo?.isMedia() =
+    this is ImageFileTypeInfo || this is VideoFileTypeInfo

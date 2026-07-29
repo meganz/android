@@ -27,4 +27,5 @@ internal data class ImagePreviewState(
     val openPhotoEditorEvent: StateEventWithContent<Pair<ImageNode, String>> = consumed(),
     val isFromLink: Boolean = false,
     val isLoggedIn: Boolean = false,
+    val isFromOffline: Boolean = false,
 )

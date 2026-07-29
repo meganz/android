@@ -911,6 +911,7 @@ class OfflineScreenTest {
             on { this.handle } doReturn handle
             on { this.totalSize } doReturn size
             on { this.folderInfo } doReturn mockFolderInfo
+            on { this.absolutePath } doReturn ""
         }
 
         return mock<OfflineNodeUiItem> {

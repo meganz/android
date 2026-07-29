@@ -176,7 +176,14 @@ class ImagePreviewViewModel @Inject constructor(
                     || imagePreviewFetcherSource == ImagePreviewFetcherSource.ALBUM_SHARING
                     || imagePreviewFetcherSource == ImagePreviewFetcherSource.PUBLIC_FILE
             val isLoggedIn = runCatching { isUserLoggedInUseCase() }.getOrDefault(false)
-            _state.update { it.copy(isFromLink = isFromLink, isLoggedIn = isLoggedIn) }
+            val isFromOffline = imagePreviewFetcherSource == ImagePreviewFetcherSource.OFFLINE
+            _state.update {
+                it.copy(
+                    isFromLink = isFromLink,
+                    isLoggedIn = isLoggedIn,
+                    isFromOffline = isFromOffline,
+                )
+            }
         }
     }
 

@@ -206,12 +206,13 @@ class ImagePreviewActivity : BaseActivity() {
             val themeMode by monitorThemeModeUseCase().collectAsStateWithLifecycle(initialValue = ThemeMode.System)
             val uiState by viewModel.state.collectAsStateWithLifecycle()
             val isFromLinkWithoutLogin = uiState.isFromLink && !uiState.isLoggedIn
+            val isSessionRequired = !isFromLinkWithoutLogin && !uiState.isFromOffline
             // Host a nav3 scaffold so the viewer can navigate to other destinations (e.g. the video editor)
             LegacyActivityScaffold(
                 container = { content ->
                     SharedAppContainer(
                         themeMode = themeMode,
-                        isSessionRequired = !isFromLinkWithoutLogin,
+                        isSessionRequired = isSessionRequired,
                         useLegacyStatusBarColor = false,
                         finishOnSessionRefresh = false,
                         content = content,

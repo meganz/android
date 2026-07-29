@@ -1241,6 +1241,8 @@ class TextEditorComposeViewModel @AssistedInject constructor(
      * so it cannot pre-empt a load that is still trying to read a local file.
      */
     private fun monitorConnectivityDuringLoad() {
+        // Skip checking if a local path existed
+        if (!args.localPath.isNullOrBlank()) return
         viewModelScope.launch {
             monitorConnectivityUseCase()
                 .drop(1)

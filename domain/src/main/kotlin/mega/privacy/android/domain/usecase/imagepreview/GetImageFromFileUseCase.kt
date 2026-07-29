@@ -40,8 +40,10 @@ class GetImageFromFileUseCase @Inject constructor(
 
             ImageResult(
                 isVideo = isVideo,
-                previewUri = if (fileSystemRepository.doesFileExist(previewFilePath)) "$FILE$previewFilePath" else null,
-                fullSizeUri = "$FILE${file.absolutePath}",
+                previewUri = previewFilePath
+                    .takeIf { fileSystemRepository.doesFileExist(it) }
+                    ?.let { File(it).toURI().toString() },
+                fullSizeUri = File(file.absolutePath).toURI().toString(),
                 isFullyLoaded = true
             )
         } else {
@@ -54,10 +56,5 @@ class GetImageFromFileUseCase @Inject constructor(
          * Default Path
          */
         private const val DEFAULT_PATH = ""
-
-        /**
-         * File path Prefix
-         */
-        private const val FILE = "file://"
     }
 }

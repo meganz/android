@@ -171,4 +171,55 @@ class MonitorOfflineImageNodesUseCaseTest {
         assertThat(result).containsExactly(fromMapper)
         verify(photosRepository, never()).fetchImageNode(NodeId(123L), false)
     }
+
+    @Test
+    fun `test that fetchImageNode is not called when offline file information exists but mapper returns null`() =
+        runTest {
+            val offlineNode = Offline(
+                id = 1,
+                handle = "123",
+                path = "testPath",
+                name = "test",
+                parentId = 0,
+                type = Offline.FILE,
+                origin = 0,
+                handleIncoming = "0",
+            )
+            val offlineFileInfo = mock<OfflineFileInformation>()
+            whenever(nodeRepository.monitorOfflineNodeUpdates())
+                .thenReturn(flowOf(listOf(offlineNode)))
+            whenever(getOfflineFileInformationByIdUseCase(NodeId(123L), true))
+                .thenReturn(offlineFileInfo)
+            whenever(offlineFileInformationToImageNodeMapper(offlineFileInfo, false))
+                .thenReturn(null)
+
+            val result = underTest("testPath").first()
+
+            assertThat(result).isEmpty()
+            verify(photosRepository, never()).fetchImageNode(NodeId(123L), false)
+        }
+
+    @Test
+    fun `test that fetchImageNode is called when offline file information is missing`() = runTest {
+        val offlineNode = Offline(
+            id = 1,
+            handle = "123",
+            path = "testPath",
+            name = "test",
+            parentId = 0,
+            type = Offline.FILE,
+            origin = 0,
+            handleIncoming = "0",
+        )
+        val imageNode = mock<ImageNode>()
+        whenever(nodeRepository.monitorOfflineNodeUpdates())
+            .thenReturn(flowOf(listOf(offlineNode)))
+        whenever(getOfflineFileInformationByIdUseCase(NodeId(123L), true)).thenReturn(null)
+        whenever(photosRepository.fetchImageNode(NodeId(123L), false)).thenReturn(imageNode)
+
+        val result = underTest("testPath").first()
+
+        assertThat(result).containsExactly(imageNode)
+        verify(photosRepository).fetchImageNode(NodeId(123L), false)
+    }
 }
