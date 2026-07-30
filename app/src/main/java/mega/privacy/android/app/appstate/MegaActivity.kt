@@ -72,7 +72,9 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.core.sharedcomponents.parcelable
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressContainer
 import mega.privacy.android.core.sharedcomponents.requeststatus.RequestStatusProgressViewModel
+import mega.privacy.android.domain.featuretoggle.ApiFeatures
 import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaEventUseCase
+import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.navOptions
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.NavigationQueueEvent
@@ -360,15 +362,17 @@ class MegaActivity : FragmentActivity() {
                                     action = { snackbarHostState.show(it.attributes) }
                                 )
 
-                                LaunchedEffect(Unit) {
-                                    monitorTransferOverQuotaEventUseCase().collect {
-                                        navigationHandler.navigate(
-                                            QuotaWarningUpgradeNavKey(
-                                                type = QuotaWarningType.Transfer,
-                                                trigger = QuotaWarningTrigger.Download,
-                                            ),
-                                            navOptions { dropIfAlreadyShown = true },
-                                        )
+                                FeatureFlagGate(feature = ApiFeatures.QuotaWarningUpsellScreen) {
+                                    LaunchedEffect(Unit) {
+                                        monitorTransferOverQuotaEventUseCase().collect {
+                                            navigationHandler.navigate(
+                                                QuotaWarningUpgradeNavKey(
+                                                    type = QuotaWarningType.Transfer,
+                                                    trigger = QuotaWarningTrigger.Download,
+                                                ),
+                                                navOptions { dropIfAlreadyShown = true },
+                                            )
+                                        }
                                     }
                                 }
 

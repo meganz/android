@@ -29,7 +29,6 @@ enum class ApiFeatures(
     QuotaWarningUpsellScreen(
         experimentName = "qwup",
         description = "Show the quota-warning upsell screen instead of the over-quota dialog",
-        singleCheckPerRun = true,
         defaultValue = false,
     ),
 

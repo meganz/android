@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.account.AccountSubscriptionDetail
 import mega.privacy.android.domain.entity.account.AccountTransferDetail
 import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
@@ -33,8 +34,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyBlocking
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -50,6 +53,7 @@ class QuotaWarningUpgradeViewModelTest {
     private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
     private val getSubscriptionsUseCase = mock<GetSubscriptionsUseCase>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
+    private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
     private val localisedPriceCurrencyCodeStringMapper =
         mock<LocalisedPriceCurrencyCodeStringMapper>()
     private val formattedSizeMapper = mock<FormattedSizeMapper>()
@@ -64,6 +68,7 @@ class QuotaWarningUpgradeViewModelTest {
             monitorTransferOverQuotaUseCase,
             getSubscriptionsUseCase,
             getCurrentUserEmail,
+            getSpecificAccountDetailUseCase,
             localisedPriceCurrencyCodeStringMapper,
             formattedSizeMapper,
         )
@@ -81,6 +86,7 @@ class QuotaWarningUpgradeViewModelTest {
             monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
             getSubscriptionsUseCase = getSubscriptionsUseCase,
             getCurrentUserEmail = getCurrentUserEmail,
+            getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
         )
     }
@@ -119,6 +125,29 @@ class QuotaWarningUpgradeViewModelTest {
             assertThat(state.storageUsedPercentage).isEqualTo(95)
             assertThat(state.transferUsed).isEqualTo(1 * BYTES_IN_GB)
             assertThat(state.transferUsedPercentage).isEqualTo(20)
+        }
+    }
+
+    @Test
+    fun `test that init requests both storage and transfer account details`() = runTest {
+        initViewModel()
+        advanceUntilIdle()
+
+        verifyBlocking(getSpecificAccountDetailUseCase) {
+            invoke(storage = true, transfer = true, pro = false)
+        }
+    }
+
+    @Test
+    fun `test that init still emits state when fetching account details fails`() = runTest {
+        wheneverBlocking { getSpecificAccountDetailUseCase(any(), any(), any()) }
+            .thenThrow(RuntimeException("offline"))
+
+        initViewModel()
+        advanceUntilIdle()
+
+        underTest.state.test {
+            assertThat(awaitItem()).isNotNull()
         }
     }
 

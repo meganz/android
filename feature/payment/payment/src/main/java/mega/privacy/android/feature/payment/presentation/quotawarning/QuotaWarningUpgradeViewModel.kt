@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.AccountSubscriptionCycle
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.payment.Subscriptions
+import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateUseCase
 import mega.privacy.android.domain.usecase.billing.GetSubscriptionsUseCase
@@ -35,6 +36,7 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
     private val getSubscriptionsUseCase: GetSubscriptionsUseCase,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val localisedSubscriptionMapper: LocalisedSubscriptionMapper,
+    private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(QuotaWarningUpgradeState())
@@ -48,6 +50,19 @@ class QuotaWarningUpgradeViewModel @Inject constructor(
         fetchEmail()
         monitorAccountDetail()
         monitorQuotaState()
+        fetchLatestUsedInfo()
+    }
+
+    private fun fetchLatestUsedInfo() {
+        viewModelScope.launch {
+            runCatching {
+                getSpecificAccountDetailUseCase(
+                    storage = true,
+                    transfer = true,
+                    pro = false
+                )
+            }.onFailure { Timber.e(it) }
+        }
     }
 
     private fun fetchEmail() {
