@@ -23,6 +23,7 @@ import mega.android.core.ui.components.LocalSnackBarHostState
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.core.nodecomponents.sheet.options.NodeOptionsBottomSheetNavKey
+import mega.privacy.android.core.sharedcomponents.extension.truncateMiddle
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeSourceType
@@ -322,7 +323,7 @@ fun EntryProviderScope<NavKey>.albumPhotosSelectionScreen(
                                 sharedR.plurals.album_photos_selection_success_message,
                                 numCommittedPhotos,
                                 numCommittedPhotos,
-                                album.title
+                                album.title.truncateMiddle()
                             )
                         )
                     }
