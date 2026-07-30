@@ -81,7 +81,7 @@ internal fun TagsSection(
                         selected = false,
                         content = "#$tag",
                         style = DefaultChipStyle,
-                        onClick = onClick,
+                        onClick = { if (canEdit) onClick() },
                     )
                 }
             }

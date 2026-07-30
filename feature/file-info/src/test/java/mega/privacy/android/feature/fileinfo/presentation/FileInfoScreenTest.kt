@@ -372,6 +372,24 @@ class FileInfoScreenTest {
     }
 
     @Test
+    fun `test that clicking a tag chip does not navigate when the node is read-only`() {
+        var navKey: NavKey? = null
+        setContent(
+            uiState = fileState.copy(
+                accessPermission = AccessPermission.READ,
+                tags = listOf("marketing"),
+            ),
+            onNavigate = { navKey = it },
+        )
+
+        composeRule.onNodeWithText("#marketing", useUnmergedTree = true)
+            .performScrollTo()
+            .performClick()
+
+        assertThat(navKey).isNull()
+    }
+
+    @Test
     fun `test that the node info screen event is tracked when the screen is shown`() {
         setContent(uiState = fileState)
 
