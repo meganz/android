@@ -16,10 +16,12 @@ import mega.privacy.android.domain.entity.NodesCurrentEvent
 import mega.privacy.android.domain.entity.RequestStatusProgressEvent
 import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.StorageSumChangedEvent
+import mega.privacy.android.domain.entity.StreamOverQuotaEvent
 import mega.privacy.android.domain.entity.TransfersResumedEvent
 import mega.privacy.android.domain.entity.UnknownEvent
 import nz.mega.sdk.MegaEvent
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Map [MegaEvent] to [Event]
@@ -127,6 +129,13 @@ internal class EventMapper @Inject constructor(
                 warningTs = KEY_WARNING_TS.takeIf(megaEvent::hasNumber)?.let(megaEvent::getNumber),
                 lastActiveTs = KEY_LAST_ACTIVE_TS.takeIf(megaEvent::hasNumber)
                     ?.let(megaEvent::getNumber),
+            )
+        }
+
+        MegaEvent.EVENT_STREAM_OVERQUOTA -> {
+            StreamOverQuotaEvent(
+                handle = megaEvent.handle,
+                timeLeft = megaEvent.number.seconds,
             )
         }
 
