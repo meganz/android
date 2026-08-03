@@ -94,8 +94,6 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
     onTransfer: (TransferTriggerEvent) -> Unit,
 ) {
     entry<MediaMainNavKey> {
-        val photoSelectionResult by navigationHandler.monitorResult<Long?>(PhotosSelectionNavKey.RESULT)
-            .collectAsStateWithLifecycle(null)
         val createAlbumResult by navigationHandler
             .monitorResult<CreateAlbumDialogResult?>(CreateAlbumDialogNavKey.RESULT)
             .collectAsStateWithLifecycle(null)
@@ -109,19 +107,6 @@ fun EntryProviderScope<NavKey>.mediaMainRoute(
             navigationHandler = navigationHandler,
             onTransfer = onTransfer,
         )
-
-        LaunchedEffect(photoSelectionResult) {
-            if (photoSelectionResult != null) {
-                navigationHandler.navigate(
-                    AlbumContentNavKey(
-                        id = photoSelectionResult,
-                        type = "custom"
-                    )
-                )
-
-                navigationHandler.clearResult(PhotosSelectionNavKey.RESULT)
-            }
-        }
 
         LaunchedEffect(createAlbumResult) {
             createAlbumResult?.let { result ->
@@ -329,13 +314,20 @@ fun EntryProviderScope<NavKey>.albumPhotosSelectionScreen(
                     }
                 }
 
-                if (!args.captureResult) {
+                val isNewAlbumFlow = args.selectionMode == AlbumFlow.Creation.ordinal
+                if (isNewAlbumFlow && numCommittedPhotos > 0) {
+                    navigationHandler.navigateAndClearTo(
+                        destination = AlbumContentNavKey(
+                            id = album.id.id,
+                            type = "custom",
+                            isNewlyCreated = true,
+                        ),
+                        newParent = args,
+                        inclusive = true,
+                    )
+                } else {
                     navigationHandler.back()
-                    return@AlbumPhotosSelectionScreen
                 }
-
-                val result = album.id.id.takeIf { numCommittedPhotos > 0 }
-                navigationHandler.returnResult(PhotosSelectionNavKey.RESULT, result)
             },
         )
     }

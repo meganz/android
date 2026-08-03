@@ -136,6 +136,8 @@ class AlbumContentViewModel @AssistedInject constructor(
 
     private var showHiddenItems: Boolean? = null
 
+    private var awaitingInitialAlbumPhotos: Boolean = navKey?.isNewlyCreated == true
+
     private val albumType: String?
         get() = savedStateHandle["type"] ?: navKey?.type
 
@@ -349,8 +351,10 @@ class AlbumContentViewModel @AssistedInject constructor(
                     progress?.isProgressing == true ->
                         _state.update { it.copy(isAddingPhotos = true) }
 
-                    progress != null && progress.totalAddedPhotos == 0 ->
-                        _state.update { it.copy(isAddingPhotos = false) }
+                    progress != null && progress.totalAddedPhotos == 0 -> {
+                        awaitingInitialAlbumPhotos = false
+                        _state.update { it.copy(isAddingPhotos = false, isLoading = false) }
+                    }
                 }
             }
             .launchIn(viewModelScope)
@@ -494,11 +498,16 @@ class AlbumContentViewModel @AssistedInject constructor(
                 photos.sortedWith(comparator).toImmutableList()
             }
 
+            val keepLoadingForNewAlbum = awaitingInitialAlbumPhotos && sortedPhotosUiState.isEmpty()
+            if (sortedPhotosUiState.isNotEmpty()) {
+                awaitingInitialAlbumPhotos = false
+            }
+
             _state.update {
                 it.copy(
                     albumSortConfiguration = sortConfiguration,
                     photos = sortedPhotosUiState,
-                    isLoading = false,
+                    isLoading = keepLoadingForNewAlbum,
                     isAddingPhotos = false
                 )
             }

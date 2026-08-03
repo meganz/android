@@ -12,7 +12,11 @@ import mega.privacy.android.navigation.contract.navkey.NoSessionNavKey
 data object MediaMainNavKey : MainNavItemNavKey
 
 @Serializable
-data class AlbumContentNavKey(val id: Long?, val type: String?) : NavKey
+data class AlbumContentNavKey(
+    val id: Long?,
+    val type: String?,
+    val isNewlyCreated: Boolean = false,
+) : NavKey
 
 @Serializable
 data class VideoPlaylistDetailNavKey(
@@ -30,12 +34,7 @@ data class AlbumCoverSelectionNavKey(val albumId: Long) : NavKey
 data class PhotosSelectionNavKey(
     val albumId: Long,
     val selectionMode: Int,
-    val captureResult: Boolean = true,
-) : NavKey {
-    companion object {
-        const val RESULT = "PhotosSelectionNavKey::result"
-    }
-}
+) : NavKey
 
 @Serializable
 data object CreateAlbumDialogNavKey : NavKey {

@@ -352,7 +352,6 @@ internal fun AlbumContentScreen(
                 PhotosSelectionNavKey(
                     albumId = album.id.id,
                     selectionMode = AlbumFlow.Addition.ordinal,
-                    captureResult = false
                 )
             )
         }
