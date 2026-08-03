@@ -207,11 +207,12 @@ class VideoPlayerActivity : PasscodeActivity(), MegaSnackbarShower {
             val uiState by videoPlayerViewModelV2.uiState.collectAsStateWithLifecycle()
 
             val isFromLinkWithoutLogin = uiState.isFromLink && !uiState.isLoggedIn
+            val isSessionRequired = !isFromLinkWithoutLogin && !uiState.isFromOffline
             LegacyActivityScaffold(
                 container = { content ->
                     MegaAppContainer(
                         themeMode = mode,
-                        isSessionRequired = !isFromLinkWithoutLogin,
+                        isSessionRequired = isSessionRequired,
                         finishOnSessionRefresh = false,
                         content = content,
                     )

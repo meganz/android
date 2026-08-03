@@ -3188,6 +3188,26 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
+    fun `test that isFromOffline is true when adapter type is OFFLINE_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = OFFLINE_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromOffline).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isFromOffline is false when adapter type is not OFFLINE_ADAPTER`() = runTest {
+        testArgs = testArgs.copy(adapterType = FILE_BROWSER_ADAPTER)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isFromOffline).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that isAlbumSharingLink is true when adapter type is FROM_ALBUM_SHARING`() = runTest {
         testArgs = testArgs.copy(adapterType = FROM_ALBUM_SHARING)
         initViewModel()

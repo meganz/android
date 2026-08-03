@@ -332,7 +332,14 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                     || args.adapterType == FOLDER_LINK_ADAPTER
                     || args.adapterType == FROM_ALBUM_SHARING
             val isLoggedIn = runCatching { isUserLoggedInUseCase() }.getOrDefault(false)
-            uiState.update { it.copy(isFromLink = isFromLink, isLoggedIn = isLoggedIn) }
+            val isFromOffline = args.adapterType == OFFLINE_ADAPTER
+            uiState.update {
+                it.copy(
+                    isFromLink = isFromLink,
+                    isLoggedIn = isLoggedIn,
+                    isFromOffline = isFromOffline,
+                )
+            }
         }
     }
 
