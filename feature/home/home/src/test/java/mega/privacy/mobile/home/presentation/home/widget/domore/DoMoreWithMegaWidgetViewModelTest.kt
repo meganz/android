@@ -3,21 +3,26 @@ package mega.privacy.mobile.home.presentation.home.widget.domore
 import androidx.compose.ui.graphics.vector.ImageVector
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsEnabledUseCase
 import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
+import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 
@@ -30,11 +35,13 @@ class DoMoreWithMegaWidgetViewModelTest {
 
     private val isCameraUploadsEnabledUseCase = mock<IsCameraUploadsEnabledUseCase>()
     private val hasCameraSyncEnabledUseCase = mock<HasCameraSyncEnabledUseCase>()
+    private val navigationEventQueue = mock<NavigationEventQueue>()
 
     private fun initViewModel(
         items: Set<DoMoreWithMegaItem> = emptySet(),
         isCameraUploadsEnabled: Boolean = false,
         hasPreviouslyEnabledCameraUploads: Boolean = false,
+        applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher()),
     ) {
         whenever(isCameraUploadsEnabledUseCase.monitorCameraUploadsEnabled)
             .thenReturn(flowOf(isCameraUploadsEnabled))
@@ -44,6 +51,8 @@ class DoMoreWithMegaWidgetViewModelTest {
             items = items,
             isCameraUploadsEnabledUseCase = isCameraUploadsEnabledUseCase,
             hasCameraSyncEnabledUseCase = hasCameraSyncEnabledUseCase,
+            navigationEventQueue = navigationEventQueue,
+            applicationScope = applicationScope,
         )
     }
 
@@ -142,6 +151,18 @@ class DoMoreWithMegaWidgetViewModelTest {
             advanceUntilIdle()
 
             assertThat(underTest.uiState.value.hasPreviouslyEnabledCameraUploads).isFalse()
+        }
+
+    @Test
+    fun `test that openCreatedAlbum emits AlbumContentNavKey through the navigation event queue`() =
+        runTest {
+            initViewModel(applicationScope = CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+            val albumId = 123L
+
+            underTest.openCreatedAlbum(albumId)
+            advanceUntilIdle()
+
+            verify(navigationEventQueue).emit(AlbumContentNavKey(id = albumId, type = "custom"))
         }
 
     private fun fakeItem(

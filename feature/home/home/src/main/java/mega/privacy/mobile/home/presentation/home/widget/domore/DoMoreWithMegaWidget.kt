@@ -42,7 +42,6 @@ import mega.privacy.android.navigation.contract.home.HomeWidget
 import mega.privacy.android.navigation.contract.home.HomeWidgetOrder
 import mega.privacy.android.navigation.contract.navkey.ContinuousScanNavKey
 import mega.privacy.android.navigation.contract.queue.snackbar.rememberSnackBarQueue
-import mega.privacy.android.navigation.destination.AlbumContentNavKey
 import mega.privacy.android.navigation.destination.CameraBackupPermissionsNavKey
 import mega.privacy.android.navigation.destination.CreateAlbumDialogNavKey
 import mega.privacy.android.navigation.destination.CreateAlbumDialogResult
@@ -114,9 +113,7 @@ class DoMoreWithMegaWidget @Inject constructor() : HomeWidget, Flagged {
                                 sharedR.string.home_do_more_with_mega_see_album_action,
                             ),
                             actionClick = {
-                                navigationHandler.navigate(
-                                    AlbumContentNavKey(id = album.albumId, type = "custom"),
-                                )
+                                viewModel.openCreatedAlbum(album.albumId)
                             },
                         ),
                     )
