@@ -96,6 +96,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.entity.node.ImageNode
+import mega.privacy.android.domain.usecase.imagepreview.mapper.OfflineFileInformationToImageNodeMapper
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.original.core.ui.controls.dialogs.MegaAlertDialog
 import mega.privacy.android.shared.original.core.ui.controls.layouts.MegaScaffold
@@ -634,21 +635,13 @@ private fun ImagePreviewContent(
             .fillMaxSize(),
     ) {
         val isVideo = imageNode.type is VideoFileTypeInfo
+        val localFilePath = imageNode.fullSizePath?.takeIf {
+            imageNode.serializedData?.contains("local") == true ||
+                    imageNode.serializedData == OfflineFileInformationToImageNodeMapper.OFFLINE_SERIALIZED_DATA_FLAG
+        }
         ImageContent(
-            fullSizePath = imageNode.run {
-                fullSizePath.takeIf {
-                    imageNode.serializedData?.contains(
-                        "local"
-                    ) == true
-                }
-            } ?: imagePath,
-            errorImagePath = imageNode.run {
-                fullSizePath.takeIf {
-                    imageNode.serializedData?.contains(
-                        "local"
-                    ) == true
-                }
-            } ?: errorImagePath,
+            fullSizePath = localFilePath ?: imagePath,
+            errorImagePath = localFilePath ?: errorImagePath,
             enableZoom = !isVideo,
             imageState = imageState ?: rememberZoomableImageState(),
             onImageTap = onImageTap,
