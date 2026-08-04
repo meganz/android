@@ -9,11 +9,11 @@ import mega.privacy.android.analytics.decorator.withScreenViewEvent
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.feature.contact.list.view.ContactListScreen
 import mega.privacy.android.feature.contact.navigation.ContactsEntry
+import mega.privacy.android.feature.contact.requests.navigation.ContactRequestsEntry
 import mega.privacy.android.feature_flags.AppFeatures
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.featureflag.FeatureFlagGate
 import mega.privacy.android.navigation.contract.metadata.buildMetadata
-import mega.privacy.android.navigation.contract.transparent.transparentMetadata
 import mega.privacy.android.navigation.destination.ContactRequestsNavKey
 import mega.privacy.android.navigation.destination.ContactsNavKey
 import mega.privacy.mobile.analytics.event.ContactListScreenEvent
@@ -63,32 +63,56 @@ private fun LegacyContactsEntry(removeDestination: () -> Unit) {
 }
 
 /**
- * Navigation destination for ContactsActivity that handles the requests entry points:
+ * Navigation destination for the contact requests screen. Behind
+ * [AppFeatures.ContactsComposeUI] either renders the Compose contact requests screen inline
+ * (flag on) or launches the legacy [ContactsActivity] requests entry points and pops the entry
+ * (flag off):
  * - SentRequests: Shows sent contact requests
  * - ReceivedRequests: Shows received contact requests
- *
- * Usage examples:
- * - Navigate to sent requests: navController.navigate(ContactsNavKey(ContactsNavKey.ContactsNavType.SentRequests))
- * - Navigate to received requests: navController.navigate(ContactsNavKey(ContactsNavKey.NavType.ReceivedRequests))
  */
-fun EntryProviderScope<NavKey>.contactsRequestLegacyDestination(removeDestination: () -> Unit) {
-    entry<ContactRequestsNavKey>(
-        metadata = transparentMetadata()
-    ) { key ->
-        val context = LocalContext.current
-
-        LaunchedEffect(key.navType) {
-            val intent = when (key.navType) {
-                ContactRequestsNavKey.NavType.SentRequests -> ContactsActivity.getSentRequestsIntent(
-                    context
+fun EntryProviderScope<NavKey>.contactRequestsDestination(
+    navigationHandler: NavigationHandler,
+) {
+    entry<ContactRequestsNavKey> { key ->
+        FeatureFlagGate(
+            feature = AppFeatures.ContactsComposeUI,
+            disabled = {
+                LegacyContactRequestsEntry(
+                    navType = key.navType,
+                    removeDestination = { navigationHandler.remove(key) },
                 )
-
-                ContactRequestsNavKey.NavType.ReceivedRequests -> ContactsActivity.getReceivedRequestsIntent(
-                    context
+            },
+            enabled = {
+                ContactRequestsEntry(
+                    navigationHandler = navigationHandler,
+                    navType = key.navType,
                 )
-            }
-            context.startActivity(intent)
-            removeDestination()
+            },
+        )
+    }
+}
+
+/**
+ * Legacy contact requests entry
+ *
+ * @param navType the request type to open the legacy screen on.
+ * @param removeDestination
+ */
+@Composable
+private fun LegacyContactRequestsEntry(
+    navType: ContactRequestsNavKey.NavType,
+    removeDestination: () -> Unit,
+) {
+    val context = LocalContext.current
+    LaunchedEffect(navType) {
+        val intent = when (navType) {
+            ContactRequestsNavKey.NavType.SentRequests ->
+                ContactsActivity.getSentRequestsIntent(context)
+
+            ContactRequestsNavKey.NavType.ReceivedRequests ->
+                ContactsActivity.getReceivedRequestsIntent(context)
         }
+        context.startActivity(intent)
+        removeDestination()
     }
 }
