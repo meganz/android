@@ -1,5 +1,6 @@
 package mega.privacy.android.feature.chat.list.view
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.badge.NotificationBadge
+import mega.android.core.ui.components.contact.component.ContactStatusDot
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.list.GenericListItem
 import mega.android.core.ui.components.profile.MediumProfileIcon
@@ -118,31 +121,43 @@ internal fun ChatRoomItemView(
 
 @Composable
 private fun ChatRoomAvatarView(item: ChatRoomUiItem) {
-    when (val avatar = item.avatar) {
-        is ChatRoomUiAvatar.Peer -> MediumProfilePicture(
-            imageFile = avatar.filePath?.let(::File),
-            name = avatar.placeholderText ?: item.title,
-            contentDescription = item.title,
-            avatarColor = avatar.color?.let(::Color) ?: PeerAvatarFallbackColor,
-            modifier = Modifier
-                .padding(8.dp)
-                .testTag(CHAT_ROOM_ITEM_AVATAR_TAG),
-        )
+    Box {
+        when (val avatar = item.avatar) {
+            is ChatRoomUiAvatar.Peer -> MediumProfilePicture(
+                imageFile = avatar.filePath?.let(::File),
+                name = avatar.placeholderText ?: item.title,
+                contentDescription = item.title,
+                avatarColor = avatar.color?.let(::Color) ?: PeerAvatarFallbackColor,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .testTag(CHAT_ROOM_ITEM_AVATAR_TAG),
+            )
 
-        ChatRoomUiAvatar.Group -> ChatRoomIconAvatarView(
-            item = item,
-            icon = ChatRoomIconAvatar.Group,
-        )
+            ChatRoomUiAvatar.Group -> ChatRoomIconAvatarView(
+                item = item,
+                icon = ChatRoomIconAvatar.Group,
+            )
 
-        ChatRoomUiAvatar.Meeting -> ChatRoomIconAvatarView(
-            item = item,
-            icon = ChatRoomIconAvatar.Meeting,
-        )
+            ChatRoomUiAvatar.Meeting -> ChatRoomIconAvatarView(
+                item = item,
+                icon = ChatRoomIconAvatar.Meeting,
+            )
 
-        ChatRoomUiAvatar.NoteToSelf -> ChatRoomIconAvatarView(
-            item = item,
-            icon = ChatRoomIconAvatar.NoteToSelf,
-        )
+            ChatRoomUiAvatar.NoteToSelf -> ChatRoomIconAvatarView(
+                item = item,
+                icon = ChatRoomIconAvatar.NoteToSelf,
+            )
+        }
+        if (item.status != ContactItemStatus.Unknown) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(6.dp)
+                    .testTag(CHAT_ROOM_ITEM_STATUS_TAG),
+            ) {
+                ContactStatusDot(status = item.status)
+            }
+        }
     }
 }
 
@@ -184,6 +199,7 @@ private val PeerAvatarFallbackColor = Color(0xFF00ACC1)
 
 internal const val CHAT_ROOM_ITEM_TAG = "chat_room_item:row"
 internal const val CHAT_ROOM_ITEM_AVATAR_TAG = "chat_room_item:avatar"
+internal const val CHAT_ROOM_ITEM_STATUS_TAG = "chat_room_item:status_dot"
 internal const val CHAT_ROOM_ITEM_TITLE_TAG = "chat_room_item:title"
 internal const val CHAT_ROOM_ITEM_MUTE_TAG = "chat_room_item:mute_icon"
 internal const val CHAT_ROOM_ITEM_MESSAGE_TAG = "chat_room_item:last_message"
@@ -220,6 +236,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
                 filePath = null,
                 color = 0xFFFEBC00.toInt(),
             ),
+            status = ContactItemStatus.Online,
         ),
         ChatRoomUiItem(
             chatId = 2L,
@@ -232,6 +249,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             highlight = false,
             isNoteToSelf = false,
             avatar = ChatRoomUiItem.ChatRoomUiAvatar.Group,
+            status = ContactItemStatus.Unknown,
         ),
         ChatRoomUiItem(
             chatId = 3L,
@@ -244,6 +262,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             highlight = false,
             isNoteToSelf = false,
             avatar = ChatRoomUiItem.ChatRoomUiAvatar.Meeting,
+            status = ContactItemStatus.Unknown,
         ),
         ChatRoomUiItem(
             chatId = 4L,
@@ -256,6 +275,7 @@ private class ChatRoomUiItemPreviewProvider : PreviewParameterProvider<ChatRoomU
             highlight = false,
             isNoteToSelf = true,
             avatar = ChatRoomUiItem.ChatRoomUiAvatar.NoteToSelf,
+            status = ContactItemStatus.Unknown,
         ),
     )
 }

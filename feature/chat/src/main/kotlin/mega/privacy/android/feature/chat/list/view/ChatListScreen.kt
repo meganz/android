@@ -10,6 +10,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaScaffoldWithTopAppBarScrollBehavior
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.components.tabs.MegaCollapsibleTabRow
 import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
@@ -134,6 +135,7 @@ private fun ChatListScreenPreview() {
                             filePath = null,
                             color = null,
                         ),
+                        status = ContactItemStatus.Online,
                     ),
                     ChatRoomUiItem(
                         chatId = 2L,
@@ -146,6 +148,7 @@ private fun ChatListScreenPreview() {
                         highlight = false,
                         isNoteToSelf = false,
                         avatar = ChatRoomUiItem.ChatRoomUiAvatar.Group,
+                        status = ContactItemStatus.Unknown,
                     ),
                 ),
                 meetings = persistentListOf(),

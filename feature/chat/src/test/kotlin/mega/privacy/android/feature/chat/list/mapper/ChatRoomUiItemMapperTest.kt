@@ -1,12 +1,18 @@
 package mega.privacy.android.feature.chat.list.mapper
 
 import com.google.common.truth.Truth.assertThat
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.domain.entity.chat.ChatAvatarItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem.ChatRoomUiAvatar
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ChatRoomUiItemMapperTest {
@@ -124,4 +130,79 @@ class ChatRoomUiItemMapperTest {
 
         assertThat(actual.lastMessage).isNull()
     }
+
+    @ParameterizedTest
+    @MethodSource("provideUserChatStatuses")
+    fun `test that invoke maps the user chat status of an individual chat room item`(
+        userChatStatus: UserChatStatus,
+        expected: ContactItemStatus,
+    ) {
+        val item = ChatRoomItem.IndividualChatRoomItem(
+            chatId = 1L,
+            title = "Mieko Kawakami",
+            userChatStatus = userChatStatus,
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.status).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test that invoke maps a null user chat status to unknown`() {
+        val item = ChatRoomItem.IndividualChatRoomItem(
+            chatId = 1L,
+            title = "Mieko Kawakami",
+            userChatStatus = null,
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.status).isEqualTo(ContactItemStatus.Unknown)
+    }
+
+    @Test
+    fun `test that invoke maps a group chat room item to an unknown status`() {
+        val item = ChatRoomItem.GroupChatRoomItem(
+            chatId = 2L,
+            title = "Recipe test #14",
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.status).isEqualTo(ContactItemStatus.Unknown)
+    }
+
+    @Test
+    fun `test that invoke maps a meeting chat room item to an unknown status`() {
+        val item = ChatRoomItem.MeetingChatRoomItem(
+            chatId = 4L,
+            title = "Weekly sync",
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.status).isEqualTo(ContactItemStatus.Unknown)
+    }
+
+    @Test
+    fun `test that invoke maps a note to self chat room item to an unknown status`() {
+        val item = ChatRoomItem.NoteToSelfChatRoomItem(
+            chatId = 3L,
+            title = "Note to self",
+            userChatStatus = UserChatStatus.Online,
+        )
+
+        val actual = underTest(item)
+
+        assertThat(actual.status).isEqualTo(ContactItemStatus.Unknown)
+    }
+
+    private fun provideUserChatStatuses(): Stream<Arguments> = Stream.of(
+        Arguments.of(UserChatStatus.Online, ContactItemStatus.Online),
+        Arguments.of(UserChatStatus.Away, ContactItemStatus.Away),
+        Arguments.of(UserChatStatus.Busy, ContactItemStatus.Busy),
+        Arguments.of(UserChatStatus.Offline, ContactItemStatus.Offline),
+        Arguments.of(UserChatStatus.Invalid, ContactItemStatus.Unknown),
+    )
 }

@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
@@ -193,6 +194,7 @@ class ChatListViewModelTest {
             filePath = null,
             color = null,
         ),
+        status = ContactItemStatus.Unknown,
     )
 
     private suspend fun ReceiveTurbine<ChatListUiState>.awaitDataState(): ChatListUiState.Data {

@@ -3,6 +3,7 @@ package mega.privacy.android.feature.chat.list.view
 import androidx.compose.runtime.Composable
 import com.android.tools.screenshot.PreviewTest
 import kotlinx.collections.immutable.persistentListOf
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.feature.chat.list.model.ChatListUiState
@@ -107,6 +108,7 @@ class ChatListScreenScreenshotTest {
                     filePath = null,
                     color = 0xFFFEBC00.toInt(),
                 ),
+                status = ContactItemStatus.Online,
             ),
             ChatRoomUiItem(
                 chatId = 2L,
@@ -119,6 +121,7 @@ class ChatListScreenScreenshotTest {
                 highlight = false,
                 isNoteToSelf = false,
                 avatar = ChatRoomUiItem.ChatRoomUiAvatar.Group,
+                status = ContactItemStatus.Unknown,
             ),
         ),
         meetings = persistentListOf(
@@ -133,6 +136,7 @@ class ChatListScreenScreenshotTest {
                 highlight = false,
                 isNoteToSelf = false,
                 avatar = ChatRoomUiItem.ChatRoomUiAvatar.Meeting,
+                status = ContactItemStatus.Unknown,
             ),
             ChatRoomUiItem(
                 chatId = 4L,
@@ -145,6 +149,7 @@ class ChatListScreenScreenshotTest {
                 highlight = true,
                 isNoteToSelf = false,
                 avatar = ChatRoomUiItem.ChatRoomUiAvatar.Meeting,
+                status = ContactItemStatus.Unknown,
             ),
         ),
     )

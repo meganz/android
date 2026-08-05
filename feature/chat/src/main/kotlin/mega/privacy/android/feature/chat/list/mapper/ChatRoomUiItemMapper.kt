@@ -1,6 +1,8 @@
 package mega.privacy.android.feature.chat.list.mapper
 
+import mega.android.core.ui.components.contact.state.ContactItemStatus
 import mega.privacy.android.domain.entity.chat.ChatRoomItem
+import mega.privacy.android.domain.entity.contacts.UserChatStatus
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem
 import mega.privacy.android.feature.chat.list.model.ChatRoomUiItem.ChatRoomUiAvatar
 import javax.inject.Inject
@@ -38,5 +40,16 @@ internal class ChatRoomUiItemMapper @Inject constructor() {
             is ChatRoomItem.GroupChatRoomItem -> ChatRoomUiAvatar.Group
             is ChatRoomItem.MeetingChatRoomItem -> ChatRoomUiAvatar.Meeting
         },
+        status = (item as? ChatRoomItem.IndividualChatRoomItem)
+            ?.userChatStatus
+            .toContactItemStatus(),
     )
+
+    private fun UserChatStatus?.toContactItemStatus(): ContactItemStatus = when (this) {
+        UserChatStatus.Online -> ContactItemStatus.Online
+        UserChatStatus.Away -> ContactItemStatus.Away
+        UserChatStatus.Busy -> ContactItemStatus.Busy
+        UserChatStatus.Offline -> ContactItemStatus.Offline
+        UserChatStatus.Invalid, null -> ContactItemStatus.Unknown
+    }
 }
