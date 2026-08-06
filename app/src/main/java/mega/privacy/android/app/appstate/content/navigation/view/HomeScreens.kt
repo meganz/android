@@ -45,6 +45,7 @@ import mega.privacy.android.navigation.contract.state.LocalNavigationRailVisible
 import mega.privacy.android.navigation.contract.state.LocalSelectionModeController
 import mega.privacy.android.navigation.contract.state.SelectionModeController
 import mega.privacy.android.navigation.contract.transition.fadeTransition
+import mega.privacy.android.navigation.destination.CustomiseNavigationNavKey
 import mega.privacy.android.navigation.destination.HomeScreensNavKey
 import mega.privacy.android.shared.ads.NewAdsContainer
 import mega.privacy.android.shared.original.core.ui.theme.extensions.conditional
@@ -201,6 +202,14 @@ fun HomeScreens(
                                             }
                                     )
                                 }
+                                CustomiseNavigationTooltipAnchor(
+                                    isOnStartDestination = homeScreenStacks.topLevelKey ==
+                                            currentState.initialDestination &&
+                                            homeScreenStacks.backStack.size == 1,
+                                    onExplore = {
+                                        outerNavigationHandler.navigate(CustomiseNavigationNavKey)
+                                    },
+                                )
                             }
                         }
                     },
