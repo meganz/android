@@ -22,6 +22,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.analytics.test.AnalyticsTestExtension
 import mega.privacy.android.app.TimberJUnit5Extension
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.VideoSpeedPlaybackItem
 import mega.privacy.android.app.mediaplayer.queue.model.MediaQueueItemType
@@ -136,6 +138,8 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.PendingFileLinkPreviewAutoOpen
@@ -260,6 +264,10 @@ class VideoPlayerViewModelV2Test {
     private val savePlaybackTimesUseCase = mock<SavePlaybackTimesUseCase>()
     private val getSRTSubtitleFileListUseCase = mock<GetSRTSubtitleFileListUseCase>()
     private val broadcastTransferOverQuotaUseCase = mock<BroadcastTransferOverQuotaUseCase>()
+    private val monitorTransferOverQuotaUseCase = mock<MonitorTransferOverQuotaUseCase>()
+    private val isInTransferOverQuotaUseCase = mock<IsInTransferOverQuotaUseCase>()
+    private var transferOverQuotaEventQueue = TransferOverQuotaEventQueue()
+    private var fakeMonitorTransferOverQuotaFlow = MutableSharedFlow<Boolean>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val playerErrorTypeMapper = mock<PlayerErrorTypeMapper>()
     private val getFeatureFlagValueUseCase = mock<GetFeatureFlagValueUseCase>()
@@ -338,6 +346,9 @@ class VideoPlayerViewModelV2Test {
             savePlaybackTimesUseCase = savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase = broadcastTransferOverQuotaUseCase,
+            monitorTransferOverQuotaUseCase = monitorTransferOverQuotaUseCase,
+            isInTransferOverQuotaUseCase = isInTransferOverQuotaUseCase,
+            transferOverQuotaEventQueue = transferOverQuotaEventQueue,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             playerErrorTypeMapper = playerErrorTypeMapper,
             getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
@@ -374,6 +385,9 @@ class VideoPlayerViewModelV2Test {
         whenever(monitorPlaybackTimesUseCase()).thenReturn(flowOf(null))
         fakeMonitorConnectivityFlow = MutableSharedFlow()
         whenever(monitorConnectivityUseCase()).thenReturn(fakeMonitorConnectivityFlow)
+        fakeMonitorTransferOverQuotaFlow = MutableSharedFlow()
+        whenever(monitorTransferOverQuotaUseCase()).thenReturn(fakeMonitorTransferOverQuotaFlow)
+        transferOverQuotaEventQueue = TransferOverQuotaEventQueue()
         whenever(playerErrorTypeMapper(any(), any())).thenReturn(PlayerErrorType.CANNOT_PLAY)
     }
 
@@ -432,6 +446,8 @@ class VideoPlayerViewModelV2Test {
             savePlaybackTimesUseCase,
             getSRTSubtitleFileListUseCase,
             broadcastTransferOverQuotaUseCase,
+            monitorTransferOverQuotaUseCase,
+            isInTransferOverQuotaUseCase,
             monitorConnectivityUseCase,
             getFeatureFlagValueUseCase,
             checkNodeAccessibilityUseCase,
@@ -1602,14 +1618,13 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
-    fun `test that retryEvent is triggered when onPlayerError is invoked within retry limit`() =
+    fun `test that onPlayerError retries the player when invoked within retry limit`() =
         runTest {
             initViewModel()
+            clearInvocations(mediaPlayerGateway)
             underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
-            underTest.uiState.test {
-                assertThat(awaitItem().retryEvent).isEqualTo(triggered)
-                cancelAndConsumeRemainingEvents()
-            }
+            advanceUntilIdle()
+            verify(mediaPlayerGateway).mediaPlayerRetry(true)
         }
 
     @Test
@@ -1708,17 +1723,108 @@ class VideoPlayerViewModelV2Test {
         }
 
     @Test
-    fun `test that retryEvent is triggered on second onPlayerError when within retry limit`() =
+    fun `test that onPlayerError retries the player on second error when within retry limit`() =
         runTest {
             initViewModel()
-            // First error launches an async coroutine (playerRetry == 1); do NOT advance so
-            // the assertion is driven only by the second error's synchronous else-if branch.
+            // First error takes the playerRetry == 1 branch; clear it so the assertion is driven
+            // only by the second error's else branch.
             underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+
             underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
-            underTest.uiState.test {
-                assertThat(awaitItem().retryEvent).isEqualTo(triggered)
-                cancelAndConsumeRemainingEvents()
-            }
+
+            verify(mediaPlayerGateway).mediaPlayerRetry(true)
+        }
+
+    @Test
+    fun `test that playback is paused when transfer over quota is raised`() = runTest {
+        whenever(mediaPlayerGateway.getPlayWhenReady()).thenReturn(true)
+        initViewModel()
+        advanceUntilIdle()
+        clearInvocations(mediaPlayerGateway)
+
+        fakeMonitorTransferOverQuotaFlow.emit(true)
+        advanceUntilIdle()
+
+        verify(mediaPlayerGateway).setPlayWhenReady(false)
+    }
+
+    @Test
+    fun `test that onPlayerError does not retry the player when transfer over quota`() = runTest {
+        initViewModel()
+        advanceUntilIdle()
+        fakeMonitorTransferOverQuotaFlow.emit(true)
+        advanceUntilIdle()
+        clearInvocations(mediaPlayerGateway)
+
+        underTest.onPlayerError(PlaybackException.ERROR_CODE_UNSPECIFIED)
+        advanceUntilIdle()
+
+        verify(mediaPlayerGateway, never()).mediaPlayerRetry(any())
+    }
+
+    @Test
+    fun `test that handleAutoReplayIfPaused does not resume when transfer over quota`() = runTest {
+        initViewModel()
+        advanceUntilIdle()
+        underTest.updatePlaybackState(MediaPlaybackState.Paused)
+        underTest.updatePlaybackStateWithReplay(false)
+        fakeMonitorTransferOverQuotaFlow.emit(true)
+        advanceUntilIdle()
+        clearInvocations(mediaPlayerGateway)
+
+        underTest.handleAutoReplayIfPaused()
+        advanceUntilIdle()
+
+        verify(mediaPlayerGateway, never()).setPlayWhenReady(true)
+    }
+
+    @Test
+    fun `test that shouldResumeOnAudioFocusGain is false when transfer over quota`() = runTest {
+        initViewModel()
+        advanceUntilIdle()
+        assertThat(underTest.shouldResumeOnAudioFocusGain()).isTrue()
+
+        fakeMonitorTransferOverQuotaFlow.emit(true)
+        advanceUntilIdle()
+
+        assertThat(underTest.shouldResumeOnAudioFocusGain()).isFalse()
+    }
+
+    @Test
+    fun `test that a streaming warning is queued when play is requested and still over quota`() =
+        runTest {
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(true)
+            initViewModel()
+            advanceUntilIdle()
+            fakeMonitorTransferOverQuotaFlow.emit(true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Playing, isPausedByUser = false)
+            advanceUntilIdle()
+
+            assertThat(transferOverQuotaEventQueue.consume())
+                .isEqualTo(TransferOverQuotaSource.Streaming)
+            verify(mediaPlayerGateway, never()).mediaPlayerRetry(any())
+        }
+
+    @Test
+    fun `test that the player is retried when play is requested after the quota window passed`() =
+        runTest {
+            whenever(isInTransferOverQuotaUseCase()).thenReturn(false)
+            initViewModel()
+            advanceUntilIdle()
+            fakeMonitorTransferOverQuotaFlow.emit(true)
+            advanceUntilIdle()
+            clearInvocations(mediaPlayerGateway)
+
+            underTest.onPlayWhenReadyChanged(MediaPlaybackState.Playing, isPausedByUser = false)
+            advanceUntilIdle()
+
+            verify(mediaPlayerGateway).mediaPlayerRetry(true)
+            assertThat(transferOverQuotaEventQueue.consume()).isNull()
         }
 
     @Test

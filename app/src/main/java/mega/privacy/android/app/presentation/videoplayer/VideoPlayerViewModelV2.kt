@@ -49,6 +49,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaEventQueue
+import mega.privacy.android.app.appstate.global.quota.TransferOverQuotaSource
 import mega.privacy.android.app.di.mediaplayer.VideoPlayer
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerGateway
 import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
@@ -169,6 +171,8 @@ import mega.privacy.android.domain.usecase.setting.MonitorSubFolderMediaDiscover
 import mega.privacy.android.domain.usecase.thumbnailpreview.GetThumbnailUseCase
 import mega.privacy.android.domain.usecase.transfers.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfers.overquota.BroadcastTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.IsInTransferOverQuotaUseCase
+import mega.privacy.android.domain.usecase.transfers.overquota.MonitorTransferOverQuotaUseCase
 import mega.privacy.android.domain.usecase.videosection.SaveVideoRecentlyWatchedUseCase
 import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
 import mega.privacy.android.navigation.ExtraConstant.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
@@ -265,6 +269,9 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private val savePlaybackTimesUseCase: SavePlaybackTimesUseCase,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val broadcastTransferOverQuotaUseCase: BroadcastTransferOverQuotaUseCase,
+    private val monitorTransferOverQuotaUseCase: MonitorTransferOverQuotaUseCase,
+    private val isInTransferOverQuotaUseCase: IsInTransferOverQuotaUseCase,
+    private val transferOverQuotaEventQueue: TransferOverQuotaEventQueue,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val playerErrorTypeMapper: PlayerErrorTypeMapper,
     @Assisted private val args: Args,
@@ -307,6 +314,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
     private var isPausedByUser = false
     private var allowUpdatePausedByUser = true
     private var wasPlayingBeforeSubtitleDialog = false
+    private var isTransferOverQuota = false
 
     init {
         uiState.update {
@@ -322,8 +330,27 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
 
         updateNameWhenNodeUpdates()
         monitorConnectivity()
+        monitorTransferOverQuota()
         loadPipFeatureFlag()
         loadLinkAndLoginState()
+    }
+
+    /**
+     * Streaming over quota keeps the SDK raising the event for every streaming request, so the
+     * player is stopped instead of retried. Leaving it idle means nothing re-requests the stream
+     * until the user asks for it, which is what stops the warning from reappearing as soon as it
+     * is dismissed.
+     */
+    private fun monitorTransferOverQuota() {
+        monitorTransferOverQuotaUseCase()
+            .onEach { isOverQuota ->
+                isTransferOverQuota = isOverQuota
+                if (isOverQuota) {
+                    pausePlaybackNonUserInitiated()
+                }
+            }
+            .catch { Timber.e(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun loadLinkAndLoginState() {
@@ -1370,19 +1397,45 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
             }
         }
         allowUpdatePausedByUser = true
+        if (state == MediaPlaybackState.Playing && isTransferOverQuota) {
+            handlePlayRequestedWhileOverQuota()
+        }
+    }
+
+    /**
+     * The player is left idle while over quota, so pressing play cannot resume on its own. Ask the
+     * SDK whether the quota window has passed: if it has, prepare the stream again, otherwise warn
+     * the user. Pressing play is a deliberate action, so the warning is raised every time rather
+     * than only once per quota window.
+     */
+    private fun handlePlayRequestedWhileOverQuota() {
+        viewModelScope.launch {
+            val stillOverQuota = runCatching { isInTransferOverQuotaUseCase() }
+                .onFailure { Timber.e(it) }
+                .getOrDefault(true)
+            if (stillOverQuota) {
+                pausePlaybackNonUserInitiated()
+                transferOverQuotaEventQueue.emit(TransferOverQuotaSource.Streaming)
+            } else {
+                isTransferOverQuota = false
+                playerRetry = 0
+                mediaPlayerGateway.mediaPlayerRetry(true)
+            }
+        }
     }
 
     /**
      * When `false`, the user explicitly paused and playback must not auto-resume on audio focus
      * gain until they press play.
      */
-    internal fun shouldResumeOnAudioFocusGain(): Boolean = !isPausedByUser
+    internal fun shouldResumeOnAudioFocusGain(): Boolean = !isPausedByUser && !isTransferOverQuota
 
     internal fun handleAutoReplayIfPaused() {
         val shouldAutoReplay = uiState.value.mediaPlaybackState == MediaPlaybackState.Paused &&
                 uiState.value.isAutoReplay &&
                 !uiState.value.showSubTitlesOptions &&
-                !isPausedByUser
+                !isPausedByUser &&
+                !isTransferOverQuota
 
         if (shouldAutoReplay) {
             updatePlaybackStateWithReplay(true)
@@ -1409,6 +1462,13 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                 }
             }
 
+            // Retrying while over quota only makes the SDK raise the warning again, so stay idle
+            // until the user asks for playback.
+            isTransferOverQuota -> {
+                pausePlaybackNonUserInitiated()
+                uiState.update { it.copy(playerErrorType = errorType) }
+            }
+
             // FILE_NOT_SUPPORTED and max retry exceeded are unrecoverable — skip retry immediately
             errorType == PlayerErrorType.FILE_NOT_SUPPORTED
                     || playerRetry > MAX_RETRY -> {
@@ -1430,12 +1490,24 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                                 return@launch
                             }
                         }
-                    uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
+                    retryPlayback(errorType)
                 }
             }
 
-            else -> uiState.update { it.copy(retryEvent = triggered, playerErrorType = errorType) }
+            else -> retryPlayback(errorType)
         }
+    }
+
+    /**
+     * Retries straight from here rather than through a UI event: while another destination is on
+     * top of the player its entry leaves composition, so an event raised here would sit unconsumed
+     * and fire again the moment the player is shown, restarting playback the user had left stopped.
+     *
+     * @param errorType the error that triggered the retry.
+     */
+    private fun retryPlayback(errorType: PlayerErrorType) {
+        uiState.update { it.copy(playerErrorType = errorType) }
+        mediaPlayerGateway.mediaPlayerRetry(true)
     }
 
     internal fun onRetryConsumed() = uiState.update { it.copy(retryEvent = consumed) }
