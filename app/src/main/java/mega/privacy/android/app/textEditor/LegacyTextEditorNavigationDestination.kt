@@ -20,6 +20,7 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
+import mega.privacy.android.core.nodecomponents.action.buildDownloadAwareActionHandler
 import mega.privacy.android.core.nodecomponents.action.rememberSingleNodeActionHandler
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogArgs
 import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDeleteDialogResult
@@ -281,10 +282,21 @@ private fun TextEditorComposeContent(
                 }
             },
         )
+        // The editor has no transfers widget, so Download shows the "Downloading" snackbar.
+        val downloadAwareActionHandler =
+            remember(nodeActionHandler, nodeOptionsActionViewModel) {
+                buildDownloadAwareActionHandler(
+                    delegate = nodeActionHandler,
+                    onDownload = { node ->
+                        nodeOptionsActionViewModel.updateSelectedNodes(listOf(node))
+                        nodeOptionsActionViewModel.downloadNode(withStartMessage = true)
+                    },
+                )
+            }
         HandleNodeOptionsActionResult(
             nodeOptionsActionViewModel = nodeOptionsActionViewModel,
             navigationHandler = navigationHandler,
-            nodeActionHandler = nodeActionHandler,
+            nodeActionHandler = downloadAwareActionHandler,
             onTransfer = transferHandler::setTransferEvent,
             onNavResultConsumed = { result ->
                 if (shouldCloseTextEditorOnNodeOptionsResult(result)) {
