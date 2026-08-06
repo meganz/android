@@ -37,6 +37,7 @@ import mega.android.core.ui.components.toolbar.AppBarNavigationType
 import mega.android.core.ui.components.toolbar.MegaTopAppBar
 import mega.android.core.ui.extensions.LaunchedOnceEffect
 import mega.android.core.ui.extensions.showAutoDurationSnackbar
+import mega.android.core.ui.model.Button
 import mega.android.core.ui.model.menu.MenuActionWithClick
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
@@ -301,55 +302,73 @@ internal fun ExplorerScreen(
             }
         },
         bottomBar = {
-            if (!uiState.isLoading && !isProcessingAction && (!showSearch || hasSelection)) {
+            if (!uiState.isLoading && (!showSearch || hasSelection)) {
                 InlineAnchoredButtonGroup(
                     modifier = Modifier.testTag(ACTION_BUTTONS_VIEW_TAG),
-                    primaryButtonText = stringResource(explorerMode.actionStringId),
-                    onPrimaryButtonClick = {
-                        protectedUserTap {
-                            if (!viewModel.uiState.value.isConnected) {
-                                showNoConnectionSnackbar()
-                                return@protectedUserTap
-                            }
-                            if (showSearch) {
-                                Analytics.tracker.trackEvent(
-                                    CloudExplorerConfirmedSearchButtonPressedEvent
-                                )
-                            } else {
-                                Analytics.tracker.trackEvent(
-                                    confirmedTabEvent(
-                                        selectedTabIndex,
-                                        nodeSourceType
-                                    )
-                                )
-                            }
-                            when {
-                                explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
-                                    onChatsSelected()
+                    buttonGroup = listOf(
+                        {
+                            Button.SecondaryButtonM3(
+                                text = stringResource(sharedR.string.general_dialog_cancel_button),
+                                enabled = !isProcessingAction,
+                                onClick = {
+                                    protectedUserTap {
+                                        Analytics.tracker.trackEvent(
+                                            CloudExplorerCancelButtonPressedEvent
+                                        )
+                                        onCloseExplorerScreen()
+                                    }
+                                },
+                            )
+                        },
+                        {
+                            Button.PrimaryButtonM3(
+                                text = stringResource(explorerMode.actionStringId),
+                                enabled = !isProcessingAction && when {
+                                    !explorerMode.isFolderPicker ->
+                                        nodeSelectionState.isInSelectionMode
 
-                                explorerMode.isFolderPicker ->
-                                    onFolderPicked(nodeExplorerId)
+                                    selectedTabIndex == CLOUD_TAB_INDEX ->
+                                        pickerRestrictions?.isPickEnabled
+                                            ?: (nodeExplorerId != disabledTargetId)
 
-                                else ->
-                                    onFilesPicked(nodeSelectionState.selectedNodeIds.toList())
-                            }
-                        }
-                    },
-                    primaryButtonEnabled = when {
-                        !explorerMode.isFolderPicker -> nodeSelectionState.isInSelectionMode
-                        selectedTabIndex == CLOUD_TAB_INDEX -> pickerRestrictions?.isPickEnabled
-                            ?: (nodeExplorerId != disabledTargetId)
+                                    selectedTabIndex == CHAT_TAB_INDEX ->
+                                        chatExplorerSelectionState.isInSelectionMode
 
-                        selectedTabIndex == CHAT_TAB_INDEX -> chatExplorerSelectionState.isInSelectionMode
-                        else -> false
-                    },
-                    textOnlyButtonText = stringResource(sharedR.string.general_dialog_cancel_button),
-                    onTextOnlyButtonClick = {
-                        protectedUserTap {
-                            Analytics.tracker.trackEvent(CloudExplorerCancelButtonPressedEvent)
-                            onCloseExplorerScreen()
-                        }
-                    },
+                                    else -> false
+                                },
+                                onClick = {
+                                    protectedUserTap {
+                                        if (!viewModel.uiState.value.isConnected) {
+                                            showNoConnectionSnackbar()
+                                            return@protectedUserTap
+                                        }
+                                        if (showSearch) {
+                                            Analytics.tracker.trackEvent(
+                                                CloudExplorerConfirmedSearchButtonPressedEvent
+                                            )
+                                        } else {
+                                            Analytics.tracker.trackEvent(
+                                                confirmedTabEvent(
+                                                    selectedTabIndex,
+                                                    nodeSourceType
+                                                )
+                                            )
+                                        }
+                                        when {
+                                            explorerMode.isFolderPicker && selectedTabIndex == CHAT_TAB_INDEX ->
+                                                onChatsSelected()
+
+                                            explorerMode.isFolderPicker ->
+                                                onFolderPicked(nodeExplorerId)
+
+                                            else ->
+                                                onFilesPicked(nodeSelectionState.selectedNodeIds.toList())
+                                        }
+                                    }
+                                },
+                            )
+                        },
+                    ),
                 )
             }
         }

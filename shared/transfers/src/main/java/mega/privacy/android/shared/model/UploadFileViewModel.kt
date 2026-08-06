@@ -43,10 +43,25 @@ class UploadFileViewModel @Inject constructor(
     fun proceedUris(uris: List<Uri>, parentNodeId: NodeId, pitagTrigger: PitagTrigger) {
         viewModelScope.launch {
             if (isInPayWall()) return@launch
+            _uiState.update { it.copy(isProcessing = true) }
             runCatching {
                 val parentOrRootNodeId = if (parentNodeId.longValue != -1L) parentNodeId
                 else getRootNodeUseCase()?.id ?: NodeId(-1L)
                 val entities = filePrepareUseCase(uris.map { UriPath(it.toString()) })
+                // Uris can become unreadable between selection and upload confirmation
+                // (deleted files, expired permission grants); surface an error instead
+                // of finishing silently with the UI locked in the processing state.
+                if (entities.isEmpty()) {
+                    _uiState.update {
+                        it.copy(
+                            isProcessing = false,
+                            uploadErrorEvent = triggered(
+                                IllegalStateException("None of the uris could be prepared for upload")
+                            ),
+                        )
+                    }
+                    return@launch
+                }
                 val collisions = checkFileNameCollisionsUseCase(
                     files = entities,
                     parentNodeId = parentOrRootNodeId,
@@ -80,6 +95,7 @@ class UploadFileViewModel @Inject constructor(
             }.onFailure { e ->
                 _uiState.update {
                     it.copy(
+                        isProcessing = false,
                         uploadErrorEvent = triggered(e)
                     )
                 }
@@ -98,6 +114,7 @@ class UploadFileViewModel @Inject constructor(
             if (isInPayWall()) return@launch
             _uiState.update {
                 it.copy(
+                    isProcessing = true,
                     startUploadEvent = triggered(
                         TransferTriggerEvent.StartChatUpload.Files(
                             chatIds = chatIds,

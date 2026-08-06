@@ -27,6 +27,14 @@ import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 import java.io.IOException
 
+/**
+ * Handles the upload flow events for the given [urisEvent].
+ *
+ * Hosts that need to disable their upload UI while an accepted request is being
+ * processed should pass their own [viewModel] instance and observe `isProcessing`
+ * from its ui state; it resets to false when processing fails, so the upload can
+ * be retried.
+ */
 @Composable
 fun UploadingFiles(
     nameCollisionLauncher: ActivityResultLauncher<ArrayList<NameCollision>>,

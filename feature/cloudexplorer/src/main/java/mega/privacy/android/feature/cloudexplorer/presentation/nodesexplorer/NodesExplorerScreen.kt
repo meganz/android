@@ -12,6 +12,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.EventEffect
 import de.palm.composestateevents.StateEventWithContent
@@ -59,6 +61,7 @@ import mega.privacy.android.shared.nodes.selection.NodeSelectionState
 import mega.privacy.android.shared.nodes.selection.rememberNodeSelectionState
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 
 @Composable
 internal fun NodesExplorerScreen(
@@ -80,7 +83,9 @@ internal fun NodesExplorerScreen(
     disabledNodeIds: Set<NodeId> = emptySet(),
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
+    uploadFileViewModel: UploadFileViewModel = hiltViewModel(),
 ) {
+    val uploadUiState by uploadFileViewModel.uiState.collectAsStateWithLifecycle()
     val uploadUrisEventState = rememberUploadUrisEventState()
     var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
     val folderPickedId = NodeId(folderPickedIdLong)
@@ -126,7 +131,8 @@ internal fun NodesExplorerScreen(
         disabledNodeIds = disabledNodeIds,
         pickerRestrictions = syncFolderPicker?.restrictions,
         onCloseExplorerScreen = onCancelExplorerScreen,
-        isProcessingAction = syncFolderPicker?.isProcessingAction ?: isProcessingAction,
+        isProcessingAction = syncFolderPicker?.isProcessingAction
+            ?: (isProcessingAction || uploadUiState.isProcessing),
         onFolderPicked = { nodeId ->
             when {
                 (explorerMode == ExplorerMode.ShareFilesToMega
@@ -192,6 +198,7 @@ internal fun NodesExplorerScreen(
             onStartUpload = onStartUpload,
             onCloseExplorerScreen = onCloseExplorerScreen,
             onNavigate = onNavigate,
+            viewModel = uploadFileViewModel,
         )
     }
 

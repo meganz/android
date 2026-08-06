@@ -3,6 +3,7 @@ package mega.privacy.android.feature.cloudexplorer.presentation.sharetomega
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.compose.ui.platform.LocalResources
 import androidx.navigation3.runtime.NavKey
 import kotlinx.coroutines.launch
@@ -16,6 +17,7 @@ import mega.privacy.android.navigation.extensions.rememberMegaResultContract
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.UploadUrisEventState
 import mega.privacy.android.shared.transfers.components.UploadingFiles
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 
 /**
  * Drives the upload flow for the Share-to-MEGA screens: handles name collisions,
@@ -27,6 +29,9 @@ import mega.privacy.android.shared.transfers.components.UploadingFiles
  * attached to those chats; once the upload starts the screen finishes via
  * [rememberOnSharedToChats] (navigate to the chat if there is exactly one, otherwise
  * show the "Sent as message" snackbar).
+ * @param viewModel The upload ViewModel; hosts pass their own instance and observe
+ * `isProcessing` from its ui state to disable their upload UI while a triggered
+ * upload is being processed. It resets to false when processing fails.
  */
 @Composable
 internal fun ShareToMegaUpload(
@@ -37,6 +42,7 @@ internal fun ShareToMegaUpload(
     onCloseExplorerScreen: () -> Unit,
     onNavigate: (NavKey) -> Unit,
     chatIds: List<Long>? = null,
+    viewModel: UploadFileViewModel = hiltViewModel(),
 ) {
     val snackbarHostState = LocalSnackBarHostState.current
     val resources = LocalResources.current
@@ -71,6 +77,7 @@ internal fun ShareToMegaUpload(
         nameCollisionLauncher = nameCollisionLauncher,
         parentNodeId = parentNodeId,
         chatIds = chatIds,
+        viewModel = viewModel,
         urisEvent = uploadUrisEventState.event,
         onUrisConsumed = uploadUrisEventState::consume,
         pitagTrigger = pitagTrigger,

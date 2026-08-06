@@ -66,10 +66,14 @@ internal class ExplorerScreenTest {
     }
 
     @Test
-    fun `test that the action buttons are hidden while an action is processing`() {
+    fun `test that both action buttons are disabled while an action is processing`() {
         setContent(isProcessingAction = true)
 
-        composeTestRule.onNodeWithTag(ACTION_BUTTONS_VIEW_TAG).assertDoesNotExist()
+        composeTestRule.onNodeWithTag(ACTION_BUTTONS_VIEW_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_copy))
+            .assertIsNotEnabled()
+        composeTestRule.onNodeWithText(actionLabel(sharedR.string.general_dialog_cancel_button))
+            .assertIsNotEnabled()
     }
 
     @Test

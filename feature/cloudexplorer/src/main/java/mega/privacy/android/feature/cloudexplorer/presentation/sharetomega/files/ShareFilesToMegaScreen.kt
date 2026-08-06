@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.consumed
@@ -49,6 +51,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.Share
 import mega.privacy.android.navigation.destination.ExplorerNavKey
 import mega.privacy.android.shared.resources.R as sharedR
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,6 +64,7 @@ internal fun ShareFilesToMegaScreen(
     onNavigate: (NavKey) -> Unit,
     monitorResult: (String) -> Flow<Any?> = { emptyFlow() },
     clearResult: (String) -> Unit = {},
+    uploadFileViewModel: UploadFileViewModel = hiltViewModel(),
 ) {
     if (uiState is ShareFilesToMegaUiState.Loading) {
         // Grace delay so fast loads never flash the processing state.
@@ -70,6 +74,7 @@ internal fun ShareFilesToMegaScreen(
         }
     } else {
         val dataUiState = uiState as ShareFilesToMegaUiState.Data
+        val uploadUiState by uploadFileViewModel.uiState.collectAsStateWithLifecycle()
         val uploadUrisEventState = rememberUploadUrisEventState()
         var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
         val folderPickedId = NodeId(folderPickedIdLong)
@@ -99,9 +104,8 @@ internal fun ShareFilesToMegaScreen(
             onCloseExplorerScreen = onNavigateBack,
             onNavigateBack = onNavigateBack,
             onNavigate = onNavigate,
-            isProcessingAction = isProcessingAction,
+            isProcessingAction = isProcessingAction || uploadUiState.isProcessing,
             onFolderPicked = { nodeId ->
-                isProcessingAction = true
                 folderPickedIdLong = nodeId.longValue
                 uploadUrisEventState.trigger(dataUiState.shareUris.map { it.toUri() })
             },
@@ -127,6 +131,7 @@ internal fun ShareFilesToMegaScreen(
             onStartUpload = onStartUpload,
             onCloseExplorerScreen = onNavigateBack,
             onNavigate = onNavigate,
+            viewModel = uploadFileViewModel,
         )
     }
 }

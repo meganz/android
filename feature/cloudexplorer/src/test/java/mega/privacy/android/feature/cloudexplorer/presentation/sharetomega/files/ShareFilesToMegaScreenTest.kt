@@ -10,13 +10,18 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.CLOUD_EXPLORER_VIEW_TAG
 import mega.privacy.android.feature.cloudexplorer.presentation.explorer.explorerViewModelStoreOwner
+import kotlinx.coroutines.flow.MutableStateFlow
 import mega.privacy.android.navigation.destination.CopyNavKey
 import mega.privacy.android.shared.nodes.components.previewdata.LocalNodeHeaderPreviewData
 import mega.privacy.android.shared.nodes.model.NodeHeaderItemUiState
 import mega.privacy.android.shared.nodes.model.NodeSortConfiguration
+import mega.privacy.android.shared.transfers.model.UploadFileUiState
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 internal class ShareFilesToMegaScreenTest {
@@ -25,6 +30,10 @@ internal class ShareFilesToMegaScreenTest {
     val composeTestRule = createComposeRule()
 
     private val viewModelStoreOwner = explorerViewModelStoreOwner()
+
+    private val uploadFileViewModel = mock<UploadFileViewModel> {
+        on { uiState } doReturn MutableStateFlow(UploadFileUiState())
+    }
 
     @Test
     fun `test that nothing is rendered immediately while loading`() {
@@ -63,6 +72,7 @@ internal class ShareFilesToMegaScreenTest {
                         onStartUpload = {},
                         onNavigateBack = {},
                         onNavigate = {},
+                        uploadFileViewModel = uploadFileViewModel,
                     )
                 }
             }

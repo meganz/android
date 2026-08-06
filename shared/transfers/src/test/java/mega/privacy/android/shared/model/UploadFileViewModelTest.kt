@@ -407,23 +407,30 @@ class UploadFileViewModelTest {
     }
 
     @Test
-    fun `test that proceedUris handles empty Uri list gracefully`() = runTest {
-        val uris = emptyList<Uri>()
-        val parentNodeId = NodeId(123L)
-        val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
-        val entities = emptyList<DocumentEntity>()
-        val collisions = emptyList<FileNameCollision>()
+    fun `test that proceedUris triggers uploadErrorEvent and resets isProcessing when no files can be prepared`() =
+        runTest {
+            val uris = listOf(
+                mock<Uri> {
+                    on { toString() } doReturn "content://com.example.provider/test.txt"
+                }
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
 
-        whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
-        whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(entities)
-        whenever(checkFileNameCollisionsUseCase(any(), any(), any())).thenReturn(collisions)
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+            whenever(filePrepareUseCase(any<List<UriPath>>()))
+                .thenReturn(emptyList<DocumentEntity>())
 
-        viewModel.proceedUris(uris, parentNodeId, PitagTrigger.Picker)
+            viewModel.proceedUris(uris, NodeId(123L), PitagTrigger.Picker)
 
-        verify(filePrepareUseCase).invoke(emptyList())
-        verify(checkFileNameCollisionsUseCase)
-            .invoke(emptyList(), parentNodeId, PitagTrigger.Picker)
-    }
+            val uiState = viewModel.uiState.value
+            assertThat(uiState.isProcessing).isFalse()
+            assertThat(uiState.uploadErrorEvent)
+                .isInstanceOf(StateEventWithContentTriggered::class.java)
+            assertThat((uiState.uploadErrorEvent as StateEventWithContentTriggered).content)
+                .isInstanceOf(IllegalStateException::class.java)
+            assertThat(uiState.startUploadEvent)
+                .isInstanceOf(StateEventWithContentConsumed::class.java)
+        }
 
     @Test
     fun `test that attachFilesToChat triggers overQuotaEvent when storage state is PayWall`() =
@@ -471,6 +478,78 @@ class UploadFileViewModelTest {
                     "content://com.example.provider/b.txt",
                 ).inOrder()
             assertThat(chatUpload.pitagTrigger).isEqualTo(PitagTrigger.ShareFromApp)
+        }
+
+    @Test
+    fun `test that proceedUris sets isProcessing when the upload request is accepted`() = runTest {
+        val uris = listOf(
+            mock<Uri> {
+                on { toString() } doReturn "content://com.example.provider/test.txt"
+            }
+        )
+        val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
+
+        whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+        whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(listOf(mock<DocumentEntity>()))
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any()))
+            .thenReturn(emptyList<FileNameCollision>())
+
+        viewModel.proceedUris(uris, NodeId(123L), PitagTrigger.Picker)
+
+        assertThat(viewModel.uiState.value.isProcessing).isTrue()
+    }
+
+    @Test
+    fun `test that proceedUris resets isProcessing when processing fails`() = runTest {
+        val uris = listOf(
+            mock<Uri> {
+                on { toString() } doReturn "content://com.example.provider/test.txt"
+            }
+        )
+        val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
+
+        whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+        whenever(filePrepareUseCase(any<List<UriPath>>())).thenReturn(listOf(mock<DocumentEntity>()))
+        whenever(checkFileNameCollisionsUseCase(any(), any(), any()))
+            .thenThrow(RuntimeException("Collision check failed"))
+
+        viewModel.proceedUris(uris, NodeId(123L), PitagTrigger.Picker)
+
+        assertThat(viewModel.uiState.value.isProcessing).isFalse()
+    }
+
+    @Test
+    fun `test that proceedUris does not set isProcessing when storage state is PayWall`() =
+        runTest {
+            val uris = listOf(
+                mock<Uri> {
+                    on { toString() } doReturn "content://com.example.provider/test.txt"
+                }
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.PayWall))
+
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+
+            viewModel.proceedUris(uris, NodeId(123L), PitagTrigger.Picker)
+
+            assertThat(viewModel.uiState.value.isProcessing).isFalse()
+        }
+
+    @Test
+    fun `test that attachFilesToChat sets isProcessing when the chat upload is triggered`() =
+        runTest {
+            val uris = listOf(
+                mock<Uri> {
+                    on { toString() } doReturn "content://com.example.provider/test.txt"
+                }
+            )
+            val storageStateFlow = MutableStateFlow(StorageStateEvent(1L, StorageState.Green))
+
+            whenever(monitorStorageStateEventUseCase()).thenReturn(storageStateFlow)
+
+            viewModel.attachFilesToChat(uris, listOf(10L), PitagTrigger.ShareFromApp)
+
+            assertThat(viewModel.uiState.value.isProcessing).isTrue()
         }
 
     @Test

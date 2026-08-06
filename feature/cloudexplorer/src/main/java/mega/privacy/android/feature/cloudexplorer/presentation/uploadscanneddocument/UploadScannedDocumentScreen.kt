@@ -5,9 +5,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import mega.privacy.android.data.extensions.toUri
 import mega.privacy.android.domain.entity.cloudexplorer.ExplorerMode
@@ -22,6 +23,7 @@ import mega.privacy.android.feature.cloudexplorer.presentation.sharetomega.Share
 import mega.privacy.android.navigation.destination.DiscardScanWarningDialogNavKey
 import mega.privacy.android.navigation.destination.UploadScannedDocumentNavKey
 import mega.privacy.android.shared.transfers.components.rememberUploadUrisEventState
+import mega.privacy.android.shared.transfers.model.UploadFileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -31,12 +33,13 @@ internal fun UploadScannedDocumentScreen(
     onStartUpload: (TransferTriggerEvent) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigate: (NavKey) -> Unit,
+    uploadFileViewModel: UploadFileViewModel = hiltViewModel(),
 ) {
     if (uiState is UploadScannedDocumentsUiState.Data) {
+        val uploadUiState by uploadFileViewModel.uiState.collectAsStateWithLifecycle()
         val uploadUrisEventState = rememberUploadUrisEventState()
         var folderPickedIdLong by rememberSaveable { mutableLongStateOf(-1L) }
         val folderPickedId = NodeId(folderPickedIdLong)
-        var isProcessingAction by rememberSaveable { mutableStateOf(false) }
         val shareUris = listOf(uiState.uriPath)
         val tabIndex = if (startNavKey.nodeSourceType == NodeSourceType.INCOMING_SHARES) {
             INCOMING_TAB_INDEX
@@ -65,9 +68,8 @@ internal fun UploadScannedDocumentScreen(
             onCloseExplorerScreen = showDiscardScanWarning,
             onNavigateBack = showDiscardScanWarning,
             onNavigate = onNavigate,
-            isProcessingAction = isProcessingAction,
+            isProcessingAction = uploadUiState.isProcessing,
             onFolderPicked = { nodeId ->
-                isProcessingAction = true
                 folderPickedIdLong = nodeId.longValue
                 uploadUrisEventState.trigger(shareUris.map { it.toUri() })
             },
@@ -80,6 +82,7 @@ internal fun UploadScannedDocumentScreen(
             onStartUpload = onStartUpload,
             onCloseExplorerScreen = onNavigateBack,
             onNavigate = onNavigate,
+            viewModel = uploadFileViewModel,
         )
     }
 }
