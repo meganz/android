@@ -3,9 +3,11 @@ package mega.privacy.android.data.mapper.photos
 import mega.privacy.android.data.mapper.handles.MegaHandleListMapper
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Category
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Favourites
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Granularity
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Location
 import mega.privacy.android.domain.entity.media.MediaTimelineFilter.Sensitivity
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter.SubCategory
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaGroupNodesByDateFilter
 import nz.mega.sdk.MegaHandleList
@@ -25,6 +27,8 @@ internal class MediaTimelineFilterMapperTest {
     private val mediaTimelineCategoryIntMapper = mock<MediaTimelineCategoryIntMapper>()
     private val mediaTimelineSensitivityIntMapper = mock<MediaTimelineSensitivityIntMapper>()
     private val mediaTimelineLocationIntMapper = mock<MediaTimelineLocationIntMapper>()
+    private val subCategoryIntMapper = mock<SubCategoryIntMapper>()
+    private val mediaTimelineFavouritesIntMapper = mock<MediaTimelineFavouritesIntMapper>()
     private val megaHandleListMapper = mock<MegaHandleListMapper>()
 
     private val underTest = MediaTimelineFilterMapper(
@@ -32,6 +36,8 @@ internal class MediaTimelineFilterMapperTest {
         mediaTimelineCategoryIntMapper = mediaTimelineCategoryIntMapper,
         mediaTimelineSensitivityIntMapper = mediaTimelineSensitivityIntMapper,
         mediaTimelineLocationIntMapper = mediaTimelineLocationIntMapper,
+        subCategoryIntMapper = subCategoryIntMapper,
+        mediaTimelineFavouritesIntMapper = mediaTimelineFavouritesIntMapper,
         megaHandleListMapper = megaHandleListMapper,
     )
 
@@ -119,6 +125,54 @@ internal class MediaTimelineFilterMapperTest {
     }
 
     @Test
+    fun `test that the mapped favourite filter is applied to the sdk filter`() {
+        val filter = MediaTimelineFilter(
+            granularity = Granularity.Day,
+            category = Category.All,
+            location = Location.CloudDriveAndVault,
+            sensitivity = Sensitivity.ShowAll,
+            favourites = Favourites.Favourites,
+        )
+        whenever(mediaTimelineFavouritesIntMapper(Favourites.Favourites)).thenReturn(FAVOURITE)
+
+        val sdkFilter = mock<MegaGroupNodesByDateFilter>()
+        mockStatic(MegaGroupNodesByDateFilter::class.java).use { mockedStatic ->
+            mockedStatic.`when`<MegaGroupNodesByDateFilter> {
+                MegaGroupNodesByDateFilter.createInstance()
+            }.thenReturn(sdkFilter)
+
+            underTest(filter, TIMEZONE_OFFSET)
+
+            verify(sdkFilter).byFavourite(FAVOURITE)
+        }
+    }
+
+    @Test
+    fun `test that a sub-category widens the category to all and applies the sub-category to the sdk filter`() {
+        val filter = MediaTimelineFilter(
+            granularity = Granularity.Day,
+            category = Category.Photos,
+            location = Location.CloudDriveAndVault,
+            sensitivity = Sensitivity.ShowAll,
+            subCategory = SubCategory.Gif,
+        )
+        whenever(mediaTimelineCategoryIntMapper(Category.All)).thenReturn(CATEGORY)
+        whenever(subCategoryIntMapper(SubCategory.Gif)).thenReturn(SUB_CATEGORY_GIF)
+
+        val sdkFilter = mock<MegaGroupNodesByDateFilter>()
+        mockStatic(MegaGroupNodesByDateFilter::class.java).use { mockedStatic ->
+            mockedStatic.`when`<MegaGroupNodesByDateFilter> {
+                MegaGroupNodesByDateFilter.createInstance()
+            }.thenReturn(sdkFilter)
+
+            underTest(filter, TIMEZONE_OFFSET)
+
+            verify(sdkFilter).byCategory(CATEGORY)
+            verify(sdkFilter).bySubCategory(SUB_CATEGORY_GIF)
+        }
+    }
+
+    @Test
     fun `test that timezone offset is applied to the sdk filter`() {
         val filter = MediaTimelineFilter(
             granularity = Granularity.Day,
@@ -144,6 +198,8 @@ internal class MediaTimelineFilterMapperTest {
         private const val CATEGORY = 13
         private const val SENSITIVITY = 0
         private const val LOCATION = 1
+        private const val FAVOURITE = 1
+        private const val SUB_CATEGORY_GIF = 1
         private const val PRIMARY_HANDLE = 100L
         private const val SECONDARY_HANDLE = 200L
         private const val TIMEZONE_OFFSET = "+09:00"

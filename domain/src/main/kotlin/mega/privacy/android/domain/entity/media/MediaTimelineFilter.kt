@@ -9,6 +9,9 @@ import mega.privacy.android.domain.entity.node.NodeId
  * @property category Which kind of media nodes to include.
  * @property location Which storage locations to include.
  * @property sensitivity Whether sensitive nodes are included.
+ * @property subCategory Restricts the media to a specific sub-category (e.g. GIF or RAW images).
+ * When not [SubCategory.All], [category] is forced to visual-media-wide at the SDK boundary.
+ * @property favourites When true, restrict the media to favourite nodes only.
  * @property includeLocationHandles When non-empty, restrict the timeline to nodes under these folder
  * handles (e.g. Camera Upload + Media Upload), taking precedence over [location].
  * @property excludeLocationHandles When non-empty, exclude nodes under these folder handles from the
@@ -20,6 +23,8 @@ data class MediaTimelineFilter(
     val category: Category,
     val location: Location,
     val sensitivity: Sensitivity,
+    val subCategory: SubCategory = SubCategory.All,
+    val favourites: Favourites = Favourites.All,
     val includeLocationHandles: List<NodeId> = emptyList(),
     val excludeLocationHandles: List<NodeId> = emptyList(),
 ) {
@@ -96,5 +101,45 @@ data class MediaTimelineFilter(
          * Exclude sensitive nodes.
          */
         HideSensitive
+    }
+
+    /**
+     * A finer-grained media sub-category applied on top of [Category].
+     */
+    enum class SubCategory {
+        /**
+         * No sub-category restriction.
+         */
+        All,
+
+        /**
+         * GIF images only.
+         */
+        Gif,
+
+        /**
+         * RAW images only.
+         */
+        Raw
+    }
+
+    /**
+     * Whether the timeline is restricted by favourite status.
+     */
+    enum class Favourites {
+        /**
+         * Include all nodes regardless of favourite status.
+         */
+        All,
+
+        /**
+         * Include favourite nodes only.
+         */
+        Favourites,
+
+        /**
+         * Include non-favourite nodes only.
+         */
+        NonFavourites
     }
 }

@@ -12,6 +12,8 @@ import javax.inject.Inject
  * @param mediaTimelineCategoryIntMapper [MediaTimelineCategoryIntMapper]
  * @param mediaTimelineSensitivityIntMapper [MediaTimelineSensitivityIntMapper]
  * @param mediaTimelineLocationIntMapper [MediaTimelineLocationIntMapper]
+ * @param subCategoryIntMapper [SubCategoryIntMapper]
+ * @param mediaTimelineFavouritesIntMapper [MediaTimelineFavouritesIntMapper]
  * @param megaHandleListMapper [MegaHandleListMapper]
  */
 internal class MediaTimelineFilterMapper @Inject constructor(
@@ -19,6 +21,8 @@ internal class MediaTimelineFilterMapper @Inject constructor(
     private val mediaTimelineCategoryIntMapper: MediaTimelineCategoryIntMapper,
     private val mediaTimelineSensitivityIntMapper: MediaTimelineSensitivityIntMapper,
     private val mediaTimelineLocationIntMapper: MediaTimelineLocationIntMapper,
+    private val subCategoryIntMapper: SubCategoryIntMapper,
+    private val mediaTimelineFavouritesIntMapper: MediaTimelineFavouritesIntMapper,
     private val megaHandleListMapper: MegaHandleListMapper,
 ) {
 
@@ -31,8 +35,12 @@ internal class MediaTimelineFilterMapper @Inject constructor(
         timezoneOffset: String,
     ): MegaGroupNodesByDateFilter =
         MegaGroupNodesByDateFilter.createInstance().also {
+            val hasSubCategory = filter.subCategory != MediaTimelineFilter.SubCategory.All
+            // A sub-category spans all visual media; the concrete category is narrowed by the sub-category.
+            val category =
+                if (hasSubCategory) MediaTimelineFilter.Category.All else filter.category
             it.byGranularity(mediaTimelineGranularityIntMapper(filter.granularity))
-            it.byCategory(mediaTimelineCategoryIntMapper(filter.category))
+            it.byCategory(mediaTimelineCategoryIntMapper(category))
             it.bySensitivity(mediaTimelineSensitivityIntMapper(filter.sensitivity))
             it.applyMediaTimelineLocation(
                 filter = filter,
@@ -40,5 +48,10 @@ internal class MediaTimelineFilterMapper @Inject constructor(
                 megaHandleListMapper = megaHandleListMapper,
             )
             it.byUtcOffset(timezoneOffset)
+
+            if (hasSubCategory) {
+                it.bySubCategory(subCategoryIntMapper(filter.subCategory))
+            }
+            it.byFavourite(mediaTimelineFavouritesIntMapper(filter.favourites))
         }
 }
