@@ -6,6 +6,7 @@ import android.os.Build
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkInfo.Companion.STOP_REASON_CANCELLED_BY_APP
+import androidx.work.WorkInfo.Companion.STOP_REASON_TIMEOUT
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import dagger.assisted.Assisted
@@ -14,6 +15,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
@@ -32,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import mega.privacy.android.data.R
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant
 import mega.privacy.android.data.constant.CameraUploadsWorkerStatusConstant.ARE_UPLOADS_PAUSED
@@ -321,7 +324,7 @@ class CameraUploadsWorker @AssistedInject constructor(
     /**
      * Job to retrieve files to upload
      */
-    private val retrieveFilesJob = Job()
+    private var retrieveFilesJob: Job? = null
 
     /**
      * Job to upload files
@@ -372,13 +375,15 @@ class CameraUploadsWorker @AssistedInject constructor(
                 val secondaryUploadNodeId =
                     NodeId(getUploadFolderHandleUseCase(CameraUploadFolderType.Secondary))
 
-                val records = async(retrieveFilesJob) {
+                val deferredRecords = async {
                     scanFiles()
-                    return@async getAndPrepareRecords(
+                    getAndPrepareRecords(
                         primaryUploadNodeId,
                         secondaryUploadNodeId,
                     )
-                }.await()
+                }
+                retrieveFilesJob = deferredRecords
+                val records = deferredRecords.await()
 
                 records?.let {
                     monitorUploadPauseStatusJob = monitorUploadPauseStatus()
@@ -417,8 +422,21 @@ class CameraUploadsWorker @AssistedInject constructor(
                 }
             }
         }
-        finalizeWork()
+        finalize()
     }
+
+    private val isStoppedByTimeout: Boolean
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                stopReason == STOP_REASON_TIMEOUT
+
+    private suspend fun finalize(): Result =
+        if (isStoppedByTimeout) {
+            withContext(NonCancellable) {
+                withTimeoutOrNull(5.seconds) { finalizeWork() } ?: Result.retry()
+            }
+        } else {
+            finalizeWork()
+        }
 
     private suspend fun finalizeWork(): Result {
         return runCatching {
@@ -428,6 +446,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 crashReporter.log("${CameraUploadsWorker::class.java.simpleName} Finished")
             }
         }.getOrElse {
+            if (it is TimeoutCancellationException) throw it
             Timber.e(it)
             return when {
                 // Fail only if the app explicitly cancelled the work on Android S or newer.
@@ -1363,7 +1382,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         var retry = 3
         while (loginMutex.isLocked && retry > 0) {
             Timber.d("Wait for the login lock to be available")
-            delay(1000)
+            delay(1000.milliseconds)
             retry--
         }
 
@@ -1407,6 +1426,7 @@ class CameraUploadsWorker @AssistedInject constructor(
         return runCatching {
             deleteCameraUploadsTemporaryRootDirectoryUseCase()
         }.onFailure {
+            if (it is TimeoutCancellationException) throw it
             Timber.e(it)
         }.isSuccess
     }
@@ -1710,6 +1730,7 @@ class CameraUploadsWorker @AssistedInject constructor(
                 )
             )
         }.onFailure {
+            if (it is TimeoutCancellationException) throw it
             Timber.w(it)
         }
     }

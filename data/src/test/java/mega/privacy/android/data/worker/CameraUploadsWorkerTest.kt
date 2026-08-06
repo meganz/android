@@ -7,6 +7,7 @@ import androidx.work.DefaultWorkerFactory
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
 import androidx.work.SystemClock
+import androidx.work.WorkInfo.Companion.STOP_REASON_TIMEOUT
 import androidx.work.WorkerParameters
 import androidx.work.impl.WorkDatabase
 import androidx.work.impl.utils.WorkForegroundUpdater
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -28,6 +30,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.currentTime
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -149,6 +152,8 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
@@ -161,6 +166,7 @@ import org.robolectric.annotation.Config
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Test class of [CameraUploadsWorker]
@@ -1985,5 +1991,56 @@ internal class CameraUploadsWorkerTest {
 
         verify(monitorCrossDeviceFolderConflictsUseCase).invoke()
     }
+
+    @Test
+    fun `test that cleanup operations are executed when the worker is cancelled after a foreground service timeout`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            doReturn(STOP_REASON_TIMEOUT).whenever(underTest).stopReason
+            val record = mock<CameraUploadsRecord> {
+                on { filePath }.thenReturn("test/path")
+                on { type }.thenReturn(CameraUploadsRecordType.TYPE_PHOTO)
+                on { tempFilePath }.thenReturn("temp/path")
+                on { folderType }.thenReturn(CameraUploadFolderType.Primary)
+                on { fileSize }.thenReturn(1024L)
+                on { mediaId }.thenReturn(1L)
+            }
+            setupDefaultProcessingFilesConditionMocks(listOf(record))
+            whenever(fileSystemRepository.doesFileExist(record.filePath)).thenReturn(true)
+            val uploadFlow = flow<CameraUploadsTransferProgress> {
+                emit(
+                    CameraUploadsTransferProgress.ToUpload(
+                        record,
+                        TransferEvent.TransferStartEvent(mock())
+                    )
+                )
+                awaitCancellation()
+            }
+            whenever(uploadCameraUploadsRecordsUseCase.invoke(any(), any(), any(), any()))
+                .thenReturn(uploadFlow)
+            val workerJob = launch { underTest.doWork() }
+            advanceTimeBy(500)
+
+            workerJob.cancelAndJoin()
+
+            verify(deleteCameraUploadsTemporaryRootDirectoryUseCase).invoke()
+        }
+
+    @Test
+    fun `test that the worker returns retry within five seconds when finalization suspends for longer after a foreground service timeout`() =
+        runTest {
+            setupDefaultCheckConditionMocks()
+            doReturn(STOP_REASON_TIMEOUT).whenever(underTest).stopReason
+            whenever(deleteCameraUploadsTemporaryRootDirectoryUseCase()) doSuspendableAnswer {
+                delay(10.seconds)
+                true
+            }
+            val start = currentTime
+
+            val result = underTest.doWork()
+
+            assertThat(currentTime - start).isAtMost(5.seconds.inWholeMilliseconds)
+            assertThat(result).isEqualTo(ListenableWorker.Result.retry())
+        }
 
 }
