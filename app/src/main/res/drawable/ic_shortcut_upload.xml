@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+     Deliberately not an <adaptive-icon>: launchers mask those with the device
+     shape (a rounded square on Xiaomi/HyperOS) and rasterize them onto an
+     opaque bitmap, which turns a transparent background black. A plain
+     layer-list keeps its alpha and its circle on every launcher.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/white" />
+            <size
+                android:width="48dp"
+                android:height="48dp" />
+        </shape>
+    </item>
+    <item>
+        <inset
+            android:drawable="@drawable/ic_cloud_upload_medium_regular_outline"
+            android:inset="22%" />
+    </item>
+</layer-list>

@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="shortcut_upload"
         android:enabled="true"
-        android:icon="@drawable/ic_cloud_upload_medium_regular_outline"
+        android:icon="@drawable/ic_shortcut_upload"
         android:shortcutShortLabel="@string/upload_files"
         android:shortcutLongLabel="@string/upload_files">
         <intent
@@ -14,7 +14,7 @@
     <shortcut
         android:shortcutId="shortcut_scan_document"
         android:enabled="true"
-        android:icon="@drawable/ic_file_scan_medium_regular_outline"
+        android:icon="@drawable/ic_shortcut_scan_document"
         android:shortcutShortLabel="@string/menu_scan_document"
         android:shortcutLongLabel="@string/menu_scan_document">
         <intent
@@ -25,7 +25,7 @@
     <shortcut
         android:shortcutId="shortcut_chat"
         android:enabled="true"
-        android:icon="@drawable/ic_message_chat_circle_medium_regular_outline"
+        android:icon="@drawable/ic_shortcut_chat"
         android:shortcutShortLabel="@string/section_chat"
         android:shortcutLongLabel="@string/section_chat">
         <intent
