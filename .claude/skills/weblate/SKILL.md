@@ -3,8 +3,10 @@ name: weblate
 description: >
   Upload new Android strings to Weblate. Extracts new strings added in the current branch
   (compared to develop) from strings_shared.xml, writes them to the transifex/weblate/strings.xml
-  file, runs the upload script, then optionally uploads a screenshot and maps it to the
-  uploaded strings via the Weblate API.
+  file, runs the upload script, then sources a screenshot for each string — reusing an existing
+  Compose screenshot-test golden, or adding a screenshot test and recording one when none exists
+  (asking the dev how to handle fleeting components like snackbars) — and maps it to the uploaded
+  strings via the Weblate API.
 triggers:
   - /weblate
   - upload strings
@@ -17,7 +19,8 @@ triggers:
 
 Upload new Android string resources to Weblate for translation. Extracts strings added in the
 current branch (vs develop), writes them to the Weblate repo's `strings.xml`, runs the
-upload script, and optionally uploads a screenshot mapped to the new strings.
+upload script, and attaches a screenshot for each string — preferring an existing Compose
+screenshot-test golden, otherwise adding a screenshot test and recording one.
 
 ## Usage
 
@@ -158,21 +161,145 @@ Verify only `values/strings_shared.xml` remains changed:
 git diff --name-only -- resources/string-resources/
 ```
 
-### Step 5 — Upload screenshot and map strings
+### Step 5 — Source a screenshot for each new string (prefer screenshot-test goldens)
 
-After the upload completes, ask the user:
-1. **Do you have a screenshot to upload?** If yes, ask for the image path.
-2. **Auto-detect strings in the screenshot:** Read the screenshot image using the Read tool
-   and visually compare the text in the image against the list of uploaded strings. Propose
-   which strings are visible in the screenshot.
-3. **Ask the user to confirm** the proposed mapping before proceeding. The user may add or
-   remove strings from the list.
+Every string uploaded to Weblate benefits from a screenshot showing it in context — it gives
+translators the surrounding UI. **Prefer Compose screenshot-test goldens as the image source**
+rather than always asking the developer for an ad-hoc screenshot. A golden is a recorded,
+deterministic render of a real composable, so if one already shows the string, reuse it; if
+none exists, add a screenshot test, record the golden, and use that.
 
-If the user provides a screenshot and confirms the strings, proceed with the sub-steps below.
+Work through the sub-steps below **per new string** (a single golden may cover several strings
+on the same screen — that's fine, reuse it for all of them). Collect the resulting PNG path(s)
+and the strings each one covers; you'll upload and map them in Step 6.
+
+#### Step 5a — Locate the composable that uses each string
+
+Find where each new string is referenced. String resources from `strings_shared.xml` are
+resolved through `mega.privacy.android.shared.resources.R` (imported variously as `sharedR`,
+`sharedResR`, `SharedResR`, or unaliased). Grep for the `.string.<name>` suffix to catch every
+alias form at once:
+
+```bash
+grep -rn "\.string\.<string_name>\b" --include=*.kt .
+```
+
+Inspect the hits under `src/main/.../*.kt` that call `stringResource(...)` to find the
+composable(s). Note: a string is sometimes passed indirectly (a `@StringRes Int` argument, or
+resolved in a ViewModel/mapper), so a direct hit may land in a mapper/VM — trace it forward to
+the composable that actually renders it. Record the composable name and its module.
+
+#### Step 5b — Check for an existing golden
+
+Screenshot tests live in `<module>/src/screenshotTest/kotlin/<package>/...` and their recorded
+reference PNGs live under:
+
+```
+<module>/src/screenshotTestDebug/reference/<package-path>/<TestClass>/<TestMethod>_<variant>_<hash>_0.png
+```
+
+(The flavored `app` module uses `src/screenshotTestGmsDebug/reference/...` instead.) Each
+`@CombinedThemePreviews` method produces two PNGs — `..._1-Dark theme_..._0.png` and
+`..._2-Light theme_..._0.png`. **Prefer the light-theme variant** for Weblate — text is more
+legible on a light background.
+
+For the composable found in Step 5a, look for a `*ScreenshotTest.kt` in the same module that
+invokes it, then check for its recorded PNG under that module's `reference/` directory:
+
+```bash
+grep -rln "<ComposableName>" --include=*.kt <module>/src/screenshotTest/
+```
+
+**If a golden exists that renders the string**, reuse its light-theme PNG as the screenshot for
+that string and skip to Step 6. Read the PNG with the Read tool and confirm the string text is
+actually visible before reusing it (the composable may hide it behind a state the test doesn't
+exercise).
+
+#### Step 5c — No golden yet: add a screenshot test and record it (capturable components)
+
+If the string appears on a screen or component that can be rendered in a static preview (screen
+body, dialog, list row, empty state, banner, etc.), add a screenshot test that renders that
+composable, then record the golden.
+
+Add a test class next to the existing screenshot tests in the composable's module, following
+the repo convention — `@PreviewTest` + `@CombinedThemePreviews`, wrapped in the theme wrapper:
+
+```kotlin
+package <same package as the composable>
+
+import androidx.compose.runtime.Composable
+import com.android.tools.screenshot.PreviewTest
+import mega.android.core.ui.preview.CombinedThemePreviews
+import mega.android.core.ui.theme.AndroidThemeForPreviews
+
+class <ComposableName>ScreenshotTest {
+
+    @PreviewTest
+    @CombinedThemePreviews
+    @Composable
+    fun <ComposableName>Default() {
+        AndroidThemeForPreviews {
+            <ComposableName>(
+                // pass whatever state makes the new string visible
+            )
+        }
+    }
+}
+```
+
+Use `mega.android.core.ui.preview.CombinedThemePreviews` and `AndroidThemeForPreviews` for new
+core-ui composables. Older screens that still use `shared.original.core.ui` may need the legacy
+`mega.privacy.android.shared.original.core.ui.preview.CombinedThemePreviews` + `OriginalTheme`
+wrapper instead — match the surrounding tests in that module.
+
+Record the golden:
+
+```bash
+./gradlew :<module-path>:updateDebugScreenshotTest
+```
+
+(For the flavored `app` module the task is `:app:updateGmsDebugScreenshotTest`.) The recorded
+PNGs land under the `reference/` path from Step 5b — use the light-theme one for the upload.
+
+> **Environment caveat:** goldens recorded on a local Mac can differ from CI by a few percent
+> (font metrics), so a locally recorded PNG may fail CI `validateDebugScreenshotTest` even
+> though it renders correctly. That does **not** block the Weblate upload — the local PNG is
+> perfectly good as a translator reference. But the new test + golden are committed to the
+> branch and become a CI baseline, so after pushing, check the screenshot-validation CI job and
+> re-record in the canonical environment if it fails.
+
+#### Step 5d — Fleeting components (snackbars, toasts, transient overlays)
+
+Some strings appear only in components that cannot be captured on a static screen — snackbars,
+toasts, and other transient overlays that are dismissed before a preview settles. For these,
+**ask the developer** which they prefer:
+
+- **(a) Add a small example component to the screenshot test** that renders the fleeting
+  component's content in isolation (e.g. render the snackbar's visual directly rather than
+  triggering it), record its golden, and use that. This gives translators an image without
+  needing to capture the live transient state.
+- **(b) Upload the string without a screenshot.**
+
+Note in the prompt that **going without a screenshot is generally discouraged for snackbars**
+(translators lose useful context), but may be acceptable for other fleeting components. Use the
+developer's choice: for (a) follow Step 5c with the example component; for (b) skip the
+screenshot for that string and note it in the Step 7 summary.
+
+#### Step 5e — Manual screenshot fallback
+
+If no composable/golden path applies (e.g. the string lives in legacy XML/View UI the
+screenshot plugin can't render), fall back to the original behaviour: ask the developer for an
+image path. Then read the image with the Read tool, propose which uploaded strings are visible,
+and ask the developer to confirm the mapping before proceeding.
+
+### Step 6 — Upload screenshots and map strings
+
+For each PNG collected in Step 5 (a reused golden, a freshly recorded golden, or a manual
+screenshot), upload it and map it to the strings it covers.
 
 Read the API config from `transifex/weblate/translate.json` to get `BASE_URL` and `SOURCE_TOKEN`.
 
-#### Step 5a — Get the branch component slug
+#### Step 6a — Get the branch component slug
 
 The branch component slug follows the pattern: `strings_shared-<sanitized_branch>`
 
@@ -191,9 +318,10 @@ COMPONENT_SLUG="strings_shared-${SANITIZED}"
 
 Example: `lh/AND-23288-move-ads-free-intro-to-shared-ads` → `strings_shared-lhand23288moveadsfreeintrotosharedads`
 
-#### Step 5b — Resize and rename the screenshot
+#### Step 6b — Resize and rename the screenshot
 
-Weblate rejects images that are too large. Scale down to max 1200px.
+Weblate rejects images that are too large. Scale down to max 1200px. This applies to golden
+PNGs too (recorded goldens render at `1080×2340` and should be scaled down):
 
 Also rename the screenshot to match the branch context for easy identification in Weblate.
 Extract the Jira ticket ID from the branch name (e.g., `AND-23288` from
@@ -207,9 +335,10 @@ sips -Z 1200 "<screenshot_path>" --out /tmp/weblate_screenshot.png
 
 Example: branch `lh/AND-23288-move-ads-free-intro-to-shared-ads` → screenshot name `AND-23288.png`
 
-If the user provides multiple screenshots, append a counter: `AND-23288_1.png`, `AND-23288_2.png`.
+If there are multiple screenshots (several goldens, or one per screen), append a counter:
+`AND-23288_1.png`, `AND-23288_2.png`.
 
-#### Step 5c — Upload the screenshot
+#### Step 6c — Upload the screenshot
 
 Save the response to a temp file and parse the screenshot ID directly from it. This avoids
 needing to paginate through 1000+ screenshots to find the newly created one.
@@ -238,9 +367,10 @@ print(data['id'])
 
 If the upload fails (no `id` in response, or HTTP error), report the error and stop.
 
-#### Step 5d — Find the unit IDs for the uploaded strings
+#### Step 6d — Find the unit IDs for the uploaded strings
 
-For each string name extracted in Step 2, look up its unit ID using the `context:=` query:
+For each string name the screenshot covers (from Step 5), look up its unit ID using the
+`context:=` query:
 
 ```bash
 curl -s -H "Authorization: Token <SOURCE_TOKEN>" \
@@ -260,7 +390,7 @@ for u in data['results']:
 "
 ```
 
-#### Step 5e — Map strings to the screenshot
+#### Step 6e — Map strings to the screenshot
 
 For each unit ID found, associate it with the screenshot:
 
@@ -272,10 +402,15 @@ curl -s -X POST \
     "<BASE_URL>/screenshots/<screenshot_id>/units/"
 ```
 
-### Step 6 — Confirm
+### Step 7 — Confirm
 
 Report the result to the user:
 - List the strings that were uploaded
 - Show the upload script output (success/failure)
-- If screenshot was uploaded: show the screenshot name and how many strings were mapped to it
+- For each string, note the screenshot source: reused golden, newly added screenshot test
+  (name the test + golden path), fleeting-component example, or no screenshot (and why)
+- If a screenshot was uploaded: show the screenshot name and how many strings were mapped to it
+- If new screenshot tests/goldens were added, remind the user they are committed to the branch
+  and must pass the CI screenshot-validation job (re-record in the canonical environment if it
+  fails — see the Step 5c environment caveat)
 - Show the URL, for example: https://translate.developers.mega.co.nz/projects/android/{COMPONENT_SLUG}/
