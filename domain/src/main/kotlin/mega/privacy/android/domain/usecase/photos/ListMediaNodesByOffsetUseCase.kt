@@ -22,10 +22,12 @@ class ListMediaNodesByOffsetUseCase @Inject constructor(
      *
      * Pagination happens independently within the given [section]: its query is scoped to the
      * section's date range, so any position can be loaded directly by [offset] without paging
-     * through the items before it.
+     * through the items before it. When [section] is null the query spans the whole [filter] scope
+     * with no date anchor (e.g. fetching a single cover node).
      *
      * @param filter the [MediaTimelineFilter] describing the scope of the media to list
-     * @param section the [MediaTimelineSection] whose media is being paginated
+     * @param section the [MediaTimelineSection] whose media is being paginated, or null to span the
+     * whole filter scope with no date anchor
      * @param order the [SortOrder] to apply to the results
      * @param maxElements the maximum number of nodes to return for the page (0 = no limit)
      * @param offset the zero-based index, within the section, of the first node to return
@@ -34,7 +36,7 @@ class ListMediaNodesByOffsetUseCase @Inject constructor(
      */
     suspend operator fun invoke(
         filter: MediaTimelineFilter,
-        section: MediaTimelineSection,
+        section: MediaTimelineSection?,
         order: SortOrder,
         maxElements: Int,
         offset: Long,

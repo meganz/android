@@ -8,12 +8,12 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.account.AccountLevelDetail
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import org.junit.jupiter.api.BeforeEach
@@ -24,7 +24,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class GetUserAlbumCoverPhotoUseCaseTest {
@@ -32,7 +31,7 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
     private lateinit var underTest: GetUserAlbumCoverPhotoUseCase
 
     private val albumRepository: AlbumRepository = mock()
-    private val photosRepository: PhotosRepository = mock()
+    private val getNodeByIdUseCase: GetNodeByIdUseCase = mock()
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase = mock()
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase = mock()
 
@@ -40,7 +39,7 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
     fun resetMocks() {
         reset(
             albumRepository,
-            photosRepository,
+            getNodeByIdUseCase,
             monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase
         )
@@ -49,7 +48,7 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
     private fun initUseCase() {
         underTest = GetUserAlbumCoverPhotoUseCase(
             albumRepository = albumRepository,
-            photosRepository = photosRepository,
+            getNodeByIdUseCase = getNodeByIdUseCase,
             monitorShowHiddenItemsUseCase = monitorShowHiddenItemsUseCase,
             monitorAccountDetailUseCase = monitorAccountDetailUseCase,
         )
@@ -92,52 +91,37 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
     }
 
     @Test
-    fun `test that refresh flag is forwarded to both repositories`() = runTest {
+    fun `test that refresh flag is forwarded to getAlbumElementIDs`() = runTest {
         val albumId = AlbumId(3L)
         val last = albumPhotoId(id = 30L, nodeId = 4000L, albumId = albumId.id)
-        val expectedPhoto =
-            createMockPhoto(id = 30L, isSensitive = false, isSensitiveInherited = false)
+        val expectedNode = createMockNode(id = 4000L)
 
         setupDefaultHiddenItemsConfig()
         whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = true))
             .thenReturn(listOf(last))
-        whenever(
-            photosRepository.getPhotoFromNodeID(
-                nodeId = last.nodeId,
-                albumPhotoId = last,
-                refresh = true
-            )
-        ).thenReturn(expectedPhoto)
+        whenever(getNodeByIdUseCase(last.nodeId)).thenReturn(expectedNode)
 
         initUseCase()
         underTest(albumId, refresh = true)
 
         verify(albumRepository).getAlbumElementIDs(albumId = albumId, refresh = true)
-        verify(photosRepository).getPhotoFromNodeID(last.nodeId, last, true)
     }
 
     @Test
-    fun `test that cover photo is returned when album has elements`() = runTest {
+    fun `test that cover node is returned when album has elements`() = runTest {
         val albumId = AlbumId(1L)
-        val albumPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
-        val expectedPhoto =
-            createMockPhoto(id = 10L, isSensitive = false, isSensitiveInherited = false)
+        val photoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
+        val expectedNode = createMockNode(id = 100L, isMarkedSensitive = false, isSensitiveInherited = false)
 
         setupDefaultHiddenItemsConfig()
         whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
-            .thenReturn(listOf(albumPhotoId))
-        whenever(
-            photosRepository.getPhotoFromNodeID(
-                nodeId = albumPhotoId.nodeId,
-                albumPhotoId = albumPhotoId,
-                refresh = false
-            )
-        ).thenReturn(expectedPhoto)
+            .thenReturn(listOf(photoId))
+        whenever(getNodeByIdUseCase(photoId.nodeId)).thenReturn(expectedNode)
 
         initUseCase()
         val result = underTest(albumId)
 
-        assertThat(result).isEqualTo(expectedPhoto)
+        assertThat(result).isEqualTo(expectedNode)
         verify(albumRepository).getUserSet(albumId)
     }
 
@@ -146,10 +130,7 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
         val albumId = AlbumId(1L)
         val coverPhotoId = albumPhotoId(id = 20L, nodeId = 200L, albumId = albumId.id)
         val otherPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
-        val coverPhoto =
-            createMockPhoto(id = 20L, modificationTime = LocalDateTime.now().minusDays(1))
-        val otherPhoto = createMockPhoto(id = 10L, modificationTime = LocalDateTime.now())
-
+        val coverNode = createMockNode(id = 200L, modificationTime = 500L)
         val userSet = mock<UserSet> {
             on { cover }.thenReturn(20L)
         }
@@ -158,174 +139,108 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
         whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
             .thenReturn(listOf(coverPhotoId, otherPhotoId))
         whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-        whenever(
-            photosRepository.getPhotoFromNodeID(
-                nodeId = coverPhotoId.nodeId,
-                albumPhotoId = coverPhotoId,
-                refresh = false
-            )
-        ).thenReturn(coverPhoto)
-        whenever(
-            photosRepository.getPhotoFromNodeID(
-                nodeId = otherPhotoId.nodeId,
-                albumPhotoId = otherPhotoId,
-                refresh = false
-            )
-        ).thenReturn(otherPhoto)
+        whenever(getNodeByIdUseCase(coverPhotoId.nodeId)).thenReturn(coverNode)
 
         initUseCase()
         val result = underTest(albumId)
 
-        assertThat(result).isEqualTo(coverPhoto)
-        // Early return — the fallback mapNotNull should never fetch the other photo
-        verify(photosRepository, never()).getPhotoFromNodeID(
-            nodeId = otherPhotoId.nodeId,
-            albumPhotoId = otherPhotoId,
-            refresh = false,
-        )
+        assertThat(result).isEqualTo(coverNode)
+        // Early return — the fallback should never fetch the other node
+        verify(getNodeByIdUseCase, never()).invoke(otherPhotoId.nodeId)
     }
 
     @Test
-    fun `test that fallback is used when selected cover node returns null from repository`() =
-        runTest {
-            val albumId = AlbumId(1L)
-            val coverPhotoId = albumPhotoId(id = 20L, nodeId = 200L, albumId = albumId.id)
-            val otherPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
-            val otherPhoto = createMockPhoto(
-                id = 10L,
-                isSensitive = false,
-                isSensitiveInherited = false,
-            )
-            val userSet = mock<UserSet> {
-                on { cover }.thenReturn(20L)
-            }
-
-            setupDefaultHiddenItemsConfig()
-            whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
-                .thenReturn(listOf(coverPhotoId, otherPhotoId))
-            whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-            whenever(
-                photosRepository.getPhotoFromNodeID(
-                    nodeId = coverPhotoId.nodeId,
-                    albumPhotoId = coverPhotoId,
-                    refresh = false,
-                )
-            ).thenReturn(null)
-            whenever(
-                photosRepository.getPhotoFromNodeID(
-                    nodeId = otherPhotoId.nodeId,
-                    albumPhotoId = otherPhotoId,
-                    refresh = false,
-                )
-            ).thenReturn(otherPhoto)
-
-            initUseCase()
-            val result = underTest(albumId)
-
-            assertThat(result).isEqualTo(otherPhoto)
+    fun `test that fallback is used when selected cover node returns null`() = runTest {
+        val albumId = AlbumId(1L)
+        val coverPhotoId = albumPhotoId(id = 20L, nodeId = 200L, albumId = albumId.id)
+        val otherPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
+        val otherNode = createMockNode(id = 100L, isMarkedSensitive = false, isSensitiveInherited = false)
+        val userSet = mock<UserSet> {
+            on { cover }.thenReturn(20L)
         }
 
+        setupDefaultHiddenItemsConfig()
+        whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
+            .thenReturn(listOf(coverPhotoId, otherPhotoId))
+        whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
+        whenever(getNodeByIdUseCase(coverPhotoId.nodeId)).thenReturn(null)
+        whenever(getNodeByIdUseCase(otherPhotoId.nodeId)).thenReturn(otherNode)
+
+        initUseCase()
+        val result = underTest(albumId)
+
+        assertThat(result).isEqualTo(otherNode)
+    }
+
     @Test
-    fun `test that free account includes all photos regardless of sensitive status`() = runTest {
+    fun `test that free account includes all nodes regardless of sensitive status`() = runTest {
         val albumId = AlbumId(1L)
-        val albumPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
-        val sensitivePhoto = createMockPhoto(
-            id = 10L,
-            isSensitive = true,
-            isSensitiveInherited = true
-        )
+        val photoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
+        val sensitiveNode = createMockNode(id = 100L, isMarkedSensitive = true, isSensitiveInherited = true)
 
         setupDefaultHiddenItemsConfig(showHiddenItems = false, isPaid = false)
         whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
-            .thenReturn(listOf(albumPhotoId))
-        whenever(
-            photosRepository.getPhotoFromNodeID(
-                nodeId = albumPhotoId.nodeId,
-                albumPhotoId = albumPhotoId,
-                refresh = false
-            )
-        ).thenReturn(sensitivePhoto)
+            .thenReturn(listOf(photoId))
+        whenever(getNodeByIdUseCase(photoId.nodeId)).thenReturn(sensitiveNode)
 
         initUseCase()
         val result = underTest(albumId)
 
-        assertThat(result).isEqualTo(sensitivePhoto)
+        assertThat(result).isEqualTo(sensitiveNode)
     }
 
     @Test
-    fun `test that paid account with showHiddenItems false filters out sensitive photos`() =
-        runTest {
-            val albumId = AlbumId(1L)
-            val albumPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
-            val sensitivePhoto = createMockPhoto(
-                id = 10L,
-                isSensitive = true,
-                isSensitiveInherited = false
-            )
+    fun `test that paid account with showHiddenItems false filters out sensitive nodes`() = runTest {
+        val albumId = AlbumId(1L)
+        val photoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
+        val sensitiveNode = createMockNode(id = 100L, isMarkedSensitive = true, isSensitiveInherited = false)
 
-            setupDefaultHiddenItemsConfig(showHiddenItems = false, isPaid = true)
-            whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
-                .thenReturn(listOf(albumPhotoId))
-            whenever(
-                photosRepository.getPhotoFromNodeID(
-                    nodeId = albumPhotoId.nodeId,
-                    albumPhotoId = albumPhotoId,
-                    refresh = false
-                )
-            ).thenReturn(sensitivePhoto)
+        setupDefaultHiddenItemsConfig(showHiddenItems = false, isPaid = true)
+        whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
+            .thenReturn(listOf(photoId))
+        whenever(getNodeByIdUseCase(photoId.nodeId)).thenReturn(sensitiveNode)
 
-            initUseCase()
-            val result = underTest(albumId)
+        initUseCase()
+        val result = underTest(albumId)
 
-            assertThat(result).isNull()
-        }
+        assertThat(result).isNull()
+    }
 
     @Test
-    fun `test that paid account with showHiddenItems true includes sensitive photos`() = runTest {
+    fun `test that paid account with showHiddenItems true includes sensitive nodes`() = runTest {
         val albumId = AlbumId(1L)
-        val albumPhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
-        val sensitivePhoto = createMockPhoto(
-            id = 10L,
-            isSensitive = true,
-            isSensitiveInherited = true
-        )
+        val photoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
+        val sensitiveNode = createMockNode(id = 100L, isMarkedSensitive = true, isSensitiveInherited = true)
 
         setupDefaultHiddenItemsConfig(showHiddenItems = true, isPaid = true)
         whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
-            .thenReturn(listOf(albumPhotoId))
-        whenever(
-            photosRepository.getPhotoFromNodeID(
-                nodeId = albumPhotoId.nodeId,
-                albumPhotoId = albumPhotoId,
-                refresh = false
-            )
-        ).thenReturn(sensitivePhoto)
+            .thenReturn(listOf(photoId))
+        whenever(getNodeByIdUseCase(photoId.nodeId)).thenReturn(sensitiveNode)
 
         initUseCase()
         val result = underTest(albumId)
 
-        assertThat(result).isEqualTo(sensitivePhoto)
+        assertThat(result).isEqualTo(sensitiveNode)
     }
 
     @Test
-    fun `test that most recently modified non-sensitive photo is used when user set cover is sensitive and hidden items disabled`() =
+    fun `test that most recently modified non-sensitive node is used when user set cover is sensitive and hidden items disabled`() =
         runTest {
             val albumId = AlbumId(1L)
             val sensitivePhotoId = albumPhotoId(id = 20L, nodeId = 200L, albumId = albumId.id)
             val nonSensitivePhotoId = albumPhotoId(id = 10L, nodeId = 100L, albumId = albumId.id)
-            val sensitivePhoto = createMockPhoto(
-                id = 20L,
-                modificationTime = LocalDateTime.now(),
-                isSensitive = true,
+            val sensitiveNode = createMockNode(
+                id = 200L,
+                modificationTime = 1000L,
+                isMarkedSensitive = true,
                 isSensitiveInherited = false
             )
-            val nonSensitivePhoto = createMockPhoto(
-                id = 10L,
-                modificationTime = LocalDateTime.now().minusDays(1),
-                isSensitive = false,
+            val nonSensitiveNode = createMockNode(
+                id = 100L,
+                modificationTime = 500L,
+                isMarkedSensitive = false,
                 isSensitiveInherited = false
             )
-
             val userSet = mock<UserSet> {
                 on { cover }.thenReturn(20L)
             }
@@ -334,25 +249,13 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
             whenever(albumRepository.getAlbumElementIDs(albumId = albumId, refresh = false))
                 .thenReturn(listOf(sensitivePhotoId, nonSensitivePhotoId))
             whenever(albumRepository.getUserSet(albumId)).thenReturn(userSet)
-            whenever(
-                photosRepository.getPhotoFromNodeID(
-                    nodeId = sensitivePhotoId.nodeId,
-                    albumPhotoId = sensitivePhotoId,
-                    refresh = false
-                )
-            ).thenReturn(sensitivePhoto)
-            whenever(
-                photosRepository.getPhotoFromNodeID(
-                    nodeId = nonSensitivePhotoId.nodeId,
-                    albumPhotoId = nonSensitivePhotoId,
-                    refresh = false
-                )
-            ).thenReturn(nonSensitivePhoto)
+            whenever(getNodeByIdUseCase(sensitivePhotoId.nodeId)).thenReturn(sensitiveNode)
+            whenever(getNodeByIdUseCase(nonSensitivePhotoId.nodeId)).thenReturn(nonSensitiveNode)
 
             initUseCase()
             val result = underTest(albumId)
 
-            assertThat(result).isEqualTo(nonSensitivePhoto)
+            assertThat(result).isEqualTo(nonSensitiveNode)
         }
 
     private fun albumPhotoId(id: Long, nodeId: Long, albumId: Long): AlbumPhotoId =
@@ -362,17 +265,15 @@ internal class GetUserAlbumCoverPhotoUseCaseTest {
             albumId = AlbumId(albumId)
         )
 
-    private fun createMockPhoto(
+    private fun createMockNode(
         id: Long = 0L,
-        modificationTime: LocalDateTime = LocalDateTime.now(),
-        isSensitive: Boolean = false,
+        modificationTime: Long = 0L,
+        isMarkedSensitive: Boolean = false,
         isSensitiveInherited: Boolean = false,
-    ): Photo.Image = mock {
-        on { this.id }.thenReturn(id)
+    ): TypedFileNode = mock {
+        on { this.id }.thenReturn(NodeId(id))
         on { this.modificationTime }.thenReturn(modificationTime)
-        on { this.isSensitive }.thenReturn(isSensitive)
+        on { this.isMarkedSensitive }.thenReturn(isMarkedSensitive)
         on { this.isSensitiveInherited }.thenReturn(isSensitiveInherited)
     }
 }
-
-

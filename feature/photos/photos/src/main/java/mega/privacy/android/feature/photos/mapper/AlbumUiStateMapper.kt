@@ -2,12 +2,12 @@ package mega.privacy.android.feature.photos.mapper
 
 import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
 import javax.inject.Inject
 
-class AlbumUiStateMapper @Inject constructor(
-    private val photoUiStateMapper: PhotoUiStateMapper,
-) {
+class AlbumUiStateMapper @Inject constructor() {
 
     /**
      * Maps a [MediaAlbum] domain entity to [AlbumUiState] for presentation layer.
@@ -34,7 +34,18 @@ class AlbumUiStateMapper @Inject constructor(
             mediaAlbum = album,
             title = title,
             isExported = isExported,
-            cover = album.cover?.let { photoUiStateMapper(it) },
+            cover = album.cover?.toMediaThumbnailRequest(),
+            isCoverSensitive = album.cover?.let { it.isMarkedSensitive || it.isSensitiveInherited } == true,
         )
     }
+
+    private fun TypedFileNode.toMediaThumbnailRequest(): MediaThumbnailRequest =
+        MediaThumbnailRequest(
+            id = id.longValue,
+            isPreview = false,
+            thumbnailFilePath = thumbnailPath,
+            previewFilePath = previewPath,
+            isPublicNode = false,
+            fileExtension = type.extension,
+        )
 }

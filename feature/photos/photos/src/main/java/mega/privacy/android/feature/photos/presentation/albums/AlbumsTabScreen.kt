@@ -35,7 +35,6 @@ import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
-import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.presentation.albums.content.toAlbumContentNavKey
@@ -118,8 +117,7 @@ internal fun AlbumsTabScreen(
                     val userAlbum = album.mediaAlbum as? MediaAlbum.User
                     val isSelected =
                         userAlbum?.let { uiState.selectedUserAlbums.contains(it) } ?: false
-                    val isSensitive =
-                        uiState.showHiddenItems && (album.cover?.isSensitive == true || album.cover?.isSensitiveInherited == true)
+                    val isSensitive = uiState.showHiddenItems && album.isCoverSensitive
                     val isEnabled = !uiState.isInSelectionMode || userAlbum != null
 
                     AlbumGridItem(
@@ -138,16 +136,7 @@ internal fun AlbumsTabScreen(
                                     userAlbum?.let(onAlbumSelectionToggle)
                                 }
                             ),
-                        coverImage = album.cover?.let {
-                            MediaThumbnailRequest(
-                                id = it.id,
-                                isPreview = false,
-                                thumbnailFilePath = it.thumbnailFilePath,
-                                previewFilePath = it.previewFilePath,
-                                isPublicNode = false,
-                                fileExtension = it.fileTypeInfo.extension
-                            )
-                        },
+                        coverImage = album.cover,
                         title = HighlightedText(album.title.text),
                         placeholder = placeholder,
                         errorPlaceholder = placeholder,

@@ -4,6 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.SystemAlbum
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -61,13 +62,13 @@ class LegacyMediaSystemAlbumMapperTest {
     @Test
     fun `test that FavouriteAlbum is mapped correctly with cover`() {
         val album = Album.FavouriteAlbum
-        val coverPhoto = createMockPhoto(id = 123L, name = "cover.jpg")
+        val coverNode = mock<TypedFileNode>()
 
-        val result = underTest(album, coverPhoto)
+        val result = underTest(album, coverNode)
 
         assertThat(result).isNotNull()
         assertThat(result?.id).isEqualTo(favouriteSystemAlbum)
-        assertThat(result?.cover).isEqualTo(coverPhoto)
+        assertThat(result?.cover).isEqualTo(coverNode)
     }
 
     @Test
@@ -84,13 +85,13 @@ class LegacyMediaSystemAlbumMapperTest {
     @Test
     fun `test that GifAlbum is mapped correctly with cover`() {
         val album = Album.GifAlbum
-        val coverPhoto = createMockPhoto(id = 456L, name = "animated.gif")
+        val coverNode = mock<TypedFileNode>()
 
-        val result = underTest(album, coverPhoto)
+        val result = underTest(album, coverNode)
 
         assertThat(result).isNotNull()
         assertThat(result?.id).isEqualTo(gifSystemAlbum)
-        assertThat(result?.cover).isEqualTo(coverPhoto)
+        assertThat(result?.cover).isEqualTo(coverNode)
     }
 
     @Test
@@ -107,22 +108,21 @@ class LegacyMediaSystemAlbumMapperTest {
     @Test
     fun `test that RawAlbum is mapped correctly with cover`() {
         val album = Album.RawAlbum
-        val coverPhoto = createMockPhoto(id = 789L, name = "photo.raw")
+        val coverNode = mock<TypedFileNode>()
 
-        val result = underTest(album, coverPhoto)
+        val result = underTest(album, coverNode)
 
         assertThat(result).isNotNull()
         assertThat(result?.id).isEqualTo(rawSystemAlbum)
-        assertThat(result?.cover).isEqualTo(coverPhoto)
+        assertThat(result?.cover).isEqualTo(coverNode)
     }
 
     @Test
     fun `test that UserAlbum returns null`() {
-        val coverPhoto = createMockPhoto(id = 100L, name = "cover.jpg")
         val album = Album.UserAlbum(
             id = AlbumId(1L),
             title = "Test Album",
-            cover = coverPhoto,
+            cover = createMockPhoto(id = 100L, name = "cover.jpg"),
             creationTime = 1000L,
             modificationTime = 2000L,
             isExported = false
@@ -135,8 +135,7 @@ class LegacyMediaSystemAlbumMapperTest {
 
     @Test
     fun `test that null is returned when system album is not in the set`() {
-        val emptySystemAlbums = emptySet<SystemAlbum>()
-        val mapperWithEmptySet = LegacyMediaSystemAlbumMapper(emptySystemAlbums)
+        val mapperWithEmptySet = LegacyMediaSystemAlbumMapper(emptySet())
         val album = Album.FavouriteAlbum
 
         val result = mapperWithEmptySet(album, null)
@@ -147,28 +146,22 @@ class LegacyMediaSystemAlbumMapperTest {
     private fun createMockPhoto(
         id: Long = 0L,
         name: String = "test.jpg",
-        isFavourite: Boolean = false,
-        creationTime: LocalDateTime = LocalDateTime.now(),
-        modificationTime: LocalDateTime = LocalDateTime.now(),
         fileTypeInfo: FileTypeInfo = mock<StaticImageFileTypeInfo>(),
-    ): Photo.Image {
-        return Photo.Image(
-            id = id,
-            albumPhotoId = null,
-            parentId = 0L,
-            name = name,
-            isFavourite = isFavourite,
-            creationTime = creationTime,
-            modificationTime = modificationTime,
-            thumbnailFilePath = null,
-            previewFilePath = null,
-            fileTypeInfo = fileTypeInfo,
-            size = 0L,
-            isTakenDown = false,
-            isSensitive = false,
-            isSensitiveInherited = false,
-            base64Id = null,
-        )
-    }
+    ): Photo.Image = Photo.Image(
+        id = id,
+        albumPhotoId = null,
+        parentId = 0L,
+        name = name,
+        isFavourite = false,
+        creationTime = LocalDateTime.now(),
+        modificationTime = LocalDateTime.now(),
+        thumbnailFilePath = null,
+        previewFilePath = null,
+        fileTypeInfo = fileTypeInfo,
+        size = 0L,
+        isTakenDown = false,
+        isSensitive = false,
+        isSensitiveInherited = false,
+        base64Id = null,
+    )
 }
-

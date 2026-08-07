@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.entity.media
 
-import mega.privacy.android.domain.entity.photos.Photo
-
 /**
  * Interface for system album
  */
@@ -17,7 +15,10 @@ interface SystemAlbum {
     val hideWhenEmpty: Boolean
 
     /**
-     * Function to determine if a photo belongs to this album type
+     * The [MediaTimelineFilter] describing which media nodes belong to this album.
+     *
+     * The album owns everything except sensitivity, which the caller overrides per emission based
+     * on the current hidden-items setting and account level.
      */
-    suspend fun filter(photo: Photo): Boolean
+    val mediaTimelineFilter: MediaTimelineFilter
 }

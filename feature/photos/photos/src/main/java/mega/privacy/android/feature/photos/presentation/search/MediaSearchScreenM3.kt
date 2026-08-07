@@ -65,7 +65,6 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.components.AlbumGridItem
 import mega.privacy.android.feature.photos.downloader.PhotoDownloaderViewModel
@@ -410,23 +409,13 @@ private fun AlbumItem(
             highlighted = query,
         )
     }
-    val isSensitive =
-        album.cover?.isSensitive == true || album.cover?.isSensitiveInherited == true
+    val isSensitive = album.isCoverSensitive
 
     AlbumGridItem(
         modifier = modifier
             .width(104.dp)
             .clickable { onClickAlbum(album.mediaAlbum) },
-        coverImage = album.cover?.let {
-            MediaThumbnailRequest(
-                id = it.id,
-                isPreview = false,
-                thumbnailFilePath = it.thumbnailFilePath,
-                previewFilePath = it.previewFilePath,
-                isPublicNode = false,
-                fileExtension = it.fileTypeInfo.extension
-            )
-        },
+        coverImage = album.cover,
         title = title,
         placeholder = placeholderPainter,
         errorPlaceholder = placeholderPainter,

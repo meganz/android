@@ -74,7 +74,6 @@ import mega.privacy.android.core.sharedcomponents.extension.isDarkMode
 import mega.privacy.android.domain.entity.media.MediaAlbum
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.feature.photos.R
 import mega.privacy.android.feature.photos.model.AlbumFlow
@@ -683,18 +682,7 @@ internal fun AlbumOptionsBottomSheet(
     val context = LocalContext.current
     val request = remember(albumUiState?.cover) {
         ImageRequest.Builder(context)
-            .data(
-                albumUiState?.cover?.let {
-                    MediaThumbnailRequest(
-                        id = it.id,
-                        isPreview = false,
-                        thumbnailFilePath = it.thumbnailFilePath,
-                        previewFilePath = it.previewFilePath,
-                        isPublicNode = false,
-                        fileExtension = it.fileTypeInfo.extension
-                    )
-                }
-            )
+            .data(albumUiState?.cover)
             .crossfade(enable = true)
             .build()
     }

@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.timeout
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import javax.inject.Inject
@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class GetUserAlbumCoverPhotoUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
-    private val photosRepository: PhotosRepository,
+    private val getNodeByIdUseCase: GetNodeByIdUseCase,
     private val monitorShowHiddenItemsUseCase: MonitorShowHiddenItemsUseCase,
     private val monitorAccountDetailUseCase: MonitorAccountDetailUseCase,
 ) {
@@ -25,7 +25,7 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
     suspend operator fun invoke(
         albumId: AlbumId,
         refresh: Boolean = false,
-    ): Photo? {
+    ): TypedFileNode? {
         val albumPhotos = albumRepository
             .getAlbumElementIDs(albumId = albumId, refresh = refresh)
             .takeIf { it.isNotEmpty() }
@@ -39,15 +39,13 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
             .firstOrNull()
         val isPaid = accountDetail?.levelDetail?.accountType?.isPaid == true
         val isHiddenEnabled = showHiddenItems && isPaid
-        val cover = findValidCover(
+
+        return findValidCover(
             albumPhotos = albumPhotos,
             selectedCoverId = albumRepository.getUserSet(albumId)?.cover,
             isHiddenEnabled = isHiddenEnabled,
             isPaid = isPaid,
-            refresh = refresh
-        ) ?: return null
-
-        return cover
+        )
     }
 
     private suspend fun findValidCover(
@@ -55,44 +53,34 @@ class GetUserAlbumCoverPhotoUseCase @Inject constructor(
         selectedCoverId: Long?,
         isHiddenEnabled: Boolean,
         isPaid: Boolean,
-        refresh: Boolean,
-    ): Photo? {
+    ): TypedFileNode? {
         val coverAlbumPhotoId = selectedCoverId?.let { coverId ->
             albumPhotos.find { it.id == coverId }
         }
-        val coverPhoto = coverAlbumPhotoId?.let {
-            photosRepository.getPhotoFromNodeID(
-                nodeId = it.nodeId,
-                albumPhotoId = it,
-                refresh = refresh,
-            )
-        }
+        val coverNode = coverAlbumPhotoId?.let { getNode(it) }
 
-        if (coverPhoto != null && isPhotoVisible(coverPhoto, isHiddenEnabled, isPaid)) {
-            return coverPhoto
+        if (coverNode != null && isNodeVisible(coverNode, isHiddenEnabled, isPaid)) {
+            return coverNode
         }
 
         return albumPhotos
-            .mapNotNull { albumPhotoId ->
-                photosRepository.getPhotoFromNodeID(
-                    nodeId = albumPhotoId.nodeId,
-                    albumPhotoId = albumPhotoId,
-                    refresh = refresh,
-                )
-            }
+            .mapNotNull { getNode(it) }
             .sortedWith(
-                compareByDescending<Photo> {
+                compareByDescending<TypedFileNode> {
                     it.modificationTime
-                }.thenByDescending { it.id }
+                }.thenByDescending { it.id.longValue }
             )
-            .firstOrNull { isPhotoVisible(it, isHiddenEnabled, isPaid) }
+            .firstOrNull { isNodeVisible(it, isHiddenEnabled, isPaid) }
     }
 
+    private suspend fun getNode(albumPhotoId: AlbumPhotoId): TypedFileNode? =
+        getNodeByIdUseCase(albumPhotoId.nodeId) as? TypedFileNode
+
     /**
-     * Determines if a photo should be visible for album cover selection.
-     * isSensitive and isSensitiveInherited only apply when isPaid is true.
-     * For free accounts, all photos are considered visible.
+     * Determines if a node should be visible for album cover selection.
+     * isMarkedSensitive and isSensitiveInherited only apply when isPaid is true.
+     * For free accounts, all nodes are considered visible.
      */
-    private fun isPhotoVisible(photo: Photo, isHiddenEnabled: Boolean, isPaid: Boolean): Boolean =
-        if (!isPaid) true else (isHiddenEnabled || (!photo.isSensitive && !photo.isSensitiveInherited))
+    private fun isNodeVisible(node: TypedFileNode, isHiddenEnabled: Boolean, isPaid: Boolean): Boolean =
+        if (!isPaid) true else (isHiddenEnabled || (!node.isMarkedSensitive && !node.isSensitiveInherited))
 }

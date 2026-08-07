@@ -343,14 +343,16 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun listMediaNodesByPage(
         filter: MediaTimelineFilter,
-        section: MediaTimelineSection,
+        section: MediaTimelineSection?,
         order: SortOrder,
         maxElements: Int,
         offset: Long,
     ): List<TypedFileNode> = withContext(ioDispatcher) {
         // Scope the query to this section's date range so pagination stays within the section.
-        val sdkFilter = mediaTimelineListFilterMapper(filter).also {
-            it.byTimestampAnchor(section.startDate, section.endDate, sortOrderIntMapper(order))
+        val sdkFilter = mediaTimelineListFilterMapper(filter).also { sdkFilter ->
+            section?.let {
+                sdkFilter.byTimestampAnchor(it.startDate, it.endDate, sortOrderIntMapper(order))
+            }
         }
         val nodeList = megaApiFacade.listAllNodesByPageAtOffset(
             filter = sdkFilter,

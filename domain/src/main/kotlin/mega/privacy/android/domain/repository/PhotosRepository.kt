@@ -312,7 +312,7 @@ interface PhotosRepository {
      */
     suspend fun listMediaNodesByPage(
         filter: MediaTimelineFilter,
-        section: MediaTimelineSection,
+        section: MediaTimelineSection?,
         order: SortOrder,
         maxElements: Int,
         offset: Long,

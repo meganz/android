@@ -2,44 +2,34 @@ package mega.privacy.android.feature.photos.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.android.core.ui.model.LocalizedText
-import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.media.MediaAlbum
+import mega.privacy.android.domain.entity.media.MediaTimelineFilter
 import mega.privacy.android.domain.entity.media.SystemAlbum
+import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.presentation.albums.model.AlbumUiState
-import mega.privacy.android.feature.photos.model.PhotoUiState
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import java.time.LocalDateTime
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AlbumUiStateMapperTest {
 
     private lateinit var underTest: AlbumUiStateMapper
-    private val mockPhotoUiStateMapper: PhotoUiStateMapper = mock()
 
     @BeforeAll
     fun setup() {
-        underTest = AlbumUiStateMapper(mockPhotoUiStateMapper)
-    }
-
-    @BeforeEach
-    fun resetMocks() {
-        reset(mockPhotoUiStateMapper)
+        underTest = AlbumUiStateMapper()
     }
 
     @Test
     fun `test that system album is mapped correctly without cover`() {
         val albumNameResId = 12345
-        val systemAlbum = createMockSystemAlbum(albumNameResId) { true }
+        val systemAlbum = createMockSystemAlbum(albumNameResId)
         val mediaAlbum = MediaAlbum.System(
             id = systemAlbum,
             cover = null
@@ -51,7 +41,8 @@ class AlbumUiStateMapperTest {
             mediaAlbum = mediaAlbum,
             title = LocalizedText.StringRes(albumNameResId),
             isExported = false,
-            cover = null
+            cover = null,
+            isCoverSensitive = false,
         )
         assertThat(actual).isEqualTo(expected)
     }
@@ -59,31 +50,16 @@ class AlbumUiStateMapperTest {
     @Test
     fun `test that system album is mapped correctly with cover`() {
         val albumNameResId = 67890
-        val systemAlbum = createMockSystemAlbum(albumNameResId) { true }
-        val coverPhoto = newImage(id = 100L, name = "cover.jpg")
-        val photoUiState = PhotoUiState.Image(
+        val systemAlbum = createMockSystemAlbum(albumNameResId)
+        val coverNode = createMockNode(
             id = 100L,
-            albumPhotoId = null,
-            parentId = 0L,
-            name = "cover.jpg",
-            isFavourite = false,
-            creationTime = coverPhoto.creationTime,
-            modificationTime = coverPhoto.modificationTime,
-            thumbnailFilePath = null,
-            previewFilePath = null,
-            fileTypeInfo = coverPhoto.fileTypeInfo,
-            size = 0L,
-            isTakenDown = false,
-            isSensitive = false,
-            isSensitiveInherited = false,
-            base64Id = null,
+            thumbnailPath = "thumb/100",
+            previewPath = "preview/100",
+            extension = "jpg",
         )
-
-        whenever(mockPhotoUiStateMapper(coverPhoto)).thenReturn(photoUiState)
-
         val mediaAlbum = MediaAlbum.System(
             id = systemAlbum,
-            cover = coverPhoto
+            cover = coverNode
         )
 
         val actual = underTest(mediaAlbum)
@@ -92,10 +68,39 @@ class AlbumUiStateMapperTest {
             mediaAlbum = mediaAlbum,
             title = LocalizedText.StringRes(albumNameResId),
             isExported = false,
-            cover = photoUiState
+            cover = MediaThumbnailRequest(
+                id = 100L,
+                isPreview = false,
+                thumbnailFilePath = "thumb/100",
+                previewFilePath = "preview/100",
+                isPublicNode = false,
+                fileExtension = "jpg",
+            ),
+            isCoverSensitive = false,
         )
         assertThat(actual).isEqualTo(expected)
-        verify(mockPhotoUiStateMapper).invoke(coverPhoto)
+    }
+
+    @Test
+    fun `test that cover is sensitive when the cover node is marked sensitive`() {
+        val systemAlbum = createMockSystemAlbum(1)
+        val coverNode = createMockNode(id = 1L, isMarkedSensitive = true)
+        val mediaAlbum = MediaAlbum.System(id = systemAlbum, cover = coverNode)
+
+        val actual = underTest(mediaAlbum)
+
+        assertThat(actual.isCoverSensitive).isTrue()
+    }
+
+    @Test
+    fun `test that cover is sensitive when the cover node is sensitive inherited`() {
+        val systemAlbum = createMockSystemAlbum(1)
+        val coverNode = createMockNode(id = 1L, isSensitiveInherited = true)
+        val mediaAlbum = MediaAlbum.System(id = systemAlbum, cover = coverNode)
+
+        val actual = underTest(mediaAlbum)
+
+        assertThat(actual.isCoverSensitive).isTrue()
     }
 
     @Test
@@ -117,7 +122,8 @@ class AlbumUiStateMapperTest {
             mediaAlbum = mediaAlbum,
             title = LocalizedText.Literal(title),
             isExported = false,
-            cover = null
+            cover = null,
+            isCoverSensitive = false,
         )
         assertThat(actual).isEqualTo(expected)
     }
@@ -126,34 +132,19 @@ class AlbumUiStateMapperTest {
     fun `test that user album is mapped correctly with cover`() {
         val albumId = AlbumId(456L)
         val title = "Vacation Photos"
-        val coverPhoto = newImage(id = 200L, name = "vacation_cover.jpg")
-        val photoUiState = PhotoUiState.Image(
+        val coverNode = createMockNode(
             id = 200L,
-            albumPhotoId = null,
-            parentId = 0L,
-            name = "vacation_cover.jpg",
-            isFavourite = false,
-            creationTime = coverPhoto.creationTime,
-            modificationTime = coverPhoto.modificationTime,
-            thumbnailFilePath = null,
-            previewFilePath = null,
-            fileTypeInfo = coverPhoto.fileTypeInfo,
-            size = 0L,
-            isTakenDown = false,
-            isSensitive = false,
-            isSensitiveInherited = false,
-            base64Id = null,
+            thumbnailPath = "thumb/200",
+            previewPath = "preview/200",
+            extension = "png",
         )
-
-        whenever(mockPhotoUiStateMapper(coverPhoto)).thenReturn(photoUiState)
-
         val mediaAlbum = MediaAlbum.User(
             id = albumId,
             title = title,
             creationTime = 1500L,
             modificationTime = 2500L,
             isExported = true,
-            cover = coverPhoto
+            cover = coverNode
         )
 
         val actual = underTest(mediaAlbum)
@@ -162,88 +153,47 @@ class AlbumUiStateMapperTest {
             mediaAlbum = mediaAlbum,
             title = LocalizedText.Literal(title),
             isExported = true,
-            cover = photoUiState
+            cover = MediaThumbnailRequest(
+                id = 200L,
+                isPreview = false,
+                thumbnailFilePath = "thumb/200",
+                previewFilePath = "preview/200",
+                isPublicNode = false,
+                fileExtension = "png",
+            ),
+            isCoverSensitive = false,
         )
         assertThat(actual).isEqualTo(expected)
-        verify(mockPhotoUiStateMapper).invoke(coverPhoto)
     }
 
-    @Test
-    fun `test that system album id is hashcode of album name`() {
-        val albumNameResId = 11111
-        val systemAlbum = createMockSystemAlbum(albumNameResId) { true }
-        val mediaAlbum = MediaAlbum.System(
-            id = systemAlbum,
-            cover = null
-        )
-
-        val actual = underTest(mediaAlbum)
-
-        assertThat(actual.mediaAlbum).isEqualTo(mediaAlbum)
-        assertThat(actual.title).isEqualTo(LocalizedText.StringRes(albumNameResId))
-    }
-
-    @Test
-    fun `test that user album id is the album id value`() {
-        val albumId = AlbumId(789L)
-        val title = "Test Album"
-        val mediaAlbum = MediaAlbum.User(
-            id = albumId,
-            title = title,
-            creationTime = 0L,
-            modificationTime = 0L,
-            isExported = false,
-            cover = null
-        )
-
-        val actual = underTest(mediaAlbum)
-
-        assertThat(actual.mediaAlbum).isEqualTo(mediaAlbum)
-        assertThat(actual.title).isEqualTo(LocalizedText.Literal(title))
-    }
-
-    private fun createMockSystemAlbum(
-        albumNameResId: Int,
-        filter: (Photo) -> Boolean,
-    ): SystemAlbum {
-        return object : SystemAlbum {
+    private fun createMockSystemAlbum(albumNameResId: Int): SystemAlbum =
+        object : SystemAlbum {
             override val albumNameResId = albumNameResId
             override val hideWhenEmpty: Boolean = true
-            override suspend fun filter(photo: Photo): Boolean = filter(photo)
+            override val mediaTimelineFilter: MediaTimelineFilter = MediaTimelineFilter(
+                granularity = MediaTimelineFilter.Granularity.Day,
+                category = MediaTimelineFilter.Category.All,
+                location = MediaTimelineFilter.Location.CloudDriveAndVault,
+                sensitivity = MediaTimelineFilter.Sensitivity.ShowAll,
+            )
+        }
+
+    private fun createMockNode(
+        id: Long = 0L,
+        thumbnailPath: String? = null,
+        previewPath: String? = null,
+        extension: String = "jpg",
+        isMarkedSensitive: Boolean = false,
+        isSensitiveInherited: Boolean = false,
+    ): TypedFileNode {
+        val fileType = StaticImageFileTypeInfo(mimeType = "image/jpeg", extension = extension)
+        return mock {
+            on { this.id }.thenReturn(NodeId(id))
+            on { this.thumbnailPath }.thenReturn(thumbnailPath)
+            on { this.previewPath }.thenReturn(previewPath)
+            on { this.type }.thenReturn(fileType)
+            on { this.isMarkedSensitive }.thenReturn(isMarkedSensitive)
+            on { this.isSensitiveInherited }.thenReturn(isSensitiveInherited)
         }
     }
-
-    private fun newImage(
-        id: Long = 0L,
-        albumPhotoId: Long? = null,
-        parentId: Long = 0L,
-        name: String = "",
-        isFavourite: Boolean = false,
-        creationTime: LocalDateTime = LocalDateTime.now(),
-        modificationTime: LocalDateTime = LocalDateTime.now(),
-        thumbnailFilePath: String? = null,
-        previewFilePath: String? = null,
-        fileTypeInfo: FileTypeInfo = mock<StaticImageFileTypeInfo>(),
-        base64Id: String? = null,
-        size: Long = 0L,
-        isTakenDown: Boolean = false,
-        isSensitive: Boolean = false,
-        isSensitiveInherited: Boolean = false,
-    ) = Photo.Image(
-        id = id,
-        albumPhotoId = albumPhotoId,
-        parentId = parentId,
-        name = name,
-        isFavourite = isFavourite,
-        creationTime = creationTime,
-        modificationTime = modificationTime,
-        thumbnailFilePath = thumbnailFilePath,
-        previewFilePath = previewFilePath,
-        fileTypeInfo = fileTypeInfo,
-        size = size,
-        isTakenDown = isTakenDown,
-        isSensitive = isSensitive,
-        isSensitiveInherited = isSensitiveInherited,
-        base64Id = base64Id,
-    )
 }

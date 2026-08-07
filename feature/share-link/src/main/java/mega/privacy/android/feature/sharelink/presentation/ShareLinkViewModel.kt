@@ -26,9 +26,9 @@ import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetAlbumPhotosUseCase
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.HasSensitiveDescendantUseCase
@@ -37,9 +37,9 @@ import mega.privacy.android.domain.usecase.SetShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.ShouldShowCopyrightUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.link.SplitLinkAndKeyUseCase
+import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.node.ExportNodesUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
-import mega.privacy.android.domain.usecase.media.MonitorUserAlbumByIdUseCase
 import mega.privacy.android.domain.usecase.photos.AlbumHasSensitiveContentUseCase
 import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import mega.privacy.android.domain.usecase.thumbnailpreview.DownloadThumbnailUseCase
@@ -292,10 +292,10 @@ class ShareLinkViewModel @AssistedInject constructor(
      * Local thumbnail path of the album [cover], downloading it when it is not cached yet. Null
      * when the album is empty or the download failed, leaving the header to its placeholder.
      */
-    private suspend fun coverThumbnailPath(cover: Photo?): String? {
-        val path = cover?.thumbnailFilePath ?: return null
+    private suspend fun coverThumbnailPath(cover: TypedFileNode?): String? {
+        val path = cover?.thumbnailPath ?: return null
         if (File(path).exists()) return path
-        runCatching { downloadThumbnailUseCase(cover.id) }
+        runCatching { downloadThumbnailUseCase(cover.id.longValue) }
             .onFailure { Timber.e(it, "Failed to download the album cover thumbnail") }
         return path.takeIf { File(it).exists() }
     }

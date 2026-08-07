@@ -48,10 +48,7 @@ internal class MediaTimelineFilterMapper @Inject constructor(
                 megaHandleListMapper = megaHandleListMapper,
             )
             it.byUtcOffset(timezoneOffset)
-
-            if (hasSubCategory) {
-                it.bySubCategory(subCategoryIntMapper(filter.subCategory))
-            }
+            it.bySubCategory(subCategoryIntMapper(filter.subCategory))
             it.byFavourite(mediaTimelineFavouritesIntMapper(filter.favourites))
         }
 }

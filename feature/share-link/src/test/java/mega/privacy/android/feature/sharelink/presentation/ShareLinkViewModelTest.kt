@@ -894,7 +894,7 @@ class ShareLinkViewModelTest {
 
     private fun stubAlbum(
         title: String = ALBUM_TITLE,
-        cover: Photo? = null,
+        cover: TypedFileNode? = null,
         photos: List<Photo> = emptyList(),
         link: String = ALBUM_LINK,
     ) {
@@ -908,14 +908,15 @@ class ShareLinkViewModelTest {
             .thenReturn(LinkAndKey(ALBUM_LINK_WITHOUT_KEY, ALBUM_KEY))
     }
 
-    private fun userAlbum(title: String = ALBUM_TITLE, cover: Photo? = null) = MediaAlbum.User(
-        id = AlbumId(ALBUM_ID),
-        title = title,
-        creationTime = 0L,
-        modificationTime = 0L,
-        isExported = true,
-        cover = cover,
-    )
+    private fun userAlbum(title: String = ALBUM_TITLE, cover: TypedFileNode? = null) =
+        MediaAlbum.User(
+            id = AlbumId(ALBUM_ID),
+            title = title,
+            creationTime = 0L,
+            modificationTime = 0L,
+            isExported = true,
+            cover = cover,
+        )
 
     private fun photo(id: Long, thumbnailFilePath: String?, modifiedYear: Int) = Photo.Image(
         id = id,
@@ -929,14 +930,19 @@ class ShareLinkViewModelTest {
         fileTypeInfo = UnknownFileTypeInfo(mimeType = "image/jpeg", extension = "jpg"),
     )
 
+    private fun coverNode(id: Long, thumbnailPath: String?) = mock<TypedFileNode> {
+        on { this.id } doReturn NodeId(id)
+        on { this.thumbnailPath } doReturn thumbnailPath
+    }
+
     private fun buildAlbumViewModel() = buildViewModel(ShareLinkSubject.Album(ALBUM_ID))
 
     @Test
     fun `test that uiState is Data with the album title cover and photo count when an album is shared`() =
         runTest {
             val thumbnail = File.createTempFile("album-cover", ".jpg").apply { deleteOnExit() }
-            val cover = photo(id = 1L, thumbnailFilePath = thumbnail.absolutePath, modifiedYear = 2024)
-            stubAlbum(cover = cover, photos = listOf(cover, photo(2L, null, 2023)))
+            val cover = coverNode(id = 1L, thumbnailPath = thumbnail.absolutePath)
+            stubAlbum(cover = cover, photos = listOf(photo(1L, null, 2024), photo(2L, null, 2023)))
 
             buildAlbumViewModel().uiState.test {
                 val state = awaitData()
@@ -978,7 +984,7 @@ class ShareLinkViewModelTest {
     @Test
     fun `test that the cover thumbnail is downloaded when it is not cached`() = runTest {
         val missing = File.createTempFile("album-missing", ".jpg").apply { delete() }
-        stubAlbum(cover = photo(id = 7L, thumbnailFilePath = missing.absolutePath, modifiedYear = 2024))
+        stubAlbum(cover = coverNode(id = 7L, thumbnailPath = missing.absolutePath))
 
         buildAlbumViewModel().uiState.test {
             assertThat(awaitData().album?.coverThumbnailPath).isNull()
