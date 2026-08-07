@@ -542,7 +542,7 @@ private fun recommendedCardData(
         subscription.localisePriceCurrencyCode(locale, isMonthly = true).price
     }
     val monthlyPriceText =
-        stringResource(sharedR.string.choose_account_screen_only_price_per_month, perMonthPrice)
+        stringResource(sharedR.string.subscription_revamp_price_per_month, perMonthPrice)
     val yearlyTotalText = if (useYearly) {
         stringResource(
             sharedR.string.subscription_quota_charged_yearly,
