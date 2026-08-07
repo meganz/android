@@ -75,6 +75,11 @@ android {
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion, project)}\"")
 
         testInstrumentationRunner = "mega.privacy.android.app.HiltTestRunner"
+        testInstrumentationRunnerArguments["clearPackageData"] = "true"
+    }
+
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
     }
 
     val debugKeyStoreFile = file("debug.keystore")
@@ -448,6 +453,7 @@ dependencies {
     androidTestImplementation(androidx.hilt.work)
     androidTestImplementation(testlib.uiautomator)
     androidTestImplementation(project(":core:analytics:analytics-tracker"))
+    androidTestUtil(testlib.orchestrator)
 
     kspAndroidTest(google.hilt.android.compiler)
     debugImplementation(androidx.fragment.test)

@@ -5,6 +5,7 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.BySelector
+import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import com.google.common.truth.Truth.assertThat
@@ -125,16 +126,15 @@ class RenameNodeTest {
         awaitObject(By.res(MORE_ICON_TAG), LOAD_TIMEOUT, "node-more-icon")
         device.findObject(By.res(MORE_ICON_TAG)).click()
 
-        // Node options bottom sheet → Rename.
-        awaitObject(By.res(RENAME_ACTION_TAG), LOAD_TIMEOUT, "rename-action")
+        // Node options bottom sheet → Rename, which sits below the sheet's initially visible area.
+        scrollUntilObject(By.res(RENAME_ACTION_TAG), SHEET_LIST_TAG, "rename-action")
         device.findObject(By.res(RENAME_ACTION_TAG)).click()
 
         // Rename dialog: replace the text and confirm.
-        awaitObject(By.res(RENAME_DIALOG_TAG), LOAD_TIMEOUT, "rename-dialog")
-        val input = device.findObject(By.res(RENAME_DIALOG_TAG))
-            .findObject(By.clazz("android.widget.EditText"))
-        input.text = NEW_NAME
-        device.findObject(By.text(RENAME_CONFIRM_TEXT).clickable(true)).click()
+        awaitObject(RENAME_INPUT, LOAD_TIMEOUT, "rename-dialog-input")
+        device.findObject(RENAME_INPUT).text = NEW_NAME
+        awaitObject(RENAME_CONFIRM, LOAD_TIMEOUT, "rename-confirm")
+        device.findObject(RENAME_CONFIRM).click()
 
         // Production code has now called renameNode. Apply the SDK-side effect (rename in the fake
         // tree + OnNodesUpdate broadcast) with the new `:data-test` mutating helper.
@@ -146,6 +146,21 @@ class RenameNodeTest {
 
         // Hold the final state briefly so a human watching the run can see the result.
         Thread.sleep(2_000)
+    }
+
+    /**
+     * Scrolls the list identified by [containerTag] until [selector] is present. The bottom sheet
+     * renders its actions in a LazyColumn, so entries below the visible area are not composed and
+     * cannot be matched by UiAutomator until they are scrolled into view.
+     */
+    private fun scrollUntilObject(selector: BySelector, containerTag: String, name: String) {
+        repeat(MAX_SCROLL_ATTEMPTS) {
+            if (device.hasObject(selector)) return
+            val container = device.findObject(By.res(containerTag)) ?: return@repeat
+            container.setGestureMargin(container.visibleBounds.height() / 4)
+            container.scroll(Direction.DOWN, SCROLL_PERCENT)
+        }
+        awaitObject(selector, LOAD_TIMEOUT, name)
     }
 
     /**
@@ -167,6 +182,8 @@ class RenameNodeTest {
     private companion object {
         const val LAUNCH_TIMEOUT = 30_000L
         const val LOAD_TIMEOUT = 15_000L
+        const val MAX_SCROLL_ATTEMPTS = 10
+        const val SCROLL_PERCENT = 0.8f
 
         const val FILE_HANDLE = 100L
         const val ORIGINAL_NAME = "before.txt"
@@ -181,13 +198,23 @@ class RenameNodeTest {
         /** Mirrors the internal MORE_ICON_TAG of NodeListViewItem rows. */
         const val MORE_ICON_TAG = "node_list_view_item:more_icon"
 
+        /** Mirrors NODE_OPTIONS_LAZY_COLUMN_TEST_TAG of the node options bottom sheet. */
+        const val SHEET_LIST_TAG = "node_options_bottom_sheet:lazy_column"
+
         /** Mirrors the testTag of RenameMenuAction in the node options bottom sheet. */
         const val RENAME_ACTION_TAG = "menu_action:rename"
 
-        /** Mirrors RENAME_NODE_DIALOG_TAG of RenameNodeDialogM3. */
-        const val RENAME_DIALOG_TAG = "rename_node_dialog:input_dialog"
-
         /** Localized label of the rename dialog's confirm button (context_rename). */
         const val RENAME_CONFIRM_TEXT = "Rename"
+
+        /**
+         * The rename dialog renders in its own window, where the activity's `testTagsAsResourceId`
+         * does not apply and no node carries a resource id, so it is matched by class and text.
+         * The confirm label sits in a child of the clickable node and is also used by the dialog
+         * title, hence the descendant match.
+         */
+        val RENAME_INPUT: BySelector = By.clazz("android.widget.EditText").text(ORIGINAL_NAME)
+        val RENAME_CONFIRM: BySelector =
+            By.clickable(true).hasDescendant(By.text(RENAME_CONFIRM_TEXT))
     }
 }

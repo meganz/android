@@ -29,6 +29,7 @@ class InstrumentedTestExampleTest {
     fun test_readStringFromContext_LocalizedString() {
         assertThat(appContext.getString(R.string.app_name)).isEqualTo("MEGA")
 
-        assertThat(appContext.getString(R.string.prolite_account)).isEqualTo("Pro Lite")
+        // Non-breaking space (U+00A0) is intentional in the string so "Pro Lite" never wraps.
+        assertThat(appContext.getString(R.string.prolite_account)).isEqualTo("Pro\u00A0Lite")
     }
 }
