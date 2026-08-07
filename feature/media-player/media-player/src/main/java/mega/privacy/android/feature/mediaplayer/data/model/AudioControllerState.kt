@@ -1,13 +1,12 @@
 package mega.privacy.android.feature.mediaplayer.data.model
 
 import androidx.media3.common.Player
-import timber.log.Timber
 
 /**
  * Raw player state emitted by [mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway].
  *
  * Represents the current snapshot of the Media3 MediaController state. The ViewModel maps this
- * into [AudioPlayerUiState] and applies domain-level side effects (analytics, persistence,
+ * into AudioPlayerUiState and applies domain-level side effects (analytics, persistence,
  * node name fetching) on top.
  */
 data class AudioControllerState(
@@ -24,16 +23,10 @@ data class AudioControllerState(
     val title: String? = null,
     val artist: String? = null,
     val artworkUri: String? = null,
-    /** Raw [androidx.media3.session.MediaController.getCurrentMediaItem] ID, always a Long-as-String in this app. */
+    /** Opaque UUID assigned to the current [androidx.media3.common.MediaItem]. */
     val currentMediaItemId: String? = null,
     /** Current playback speed multiplier; `1.0` = normal speed. */
     val playbackSpeed: Float = 1f,
-) {
-    /** Convenience accessor that converts [currentMediaItemId] to [Long], or `null` if absent. */
-    val currentMediaItemHandle: Long?
-        get() = currentMediaItemId?.toLongOrNull().also { result ->
-            if (result == null && currentMediaItemId != null) {
-                Timber.w("Non-numeric media item ID: $currentMediaItemId")
-            }
-        }
-}
+    /** MEGA node handle for the current media item, resolved via [mega.privacy.android.feature.mediaplayer.data.MediaHandleStore]. */
+    val currentMediaItemHandle: Long? = null,
+)

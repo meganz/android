@@ -17,21 +17,22 @@ import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
+import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import mega.privacy.android.feature.mediaplayer.data.gateway.AudioMediaControllerGateway
 import mega.privacy.android.feature.mediaplayer.data.model.AudioControllerState
-import mega.privacy.android.domain.qualifier.MainDispatcher
 import timber.log.Timber
 
 /**
@@ -44,6 +45,7 @@ import timber.log.Timber
 internal class AudioMediaControllerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    private val mediaHandleStore: MediaHandleStore,
 ) : AudioMediaControllerGateway {
 
     private val gatewayScope = CoroutineScope(SupervisorJob() + mainDispatcher)
@@ -129,6 +131,11 @@ internal class AudioMediaControllerFacade @Inject constructor(
             artworkUri = c.mediaMetadata.artworkUri?.toString(),
             currentMediaItemId = c.currentMediaItem?.mediaId,
             playbackSpeed = c.playbackParameters.speed,
+            currentMediaItemHandle = c.currentMediaItem?.mediaId?.let {
+                mediaHandleStore.getHandle(
+                    it
+                )
+            },
         )
         _playerState.tryEmit(currentState)
     }
@@ -156,7 +163,12 @@ internal class AudioMediaControllerFacade @Inject constructor(
         }
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            updateState { copy(currentMediaItemId = mediaItem?.mediaId) }
+            updateState {
+                copy(
+                    currentMediaItemId = mediaItem?.mediaId,
+                    currentMediaItemHandle = mediaItem?.mediaId?.let { mediaHandleStore.getHandle(it) },
+                )
+            }
         }
 
         override fun onPlaybackStateChanged(state: Int) {

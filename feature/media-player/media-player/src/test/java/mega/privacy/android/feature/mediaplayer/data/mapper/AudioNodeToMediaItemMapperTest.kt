@@ -4,6 +4,7 @@ import android.net.Uri
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -14,24 +15,30 @@ import org.mockito.kotlin.whenever
 internal class AudioNodeToMediaItemMapperTest {
 
     private lateinit var underTest: AudioNodeToMediaItemMapper
+    private lateinit var mediaHandleStore: MediaHandleStore
 
     private val uri: Uri = mock()
 
     @BeforeEach
     fun setUp() {
-        underTest = AudioNodeToMediaItemMapper()
+        mediaHandleStore = MediaHandleStore()
+        underTest = AudioNodeToMediaItemMapper(mediaHandleStore)
     }
 
     @Test
-    fun `test that invoke with node sets media id to node handle as string`() {
+    fun `test that invoke with node assigns a UUID media id mapped to the node handle`() {
         val handle = 123L
         val node = mock<TypedAudioNode>().also {
             whenever(it.id).thenReturn(NodeId(handle))
+            whenever(it.name).thenReturn(null)
         }
 
         val result = underTest(node, uri)
 
-        assertThat(result.mediaId).isEqualTo(handle.toString())
+        assertThat(mediaHandleStore.getHandle(result.mediaId)).isEqualTo(handle)
+        assertThat(result.mediaId).matches(
+            "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        )
     }
 
     @Test
@@ -46,12 +53,15 @@ internal class AudioNodeToMediaItemMapperTest {
     }
 
     @Test
-    fun `test that invoke with raw fields sets media id to handle as string`() {
+    fun `test that invoke with raw fields assigns a UUID media id mapped to the handle`() {
         val handle = 456L
 
         val result = underTest(handle = handle, uri = uri)
 
-        assertThat(result.mediaId).isEqualTo(handle.toString())
+        assertThat(mediaHandleStore.getHandle(result.mediaId)).isEqualTo(handle)
+        assertThat(result.mediaId).matches(
+            "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        )
     }
 
     @Test

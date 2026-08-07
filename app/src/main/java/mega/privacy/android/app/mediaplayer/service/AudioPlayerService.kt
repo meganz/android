@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioR
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.MonitorAudioShuffleEnabledUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.TrackAudioPlaybackInfoUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 import mega.privacy.android.feature.mediaplayer.navigation.AudioPlayerScreenNavKey
 import mega.privacy.mobile.analytics.event.AudioPlayerIsActivatedEvent
 import timber.log.Timber
@@ -93,6 +94,9 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     @Inject
     lateinit var monitorAccountDetailUseCase: MonitorAccountDetailUseCase
+
+    @Inject
+    lateinit var mediaHandleStore: MediaHandleStore
 
     private var player: ExoPlayer? = null
     private var mediaSession: MediaSession? = null
@@ -191,8 +195,22 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         val currentPlayer = player ?: return
         mediaSession = MediaSession.Builder(this, currentPlayer)
             .setSessionActivity(pendingIntent)
+            .setCallback(object : MediaSession.Callback {
+                override fun onConnect(
+                    session: MediaSession,
+                    controller: MediaSession.ControllerInfo,
+                ): MediaSession.ConnectionResult {
+                    if (!isTrustedController(controller)) {
+                        return MediaSession.ConnectionResult.reject()
+                    }
+                    return super.onConnect(session, controller)
+                }
+            })
             .build()
     }
+
+    private fun isTrustedController(controllerInfo: MediaSession.ControllerInfo): Boolean =
+        isPackageTrusted(controllerInfo.packageName, packageName)
 
     private fun observePreferences() {
         lifecycleScope.launch {
@@ -256,7 +274,7 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
     }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
-        mediaSession
+        if (isTrustedController(controllerInfo)) mediaSession else null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Handle our custom actions before calling super to prevent MediaSessionService from
@@ -290,7 +308,8 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         trackPlaybackInfoJob = lifecycleScope.launch {
             player?.let { exoPlayer ->
                 trackAudioPlaybackInfoUseCase {
-                    val handle = exoPlayer.currentMediaItem?.mediaId?.toLongOrNull() ?: -1L
+                    val handle = exoPlayer.currentMediaItem?.mediaId
+                        ?.let { mediaHandleStore.getHandle(it) } ?: -1L
                     MediaPlaybackInfo(
                         mediaHandle = handle,
                         totalDuration = exoPlayer.duration.coerceAtLeast(0L),
@@ -380,6 +399,13 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
 
     private fun stopPlayerAndSelf() {
         MiniAudioPlayerController.notifyV2AudioPlayerPlaying(false)
+        // Stop audio immediately so playback cannot continue even if the service is kept alive
+        // by an external MediaController binding (e.g. a notification-listener app that obtained
+        // a MediaController via MediaSessionManager.getActiveSessions()).  Without this, stopSelf()
+        // is deferred until the external client unbinds, and onDestroy() never runs in the
+        // meantime, leaving ExoPlayer playing in the background.
+        runCatching { player?.stop() }
+            .onFailure { Timber.e(it, "Failed to stop ExoPlayer") }
         ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
         // Release the session before stopSelf() so that all bound MediaController clients
         // (including the Audio Player screen) disconnect immediately. Without this, stopSelf()
@@ -410,12 +436,26 @@ class AudioPlayerService : MediaSessionService(), LifecycleEventObserver {
         runCatching { player?.release() }
             .onFailure { Timber.e(it, "Failed to release ExoPlayer") }
         player = null
+        mediaHandleStore.clear()
         super.onDestroy()
     }
 
     companion object {
-        private const val ACTION_STOP = "mega.privacy.android.app.mediaplayer.AudioPlayerService.STOP"
-        private const val ACTION_DISMISS = "mega.privacy.android.app.mediaplayer.AudioPlayerService.DISMISS"
+        private const val ACTION_STOP =
+            "mega.privacy.android.app.mediaplayer.AudioPlayerService.STOP"
+        private const val ACTION_DISMISS =
+            "mega.privacy.android.app.mediaplayer.AudioPlayerService.DISMISS"
+
+        /**
+         * Returns true if [callerPackage] should be allowed to connect to the MediaSession.
+         *
+         * Only MEGA itself ([appPackage]) and the Android system process are permitted.
+         * The system process routes media button events from Bluetooth devices and the lock
+         * screen. All other callers are rejected to prevent third-party apps from reading
+         * node handles out of the Media3 session timeline.
+         */
+        internal fun isPackageTrusted(callerPackage: String, appPackage: String): Boolean =
+            callerPackage == appPackage || callerPackage == "android"
 
         /**
          * Stops the audio player service from outside a bound component.

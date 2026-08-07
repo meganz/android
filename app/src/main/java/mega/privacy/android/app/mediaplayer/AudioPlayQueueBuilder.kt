@@ -135,9 +135,10 @@ class AudioPlayQueueBuilder @Inject constructor(
             params.uri
         } ?: return@flow
 
+        val firstMediaItem = audioNodeToMediaItemMapper(handle, firstUri, fileName)
         emit(
             MediaPlaySources(
-                mediaItems = listOf(audioNodeToMediaItemMapper(handle, firstUri, fileName)),
+                mediaItems = listOf(firstMediaItem),
                 newIndexForCurrentItem = 0,
                 nameToDisplay = fileName,
             )
@@ -163,7 +164,7 @@ class AudioPlayQueueBuilder @Inject constructor(
             false
         }
 
-        val (mediaItems, firstPlayIndex) = buildFullPlayQueue(
+        val (rawMediaItems, firstPlayIndex) = buildFullPlayQueue(
             params = params,
             type = type,
             showHiddenItems = showHiddenItems,
@@ -171,7 +172,16 @@ class AudioPlayQueueBuilder @Inject constructor(
             isBusinessExpired = isBusinessExpired,
         )
 
-        if (mediaItems.isNotEmpty()) {
+        if (rawMediaItems.isNotEmpty()) {
+            // Reuse the first-emit item for the current track so its UUID stays consistent
+            // across both emissions. applyMediaSources checks mediaId equality to decide whether
+            // to expand the queue with addMediaItems (no interruption) or reset with setMediaItems
+            // (causes re-buffer). A mismatched UUID would always trigger the reset path.
+            val mediaItems = if (firstPlayIndex in rawMediaItems.indices) {
+                rawMediaItems.toMutableList().also { it[firstPlayIndex] = firstMediaItem }
+            } else {
+                rawMediaItems
+            }
             emit(
                 MediaPlaySources(
                     mediaItems = mediaItems,

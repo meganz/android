@@ -84,7 +84,6 @@ class AudioPlayerViewModelTest {
         )
     }
 
-
     @Test
     fun `test that uiState emits Loading before MediaController connects`() = runTest {
         assertThat(underTest.uiState.value).isEqualTo(AudioPlayerUiState.Loading)
@@ -102,8 +101,6 @@ class AudioPlayerViewModelTest {
             assertThat(state.duration).isEqualTo(60_000L)
         }
     }
-
-
 
     @Test
     fun `test that togglePlayPause calls pause when current state is playing`() = runTest {
@@ -134,8 +131,6 @@ class AudioPlayerViewModelTest {
             verify(gateway, never()).play()
             verify(gateway, never()).pause()
         }
-
-
 
     @Test
     fun `test that seekTo forwards position to gateway`() = runTest {
@@ -189,8 +184,6 @@ class AudioPlayerViewModelTest {
             }
         }
 
-
-
     @Test
     fun `test that toggleShuffle enables shuffle when current state has shuffle disabled`() =
         runTest {
@@ -228,8 +221,6 @@ class AudioPlayerViewModelTest {
 
         verify(setAudioShuffleEnabledUseCase).invoke(true)
     }
-
-
 
     @Test
     fun `test that cycleRepeatMode sets ALL when current mode is OFF`() = runTest {
@@ -280,8 +271,6 @@ class AudioPlayerViewModelTest {
 
         verify(setAudioRepeatModeUseCase).invoke(RepeatToggleMode.REPEAT_ALL.ordinal)
     }
-
-
 
     @Test
     fun `test that setCurrentIntent updates adapter type in uiState`() = runTest {
@@ -464,8 +453,6 @@ class AudioPlayerViewModelTest {
         whenever(getStringExtra(URL_LOCAL_FILE_PATH)).thenReturn(localFilePath)
     }
 
-
-
     @Test
     fun `test that onMediaItemTransition updates handle and thumbnail in uiState`() = runTest {
         underTest.uiState.test {
@@ -473,7 +460,12 @@ class AudioPlayerViewModelTest {
             gatewayPlayerState.emit(AudioControllerState())
             awaitItem() // Data (initial)
 
-            gatewayPlayerState.emit(AudioControllerState(currentMediaItemId = "123456"))
+            gatewayPlayerState.emit(
+                AudioControllerState(
+                    currentMediaItemId = "some-uuid",
+                    currentMediaItemHandle = 123456L
+                )
+            )
 
             val state = awaitItem() as AudioPlayerUiState.Data
             assertThat(state.currentPlayingHandle).isEqualTo(123456L)
@@ -492,7 +484,12 @@ class AudioPlayerViewModelTest {
             gatewayPlayerState.emit(AudioControllerState())
             awaitItem() // Data (initial, no mediaItemId change)
 
-            gatewayPlayerState.emit(AudioControllerState(currentMediaItemId = "123456"))
+            gatewayPlayerState.emit(
+                AudioControllerState(
+                    currentMediaItemId = "some-uuid",
+                    currentMediaItemHandle = 123456L
+                )
+            )
             // fetchNodeName runs eagerly on UnconfinedTestDispatcher before mapToUiState, so
             // both playerState updates are conflated by StateFlow into a single emission
             // that carries both the new handle and the resolved node name.
@@ -501,8 +498,6 @@ class AudioPlayerViewModelTest {
             assertThat(state.currentPlayingItemName).isEqualTo("track.mp3")
         }
     }
-
-
 
     @Test
     fun `test that isPodcastMode is true by default`() = runTest {

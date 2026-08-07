@@ -3,19 +3,23 @@ package mega.privacy.android.feature.mediaplayer.data.mapper
 import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import mega.privacy.android.domain.entity.node.TypedAudioNode
+import java.util.UUID
 import javax.inject.Inject
+import mega.privacy.android.domain.entity.node.TypedAudioNode
+import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
 
 /**
  * Maps a [TypedAudioNode] and a resolved stream [Uri] to a Media3 [MediaItem].
  *
- * When [displayName] is provided it is set as the initial [MediaMetadata.title] so the UI can
+ * When displayName is provided it is set as the initial [MediaMetadata.title] so the UI can
  * show the file name immediately while Media3 extracts embedded tags (ID3, Vorbis comment, etc.).
  * Once extraction completes, Media3 fires Player.Listener.onMediaMetadataChanged with the real
  * title/artist, which takes precedence over the initial value.
  * Artwork is resolved separately by the Compose UI layer via ThumbnailRequest.
  */
-class AudioNodeToMediaItemMapper @Inject constructor() {
+class AudioNodeToMediaItemMapper @Inject constructor(
+    private val mediaHandleStore: MediaHandleStore,
+) {
 
     /**
      * Create a [MediaItem] from a [TypedAudioNode] and its resolved stream [Uri].
@@ -29,14 +33,17 @@ class AudioNodeToMediaItemMapper @Inject constructor() {
      *
      * @param displayName optional file name shown before embedded metadata is extracted
      */
-    operator fun invoke(handle: Long, uri: Uri, displayName: String? = null): MediaItem =
-        MediaItem.Builder()
+    operator fun invoke(handle: Long, uri: Uri, displayName: String? = null): MediaItem {
+        val mediaId = UUID.randomUUID().toString()
+        mediaHandleStore.register(mediaId, handle)
+        return MediaItem.Builder()
             .setUri(uri)
-            .setMediaId(handle.toString())
+            .setMediaId(mediaId)
             .apply {
                 if (displayName != null) {
                     setMediaMetadata(MediaMetadata.Builder().setTitle(displayName).build())
                 }
             }
             .build()
+    }
 }

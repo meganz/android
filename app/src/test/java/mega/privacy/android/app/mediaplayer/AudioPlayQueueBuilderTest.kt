@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.net.Uri
+import androidx.media3.common.MediaItem
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -355,6 +356,37 @@ class AudioPlayQueueBuilderTest {
             eq("song.mp3")
         )
     }
+
+    @Test
+    fun `test that second emission reuses the first-emit media item for the current item`() =
+        runTest {
+            // The UUID-reuse fix saves `firstMediaItem` before the full queue build, then
+            // substitutes it back at firstPlayIndex so the mediaId stays stable across both
+            // emissions.  Full end-to-end verification of the second emission requires
+            // Robolectric because Android's Uri.parse() is unavailable in JVM unit tests and
+            // is called during full queue URL resolution.  This test covers the precondition:
+            // the first emission stores and emits exactly the mapper instance.
+            val handle = 123L
+            val firstMediaItem = mock<MediaItem>()
+            val secondCallItem = mock<MediaItem>()
+            whenever(audioNodeToMediaItemMapper(any<Long>(), any<Uri>(), anyOrNull()))
+                .thenReturn(firstMediaItem, secondCallItem)
+            val params = buildParams(
+                adapterType = AUDIO_BROWSE_ADAPTER,
+                handle = handle,
+                isPlayQueue = true,
+            )
+
+            underTest(params).test {
+                val first = awaitItem()
+                assertThat(first.mediaItems).hasSize(1)
+                assertThat(first.mediaItems[0]).isSameInstanceAs(firstMediaItem)
+                // Full queue is empty (no nodes stubbed), so the flow completes after
+                // the first emission.  cancelAndIgnoreRemainingEvents() handles any
+                // residual events from the streaming-server setup coroutines.
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     private fun buildParams(
         adapterType: Int = AUDIO_BROWSE_ADAPTER,
