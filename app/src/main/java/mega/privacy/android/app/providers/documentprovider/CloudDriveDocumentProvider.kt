@@ -397,7 +397,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
         mimeType: String,
         displayName: String,
     ): String {
-        Timber.d("CloudDriveDocumentProvider createDocument parent=$parentDocumentId mime=$mimeType name=$displayName")
+        Timber.d("CloudDriveDocumentProvider createDocument parent=$parentDocumentId mime=$mimeType")
         val pendingId = try {
             runBlocking(openDocumentDispatcher) {
                 if (mimeType == Document.MIME_TYPE_DIR) {
@@ -441,7 +441,7 @@ class CloudDriveDocumentProvider : DocumentsProvider() {
     }
 
     override fun renameDocument(documentId: String, displayName: String): String? {
-        Timber.d("CloudDriveDocumentProvider renameDocument documentId=$documentId name=$displayName")
+        Timber.d("CloudDriveDocumentProvider renameDocument documentId=$documentId")
         return try {
             val parentDocumentId = runBlocking(openDocumentDispatcher) {
                 dataProvider.renameDocument(documentId, displayName)

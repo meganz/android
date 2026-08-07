@@ -216,6 +216,8 @@ class CheckForValidNameUseCaseTest {
             Arguments.of("..", folderNode, InvalidNameType.DOUBLE_DOT_NAME),
             Arguments.of("SomeInvalidName/*", fileNode, InvalidNameType.INVALID_NAME),
             Arguments.of("SomeInvalidName/*", folderNode, InvalidNameType.INVALID_NAME),
+            Arguments.of("line${0x0A.toChar()}break", folderNode, InvalidNameType.INVALID_NAME),
+            Arguments.of("null${0x00.toChar()}byte", folderNode, InvalidNameType.INVALID_NAME),
             Arguments.of("no extension", fileNode, InvalidNameType.NO_EXTENSION),
             Arguments.of("changeInExtension.jpeg", fileNode, InvalidNameType.DIFFERENT_EXTENSION),
             Arguments.of("Proper rename.pdf", fileNode, InvalidNameType.VALID),
@@ -223,6 +225,6 @@ class CheckForValidNameUseCaseTest {
         )
 
     companion object {
-        private const val INVALID_NAME_REGEX = "[*|\\?:\"<>\\\\\\\\/]"
+        private const val INVALID_NAME_REGEX = "[*|\\?:\"<>\\\\\\\\/\\x00-\\x1F\\x7F]"
     }
 }

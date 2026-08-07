@@ -47,6 +47,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.pitag.PitagTarget
 import mega.privacy.android.domain.entity.pitag.PitagTrigger
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.NodeNameException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.GetRootNodeIdUseCase
@@ -62,6 +63,7 @@ import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.GetOpenableLocalFileForCloudDriveSafUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.domain.usecase.node.ValidateNodeNameCharactersUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
@@ -98,6 +100,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     private val getChildNodeUseCase: DaggerLazy<GetChildNodeUseCase>,
     private val startUploadUseCase: DaggerLazy<StartUploadUseCase>,
     private val getCacheFileUseCase: DaggerLazy<GetCacheFileUseCase>,
+    private val validateNodeNameCharactersUseCase: DaggerLazy<ValidateNodeNameCharactersUseCase>,
 ) {
     private val pendingCreates = ConcurrentHashMap<String, PendingCreate>()
     private val pendingFinalizeSignals = ConcurrentHashMap<String, CompletableDeferred<Unit>>()
@@ -544,6 +547,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         mimeType: String,
     ): String {
         assertSessionReadyForWrite()
+        assertNameIsSafe(displayName)
         val parentNodeId = resolveParentNodeId(parentDocumentId)
             ?: throw FileNotFoundException("Invalid parent: $parentDocumentId")
         if (getChildNodeUseCase.get()(parentNodeId, displayName) != null) {
@@ -681,6 +685,7 @@ class CloudDriveDocumentDataProvider @Inject constructor(
     /** Renames via the SDK and returns the parent document id so the caller can notify the listing. */
     suspend fun renameDocument(documentId: String, newName: String): String {
         assertSessionReadyForWrite()
+        assertNameIsSafe(newName)
         val nodeId = documentIdToNodeIdMapper.get()(documentId, CLOUD_DRIVE_ROOT_ID)
             ?: throw FileNotFoundException("Invalid document id: $documentId")
         val parentDocumentId = resolveParentDocumentId(nodeId)
@@ -728,6 +733,19 @@ class CloudDriveDocumentDataProvider @Inject constructor(
         return runCatching {
             withTimeoutOrNull(FOLDER_CREATE_TIMEOUT_MS) { signal.await() }
         }.getOrNull()
+    }
+
+    /**
+     * The SAF caller is an arbitrary app holding a write URI grant, so [name] is untrusted input.
+     * It ends up both in the cloud tree every other client syncs and, for uploads, in the scratch
+     * file name built by [prepareWriteScratchFile], where a separator would escape the cache folder.
+     */
+    private fun assertNameIsSafe(name: String) {
+        try {
+            validateNodeNameCharactersUseCase.get()(name)
+        } catch (e: NodeNameException) {
+            throw FileNotFoundException("Invalid document name").also { it.initCause(e) }
+        }
     }
 
     private fun assertSessionReadyForWrite() {

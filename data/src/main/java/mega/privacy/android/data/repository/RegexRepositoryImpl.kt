@@ -12,9 +12,11 @@ import javax.inject.Inject
 class RegexRepositoryImpl @Inject constructor() : RegexRepository {
     companion object {
         /**
-         * Regex for invalid name pattern
+         * Regex for invalid name pattern: reserved path characters plus C0/DEL control
+         * characters. Control characters matter beyond the local filesystem - a newline in a
+         * node name becomes an extra rule in MEGAsync's .megaignore writer.
          */
-        private const val INVALID_NAME_REGEX = "[*|\\?:\"<>\\\\\\\\/]"
+        private const val INVALID_NAME_REGEX = "[*|\\?:\"<>\\\\\\\\/\\x00-\\x1F\\x7F]"
     }
 
     override val webUrlPattern: Pattern = Patterns.WEB_URL

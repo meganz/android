@@ -45,6 +45,7 @@ import mega.privacy.android.domain.usecase.node.GetNodesByIdInChunkUseCase
 import mega.privacy.android.domain.usecase.node.GetOpenableLocalFileForCloudDriveSafUseCase
 import mega.privacy.android.domain.usecase.node.MonitorNodeUpdatesUseCase
 import mega.privacy.android.domain.usecase.node.RenameNodeUseCase
+import mega.privacy.android.domain.usecase.node.ValidateNodeNameCharactersUseCase
 import mega.privacy.android.domain.usecase.node.hiddennode.MonitorHiddenNodesEnabledUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
 import mega.privacy.android.domain.usecase.transfers.uploads.StartUploadUseCase
@@ -53,8 +54,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -62,11 +66,13 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyBlocking
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.kotlin.wheneverBlocking
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.util.regex.Pattern
 
 /**
  * Unit tests for [CloudDriveDocumentDataProvider].
@@ -99,11 +105,20 @@ class CloudDriveDocumentDataProviderTest {
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
     private val mockedCredentials: UserCredentials = mock()
 
+    // Real instance backed by the production regex: stubbing it would defeat the point of the
+    // hostile-name tests below.
+    private val validateNodeNameCharactersUseCase = ValidateNodeNameCharactersUseCase(
+        mock { on { invalidNamePattern } doReturn Pattern.compile(INVALID_NAME_REGEX) }
+    )
+
     private lateinit var underTest: CloudDriveDocumentDataProvider
 
     private companion object {
         private const val DOCUMENT_ID_PREFIX = "mega_cloud_drive_root"
         private val ROOT_NODE_ID = NodeId(1L)
+
+        // Mirrors RegexRepositoryImpl.INVALID_NAME_REGEX.
+        private const val INVALID_NAME_REGEX = "[*|\\?:\"<>\\\\\\\\/\\x00-\\x1F\\x7F]"
     }
 
     @BeforeEach
@@ -173,6 +188,7 @@ class CloudDriveDocumentDataProviderTest {
             getChildNodeUseCase = lazyOf(getChildNodeUseCase),
             startUploadUseCase = lazyOf(startUploadUseCase),
             getCacheFileUseCase = lazyOf(getCacheFileUseCase),
+            validateNodeNameCharactersUseCase = lazyOf(validateNodeNameCharactersUseCase),
         )
     }
 
@@ -1238,5 +1254,50 @@ class CloudDriveDocumentDataProviderTest {
             }
         }
 
+    @ParameterizedTest(name = "name: {0}")
+    @ValueSource(strings = ["../evil", "a/b", "..", ".", "", "a\\b"])
+    fun `test that renameDocument rejects a hostile name without reaching renameNodeUseCase`(
+        hostileName: String,
+    ) = runTest {
+        assertThrows<FileNotFoundException> {
+            underTest.renameDocument("$DOCUMENT_ID_PREFIX:9999", hostileName)
+        }
+        verifyNoInteractions(renameNodeUseCase)
+    }
+
+    @Test
+    fun `test that renameDocument rejects a name containing a newline`() = runTest {
+        assertThrows<FileNotFoundException> {
+            underTest.renameDocument("$DOCUMENT_ID_PREFIX:9999", "a\nb")
+        }
+        verifyNoInteractions(renameNodeUseCase)
+    }
+
     // endregion renameDocument
+
+    // region hostile names on create
+
+    @ParameterizedTest(name = "name: {0}")
+    @ValueSource(strings = ["../evil", "a/b", "..", ".", "", "a\\b"])
+    fun `test that registerPendingFolder rejects a hostile name before resolving the parent`(
+        hostileName: String,
+    ) = runTest {
+        assertThrows<FileNotFoundException> {
+            underTest.registerPendingFolder("$DOCUMENT_ID_PREFIX:7", hostileName)
+        }
+        verifyNoInteractions(getChildNodeUseCase)
+    }
+
+    @ParameterizedTest(name = "name: {0}")
+    @ValueSource(strings = ["../evil", "a/b", "..", ".", "", "a\\b"])
+    fun `test that registerPendingFile rejects a hostile name before resolving the parent`(
+        hostileName: String,
+    ) = runTest {
+        assertThrows<FileNotFoundException> {
+            underTest.registerPendingFile("$DOCUMENT_ID_PREFIX:7", hostileName, "text/plain")
+        }
+        verifyNoInteractions(getChildNodeUseCase)
+    }
+
+    // endregion hostile names on create
 }
