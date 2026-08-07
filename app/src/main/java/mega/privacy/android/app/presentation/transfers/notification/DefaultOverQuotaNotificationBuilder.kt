@@ -83,7 +83,10 @@ class DefaultOverQuotaNotificationBuilder @Inject constructor(
             setContentText(
                 context.getString(
                     R.string.current_text_depleted_transfer_overquota,
-                    TimeUtils.getHumanizedTime(getBandwidthOverQuotaDelayUseCase().inWholeSeconds)
+                    TimeUtils.getHumanizedTime(
+                        getBandwidthOverQuotaDelayUseCase().inWholeSeconds,
+                        context
+                    )
                 )
             )
             setContentIntent(clickPendingIntent)

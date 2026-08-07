@@ -2,7 +2,6 @@ package mega.privacy.android.app.utils
 
 import android.content.Context
 import android.text.format.DateFormat.getBestDateTimePattern
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING
 import mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING
@@ -555,11 +554,11 @@ object TimeUtils {
      * - If time is lower than a MINUTE, the formatted string will be "Xs".
      *
      * @param time Time in seconds to get the formatted string.
+     * @param context The [Context] used to resolve the localized string resources.
      * @return The humanized format string.
      */
     @JvmStatic
-    fun getHumanizedTime(time: Long): String {
-        val context = MegaApplication.getInstance().applicationContext
+    fun getHumanizedTime(time: Long, context: Context): String {
         if (time <= 0) {
             return context.getString(R.string.label_time_in_seconds, 0)
         }
@@ -600,11 +599,12 @@ object TimeUtils {
      * - If time is lower than a MINUTE, the formatted string will be "Xs".
      *
      * @param time Time in milliseconds to get the formatted string.
+     * @param context The [Context] used to resolve the localized string resources.
      * @return The humanized format string.
      */
     @JvmStatic
-    fun getHumanizedTimeMs(time: Long): String {
-        return getHumanizedTime(TimeUnit.MILLISECONDS.toSeconds(time))
+    fun getHumanizedTimeMs(time: Long, context: Context): String {
+        return getHumanizedTime(TimeUnit.MILLISECONDS.toSeconds(time), context)
     }
 
 }

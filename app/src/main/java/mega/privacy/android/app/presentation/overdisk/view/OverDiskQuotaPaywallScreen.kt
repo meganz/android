@@ -298,6 +298,7 @@ private fun deletionWarningText(deadlineTimestamp: Long): String {
     }
 
     val remainingMs = TimeUnit.SECONDS.toMillis(deadlineTimestamp) - nowMs
+    val context = LocalContext.current
     return when {
         deadlineTimestamp < 0 ->
             stringResource(id = R.string.over_disk_quota_paywall_deletion_warning_no_data)
@@ -307,7 +308,7 @@ private fun deletionWarningText(deadlineTimestamp: Long): String {
 
         else -> stringResource(
             id = R.string.over_disk_quota_paywall_deletion_warning,
-            getHumanizedTimeMs(remainingMs),
+            getHumanizedTimeMs(remainingMs, context),
         )
     }
 }

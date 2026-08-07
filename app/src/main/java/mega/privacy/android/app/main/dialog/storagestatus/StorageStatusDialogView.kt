@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -235,10 +236,11 @@ private fun getDetail(state: StorageStatusDialogState): DialogViewDetail {
     val verticalActionButtonText: String
     val horizontalActionButtonText: String
 
+    val context = LocalContext.current
     val product = state.product
     if (product != null) {
-        storageString = Util.getSizeStringGBBased(product.storage.toLong())
-        transferString = Util.getSizeStringGBBased(product.transfer.toLong())
+        storageString = Util.getSizeStringGBBased(product.storage.toLong(), context)
+        transferString = Util.getSizeStringGBBased(product.transfer.toLong(), context)
     }
 
     when (state.storageState) {

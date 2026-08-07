@@ -68,6 +68,7 @@ internal fun TransferOverQuotaDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     uiState.bandwidthOverQuotaDelay?.let { bandwidthOverQuotaDelay ->
         // Countdown timer state
         var overQuotaDelay: Long by rememberSaveable {
@@ -89,7 +90,7 @@ internal fun TransferOverQuotaDialog(
         TransferOverQuotaDialogContent(
             isLoggedIn = uiState.isLoggedIn,
             isFreeAccount = uiState.isFreeAccount,
-            overQuotaDelay = TimeUtils.getHumanizedTime(overQuotaDelay),
+            overQuotaDelay = TimeUtils.getHumanizedTime(overQuotaDelay, context),
             navigateToUpgradeAccount = navigateToUpgradeAccount,
             navigateToLogin = navigateToLogin,
             onDismiss = onDismiss,

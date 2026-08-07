@@ -44,7 +44,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -385,14 +384,20 @@ object Util {
         return formatFileSize(size, context!!)
     }
 
+    /**
+     * Gets a human readable size string for a size expressed in gigabytes.
+     *
+     * @param gbSize The size in gigabytes.
+     * @param context The [Context] used to resolve the localized string resources.
+     * @return The size string.
+     */
     @JvmStatic
-    fun getSizeStringGBBased(gbSize: Long): String {
+    fun getSizeStringGBBased(gbSize: Long, context: Context): String {
         val sizeString: String
         val decf = DecimalFormat("###.##")
 
         val TB = 1024f
 
-        val context = MegaApplication.getInstance().applicationContext
         sizeString = if (gbSize < TB) {
             context.getString(
                 mega.privacy.android.shared.resources.R.string.label_file_size_gigabytes,
