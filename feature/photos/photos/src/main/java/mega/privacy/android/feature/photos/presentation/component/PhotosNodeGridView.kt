@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,13 +18,13 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -38,7 +37,6 @@ import kotlinx.collections.immutable.persistentListOf
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.components.scrollbar.fastscroll.FastScrollLazyVerticalGrid
-import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
 import mega.android.core.ui.theme.AppTheme
@@ -48,8 +46,10 @@ import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.photos.thumbnail.MediaThumbnailRequest
 import mega.privacy.android.feature.photos.components.ImagePhotosNode
+import mega.privacy.android.feature.photos.components.ShimmerPhotosNode
 import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMenu
 import mega.privacy.android.feature.photos.components.VideoPhotosNode
+import mega.privacy.android.feature.photos.extensions.photosGridDragToSelectGesture
 import mega.privacy.android.feature.photos.model.MediaType
 import mega.privacy.android.feature.photos.model.PhotoNodeUiState
 import mega.privacy.android.feature.photos.model.PhotoUiState
@@ -396,11 +396,47 @@ fun PhotosNodeGridViewV2(
     val isPreview by remember(configuration, gridSize) {
         derivedStateOf { isPreview(configuration, gridSize) }
     }
+    // The gesture keeps the lambdas it captures when the pointer input starts, so they read the
+    // latest data through rememberUpdatedState instead of capturing it directly. Drag-selecting a
+    // cell fires the same onLongClick event as long-pressing it; the live selection makes that
+    // toggle idempotent — cells already in the target state are skipped.
+    val currentItems by rememberUpdatedState(items)
+    val currentSelectedPhotoIds by rememberUpdatedState(selectedPhotoIds)
+    val currentOnLongClick by rememberUpdatedState(onLongClick)
+    val photoIndexByKey by remember {
+        derivedStateOf {
+            buildMap {
+                currentItems.forEachIndexed { index, item ->
+                    if (item.contentType == PhotosNodeContentType.PhotoNode) {
+                        put(item.key, index)
+                    }
+                }
+            }
+        }
+    }
 
     FastScrollLazyVerticalGrid(
         totalItems = items.size,
         columns = GridCells.Fixed(spanCount),
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .photosGridDragToSelectGesture(
+                lazyGridState = lazyGridState,
+                mediaIndexOfKey = { key -> (key as? Long)?.let { photoIndexByKey[it] } },
+                isMediaSelected = { index ->
+                    currentItems.getOrNull(index)
+                        ?.let { it.id in currentSelectedPhotoIds } == true
+                },
+                onDragSelectionChange = { index, selected ->
+                    currentItems.getOrNull(index)
+                        ?.takeIf {
+                            it.contentType == PhotosNodeContentType.PhotoNode &&
+                                    !it.isTakenDown &&
+                                    (it.id in currentSelectedPhotoIds) != selected
+                        }
+                        ?.let { currentOnLongClick(it.id) }
+                },
+            ),
         contentPadding = contentPadding,
         state = lazyGridState,
         tooltipText = { index ->
@@ -575,13 +611,13 @@ internal fun PhotoNodeBodyV2(
     onLongClick: () -> Unit = {},
 ) {
     if (node == null) {
-        // Not loaded yet (revamp lazy pagination) — show a shimmer placeholder.
-        Spacer(
+        // Not loaded yet (revamp lazy pagination) — show a shimmer placeholder. It can already
+        // be selected: drag-to-select marks swept cells before their node arrives.
+        ShimmerPhotosNode(
+            isSelected = isSelected,
             modifier = modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
-                .testTag(PHOTOS_NODE_BODY_SHIMMER_TAG)
-                .shimmerEffect(shape = RoundedCornerShape(0.dp)),
+                .testTag(PHOTOS_NODE_BODY_SHIMMER_TAG),
         )
         return
     }

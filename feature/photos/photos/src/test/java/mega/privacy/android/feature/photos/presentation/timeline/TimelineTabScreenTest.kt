@@ -1,5 +1,7 @@
 package mega.privacy.android.feature.photos.presentation.timeline
 
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -9,8 +11,10 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.common.truth.Truth.assertThat
 import de.palm.composestateevents.triggered
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.analytics.tracker.AnalyticsTracker
@@ -380,6 +384,244 @@ class TimelineTabScreenTest {
             }
         }
     }
+
+    @Test
+    fun `test that drag selection extends over the photo range when dragging after a long press`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf<Long>()
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = (1L..3L).map { photoNode(id = it) },
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    moveBy(Offset(width.toFloat() * 2, 0f))
+                    up()
+                }
+
+            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+        }
+    }
+
+    @Test
+    fun `test that drag selection shrinks when dragging back towards the anchor`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf<Long>()
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = (1L..3L).map { photoNode(id = it) },
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    moveBy(Offset(width.toFloat() * 2, 0f))
+                    moveBy(Offset(-width.toFloat(), 0f))
+                    up()
+                }
+
+            assertThat(selectedIds).containsExactly(1L, 2L)
+        }
+    }
+
+    @Test
+    fun `test that drag selection extends across rows when dragging vertically`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf<Long>()
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = (1L..6L).map { photoNode(id = it) },
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    moveBy(Offset(0f, height.toFloat()))
+                    up()
+                }
+
+            assertThat(selectedIds).containsExactly(1L, 2L, 3L, 4L)
+        }
+    }
+
+    @Test
+    fun `test that a long press without dragging only selects the pressed photo`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf<Long>()
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = (1L..3L).map { photoNode(id = it) },
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    up()
+                }
+
+            assertThat(selectedIds).containsExactly(1L)
+        }
+    }
+
+    @Test
+    fun `test that a photo selected before the drag is deselected when the range retreats over it`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf(2L, 3L)
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = (1L..3L).map { photoNode(id = it) },
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    moveBy(Offset(width.toFloat() * 2, 0f))
+                    moveBy(Offset(-width.toFloat(), 0f))
+                    up()
+                }
+
+            assertThat(selectedIds).containsExactly(1L, 2L)
+        }
+    }
+
+    @Test
+    fun `test that dragging from a selected anchor deselects the swept range`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf(1L, 2L, 3L)
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = (1L..3L).map { photoNode(id = it) },
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    moveBy(Offset(width.toFloat() * 2, 0f))
+                    up()
+                }
+
+            assertThat(selectedIds).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that a deselecting drag restores cells the range retreats from`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf(1L, 2L, 3L)
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = (1L..3L).map { photoNode(id = it) },
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    moveBy(Offset(width.toFloat() * 2, 0f))
+                    moveBy(Offset(-width.toFloat(), 0f))
+                    up()
+                }
+
+            assertThat(selectedIds).containsExactly(3L)
+        }
+    }
+
+    @Test
+    fun `test that taken down photos are excluded from the drag selection`() {
+        composeRuleScope {
+            val selectedIds = mutableStateSetOf<Long>()
+            setScreen(
+                uiState = TimelineTabUiState(
+                    isLoading = false,
+                    displayedPhotos = listOf(
+                        photoNode(id = 1L),
+                        photoNode(id = 2L, isTakenDown = true),
+                        photoNode(id = 3L),
+                    ),
+                ),
+                selectedPhotoIds = selectedIds,
+                onPhotoSelected = { selectedIds.toggle(it) },
+            )
+
+            onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+                .onFirst()
+                .performTouchInput {
+                    down(center)
+                    advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                    moveBy(Offset(width.toFloat() * 2, 0f))
+                    up()
+                }
+
+            assertThat(selectedIds).containsExactly(1L, 3L)
+        }
+    }
+
+    private fun MutableSet<Long>.toggle(id: Long) {
+        if (id in this) remove(id) else add(id)
+    }
+
+    private fun photoNode(
+        id: Long,
+        isTakenDown: Boolean = false,
+    ) = PhotosNodeContentItemV2(
+        key = -id,
+        contentType = PhotosNodeContentType.PhotoNode,
+        id = id,
+        mediaType = MediaType.Image,
+        day = 1,
+        month = 1,
+        year = 1,
+        fullModificationTime = ZonedDateTime.now().toEpochSecond(),
+        thumbnailFilePath = null,
+        previewFilePath = null,
+        extension = "",
+        isFavourite = false,
+        isSensitive = false,
+        isTakenDown = isTakenDown,
+    )
 
     private fun composeRuleScope(block: ComposeContentTestRule.() -> Unit) {
         with(composeRule) {

@@ -25,7 +25,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -59,6 +61,7 @@ import mega.privacy.android.feature.photos.components.TimelineGridSizeSettingsMe
 import mega.privacy.android.feature.photos.extensions.isScrolledToEnd
 import mega.privacy.android.feature.photos.extensions.isScrolledToTop
 import mega.privacy.android.feature.photos.extensions.isScrollingDown
+import mega.privacy.android.feature.photos.extensions.photosGridDragToSelectGesture
 import mega.privacy.android.feature.photos.extensions.photosZoomGestureDetector
 import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
 import mega.privacy.android.feature.photos.model.TimelineGridSize
@@ -378,6 +381,35 @@ private fun TimelineRevampGrid(
         }
     }
 
+    // The drag-to-select gesture keeps the lambdas it captures when the pointer input starts, so
+    // they read the latest data through rememberUpdatedState instead of capturing it directly.
+    // Drag-selecting a cell fires the same onNodeSelected event as long-pressing it; the live
+    // selection makes that toggle idempotent — cells already in the target state are skipped.
+    val currentOffsetByGroupId by rememberUpdatedState(offsetByGroupId)
+    val currentLoadedNodes by rememberUpdatedState(loadedNodes)
+    val currentSelectedPhotoIds by rememberUpdatedState(selectedPhotoIds)
+    val currentOnNodeSelected by rememberUpdatedState(onNodeSelected)
+
+    // Cells swept while their node is still loading lazily cannot fire onNodeSelected yet; they
+    // are parked here (as snapshot state, so their shimmer placeholders render as selected) and
+    // selected once the node arrives.
+    val pendingDragSelection = remember { mutableStateSetOf<Int>() }
+
+    LaunchedEffect(loadedNodes) {
+        val iterator = pendingDragSelection.iterator()
+        while (iterator.hasNext()) {
+            val node = loadedNodes[iterator.next()] ?: continue
+            iterator.remove()
+            node.takeUnless { it.isTakenDown }
+                ?.takeIf { it.id !in selectedPhotoIds }
+                ?.let(onNodeSelected)
+        }
+    }
+
+    LaunchedEffect(selectedPhotoIds.isEmpty()) {
+        if (selectedPhotoIds.isEmpty()) pendingDragSelection.clear()
+    }
+
     NotifyVisibleMediaRange(
         gridState = lazyGridState,
         offsetByGroupId = offsetByGroupId,
@@ -437,6 +469,31 @@ private fun TimelineRevampGrid(
                     onZoomIn = onZoomIn,
                     onZoomOut = onZoomOut,
                 )
+                .photosGridDragToSelectGesture(
+                    lazyGridState = lazyGridState,
+                    mediaIndexOfKey = { key ->
+                        globalMediaIndexOf(key, currentOffsetByGroupId)
+                    },
+                    isMediaSelected = { index ->
+                        currentLoadedNodes[index]
+                            ?.let { it.id in currentSelectedPhotoIds } == true
+                    },
+                    onDragSelectionChange = { index, selected ->
+                        val node = currentLoadedNodes[index]
+                        if (node == null) {
+                            if (selected) {
+                                pendingDragSelection.add(index)
+                            } else {
+                                pendingDragSelection.remove(index)
+                            }
+                        } else {
+                            if (!selected) pendingDragSelection.remove(index)
+                            node.takeUnless { it.isTakenDown }
+                                ?.takeIf { (it.id in currentSelectedPhotoIds) != selected }
+                                ?.let { currentOnNodeSelected(it) }
+                        }
+                    },
+                )
                 .testTag(TIMELINE_REVAMP_CONTENT_GRID_TAG),
             state = lazyGridState,
             totalItems = totalGridItems,
@@ -494,7 +551,11 @@ private fun TimelineRevampGrid(
                         modifier = Modifier
                             .animateItem()
                             .padding(all = 1.dp),
-                        isSelected = node != null && node.id in selectedPhotoIds,
+                        isSelected = if (node != null) {
+                            node.id in selectedPhotoIds
+                        } else {
+                            base + index in pendingDragSelection
+                        },
                         shouldShowFavourite = node?.isFavourite == true,
                         isHiddenNodesEnabled = isHiddenNodesEnabled,
                         onClick = { onNodeClicked(node) },

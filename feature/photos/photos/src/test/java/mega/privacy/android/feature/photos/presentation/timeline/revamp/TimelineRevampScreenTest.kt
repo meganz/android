@@ -1,14 +1,29 @@
 package mega.privacy.android.feature.photos.presentation.timeline.revamp
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.test.assertAll
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.media.MediaTimelineSection
+import mega.privacy.android.feature.photos.model.MediaType
+import mega.privacy.android.feature.photos.model.PhotosNodeContentItemV2
+import mega.privacy.android.feature.photos.model.PhotosNodeContentType
 import mega.privacy.android.feature.photos.presentation.MediaCameraUploadUiState
+import mega.privacy.android.feature.photos.presentation.component.PHOTOS_NODE_BODY_IMAGE_NODE_TAG
+import mega.privacy.android.feature.photos.presentation.component.PHOTOS_NODE_BODY_SHIMMER_TAG
 import mega.privacy.android.feature.photos.presentation.timeline.model.MediaTimePeriod
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCard
 import mega.privacy.android.feature.photos.presentation.timeline.model.PhotosNodeListCardPeriod
@@ -196,10 +211,119 @@ class TimelineRevampScreenTest {
         composeRule.onAllNodesWithTag("${TIMELINE_REVAMP_SECTION_HEADER_TAG}2026-5").assertCountEquals(1)
     }
 
-    private fun ComposeContentTestRule.setScreen(uiState: TimelineRevampUiState) {
+    @Test
+    fun `test that drag selection extends over the media range when dragging after a long press`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        composeRule.setScreen(
+            TimelineRevampUiState.Data(
+                sections = listOf(
+                    MediaTimelineSection(
+                        groupId = "2026-06-15",
+                        startDate = 1_781_481_600L,
+                        endDate = 1_781_481_600L,
+                        count = 3,
+                    ),
+                ),
+                sectionStartOffsets = listOf(0),
+                loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
+            ),
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { node ->
+                if (node.id in selectedIds) selectedIds.remove(node.id) else selectedIds.add(node.id)
+            },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat() * 2, 0f))
+                up()
+            }
+
+        assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+    }
+
+    @Test
+    fun `test that swept cells are selected once their nodes are lazily loaded`() {
+        val selectedIds = mutableStateSetOf<Long>()
+        val initialState = TimelineRevampUiState.Data(
+            sections = listOf(
+                MediaTimelineSection(
+                    groupId = "2026-06-15",
+                    startDate = 1_781_481_600L,
+                    endDate = 1_781_481_600L,
+                    count = 3,
+                ),
+            ),
+            sectionStartOffsets = listOf(0),
+            loadedNodes = mapOf(0 to photoNode(id = 1L)),
+        )
+        var uiState by mutableStateOf(initialState)
+        composeRule.setScreenContent(
+            uiState = { uiState },
+            selectedPhotoIds = selectedIds,
+            onNodeSelected = { node ->
+                if (node.id in selectedIds) selectedIds.remove(node.id) else selectedIds.add(node.id)
+            },
+        )
+
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_IMAGE_NODE_TAG)
+            .onFirst()
+            .performTouchInput {
+                down(center)
+                advanceEventTime(viewConfiguration.longPressTimeoutMillis + 100)
+                moveBy(Offset(width.toFloat() * 2, 0f))
+                up()
+            }
+
+        composeRule.runOnIdle {
+            assertThat(selectedIds).containsExactly(1L)
+        }
+        composeRule.onAllNodesWithTag(PHOTOS_NODE_BODY_SHIMMER_TAG).assertAll(isSelected())
+
+        composeRule.runOnIdle {
+            uiState = initialState.copy(
+                loadedNodes = (0..2).associateWith { index -> photoNode(id = index + 1L) },
+            )
+        }
+
+        composeRule.runOnIdle {
+            assertThat(selectedIds).containsExactly(1L, 2L, 3L)
+        }
+    }
+
+    private fun photoNode(id: Long) = PhotosNodeContentItemV2(
+        key = id,
+        contentType = PhotosNodeContentType.PhotoNode,
+        id = id,
+        mediaType = MediaType.Image,
+        day = 15,
+        month = 6,
+        year = 2026,
+        fullModificationTime = 1_781_481_600L,
+        thumbnailFilePath = null,
+        previewFilePath = null,
+        extension = "",
+        isFavourite = false,
+        isSensitive = false,
+    )
+
+    private fun ComposeContentTestRule.setScreen(
+        uiState: TimelineRevampUiState,
+        selectedPhotoIds: Set<Long> = emptySet(),
+        onNodeSelected: (PhotosNodeContentItemV2) -> Unit = {},
+    ) = setScreenContent({ uiState }, selectedPhotoIds, onNodeSelected)
+
+    private fun ComposeContentTestRule.setScreenContent(
+        uiState: () -> TimelineRevampUiState,
+        selectedPhotoIds: Set<Long> = emptySet(),
+        onNodeSelected: (PhotosNodeContentItemV2) -> Unit = {},
+    ) {
         setContent {
             TimelineRevampScreen(
-                uiState = uiState,
+                uiState = uiState(),
                 mediaCameraUploadUiState = MediaCameraUploadUiState(),
                 showEnableCameraUploadsPage = false,
                 onVisibleRangeChanged = { _, _ -> },
@@ -208,9 +332,9 @@ class TimelineRevampScreenTest {
                 onZoomOut = {},
                 onMediaTimePeriodSelected = {},
                 onNodeClicked = {},
-                onNodeSelected = {},
+                onNodeSelected = onNodeSelected,
                 onScrollingChanged = {},
-                selectedPhotoIds = emptySet(),
+                selectedPhotoIds = selectedPhotoIds,
                 onTakenDownDialogEventConsumed = {},
                 clearCameraUploadsCompletedMessage = {},
                 onNavigateToCameraUploadsSettings = {},

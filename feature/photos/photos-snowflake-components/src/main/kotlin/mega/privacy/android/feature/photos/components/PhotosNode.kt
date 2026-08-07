@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,6 +26,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,6 +39,7 @@ import coil3.request.crossfade
 import mega.android.core.ui.components.MegaText
 import mega.android.core.ui.components.image.MegaIcon
 import mega.android.core.ui.modifiers.conditional
+import mega.android.core.ui.modifiers.shimmerEffect
 import mega.android.core.ui.preview.BooleanProvider
 import mega.android.core.ui.preview.CombinedThemePreviews
 import mega.android.core.ui.theme.AndroidThemeForPreviews
@@ -120,6 +124,54 @@ fun VideoPhotosNode(
                 text = duration,
                 style = MaterialTheme.typography.labelSmall,
                 textColor = TextColor.OnColor
+            )
+        }
+    }
+}
+
+/**
+ * Placeholder for a photo cell whose node is still loading. It can already be selected — the
+ * timeline's drag-to-select gesture marks swept cells before their node arrives — in which case
+ * it mirrors the selected treatment of a loaded cell.
+ */
+@Composable
+fun ShimmerPhotosNode(
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .aspectRatio(1f)
+            .semantics { selected = isSelected }
+            .conditional(isSelected) {
+                Modifier
+                    .border(
+                        width = 2.dp,
+                        color = DSTokens.colors.border.strongSelected,
+                        shape = RoundedCornerShape(4.dp)
+                    )
+                    .clip(RoundedCornerShape(4.dp))
+            }
+    ) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxSize()
+                .shimmerEffect(shape = RoundedCornerShape(0.dp)),
+        )
+
+        if (isSelected) {
+            MegaIcon(
+                modifier = Modifier
+                    .padding(top = 4.dp, start = 4.dp)
+                    .background(
+                        color = DSTokens.colors.background.surfaceTransparent,
+                        shape = RoundedCornerShape(2.dp)
+                    )
+                    .padding(2.dp)
+                    .align(Alignment.TopStart),
+                painter = rememberVectorPainter(IconPack.Small.Thin.Outline.Check),
+                contentDescription = "check icon",
+                tint = IconColor.OnColor,
             )
         }
     }
@@ -299,6 +351,19 @@ private fun BasicPhotosNodePreview(
             isSensitive = false,
             isSelected = isTrue,
             shouldShowFavourite = isTrue
+        )
+    }
+}
+
+@CombinedThemePreviews
+@Composable
+private fun ShimmerPhotosNodePreview(
+    @PreviewParameter(BooleanProvider::class) isTrue: Boolean,
+) {
+    AndroidThemeForPreviews {
+        ShimmerPhotosNode(
+            modifier = Modifier.size(137.dp),
+            isSelected = isTrue,
         )
     }
 }
