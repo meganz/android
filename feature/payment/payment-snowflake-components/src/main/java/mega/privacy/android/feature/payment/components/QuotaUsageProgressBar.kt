@@ -16,7 +16,8 @@ import mega.android.core.ui.theme.values.SupportColor
 
 /**
  * Determinate usage bar used on the quota-warning upsell cards. Colours the bar by [level]
- * (green when healthy, amber when approaching the limit, red when over).
+ * (green when healthy, amber when approaching the limit, red when over), except that a bar
+ * filled to 100% always shows as an error.
  *
  * @param percentage usage as a 0..100 value; coerced into range
  * @param level determines the bar colour
@@ -27,7 +28,7 @@ fun QuotaUsageProgressBar(
     level: QuotaUsageLevel,
     modifier: Modifier = Modifier,
 ) {
-    val supportColor = when (level) {
+    val supportColor = when (level.escalateIfFull(percentage)) {
         QuotaUsageLevel.Normal -> SupportColor.Success
         QuotaUsageLevel.Warning -> SupportColor.Warning
         QuotaUsageLevel.Error -> SupportColor.Error
@@ -41,6 +42,13 @@ fun QuotaUsageProgressBar(
         surfaceColor = SurfaceColor.Surface3,
     )
 }
+
+/**
+ * The backend quota state can still report a warning once usage has actually reached the limit,
+ * so a completely filled bar is always shown as an error.
+ */
+internal fun QuotaUsageLevel.escalateIfFull(percentage: Float): QuotaUsageLevel =
+    if (percentage >= 100f) QuotaUsageLevel.Error else this
 
 /**
  * Severity level of a quota usage bar, driving its colour.
