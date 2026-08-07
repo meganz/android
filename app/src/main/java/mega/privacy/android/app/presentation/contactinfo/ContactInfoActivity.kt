@@ -696,6 +696,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             )
         }
         CallUtil.setCallMenuItem(
+            this,
             returnCallMenuItem,
             layoutCallMenuItem,
             rootViewBinding.chronoMenu

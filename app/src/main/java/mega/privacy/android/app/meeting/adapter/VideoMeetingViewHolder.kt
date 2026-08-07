@@ -71,7 +71,7 @@ class VideoMeetingViewHolder(
         if (isGrid) {
             avatarSize = BIG_AVATAR
 
-            if (Util.getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
+            if (Util.getCurrentOrientation(itemView.context) == Configuration.ORIENTATION_PORTRAIT) {
                 portraitLayout(isFirstPage, itemCount)
             } else {
                 landscapeLayout(isFirstPage, itemCount)

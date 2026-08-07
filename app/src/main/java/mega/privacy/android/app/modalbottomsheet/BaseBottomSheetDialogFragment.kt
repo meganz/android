@@ -63,23 +63,27 @@ import javax.inject.Inject
  * @property savedState         State of the sheet to restore it after screen's rotations.
  */
 @AndroidEntryPoint
-open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), ActivityLauncher {
+abstract class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), ActivityLauncher {
 
     companion object {
         private const val HEIGHT_SEPARATOR = 1F
         private const val STATE = "STATE"
     }
 
+    /** MEGA SDK API, available to subclasses. */
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    /** MEGA Chat SDK API, available to subclasses. */
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
 
+    /** Legacy database handler, available to subclasses. */
     @Inject
     lateinit var dbH: LegacyDatabaseHandler
 
+    /** Navigator for launching app destinations from subclasses. */
     @Inject
     lateinit var megaNavigator: MegaNavigator
 
@@ -93,6 +97,14 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     private val maxHeight by lazy { getRealHeight() }
     private var statusBarColor: Int = 0
 
+    /**
+     * Captures the current status bar colour, restores any saved sheet state and applies the
+     * bottom sheet behaviour once the view is laid out.
+     *
+     * @param view                  The created view.
+     * @param savedInstanceState    State from which the sheet state is restored, if any.
+     */
+    @Suppress("DEPRECATION")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         statusBarColor = dialog?.window?.statusBarColor ?: android.R.color.transparent
@@ -100,11 +112,19 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         view.post { setBottomSheetBehavior() }
     }
 
+    /**
+     * Persists the current bottom sheet state so it can be restored after configuration changes.
+     *
+     * @param outState  Bundle in which the sheet state is stored.
+     */
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(STATE, BottomSheetBehavior.from(contentView.parent as View).state)
         super.onSaveInstanceState(outState)
     }
 
+    /**
+     * Forces the sheet to start half-expanded and to match the parent width.
+     */
     override fun onStart() {
         super.onStart()
 
@@ -116,6 +136,10 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
             }
     }
 
+    /**
+     * Constrains the sheet width in landscape and keeps the navigation bar buttons visible in
+     * light mode.
+     */
     override fun onResume() {
         super.onResume()
 
@@ -164,10 +188,18 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     /**
      * Sets the initial state of a BottomSheet and its state.
      */
+    @Suppress("DEPRECATION")
     private fun setBottomSheetBehavior() {
         calculatePeekHeight()
         BottomSheetBehavior.from(contentView.parent as View).apply {
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                /**
+                 * Dismisses the sheet when hidden and updates the status bar colour to match the
+                 * expanded or collapsed state.
+                 *
+                 * @param bottomSheet   The bottom sheet view.
+                 * @param newState      The new [BottomSheetBehavior] state.
+                 */
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     when (newState) {
                         BottomSheetBehavior.STATE_HIDDEN -> {
@@ -206,6 +238,12 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
                     }
                 }
 
+                /**
+                 * No-op; slide events are not handled.
+                 *
+                 * @param bottomSheet   The bottom sheet view.
+                 * @param slideOffset   The new slide offset.
+                 */
                 override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 }
             })
@@ -218,11 +256,6 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
     protected fun setStateBottomSheetBehaviorHidden() {
         BottomSheetBehavior.from(contentView.parent as View).state =
             BottomSheetBehavior.STATE_HIDDEN
-    }
-
-    protected fun setStateBottomSheetBehaviorExtended() {
-        BottomSheetBehavior.from(contentView.parent as View).state =
-            BottomSheetBehavior.STATE_EXPANDED
     }
 
     /**
@@ -260,19 +293,19 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         val heightSeparator by lazy { dp2px(HEIGHT_SEPARATOR) }
 
         val childCount = when (itemsLayout) {
+            is RadioGroup -> (itemsLayout as RadioGroup).childCount
             is LinearLayout -> (itemsLayout as LinearLayout).childCount
             is RelativeLayout -> (itemsLayout as RelativeLayout).childCount
             is ConstraintLayout -> (itemsLayout as ConstraintLayout).childCount
-            is RadioGroup -> (itemsLayout as RadioGroup).childCount
             else -> 0
         }
 
         for (i in 0 until childCount) {
             val v: View = when (itemsLayout) {
+                is RadioGroup -> (itemsLayout as RadioGroup).getChildAt(i)
                 is LinearLayout -> (itemsLayout as LinearLayout).getChildAt(i)
                 is RelativeLayout -> (itemsLayout as RelativeLayout).getChildAt(i)
                 is ConstraintLayout -> (itemsLayout as ConstraintLayout).getChildAt(i)
-                is RadioGroup -> (itemsLayout as RadioGroup).getChildAt(i)
                 else -> continue
             }
 
@@ -302,8 +335,9 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
      *
      * @return The real height of the screen.
      */
-    private fun getRealHeight(): Int =
-        when {
+    private fun getRealHeight(): Int {
+        if (!isAdded) return 0
+        return when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
                 val metrics = requireActivity().windowManager.currentWindowMetrics
                 val insets = metrics.windowInsets.getInsets(WindowInsets.Type.systemBars())
@@ -321,10 +355,13 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
 
                     getRealScreenSize().y - insets.bottom - insets.top
                 } else {
-                    getRealScreenSize().y - getStatusBarHeight() - getNavigationBarHeight()
+                    getRealScreenSize().y - getStatusBarHeight(requireContext()) - getNavigationBarHeight(
+                        requireContext()
+                    )
                 }
             }
         }
+    }
 
     /**
      * Gets the real size of the screen.
@@ -339,14 +376,23 @@ open class BaseBottomSheetDialogFragment : BottomSheetDialogFragment(), Activity
         return size
     }
 
+    /**
+     * Launches an activity for the given [intent].
+     *
+     * @param intent    The intent to launch.
+     */
     override fun launchActivity(intent: Intent) {
         startActivity(intent)
     }
 
-    @Suppress("deprecation")
+    /**
+     * Launches an activity for the given [intent], expecting a result.
+     *
+     * @param intent        The intent to launch.
+     * @param requestCode   The request code to identify the result.
+     */
+    @Suppress("DEPRECATION")
     override fun launchActivityForResult(intent: Intent, requestCode: Int) {
         startActivityForResult(intent, requestCode)
     }
-
-    protected open fun shouldSetStatusBarColor(): Boolean = true
 }

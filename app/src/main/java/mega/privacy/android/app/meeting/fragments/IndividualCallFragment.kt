@@ -584,7 +584,7 @@ class IndividualCallFragment : MeetingBaseFragment() {
         }
 
         val params = rootLayout.layoutParams
-        if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
+        if (getCurrentOrientation(requireContext()) == Configuration.ORIENTATION_PORTRAIT) {
             params.width = Util.dp2px(88f, resources.displayMetrics)
             params.height = Util.dp2px(120f, resources.displayMetrics)
         } else {

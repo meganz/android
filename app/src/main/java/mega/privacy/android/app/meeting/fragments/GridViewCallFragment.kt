@@ -65,6 +65,7 @@ class GridViewCallFragment : MeetingBaseFragment() {
 
         adapterPager = GridViewPagerAdapter(
             viewPagerData,
+            requireContext(),
             (parentFragment as InMeetingFragment).inMeetingViewModel,
             maxWidth,
             maxHeight,

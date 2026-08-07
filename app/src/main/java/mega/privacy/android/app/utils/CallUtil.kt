@@ -462,12 +462,12 @@ object CallUtil {
     }
 
     private fun createCallMenuItem(
+        context: Context,
         call: MegaChatCall,
         returnCallMenuItem: MenuItem,
         layoutCallMenuItem: LinearLayout,
         chronometerMenuItem: Chronometer?,
     ) {
-        val context = MegaApplication.getInstance().baseContext
         val callStatus = call.status
         layoutCallMenuItem.background =
             ContextCompat.getDrawable(context, R.drawable.dark_rounded_chat_own_message)
@@ -494,21 +494,23 @@ object CallUtil {
      * This method shows or hides the toolbar icon to return a call when a call is in progress
      * and it is in Cloud Drive section, Recents section, Incoming section, Outgoing section or in the chats list.
      *
+     * @param context             Context used to resolve drawables and screen orientation.
      * @param returnCallMenuItem  The MenuItem.
      * @param layoutCallMenuItem  The layout of MenuItem.
      * @param chronometerMenuItem The chronometer.
      */
     @JvmStatic
     fun setCallMenuItem(
+        context: Context,
         returnCallMenuItem: MenuItem,
         layoutCallMenuItem: LinearLayout,
         chronometerMenuItem: Chronometer?,
     ) {
-        val context = MegaApplication.getInstance().baseContext
         if (!isScreenInPortrait(context) && participatingInACall()) {
             val currentCall = getCallInProgress()
             if (currentCall != null) {
                 createCallMenuItem(
+                    context,
                     currentCall,
                     returnCallMenuItem,
                     layoutCallMenuItem,
@@ -523,6 +525,7 @@ object CallUtil {
                     val call = MegaApplication.getInstance().megaChatApi.getChatCall(chatId)
                     if (call != null && call.isOnHold) {
                         createCallMenuItem(
+                            context,
                             call,
                             returnCallMenuItem,
                             layoutCallMenuItem,
@@ -1004,7 +1007,7 @@ object CallUtil {
     @JvmStatic
     fun checkCameraPermission(activity: Activity?): Boolean {
         val hasCameraPermission = hasPermissions(
-            MegaApplication.getInstance().baseContext,
+            activity?.applicationContext,
             Manifest.permission.CAMERA,
         )
         if (!hasCameraPermission) {
@@ -1026,7 +1029,7 @@ object CallUtil {
     @JvmStatic
     fun checkAudioPermission(activity: Activity?): Boolean {
         val hasRecordAudioPermission = hasPermissions(
-            MegaApplication.getInstance().baseContext,
+            activity?.applicationContext,
             Manifest.permission.RECORD_AUDIO,
         )
         if (!hasRecordAudioPermission) {

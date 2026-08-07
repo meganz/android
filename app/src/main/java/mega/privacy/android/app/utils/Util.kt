@@ -629,32 +629,34 @@ object Util {
     /**
      * Gets the status bar height if available.
      *
+     * @param context Context used to resolve the system bar dimension.
      * @return The status bar height if available.
      */
     @JvmStatic
-    fun getStatusBarHeight(): Int {
-        return getSystemBarHeight("status_bar_height")
+    fun getStatusBarHeight(context: Context): Int {
+        return getSystemBarHeight(context, "status_bar_height")
     }
 
     /**
      * Gets the navigation bar height if available.
      *
+     * @param context Context used to resolve the system bar dimension.
      * @return The status bar height if available.
      */
     @JvmStatic
-    fun getNavigationBarHeight(): Int {
-        return getSystemBarHeight("navigation_bar_height")
+    fun getNavigationBarHeight(context: Context): Int {
+        return getSystemBarHeight(context, "navigation_bar_height")
     }
 
     /**
      * Gets a system bar height if available.
      *
+     * @param context Context used to resolve the system bar dimension.
      * @param systemBarName The system bar name.
      * @return The system bar height if available.
      */
     @JvmStatic
-    fun getSystemBarHeight(systemBarName: String): Int {
-        val context = MegaApplication.getInstance().baseContext
+    fun getSystemBarHeight(context: Context, systemBarName: String): Int {
         val resourceId = context.resources.getIdentifier(
             systemBarName, "dimen",
             "android"
@@ -861,7 +863,7 @@ object Util {
         handler.postDelayed({
             // The view needs to request the focus or the keyboard may not pops up
             if (view.requestFocus()) {
-                val imm = MegaApplication.getInstance().applicationContext
+                val imm = view.context.applicationContext
                     .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
             }
@@ -1063,10 +1065,11 @@ object Util {
     /**
      * Method to know the current orientation of the device
      *
+     * @param context Context used to read the device configuration.
      * @return current orientation of the device
      */
     @JvmStatic
-    fun getCurrentOrientation(): Int {
-        return MegaApplication.getInstance().applicationContext.resources.configuration.orientation
+    fun getCurrentOrientation(context: Context): Int {
+        return context.resources.configuration.orientation
     }
 }

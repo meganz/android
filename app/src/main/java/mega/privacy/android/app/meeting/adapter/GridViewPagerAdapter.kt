@@ -1,6 +1,7 @@
 package mega.privacy.android.app.meeting.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ import timber.log.Timber
 
 class GridViewPagerAdapter(
     var data: List<List<Participant>>,
+    private val context: Context,
     private val inMeetingViewModel: InMeetingViewModel,
     private var maxWidth: Int,
     private var maxHeight: Int,
@@ -605,7 +607,7 @@ class GridViewPagerAdapter(
         gridView: CustomizedGridCallRecyclerView,
         size: Int,
     ) {
-        if (getCurrentOrientation() == Configuration.ORIENTATION_PORTRAIT) {
+        if (getCurrentOrientation(context) == Configuration.ORIENTATION_PORTRAIT) {
             if (position == 0) {
                 gridView.setColumnWidth(
                     when (size) {
@@ -650,7 +652,7 @@ class GridViewPagerAdapter(
      * Determine if current orientation is landscape
      */
     fun isLandscape() =
-        getCurrentOrientation() == Configuration.ORIENTATION_LANDSCAPE
+        getCurrentOrientation(context) == Configuration.ORIENTATION_LANDSCAPE
 
     companion object {
         private const val PARTICIPANTS_PER_PAGE = 6

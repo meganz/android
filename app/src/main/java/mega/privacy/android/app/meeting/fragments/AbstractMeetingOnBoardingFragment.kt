@@ -158,7 +158,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setProfileAvatar()
         setMarginTopOfMeetingName(
-            Util.getStatusBarHeight() + ChatUtil.getActionBarHeight(
+            Util.getStatusBarHeight(requireContext()) + ChatUtil.getActionBarHeight(
                 activity, activity?.resources
             ) + Util.dp2px(MEETING_NAME_MARGIN_TOP)
         )

@@ -50,9 +50,10 @@ import mega.privacy.android.app.presentation.settings.customisenavigation.model.
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.MaxSelectableNavigationItems
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.MinSelectableNavigationItems
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.NavigationItemUiModel
-import mega.privacy.android.app.presentation.settings.customisenavigation.model.PendingSelectionUpdate
+import mega.privacy.android.app.presentation.settings.customisenavigation.model.NavigationSelectionError
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.addNavigationItem
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.moveNavigationItem
+import mega.privacy.android.app.presentation.settings.customisenavigation.model.navigationSelectionError
 import mega.privacy.android.app.presentation.settings.customisenavigation.model.removeNavigationItem
 import mega.privacy.android.icon.pack.IconPack
 import mega.privacy.android.shared.resources.R as sharedR
@@ -136,16 +137,18 @@ private fun CustomiseNavigationContent(
         MinSelectableNavigationItems,
     )
 
-    fun applyUpdate(update: PendingSelectionUpdate) {
-        when (update) {
-            is PendingSelectionUpdate.Applied -> pendingIds = update.orderedIds
-            PendingSelectionUpdate.MaxItemsReached -> coroutineScope.launch {
+    fun onSaveClicked() {
+        Analytics.tracker.trackEvent(CustomiseNavigationSaveButtonPressedEvent)
+        when (pendingIds.navigationSelectionError()) {
+            NavigationSelectionError.TooFewItems -> coroutineScope.launch {
+                snackbarHostState?.showAutoDurationSnackbar(minItemsMessage)
+            }
+
+            NavigationSelectionError.TooManyItems -> coroutineScope.launch {
                 snackbarHostState?.showAutoDurationSnackbar(maxItemsMessage)
             }
 
-            PendingSelectionUpdate.MinItemsRequired -> coroutineScope.launch {
-                snackbarHostState?.showAutoDurationSnackbar(minItemsMessage)
-            }
+            null -> onSave(pendingIds)
         }
     }
 
@@ -166,7 +169,7 @@ private fun CustomiseNavigationContent(
                 items = pendingItems,
                 menuItem = data.menuItem,
                 onMove = { from, to -> pendingIds = pendingIds.moveNavigationItem(from, to) },
-                onItemDisabled = { id -> applyUpdate(pendingIds.removeNavigationItem(id)) },
+                onItemDisabled = { id -> pendingIds = pendingIds.removeNavigationItem(id) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -174,7 +177,7 @@ private fun CustomiseNavigationContent(
             if (availableItems.isNotEmpty()) {
                 AvailableToAddCard(
                     items = availableItems,
-                    onItemEnabled = { id -> applyUpdate(pendingIds.addNavigationItem(id)) },
+                    onItemEnabled = { id -> pendingIds = pendingIds.addNavigationItem(id) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
@@ -188,10 +191,7 @@ private fun CustomiseNavigationContent(
                 .testTag(CustomiseNavigationScreenTestTags.SAVE_BUTTON),
             text = stringResource(sharedR.string.general_action_save),
             enabled = pendingIds != baseIds,
-            onClick = {
-                Analytics.tracker.trackEvent(CustomiseNavigationSaveButtonPressedEvent)
-                onSave(pendingIds)
-            },
+            onClick = ::onSaveClicked,
         )
         TextOnlyButton(
             modifier = Modifier
@@ -272,6 +272,8 @@ private fun YourNavigationCard(
         Column {
             val selectedCount = items.size + 1
             val maxCount = MaxSelectableNavigationItems + 1
+            val isSelectionInvalid = items.size < MinSelectableNavigationItems ||
+                    items.size > MaxSelectableNavigationItems
             CardHeader(
                 title = stringResource(sharedR.string.settings_customise_navigation_your_navigation),
             ) {
@@ -282,7 +284,7 @@ private fun YourNavigationCard(
                         selectedCount,
                         maxCount,
                     ),
-                    textColor = if (selectedCount == maxCount) {
+                    textColor = if (isSelectionInvalid) {
                         TextColor.Error
                     } else {
                         TextColor.Secondary
@@ -387,9 +389,11 @@ private fun NavigationItemRow(
         leadingElement = if (showDragHandle) {
             {
                 MegaIcon(
-                    imageVector = IconPack.Medium.Thin.Outline.Menu04,
+                    imageVector = IconPack.Small.Thin.Outline.QueueLine,
                     tint = if (isEnabled) IconColor.Secondary else IconColor.Disabled,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .size(24.dp),
                 )
             }
         } else {
