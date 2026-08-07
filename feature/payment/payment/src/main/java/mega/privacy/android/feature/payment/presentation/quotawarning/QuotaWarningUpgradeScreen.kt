@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -188,12 +187,13 @@ private fun QuotaWarningUpgradeContent(
 ) {
     val hasError = !isConnected || hasLoadError
     MegaScaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .safeDrawingPadding()
+            .fillMaxSize(),
         topBar = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .statusBarsPadding()
                     .height(56.dp)
                     .padding(horizontal = 16.dp),
             ) {
@@ -467,11 +467,7 @@ private fun QuotaWarningBottomBar(
             )
         }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .navigationBarsPadding()
-    ) {
+    Box(modifier = Modifier.fillMaxWidth()) {
         AnchoredButtonGroup(
             modifier = Modifier
                 .widthIn(max = CONTENT_MAX_WIDTH.dp)
