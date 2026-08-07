@@ -98,6 +98,7 @@ replay_pid*
 /.claude/temp
 /.claude/skills/ht-*/
 /.claude/skills/release-checklist/local-constants.md
+/.claude/skills/**/__pycache__/
 ./review.md
 review.md
 .trees
