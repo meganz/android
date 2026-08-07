@@ -48,22 +48,9 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
     }
 
     @Test
-    fun `test that non-file collisions are ignored`() = runTest {
-        val nodeNameCollision = NodeNameCollisionResult(
-            nameCollision = NodeNameCollision.Default(
-                collisionHandle = 1L,
-                nodeHandle = 2L,
-                name = "test",
-                size = 100L,
-                childFolderCount = 0,
-                childFileCount = 0,
-                lastModified = 0L,
-                parentHandle = 0L,
-                isFile = false,
-                type = NodeNameCollisionType.COPY,
-                renameName = null
-            ),
-        )
+    fun `test that collisions without rename name are ignored`() = runTest {
+        val nodeNameCollision = nodeNameCollisionResult(renameName = null)
+
         val result = underTest(
             listOf(nodeNameCollision),
             emptyList(),
@@ -77,22 +64,9 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
     @Test
     fun `test that collisions rename names are updated when expected rename name already exists`() =
         runTest {
-            val nodeNameCollision = NodeNameCollisionResult(
-                nameCollision = NodeNameCollision.Default(
-                    collisionHandle = 1L,
-                    nodeHandle = 2L,
-                    name = "test",
-                    size = 100L,
-                    childFolderCount = 0,
-                    childFileCount = 0,
-                    lastModified = 0L,
-                    parentHandle = 0L,
-                    isFile = true,
-                    type = NodeNameCollisionType.COPY,
-                    renameName = "test (1)"
-                ),
-            )
+            val nodeNameCollision = nodeNameCollisionResult(renameName = "test (1)")
             whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("test (1)")
+
             val result = underTest(
                 listOf(nodeNameCollision),
                 listOf("test (1)"),
@@ -104,23 +78,44 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
         }
 
     @Test
+    fun `test that rename names are unique when multiple file and folder collisions are provided`() =
+        runTest {
+            val nodeNameCollisions = listOf(
+                nodeNameCollisionResult(
+                    renameName = "test (1)",
+                    isFile = true,
+                    nodeHandle = 2L,
+                ),
+                nodeNameCollisionResult(
+                    renameName = "test (1)",
+                    isFile = false,
+                    nodeHandle = 3L,
+                ),
+                nodeNameCollisionResult(
+                    renameName = "test (1)",
+                    isFile = false,
+                    nodeHandle = 4L,
+                ),
+            )
+            whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("test (1)")
+
+            val result = underTest(
+                nodeNameCollisions,
+                listOf("test (1)"),
+                true
+            )
+
+            assertThat(result.first.map { it.nameCollision.renameName })
+                .containsExactly("test (2)", "test (3)", "test (4)")
+            assertThat(result.second)
+                .containsExactly("test (1)", "test (2)", "test (3)", "test (4)")
+        }
+
+    @Test
     fun `test that new rename name is added to the list when applyOnNext is true`() = runTest {
-        val nodeNameCollision = NodeNameCollisionResult(
-            nameCollision = NodeNameCollision.Default(
-                collisionHandle = 1L,
-                nodeHandle = 2L,
-                name = "test",
-                size = 100L,
-                childFolderCount = 0,
-                childFileCount = 0,
-                lastModified = 0L,
-                parentHandle = 0L,
-                isFile = true,
-                type = NodeNameCollisionType.COPY,
-                renameName = "test (1)"
-            ),
-        )
+        val nodeNameCollision = nodeNameCollisionResult(renameName = "test (1)")
         whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("test (1)")
+
         val result = underTest(
             listOf(nodeNameCollision),
             listOf("test (1)"),
@@ -130,4 +125,24 @@ class UpdateNodeNameCollisionsResultUseCaseTest {
         assertThat(result.first.first().nameCollision.renameName).isEqualTo("test (2)")
         assertThat(result.second).contains("test (2)")
     }
+
+    private fun nodeNameCollisionResult(
+        renameName: String?,
+        isFile: Boolean = true,
+        nodeHandle: Long = 2L,
+    ) = NodeNameCollisionResult(
+        nameCollision = NodeNameCollision.Default(
+            collisionHandle = 1L,
+            nodeHandle = nodeHandle,
+            name = "test",
+            size = 100L,
+            childFolderCount = 0,
+            childFileCount = 0,
+            lastModified = 0L,
+            parentHandle = 0L,
+            isFile = isFile,
+            type = NodeNameCollisionType.COPY,
+            renameName = renameName
+        ),
+    )
 }

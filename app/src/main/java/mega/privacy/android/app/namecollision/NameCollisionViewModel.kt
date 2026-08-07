@@ -425,9 +425,9 @@ class NameCollisionViewModel @Inject constructor(
     }
 
     /**
-     * Renames the current item and the next ones if [applyOnNext]. Only available for files.
+     * Renames the current item and the next ones if [applyOnNext].
      *
-     * @param applyOnNext   True if should rename the next file collisions.
+     * @param applyOnNext   True if should rename the next collisions.
      */
     fun rename(applyOnNext: Boolean) {
         renameNames.add(currentCollision.value?.nameCollision?.renameName ?: return)

@@ -23,7 +23,7 @@ class UpdateNodeNameCollisionsResultUseCase @Inject constructor(
      *
      * @param nameCollisionResults The list of NodeNameCollision
      * @param renameNames       List of already applied rename names.
-     * @param applyOnNext       True if the choice will be applied for the rest of files, false otherwise.
+     * @param applyOnNext       True if the choice will be applied for the rest of items, false otherwise.
      *
      * @return [NodeCollisionsWithRenameNames]
      */
@@ -39,8 +39,7 @@ class UpdateNodeNameCollisionsResultUseCase @Inject constructor(
             .map { collision ->
                 async {
                     val nameCollision = collision.nameCollision
-                    if (!nameCollision.isFile || collision.nameCollision.renameName == null)
-                        return@async collision
+                    if (nameCollision.renameName == null) return@async collision
                     semaphore.withPermit {
                         var newRenameName =
                             getNodeNameCollisionRenameNameUseCase(collision.nameCollision)
