@@ -1,13 +1,13 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.repository.StreamingServerRepository
 import javax.inject.Inject
 
 /**
  * The use case of getting local folder for folder link from mega api folder
  */
 class GetLocalFolderLinkFromMegaApiFolderUseCase @Inject constructor(
-    private val mediaPlayerRepository: MediaPlayerRepository,
+    private val streamingServerRepository: StreamingServerRepository,
 ) {
 
     /**
@@ -17,5 +17,5 @@ class GetLocalFolderLinkFromMegaApiFolderUseCase @Inject constructor(
      * @return folder link
      */
     suspend operator fun invoke(handle: Long) =
-        mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(handle)
+        streamingServerRepository.getFolderLinkFileStreamingUriFromFolderApi(handle)
 }

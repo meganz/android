@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.repository.StreamingServerRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,23 +15,23 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetLocalLinkFromMegaApiUseCaseTest {
     private lateinit var underTest: GetLocalLinkFromMegaApiUseCase
-    private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+    private val streamingServerRepository = mock<StreamingServerRepository>()
 
     @BeforeAll
     fun setUp() {
-        underTest = GetLocalLinkFromMegaApiUseCase(mediaPlayerRepository = mediaPlayerRepository)
+        underTest = GetLocalLinkFromMegaApiUseCase(streamingServerRepository = streamingServerRepository)
     }
 
     @BeforeEach
     fun resetMock() {
-        reset(mediaPlayerRepository)
+        reset(streamingServerRepository)
     }
 
     @Test
     fun `test that result is null when the local link is null`() =
         runTest {
             val testHandle = 123456L
-            whenever(mediaPlayerRepository.getLocalLinkFromMegaApi(testHandle)).thenReturn(null)
+            whenever(streamingServerRepository.getFileStreamingUri(testHandle)).thenReturn(null)
             Truth.assertThat(underTest(testHandle)).isNull()
         }
 
@@ -40,7 +40,7 @@ class GetLocalLinkFromMegaApiUseCaseTest {
         runTest {
             val testHandle = 123456L
             val testLink = "expected link"
-            whenever(mediaPlayerRepository.getLocalLinkFromMegaApi(testHandle)).thenReturn(testLink)
+            whenever(streamingServerRepository.getFileStreamingUri(testHandle)).thenReturn(testLink)
             Truth.assertThat(underTest(testHandle)).isEqualTo(testLink)
         }
 
@@ -49,6 +49,6 @@ class GetLocalLinkFromMegaApiUseCaseTest {
         runTest {
             val testHandle = 123456L
             underTest(testHandle)
-            verify(mediaPlayerRepository).getLocalLinkFromMegaApi(testHandle)
+            verify(streamingServerRepository).getFileStreamingUri(testHandle)
         }
 }

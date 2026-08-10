@@ -321,6 +321,7 @@ internal abstract class RepositoryModule {
     abstract fun bindAndroidBillingRepository(repository: DefaultBillingRepository): AndroidBillingRepository
 
     @Binds
+    @Singleton
     abstract fun bindStreamingServerRepository(implementation: StreamingServerRepositoryImpl): StreamingServerRepository
 
     @Binds

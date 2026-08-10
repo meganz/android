@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.repository.StreamingServerRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,24 +15,24 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetLocalFolderLinkFromMegaApiFolderUseCaseTest {
     private lateinit var underTest: GetLocalFolderLinkFromMegaApiFolderUseCase
-    private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+    private val streamingServerRepository = mock<StreamingServerRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest =
-            GetLocalFolderLinkFromMegaApiFolderUseCase(mediaPlayerRepository = mediaPlayerRepository)
+            GetLocalFolderLinkFromMegaApiFolderUseCase(streamingServerRepository = streamingServerRepository)
     }
 
     @BeforeEach
     fun resetMock() {
-        reset(mediaPlayerRepository)
+        reset(streamingServerRepository)
     }
 
     @Test
     fun `test that result is null when the local link is null`() =
         runTest {
             val testHandle = 123456L
-            whenever(mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(testHandle))
+            whenever(streamingServerRepository.getFolderLinkFileStreamingUriFromFolderApi(testHandle))
                 .thenReturn(null)
             assertThat(underTest(testHandle)).isNull()
         }
@@ -42,7 +42,7 @@ class GetLocalFolderLinkFromMegaApiFolderUseCaseTest {
         runTest {
             val testHandle = 123456L
             val testLink = "expected link"
-            whenever(mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApiFolder(testHandle))
+            whenever(streamingServerRepository.getFolderLinkFileStreamingUriFromFolderApi(testHandle))
                 .thenReturn(testLink)
             assertThat(underTest(testHandle)).isEqualTo(testLink)
         }
@@ -52,6 +52,6 @@ class GetLocalFolderLinkFromMegaApiFolderUseCaseTest {
         runTest {
             val testHandle = 123456L
             underTest(testHandle)
-            verify(mediaPlayerRepository).getLocalLinkForFolderLinkFromMegaApiFolder(testHandle)
+            verify(streamingServerRepository).getFolderLinkFileStreamingUriFromFolderApi(testHandle)
         }
 }

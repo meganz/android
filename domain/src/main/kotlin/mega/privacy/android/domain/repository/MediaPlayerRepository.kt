@@ -17,30 +17,6 @@ import mega.privacy.android.domain.exception.MegaException
 interface MediaPlayerRepository {
 
     /**
-     * Returns a URL to a node in the local HTTP proxy server for folder link from MegaApiFolder
-     *
-     * @param nodeHandle node Handle
-     * @return URL to the node in the local HTTP proxy server, otherwise NULL
-     */
-    suspend fun getLocalLinkForFolderLinkFromMegaApiFolder(nodeHandle: Long): String?
-
-    /**
-     * Returns a URL to a node in the local HTTP proxy server for folder link from MegaApi
-     *
-     * @param nodeHandle node Handle
-     * @return URL to the node in the local HTTP proxy server, otherwise NULL
-     */
-    suspend fun getLocalLinkForFolderLinkFromMegaApi(nodeHandle: Long): String?
-
-    /**
-     * Returns a URL to a node in the local HTTP proxy server from MegaApi
-     *
-     * @param nodeHandle node Handle
-     * @return URL to the node in the local HTTP proxy server, otherwise NULL
-     */
-    suspend fun getLocalLinkFromMegaApi(nodeHandle: Long): String?
-
-    /**
      * Get all audio nodes
      *
      * @param order list order

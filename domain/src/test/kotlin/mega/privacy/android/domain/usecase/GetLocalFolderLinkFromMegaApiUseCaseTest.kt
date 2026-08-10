@@ -2,7 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.repository.StreamingServerRepository
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,24 +15,24 @@ import org.mockito.kotlin.whenever
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GetLocalFolderLinkFromMegaApiUseCaseTest {
     private lateinit var underTest: GetLocalFolderLinkFromMegaApiUseCase
-    private val mediaPlayerRepository = mock<MediaPlayerRepository>()
+    private val streamingServerRepository = mock<StreamingServerRepository>()
 
     @BeforeAll
     fun setUp() {
         underTest =
-            GetLocalFolderLinkFromMegaApiUseCase(mediaPlayerRepository = mediaPlayerRepository)
+            GetLocalFolderLinkFromMegaApiUseCase(streamingServerRepository = streamingServerRepository)
     }
 
     @BeforeEach
     fun resetMock() {
-        reset(mediaPlayerRepository)
+        reset(streamingServerRepository)
     }
 
     @Test
     fun `test that result is null when the local link is null`() =
         runTest {
             val testHandle = 123456L
-            whenever(mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApi(testHandle))
+            whenever(streamingServerRepository.getFolderLinkFileStreamingUri(testHandle))
                 .thenReturn(null)
             Truth.assertThat(underTest(testHandle)).isNull()
         }
@@ -42,7 +42,7 @@ class GetLocalFolderLinkFromMegaApiUseCaseTest {
         runTest {
             val testHandle = 123456L
             val testLink = "expected link"
-            whenever(mediaPlayerRepository.getLocalLinkForFolderLinkFromMegaApi(testHandle))
+            whenever(streamingServerRepository.getFolderLinkFileStreamingUri(testHandle))
                 .thenReturn(testLink)
             Truth.assertThat(underTest(testHandle)).isEqualTo(testLink)
         }
@@ -52,6 +52,6 @@ class GetLocalFolderLinkFromMegaApiUseCaseTest {
         runTest {
             val testHandle = 123456L
             underTest(testHandle)
-            verify(mediaPlayerRepository).getLocalLinkForFolderLinkFromMegaApi(testHandle)
+            verify(streamingServerRepository).getFolderLinkFileStreamingUri(testHandle)
         }
 }

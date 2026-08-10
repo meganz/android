@@ -64,31 +64,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
     private var latestAudioPlaybackInfo: MediaPlaybackInfo? = null
 
-    override suspend fun getLocalLinkForFolderLinkFromMegaApi(nodeHandle: Long): String? =
-        withContext(ioDispatcher) {
-            megaApiFolder.getMegaNodeByHandle(nodeHandle)?.let { megaNode ->
-                megaApiFolder.authorizeNode(megaNode)
-            }?.let {
-                megaApi.httpServerGetLocalLink(it)
-            }
-        }
-
-    override suspend fun getLocalLinkForFolderLinkFromMegaApiFolder(nodeHandle: Long): String? =
-        withContext(ioDispatcher) {
-            megaApiFolder.getMegaNodeByHandle(nodeHandle)?.let { megaNode ->
-                megaApiFolder.authorizeNode(megaNode)
-            }?.let {
-                megaApiFolder.httpServerGetLocalLink(it)
-            }
-        }
-
-    override suspend fun getLocalLinkFromMegaApi(nodeHandle: Long): String? =
-        withContext(ioDispatcher) {
-            megaApi.getMegaNodeByHandle(nodeHandle)?.let { megaNode ->
-                megaApi.httpServerGetLocalLink(megaNode)
-            }
-        }
-
     override suspend fun getAudioNodes(order: SortOrder): List<TypedAudioNode> =
         getMegaNodeByCategory(
             searchCategory = SearchCategory.AUDIO,
