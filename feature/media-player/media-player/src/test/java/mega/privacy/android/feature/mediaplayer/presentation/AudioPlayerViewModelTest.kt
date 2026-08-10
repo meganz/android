@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.reset
@@ -498,6 +499,38 @@ class AudioPlayerViewModelTest {
             assertThat(state.currentPlayingItemName).isEqualTo("track.mp3")
         }
     }
+
+    @Test
+    fun `test that handleSideEffects fetches node name on first emission when media item handle is set`() =
+        runTest {
+            val node = mock<FileNode>()
+            whenever(node.name).thenReturn("track.mp3")
+            whenever(getNodeByHandleUseCase(123456L)).thenReturn(node)
+
+            underTest.uiState.test {
+                awaitItem() // Loading
+
+                // First emission already carries a handle — fetchNodeName must fire even
+                // though there is no previous state (prev == null path).
+                gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = 123456L))
+
+                val state = awaitItem() as AudioPlayerUiState.Data
+                assertThat(state.currentPlayingItemName).isEqualTo("track.mp3")
+            }
+        }
+
+    @Test
+    fun `test that handleSideEffects does not call getNodeByHandleUseCase on first emission when media item handle is null`() =
+        runTest {
+            underTest.uiState.test {
+                awaitItem() // Loading
+
+                gatewayPlayerState.emit(AudioControllerState(currentMediaItemHandle = null))
+                awaitItem() // Data
+
+                verify(getNodeByHandleUseCase, never()).invoke(any(), any())
+            }
+        }
 
     @Test
     fun `test that isPodcastMode is true by default`() = runTest {

@@ -115,7 +115,12 @@ class AudioPlayerViewModel @Inject constructor(
     }
 
     private fun handleSideEffects(prev: AudioControllerState?, current: AudioControllerState) {
-        if (prev == null) return
+        if (prev == null) {
+            // Fetch node name on first emission so currentPlayingItemName serves as the filename
+            // fallback while Media3 extracts the embedded title from the file's tags.
+            current.currentMediaItemHandle?.let { fetchNodeName(it) }
+            return
+        }
 
         if (prev.shuffleEnabled != current.shuffleEnabled) {
             if (current.shuffleEnabled) {

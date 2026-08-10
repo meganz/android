@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.feature.mediaplayer.data.mapper.AudioNodeToMediaItemMapper
 import mega.privacy.android.app.mediaplayer.model.AudioPlayQueueParams
 import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
@@ -45,6 +44,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudioNodes
 import mega.privacy.android.domain.usecase.mediaplayer.audioplayer.GetAudiosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.node.backup.GetBackupsNodeUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorShowHiddenItemsUseCase
+import mega.privacy.android.feature.mediaplayer.data.mapper.AudioNodeToMediaItemMapper
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
@@ -58,7 +58,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -125,7 +124,7 @@ class AudioPlayQueueBuilderTest {
             audioNodeToMediaItemMapper(
                 any<Long>(),
                 any<Uri>(),
-                anyOrNull()
+                anyOrNull(),
             )
         ).thenReturn(mock())
 
@@ -345,7 +344,7 @@ class AudioPlayQueueBuilderTest {
         }
 
     @Test
-    fun `test that invoke passes file name as display name to mapper on first emit`() = runTest {
+    fun `test that invoke passes handle and uri to mapper on first emit`() = runTest {
         val params = buildParams(adapterType = AUDIO_BROWSE_ADAPTER, fileName = "song.mp3")
 
         underTest(params).test { cancelAndIgnoreRemainingEvents() }
@@ -353,7 +352,7 @@ class AudioPlayQueueBuilderTest {
         verify(audioNodeToMediaItemMapper, atLeastOnce()).invoke(
             any<Long>(),
             any<Uri>(),
-            eq("song.mp3")
+            anyOrNull(),
         )
     }
 

@@ -72,7 +72,7 @@ internal class AudioNodeToMediaItemMapperTest {
     }
 
     @Test
-    fun `test that invoke with node sets media metadata title to node name`() {
+    fun `test that invoke with node does not set media metadata title`() {
         val node = mock<TypedAudioNode>().also {
             whenever(it.id).thenReturn(NodeId(1L))
             whenever(it.name).thenReturn("my song.mp3")
@@ -80,19 +80,12 @@ internal class AudioNodeToMediaItemMapperTest {
 
         val result = underTest(node, uri)
 
-        assertThat(result.mediaMetadata.title.toString()).isEqualTo("my song.mp3")
+        assertThat(result.mediaMetadata.title).isNull()
     }
 
     @Test
-    fun `test that invoke with display name sets media metadata title`() {
-        val result = underTest(handle = 1L, uri = uri, displayName = "audio.mp3")
-
-        assertThat(result.mediaMetadata.title.toString()).isEqualTo("audio.mp3")
-    }
-
-    @Test
-    fun `test that invoke without display name does not set media metadata title`() {
-        val result = underTest(handle = 1L, uri = uri, displayName = null)
+    fun `test that invoke with raw fields does not set media metadata title`() {
+        val result = underTest(handle = 1L, uri = uri)
 
         assertThat(result.mediaMetadata.title).isNull()
     }

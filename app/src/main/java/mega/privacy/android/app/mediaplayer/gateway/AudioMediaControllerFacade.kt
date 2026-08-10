@@ -57,6 +57,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
     private var controllerFuture: ListenableFuture<MediaController>? = null
     private var positionPollingJob: Job? = null
     private var currentState = AudioControllerState()
+    private var isReconnecting = false
 
     init {
         connect()
@@ -73,6 +74,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
             MediaController.Builder(context, sessionToken)
                 .setListener(object : MediaController.Listener {
                     override fun onDisconnected(controller: MediaController) {
+                        // Skip idle emission and future cleanup when we initiated the disconnect
+                        // ourselves via reconnectController(). In that case the new future is
+                        // already stored in controllerFuture and must not be released here.
+                        if (isReconnecting) return
                         updateState { copy(isIdle = true) }
                         stopPositionPolling()
                         controller.removeListener(playerListener)
@@ -98,13 +103,16 @@ internal class AudioMediaControllerFacade @Inject constructor(
                                     result.release()
                                     return
                                 }
+                                val suppressIdle = isReconnecting
+                                isReconnecting = false
                                 controller = result
                                 result.addListener(playerListener)
-                                syncAndEmit(result)
+                                syncAndEmit(result, suppressIdle = suppressIdle)
                                 startPositionPolling()
                             }
 
                             override fun onFailure(t: Throwable) {
+                                isReconnecting = false
                                 Timber.e(
                                     t,
                                     "Failed to connect MediaController to AudioPlayerService"
@@ -116,7 +124,10 @@ internal class AudioMediaControllerFacade @Inject constructor(
                 }
     }
 
-    private fun syncAndEmit(c: MediaController) {
+    private fun syncAndEmit(c: MediaController, suppressIdle: Boolean = false) {
+        // When suppressIdle is true the player may transiently report STATE_IDLE while the
+        // service is setting up a new playlist. Suppressing it prevents a false-idle emission
+        // from cancelling the sleep timer during an intentional track switch.
         currentState = AudioControllerState(
             isPlaying = c.isPlaying,
             currentPositionMs = c.currentPosition.coerceAtLeast(0L),
@@ -125,7 +136,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
             shuffleEnabled = c.shuffleModeEnabled,
             mediaItemCount = c.mediaItemCount,
             isBuffering = c.playbackState == Player.STATE_BUFFERING,
-            isIdle = c.playbackState == Player.STATE_IDLE,
+            isIdle = !suppressIdle && c.playbackState == Player.STATE_IDLE,
             title = c.mediaMetadata.title?.toString(),
             artist = c.mediaMetadata.artist?.toString(),
             artworkUri = c.mediaMetadata.artworkUri?.toString(),
@@ -235,6 +246,7 @@ internal class AudioMediaControllerFacade @Inject constructor(
     }
 
     private fun reconnectController() {
+        isReconnecting = true
         stopPositionPolling()
         controller?.removeListener(playerListener)
         val futureToRelease = controllerFuture

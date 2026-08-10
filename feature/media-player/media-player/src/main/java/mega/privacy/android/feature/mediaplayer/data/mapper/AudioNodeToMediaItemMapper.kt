@@ -15,18 +15,15 @@ import mega.privacy.android.feature.mediaplayer.data.MediaHandleStore
  * show the file name immediately while Media3 extracts embedded tags (ID3, Vorbis comment, etc.).
  * Once extraction completes, Media3 fires Player.Listener.onMediaMetadataChanged with the real
  * title/artist, which takes precedence over the initial value.
+ *
  * Artwork is resolved separately by the Compose UI layer via ThumbnailRequest.
  */
 class AudioNodeToMediaItemMapper @Inject constructor(
     private val mediaHandleStore: MediaHandleStore,
 ) {
 
-    /**
-     * Create a [MediaItem] from a [TypedAudioNode] and its resolved stream [Uri].
-     * The node's [TypedAudioNode.name] is used as the initial title fallback.
-     */
     operator fun invoke(node: TypedAudioNode, uri: Uri): MediaItem =
-        invoke(handle = node.id.longValue, uri = uri, displayName = node.name)
+        invoke(handle = node.id.longValue, uri = uri)
 
     /**
      * Create a [MediaItem] directly from raw fields (for offline items and the fast first-emit).
