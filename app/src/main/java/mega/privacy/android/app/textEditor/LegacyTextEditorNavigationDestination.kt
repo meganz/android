@@ -42,8 +42,6 @@ import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.contract.TransferHandler
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.INCOMING_SHARES_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.LINKS_ADAPTER
-import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt.RUBBISH_BIN_ADAPTER
 import nz.mega.sdk.MegaApiJava
 import java.io.File
@@ -86,16 +84,6 @@ private fun inExcludedAdapterForGetLinkAndEdit(nodeSourceType: Int?): Boolean {
 private fun shouldShowDownload(nodeSourceType: Int?): Boolean {
     if (nodeSourceType == null) return true
     return nodeSourceType != OFFLINE_ADAPTER && nodeSourceType != RUBBISH_BIN_ADAPTER
-}
-
-/** True when the editor was opened from a Shared folder (incoming/outgoing shares or links). Save will create a new file with (1)(2) naming instead of overwriting. */
-private fun isFromSharedFolder(nodeSourceType: Int?): Boolean {
-    if (nodeSourceType == null) return false
-    return nodeSourceType in setOf(
-        INCOMING_SHARES_ADAPTER,
-        OUTGOING_SHARES_ADAPTER,
-        LINKS_ADAPTER,
-    )
 }
 
 /**
@@ -200,7 +188,6 @@ private fun cloudNodeArgs(
         showDownload = shouldShowDownload(nodeSourceType),
         showShare = shouldShowShare(nodeSourceType),
         showSendToChat = shouldShowSendToChat(nodeSourceType),
-        isFromSharedFolder = isFromSharedFolder(nodeSourceType),
         fromHome = navKey.fromHome,
         isFolderLink = isFolderLink,
     )

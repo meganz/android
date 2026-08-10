@@ -187,7 +187,6 @@ internal class TextEditorComposeViewModelTest {
         showDownload: Boolean = true,
         showShare: Boolean = true,
         showSendToChat: Boolean = false,
-        isFromSharedFolder: Boolean = false,
         fromHome: Boolean = false,
         chatId: Long? = null,
         messageId: Long? = null,
@@ -205,7 +204,6 @@ internal class TextEditorComposeViewModelTest {
                 showDownload = showDownload,
                 showShare = showShare,
                 showSendToChat = showSendToChat,
-                isFromSharedFolder = isFromSharedFolder,
                 fromHome = fromHome,
                 chatId = chatId,
                 messageId = messageId,
@@ -566,7 +564,7 @@ internal class TextEditorComposeViewModelTest {
             isEditMode = false,
             fromHome = true,
         )
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
             .thenReturn(saveResult)
         initUnderTest(mode = TextEditorMode.Create, fromHome = true)
         advanceUntilIdle()
@@ -581,14 +579,13 @@ internal class TextEditorComposeViewModelTest {
             any(),
             any(),
             fromHomeCaptor.capture(),
-            any(),
         )
         assertThat(fromHomeCaptor.firstValue).isTrue()
     }
 
     @Test
     fun `test that confirmDiscard in Create mode does not invoke save use case`() = runTest {
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
             .thenReturn(
                 TextEditorSaveResult.UploadRequired(
                     tempPath = "/tmp/x.txt",
@@ -611,14 +608,13 @@ internal class TextEditorComposeViewModelTest {
             any(),
             any(),
             any(),
-            any(),
         )
     }
 
     @Test
     fun `test that saveFile in Create mode emits closeEvent and does not queue snackbar`() =
         runTest {
-            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
                 .thenReturn(
                     TextEditorSaveResult.UploadRequired(
                         tempPath = "/tmp/new.txt",
@@ -644,7 +640,7 @@ internal class TextEditorComposeViewModelTest {
             val lines = listOf("hello")
             doReturn(flowOf(lines)).whenever(getTextContentForTextEditorUseCase)
                 .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
-            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
                 .thenReturn(
                     TextEditorSaveResult.UploadRequired(
                         tempPath = "/tmp/edit.txt",
@@ -1220,7 +1216,7 @@ internal class TextEditorComposeViewModelTest {
             isEditMode = true,
             fromHome = false,
         )
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
             .thenReturn(saveResult)
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
         advanceUntilIdle()
@@ -1232,7 +1228,7 @@ internal class TextEditorComposeViewModelTest {
 
         val textCaptor = argumentCaptor<String>()
         verify(saveTextContentForTextEditorUseCase).invoke(
-            any(), textCaptor.capture(), any(), any(), any(), any(),
+            any(), textCaptor.capture(), any(), any(), any(),
         )
         val savedLines = textCaptor.firstValue.split("\n")
         assertThat(savedLines.first()).startsWith("EDITED")
@@ -1248,7 +1244,7 @@ internal class TextEditorComposeViewModelTest {
             isEditMode = false,
             fromHome = false,
         )
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
             .thenReturn(saveResult)
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Create)
         advanceUntilIdle()
@@ -1260,7 +1256,7 @@ internal class TextEditorComposeViewModelTest {
 
         val textCaptor = argumentCaptor<String>()
         verify(saveTextContentForTextEditorUseCase).invoke(
-            any(), textCaptor.capture(), any(), any(), any(), any(),
+            any(), textCaptor.capture(), any(), any(), any(),
         )
         assertThat(textCaptor.firstValue).isEqualTo("brand new content")
     }
@@ -1276,7 +1272,7 @@ internal class TextEditorComposeViewModelTest {
                 isEditMode = true,
                 fromHome = false,
             )
-            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
                 .thenReturn(saveResult)
 
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.View)
@@ -1286,7 +1282,7 @@ internal class TextEditorComposeViewModelTest {
             advanceUntilIdle()
 
             verify(saveTextContentForTextEditorUseCase).invoke(
-                any(), any(), any(), any(), any(), any(),
+                any(), any(), any(), any(), any(),
             )
         }
 
@@ -1301,7 +1297,7 @@ internal class TextEditorComposeViewModelTest {
                 isEditMode = true,
                 fromHome = false,
             )
-            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
                 .thenReturn(saveResult)
 
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
@@ -1326,7 +1322,7 @@ internal class TextEditorComposeViewModelTest {
                 isEditMode = true,
                 fromHome = false,
             )
-            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+            whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
                 .thenReturn(saveResult)
 
             initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
@@ -1344,7 +1340,7 @@ internal class TextEditorComposeViewModelTest {
     fun `test that saveFile failure triggers errorEvent and sets errorMessage`() = runTest {
         doReturn(flowOf(emptyList<String>())).whenever(getTextContentForTextEditorUseCase)
             .invoke(nodeHandle = any(), localPath = anyOrNull(), chunkSizeLines = any())
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
             .thenThrow(RuntimeException("disk full"))
 
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
@@ -1420,7 +1416,7 @@ internal class TextEditorComposeViewModelTest {
             isEditMode = true,
             fromHome = false,
         )
-        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any(), any()))
+        whenever(saveTextContentForTextEditorUseCase(any(), any(), any(), any(), any()))
             .thenReturn(saveResult)
 
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit)
@@ -2315,7 +2311,6 @@ internal class TextEditorComposeViewModelTest {
                 fileName = any(),
                 mode = any(),
                 fromHome = any(),
-                isFromSharedFolder = any(),
             )
         initUnderTest(nodeHandle = 1L, mode = TextEditorMode.Edit, fileName = "test.txt")
         advanceUntilIdle()
@@ -2330,7 +2325,6 @@ internal class TextEditorComposeViewModelTest {
             fileName = any(),
             mode = any(),
             fromHome = any(),
-            isFromSharedFolder = any(),
         )
         assertThat(textCaptor.firstValue).isEqualTo(originalText)
     }

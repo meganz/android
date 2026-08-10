@@ -7,7 +7,6 @@ import mega.android.core.ui.model.LocalizedText
 import mega.privacy.android.core.nodecomponents.action.NodeOptionsActionViewModel
 import mega.privacy.android.core.nodecomponents.sheet.options.HandleNodeOptionsActionResult
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.NodeSourceType
 import mega.privacy.android.domain.entity.transfer.event.TransferTriggerEvent
 import mega.privacy.android.navigation.contract.NavigationHandler
 import mega.privacy.android.navigation.destination.CloudDriveNavKey
@@ -40,7 +39,7 @@ fun EntryProviderScope<NavKey>.cloudDriveScreen(
         )
         val nodeOptionsActionViewModel =
             hiltViewModel<NodeOptionsActionViewModel, NodeOptionsActionViewModel.Factory>(
-                creationCallback = { it.create(NodeSourceType.CLOUD_DRIVE) }
+                creationCallback = { it.create(key.nodeSourceType) }
             )
 
         HandleNodeOptionsActionResult(

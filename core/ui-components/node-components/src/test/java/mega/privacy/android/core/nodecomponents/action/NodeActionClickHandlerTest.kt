@@ -53,6 +53,7 @@ import mega.privacy.android.core.nodecomponents.dialog.delete.MoveToRubbishOrDel
 import mega.privacy.android.core.nodecomponents.dialog.leaveshare.LeaveShareDialogNavKey
 import mega.privacy.android.core.nodecomponents.mapper.NodeHandlesToJsonMapper
 import mega.privacy.android.core.nodecomponents.mapper.NodeShareContentUrisIntentMapper
+import mega.privacy.android.core.nodecomponents.mapper.NodeSourceTypeToViewTypeMapper
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToAlbumMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToMenuAction
 import mega.privacy.android.core.nodecomponents.menu.menuaction.AddToPlaylistMenuAction
@@ -127,6 +128,7 @@ import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import mega.privacy.android.navigation.destination.MoveNavKey
 import mega.privacy.android.navigation.destination.ShareLinkNavKey
 import mega.privacy.android.shared.nodes.dialog.removelink.RemoveNodeLinkDialogNavKey
+import mega.privacy.android.shared.nodes.model.NodeSourceTypeInt
 import mega.privacy.android.navigation.destination.SyncNewFolderNavKey
 import org.junit.After
 import org.junit.Before
@@ -1215,7 +1217,7 @@ class NodeActionClickHandlerTest {
     // EditAction Tests
     @Test
     fun `test EditAction canHandle returns true for EditMenuAction`() {
-        val action = EditActionClickHandler()
+        val action = EditActionClickHandler(NodeSourceTypeToViewTypeMapper())
         val menuAction = mock<EditMenuAction>()
 
         assertThat(action.canHandle(menuAction)).isTrue()
@@ -1223,7 +1225,7 @@ class NodeActionClickHandlerTest {
 
     @Test
     fun `test that EditAction handle navigates to text editor in Edit mode`() {
-        val action = EditActionClickHandler()
+        val action = EditActionClickHandler(NodeSourceTypeToViewTypeMapper())
         val menuAction = mock<EditMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -1237,8 +1239,26 @@ class NodeActionClickHandlerTest {
     }
 
     @Test
+    fun `test that EditAction handle navigates with node source type when opened from incoming shares`() {
+        val action = EditActionClickHandler(NodeSourceTypeToViewTypeMapper())
+        val menuAction = mock<EditMenuAction>()
+
+        whenever(mockViewModel.getNodeSourceType()).thenReturn(NodeSourceType.INCOMING_SHARES)
+
+        action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
+
+        verify(mockNavigationHandler).navigate(
+            LegacyTextEditorNavKey(
+                nodeHandle = mockFileNode.id.longValue,
+                mode = TextEditorMode.Edit.value,
+                nodeSourceType = NodeSourceTypeInt.INCOMING_SHARES_ADAPTER,
+            )
+        )
+    }
+
+    @Test
     fun `test that EditAction handle dismisses bottom sheet`() {
-        val action = EditActionClickHandler()
+        val action = EditActionClickHandler(NodeSourceTypeToViewTypeMapper())
         val menuAction = mock<EditMenuAction>()
 
         action.handle(menuAction, mockFileNode, mockSingleNodeActionProvider)
@@ -1952,7 +1972,9 @@ class NodeActionClickHandlerTest {
             ).canHandle(wrongAction)
         ).isFalse()
         assertThat(InfoActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
-        assertThat(EditActionClickHandler().canHandle(wrongAction)).isFalse()
+        assertThat(
+            EditActionClickHandler(NodeSourceTypeToViewTypeMapper()).canHandle(wrongAction)
+        ).isFalse()
         assertThat(DisputeTakeDownActionClickHandler(mockMegaNavigator).canHandle(wrongAction)).isFalse()
         assertThat(
             VerifyActionClickHandler(mockGetNodeShareDataUseCase, mockMegaNavigator).canHandle(

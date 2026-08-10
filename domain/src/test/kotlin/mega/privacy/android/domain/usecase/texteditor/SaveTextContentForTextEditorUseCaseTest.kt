@@ -8,17 +8,22 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.texteditor.TextEditorSaveResult
 import mega.privacy.android.domain.entity.texteditor.TextEditorMode
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.GetNodeByIdUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeUseCase
 import mega.privacy.android.domain.usecase.cache.GetCacheFileUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.videoplayer.GetNodeAccessUseCase
 import mega.privacy.android.domain.usecase.node.namecollision.GetNodeNameCollisionRenameNameUseCase
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -27,6 +32,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class SaveTextContentForTextEditorUseCaseTest {
@@ -38,6 +44,7 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         mock()
     private val getCacheFileUseCase: GetCacheFileUseCase = mock()
     private val fileSystemRepository: FileSystemRepository = mock()
+    private val getNodeAccessUseCase: GetNodeAccessUseCase = mock()
 
     private val underTest = SaveTextContentForTextEditorUseCase(
         ioDispatcher = ioDispatcher,
@@ -46,6 +53,7 @@ internal class SaveTextContentForTextEditorUseCaseTest {
         getNodeNameCollisionRenameNameUseCase = getNodeNameCollisionRenameNameUseCase,
         getCacheFileUseCase = getCacheFileUseCase,
         fileSystemRepository = fileSystemRepository,
+        getNodeAccessUseCase = getNodeAccessUseCase,
     )
 
     @TempDir
@@ -59,6 +67,7 @@ internal class SaveTextContentForTextEditorUseCaseTest {
             getNodeNameCollisionRenameNameUseCase,
             getCacheFileUseCase,
             fileSystemRepository,
+            getNodeAccessUseCase,
         )
     }
 
@@ -189,38 +198,6 @@ internal class SaveTextContentForTextEditorUseCaseTest {
     }
 
     @Test
-    fun `test that save when Edit and isFromSharedFolder uses unique name from collision use case`() =
-        runTest {
-            val parentHandle = 100L
-            val nodeHandle = 99L
-            val node = mock<TypedFileNode> {
-                on { id } doReturn NodeId(nodeHandle)
-                on { parentId } doReturn NodeId(parentHandle)
-            }
-            val tempFile = File(tempDir, "notes (1).txt")
-            whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-            whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("notes (1).txt")
-            whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
-
-            val saveResult = underTest(
-                nodeHandle = nodeHandle,
-                text = "content",
-                fileName = "notes.txt",
-                mode = TextEditorMode.Edit,
-                fromHome = false,
-                isFromSharedFolder = true,
-            )
-
-            assertThat(saveResult).isInstanceOf(TextEditorSaveResult.UploadRequired::class.java)
-            (saveResult as TextEditorSaveResult.UploadRequired).let {
-                assertThat(it.tempPath).isEqualTo(tempFile.absolutePath)
-                assertThat(it.parentHandle).isEqualTo(parentHandle)
-                assertThat(it.isEditMode).isTrue()
-            }
-            verify(getNodeNameCollisionRenameNameUseCase).invoke(any())
-        }
-
-    @Test
     fun `test that save uses untitled when fileName is empty`() = runTest {
         val parentHandle = 100L
         val nodeHandle = 99L
@@ -273,30 +250,6 @@ internal class SaveTextContentForTextEditorUseCaseTest {
     }
 
     @Test
-    fun `test that save when Edit and not from shared folder does not call collision rename use case`() =
-        runTest {
-            val parentHandle = 100L
-            val nodeHandle = 99L
-            val node = mock<TypedFileNode> {
-                on { id } doReturn NodeId(nodeHandle)
-                on { parentId } doReturn NodeId(parentHandle)
-            }
-            val tempFile = File(tempDir, "notes.txt")
-            whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
-            whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
-
-            underTest(
-                nodeHandle = nodeHandle,
-                text = "content",
-                fileName = "notes.txt",
-                mode = TextEditorMode.Edit,
-                isFromSharedFolder = false,
-            )
-
-            verifyNoInteractions(getNodeNameCollisionRenameNameUseCase)
-        }
-
-    @Test
     fun `test that save deletes stale directory and writes file when Edit and cache path is directory`() =
         runTest {
             val parentHandle = 100L
@@ -315,10 +268,76 @@ internal class SaveTextContentForTextEditorUseCaseTest {
                 text = "content",
                 fileName = "notes.txt",
                 mode = TextEditorMode.Edit,
-                isFromSharedFolder = false,
             )
 
             verify(fileSystemRepository).deleteFolderAndItsFiles(dirAsFile.absolutePath)
             assertThat(saveResult).isInstanceOf(TextEditorSaveResult.UploadRequired::class.java)
         }
+
+    @ParameterizedTest(name = "access is {0}")
+    @MethodSource("provideAccessWithoutVersioningRight")
+    fun `test that save uses unique name when mode is Edit and node access cannot create a version`(
+        access: AccessPermission,
+    ) = runTest {
+        val parentHandle = 100L
+        val nodeHandle = 99L
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(nodeHandle)
+            on { parentId } doReturn NodeId(parentHandle)
+        }
+        val tempFile = File(tempDir, "notes (1).txt")
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
+        whenever(getNodeAccessUseCase(NodeId(nodeHandle))).thenReturn(access)
+        whenever(getNodeNameCollisionRenameNameUseCase(any())).thenReturn("notes (1).txt")
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
+
+        val saveResult = underTest(
+            nodeHandle = nodeHandle,
+            text = "content",
+            fileName = "notes.txt",
+            mode = TextEditorMode.Edit,
+        )
+
+        assertThat((saveResult as TextEditorSaveResult.UploadRequired).tempPath)
+            .isEqualTo(tempFile.absolutePath)
+        verify(getNodeNameCollisionRenameNameUseCase).invoke(any())
+    }
+
+    @ParameterizedTest(name = "access is {0}")
+    @MethodSource("provideAccessWithVersioningRight")
+    fun `test that save keeps original name when mode is Edit and node access can create a version`(
+        access: AccessPermission?,
+    ) = runTest {
+        val parentHandle = 100L
+        val nodeHandle = 99L
+        val node = mock<TypedFileNode> {
+            on { id } doReturn NodeId(nodeHandle)
+            on { parentId } doReturn NodeId(parentHandle)
+        }
+        val tempFile = File(tempDir, "notes.txt")
+        whenever(getNodeByIdUseCase(NodeId(nodeHandle))).thenReturn(node)
+        whenever(getNodeAccessUseCase(NodeId(nodeHandle))).thenReturn(access)
+        whenever(getCacheFileUseCase(any(), any())).thenReturn(tempFile)
+
+        underTest(
+            nodeHandle = nodeHandle,
+            text = "content",
+            fileName = "notes.txt",
+            mode = TextEditorMode.Edit,
+        )
+
+        verifyNoInteractions(getNodeNameCollisionRenameNameUseCase)
+    }
+
+    private fun provideAccessWithoutVersioningRight() = Stream.of(
+        Arguments.of(AccessPermission.READ),
+        Arguments.of(AccessPermission.READWRITE),
+    )
+
+    private fun provideAccessWithVersioningRight() = Stream.of(
+        Arguments.of(AccessPermission.FULL),
+        Arguments.of(AccessPermission.OWNER),
+        Arguments.of(AccessPermission.UNKNOWN),
+        Arguments.of(null),
+    )
 }

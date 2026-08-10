@@ -408,7 +408,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
         val showDownload: Boolean = true,
         val showShare: Boolean = true,
         val showSendToChat: Boolean = false,
-        val isFromSharedFolder: Boolean = false,
         /** When true (e.g. new file from Home), forwarded to upload as [TransferTriggerEvent.StartUpload.TextFile.fromHomePage]. */
         val fromHome: Boolean = false,
         val chatId: Long? = null,
@@ -763,7 +762,6 @@ class TextEditorComposeViewModel @AssistedInject constructor(
                     fileName = state.fileName.ifEmpty { "untitled.txt" },
                     mode = state.mode,
                     fromHome = args.fromHome,
-                    isFromSharedFolder = args.isFromSharedFolder,
                 )
             }.fold(
                 onSuccess = { saveResult ->
