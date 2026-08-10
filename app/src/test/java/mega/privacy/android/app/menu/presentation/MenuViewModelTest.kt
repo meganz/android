@@ -48,8 +48,8 @@ import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCa
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
-import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionWithOfferUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferMenuBannerClosedUseCase
+import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
 import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferMenuBannerClosedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
@@ -109,8 +109,7 @@ class MenuViewModelTest {
     private val getRubbishNodeUseCase = mock<GetRubbishNodeUseCase>()
     private val getSpecificAccountDetailUseCase = mock<GetSpecificAccountDetailUseCase>()
     private val avatarContentMapper = mock<AvatarContentMapper>()
-    private val getRecommendedSubscriptionWithOfferUseCase =
-        mock<GetRecommendedSubscriptionWithOfferUseCase>()
+    private val monitorSubscriptionOfferUseCase = mock<MonitorSubscriptionOfferUseCase>()
     private val monitorSubscriptionOfferMenuBannerClosedUseCase =
         mock<MonitorSubscriptionOfferMenuBannerClosedUseCase>()
     private val setSubscriptionOfferMenuBannerClosedUseCase =
@@ -151,12 +150,13 @@ class MenuViewModelTest {
             getRubbishNodeUseCase,
             getSpecificAccountDetailUseCase,
             avatarContentMapper,
-            getRecommendedSubscriptionWithOfferUseCase,
+            monitorSubscriptionOfferUseCase,
             monitorSubscriptionOfferMenuBannerClosedUseCase,
             setSubscriptionOfferMenuBannerClosedUseCase,
             subscriptionOfferBannerMapper,
         )
         stubOfferBannerNotClosed()
+        whenever(monitorSubscriptionOfferUseCase()).thenReturn(flowOf(Result.success(null)))
     }
 
     private fun stubOfferBannerNotClosed() {
@@ -171,13 +171,13 @@ class MenuViewModelTest {
      * Stubs an active offer and its banner mapping, returning the banner the state is expected to
      * expose.
      */
-    private suspend fun stubActiveOfferBanner(): SubscriptionOfferBannerUiModel {
+    private fun stubActiveOfferBanner(): SubscriptionOfferBannerUiModel {
         val subscription = mock<Subscription>()
         val offer = mock<RecommendedSubscriptionOffer> {
             on { this.subscription } doReturn subscription
         }
         val offerBanner = mock<SubscriptionOfferBannerUiModel>()
-        whenever(getRecommendedSubscriptionWithOfferUseCase()).thenReturn(offer)
+        whenever(monitorSubscriptionOfferUseCase()).thenReturn(flowOf(Result.success(offer)))
         whenever(subscriptionOfferBannerMapper(eq(subscription), any())).thenReturn(offerBanner)
         return offerBanner
     }
@@ -1005,7 +1005,7 @@ class MenuViewModelTest {
     @Test
     fun `test that init emits no offer banner when no subscription carries an offer`() = runTest {
         stubDefaultDependencies()
-        whenever(getRecommendedSubscriptionWithOfferUseCase()).thenReturn(null)
+        whenever(monitorSubscriptionOfferUseCase()).thenReturn(flowOf(Result.success(null)))
 
         initUnderTest()
 
@@ -1018,8 +1018,8 @@ class MenuViewModelTest {
     @Test
     fun `test that init emits no offer banner when the offer lookup fails`() = runTest {
         stubDefaultDependencies()
-        whenever(getRecommendedSubscriptionWithOfferUseCase())
-            .thenAnswer { throw RuntimeException("Billing unavailable") }
+        whenever(monitorSubscriptionOfferUseCase())
+            .thenReturn(flowOf(Result.failure(RuntimeException("Billing unavailable"))))
 
         initUnderTest()
 
@@ -1041,7 +1041,35 @@ class MenuViewModelTest {
                 assertThat(awaitItem().offerBanner).isNull()
                 cancelAndIgnoreRemainingEvents()
             }
-            verifyNoInteractions(getRecommendedSubscriptionWithOfferUseCase)
+            verifyNoInteractions(monitorSubscriptionOfferUseCase)
+        }
+
+    @Test
+    fun `test that the offer banner is removed when the offer goes away after an upgrade`() =
+        runTest {
+            stubDefaultDependencies()
+            val subscription = mock<Subscription>()
+            val offer = mock<RecommendedSubscriptionOffer> {
+                on { this.subscription } doReturn subscription
+            }
+            val offerBanner = mock<SubscriptionOfferBannerUiModel>()
+            val offers = MutableStateFlow<Result<RecommendedSubscriptionOffer?>>(
+                Result.success(offer)
+            )
+            whenever(monitorSubscriptionOfferUseCase()).thenReturn(offers)
+            whenever(subscriptionOfferBannerMapper(eq(subscription), any()))
+                .thenReturn(offerBanner)
+
+            initUnderTest()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().offerBanner).isEqualTo(offerBanner)
+
+                offers.value = Result.success(null)
+
+                assertThat(awaitItem().offerBanner).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
         }
 
     @Test
@@ -1111,7 +1139,7 @@ class MenuViewModelTest {
             getRubbishNodeUseCase = getRubbishNodeUseCase,
             getSpecificAccountDetailUseCase = getSpecificAccountDetailUseCase,
             avatarContentMapper = avatarContentMapper,
-            getRecommendedSubscriptionWithOfferUseCase = getRecommendedSubscriptionWithOfferUseCase,
+            monitorSubscriptionOfferUseCase = monitorSubscriptionOfferUseCase,
             monitorSubscriptionOfferMenuBannerClosedUseCase = monitorSubscriptionOfferMenuBannerClosedUseCase,
             setSubscriptionOfferMenuBannerClosedUseCase = setSubscriptionOfferMenuBannerClosedUseCase,
             subscriptionOfferBannerMapper = subscriptionOfferBannerMapper,

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -52,6 +53,11 @@ fun ScrollableBanner(
 
     val listState = rememberLazyListState()
     val cardWidth = rememberBannerCardWidth(bannerCount = totalCount)
+
+    val hasOfferBanner = offerBanner != null
+    LaunchedEffect(hasOfferBanner) {
+        if (hasOfferBanner) listState.scrollToItem(0)
+    }
 
     LazyRow(
         modifier = modifier,

@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -14,8 +15,9 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -42,8 +44,8 @@ import mega.privacy.android.domain.usecase.account.GetSpecificAccountDetailUseCa
 import mega.privacy.android.domain.usecase.account.IsAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.account.MonitorAccountDetailUseCase
 import mega.privacy.android.domain.usecase.avatar.GetMyAvatarFileUseCase
-import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionWithOfferUseCase
 import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferMenuBannerClosedUseCase
+import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
 import mega.privacy.android.domain.usecase.billing.SetSubscriptionOfferMenuBannerClosedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.login.CheckPasswordReminderUseCase
@@ -55,7 +57,6 @@ import mega.privacy.android.feature.myaccount.presentation.mapper.AvatarContentM
 import mega.privacy.android.navigation.contract.NavDrawerItem
 import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.home.presentation.home.widget.banner.mapper.SubscriptionOfferBannerMapper
-import mega.privacy.mobile.home.presentation.home.widget.banner.model.SubscriptionOfferBannerUiModel
 import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
@@ -82,7 +83,7 @@ class MenuViewModel @Inject constructor(
     private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
     private val getSpecificAccountDetailUseCase: GetSpecificAccountDetailUseCase,
     private val avatarContentMapper: AvatarContentMapper,
-    private val getRecommendedSubscriptionWithOfferUseCase: GetRecommendedSubscriptionWithOfferUseCase,
+    private val monitorSubscriptionOfferUseCase: MonitorSubscriptionOfferUseCase,
     private val monitorSubscriptionOfferMenuBannerClosedUseCase: MonitorSubscriptionOfferMenuBannerClosedUseCase,
     private val setSubscriptionOfferMenuBannerClosedUseCase: SetSubscriptionOfferMenuBannerClosedUseCase,
     private val subscriptionOfferBannerMapper: SubscriptionOfferBannerMapper,
@@ -111,26 +112,40 @@ class MenuViewModel @Inject constructor(
         monitorUserChanges()
         monitorUnreadNotificationsCount()
         monitorNodeUpdatesForRubbishBin()
-        loadSubscriptionOfferBanner()
+        monitorSubscriptionOfferBanner()
     }
 
     /**
-     * Load the subscription offer banner. The offer is not delivered by the banners API, so it is
-     * built locally from the recommended subscription that currently carries an offer.
+     * Monitor the subscription offer banner. The offer is not delivered by the banners API, so it is
+     * built locally from the recommended subscription that currently carries an offer, and dropped
+     * again once the account moves to a plan the campaign no longer targets.
      */
-    private fun loadSubscriptionOfferBanner() {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun monitorSubscriptionOfferBanner() {
         viewModelScope.launch {
-            val offerBanner = runCatching { getSubscriptionOfferBanner() }
-                .onFailure { Timber.e(it, "Failed to load subscription offer banner") }
-                .getOrNull()
-            _uiState.update { it.copy(offerBanner = offerBanner) }
+            monitorSubscriptionOfferMenuBannerClosedUseCase()
+                .distinctUntilChanged()
+                .flatMapLatest { isClosed ->
+                    if (isClosed) {
+                        flowOf(null)
+                    } else {
+                        monitorSubscriptionOfferUseCase().map { result ->
+                            result
+                                .onFailure { Timber.e(it, "Failed to load the offer banner") }
+                                .getOrNull()
+                        }
+                    }
+                }
+                .map { offer ->
+                    offer?.let {
+                        subscriptionOfferBannerMapper(it.subscription, Locale.getDefault())
+                    }
+                }
+                .catch { Timber.e(it, "Failed to monitor subscription offer banner") }
+                .collect { offerBanner ->
+                    _uiState.update { it.copy(offerBanner = offerBanner) }
+                }
         }
-    }
-
-    private suspend fun getSubscriptionOfferBanner(): SubscriptionOfferBannerUiModel? {
-        if (monitorSubscriptionOfferMenuBannerClosedUseCase().first()) return null
-        return getRecommendedSubscriptionWithOfferUseCase()
-            ?.let { subscriptionOfferBannerMapper(it.subscription, Locale.getDefault()) }
     }
 
     /**

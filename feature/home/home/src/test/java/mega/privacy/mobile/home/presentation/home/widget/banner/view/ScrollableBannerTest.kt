@@ -1,6 +1,10 @@
 package mega.privacy.mobile.home.presentation.home.widget.banner.view
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -213,6 +217,35 @@ class ScrollableBannerTest {
             .assertIsDisplayed()
         composeRule.onNodeWithText("€4.99/month for Pro I", substring = true).assertIsDisplayed()
         composeRule.onNodeWithText("Grab deal").assertIsDisplayed()
+    }
+
+    /**
+     * The offer loads after the promo banners, so it is prepended to a list the LazyRow has already
+     * anchored to the first promo banner's key, which would leave the offer off-screen to the left.
+     */
+    @Test
+    fun `test that the offer banner is scrolled into view when it loads after the promo banners`() {
+        var offer by mutableStateOf<SubscriptionOfferBannerUiModel?>(null)
+
+        composeRule.setContent {
+            AndroidThemeForPreviews {
+                ScrollableBanner(
+                    offerBanner = offer,
+                    banners = listOf(banner1, banner2),
+                    onDismiss = { _, _ -> },
+                    onClick = {},
+                )
+            }
+        }
+        composeRule.onNodeWithText(banner1.title).assertIsDisplayed()
+
+        offer = offerBanner
+        composeRule.waitForIdle()
+
+        val offerBounds = composeRule
+            .onNodeWithText("Black Friday · Get 50% off", substring = true)
+            .getUnclippedBoundsInRoot()
+        assertThat(offerBounds.left.value).isAtLeast(0f)
     }
 
     @Test

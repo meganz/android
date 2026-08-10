@@ -3,6 +3,7 @@ package mega.privacy.android.feature.payment.presentation.offer
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -10,7 +11,7 @@ import mega.privacy.android.core.test.extension.CoroutineMainDispatcherExtension
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.RecommendedSubscriptionOffer
-import mega.privacy.android.domain.usecase.billing.GetRecommendedSubscriptionWithOfferUseCase
+import mega.privacy.android.domain.usecase.billing.MonitorSubscriptionOfferUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.feature.payment.model.LocalisedSubscription
 import mega.privacy.android.feature.payment.model.mapper.LocalisedSubscriptionMapper
@@ -24,7 +25,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.mockito.kotlin.wheneverBlocking
 
 @ExtendWith(CoroutineMainDispatcherExtension::class)
 @ExperimentalCoroutinesApi
@@ -33,8 +33,7 @@ class SubscriptionOfferViewModelTest {
 
     private lateinit var underTest: SubscriptionOfferViewModel
 
-    private val getRecommendedSubscriptionWithOfferUseCase =
-        mock<GetRecommendedSubscriptionWithOfferUseCase>()
+    private val monitorSubscriptionOfferUseCase = mock<MonitorSubscriptionOfferUseCase>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
     private val localisedSubscriptionMapper = mock<LocalisedSubscriptionMapper>()
     private val localisedSubscription = mock<LocalisedSubscription>()
@@ -42,7 +41,7 @@ class SubscriptionOfferViewModelTest {
     @BeforeEach
     fun setUp() {
         reset(
-            getRecommendedSubscriptionWithOfferUseCase,
+            monitorSubscriptionOfferUseCase,
             monitorConnectivityUseCase,
             localisedSubscriptionMapper,
         )
@@ -57,28 +56,43 @@ class SubscriptionOfferViewModelTest {
 
     private fun initViewModel() {
         underTest = SubscriptionOfferViewModel(
-            getRecommendedSubscriptionWithOfferUseCase = getRecommendedSubscriptionWithOfferUseCase,
+            monitorSubscriptionOfferUseCase = monitorSubscriptionOfferUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             localisedSubscriptionMapper = localisedSubscriptionMapper,
         )
     }
 
     /**
-     * Stubs the recommended offer with a subscription on [sku], returning the promoted
-     * [Subscription] so the test can assert which billing period it was mapped on.
+     * Stubs the monitored offer with a subscription on [sku], returning the promoted [Subscription]
+     * so the test can assert which billing period it was mapped on.
      */
     private fun stubOffer(sku: String, hasMultipleOffers: Boolean = false): Subscription {
-        val subscription = mock<Subscription> {
-            on { this.sku } doReturn sku
-            on { offerValidUntil } doReturn OFFER_VALID_UNTIL
-        }
-        val offer = mock<RecommendedSubscriptionOffer> {
+        val subscription = subscription(sku)
+        val offer = offer(subscription, hasMultipleOffers)
+        whenever(monitorSubscriptionOfferUseCase()).thenReturn(flowOf(Result.success(offer)))
+        return subscription
+    }
+
+    private fun stubNoOffer() {
+        whenever(monitorSubscriptionOfferUseCase())
+            .thenReturn(flowOf(Result.success(null)))
+    }
+
+    private fun stubOfferFailure() {
+        whenever(monitorSubscriptionOfferUseCase())
+            .thenReturn(flowOf(Result.failure(RuntimeException("boom"))))
+    }
+
+    private fun subscription(sku: String) = mock<Subscription> {
+        on { this.sku } doReturn sku
+        on { offerValidUntil } doReturn OFFER_VALID_UNTIL
+    }
+
+    private fun offer(subscription: Subscription, hasMultipleOffers: Boolean = false) =
+        mock<RecommendedSubscriptionOffer> {
             on { this.subscription } doReturn subscription
             on { this.hasMultipleOffers } doReturn hasMultipleOffers
         }
-        wheneverBlocking { getRecommendedSubscriptionWithOfferUseCase() }.thenReturn(offer)
-        return subscription
-    }
 
     @Test
     fun `test that init exposes a monthly offer on the monthly billing period`() = runTest {
@@ -129,7 +143,7 @@ class SubscriptionOfferViewModelTest {
 
     @Test
     fun `test that init exposes no offer when there is no recommended subscription`() = runTest {
-        wheneverBlocking { getRecommendedSubscriptionWithOfferUseCase() }.thenReturn(null)
+        stubNoOffer()
         initViewModel()
 
         underTest.state.test {
@@ -143,7 +157,7 @@ class SubscriptionOfferViewModelTest {
     @Test
     fun `test that init does not report a load error when there is no recommended subscription`() =
         runTest {
-            wheneverBlocking { getRecommendedSubscriptionWithOfferUseCase() }.thenReturn(null)
+            stubNoOffer()
             initViewModel()
 
             underTest.state.test {
@@ -153,8 +167,7 @@ class SubscriptionOfferViewModelTest {
 
     @Test
     fun `test that init exposes no offer when loading fails`() = runTest {
-        wheneverBlocking { getRecommendedSubscriptionWithOfferUseCase() }
-            .thenThrow(RuntimeException("boom"))
+        stubOfferFailure()
         initViewModel()
 
         underTest.state.test {
@@ -166,8 +179,7 @@ class SubscriptionOfferViewModelTest {
 
     @Test
     fun `test that init reports a load error when loading fails`() = runTest {
-        wheneverBlocking { getRecommendedSubscriptionWithOfferUseCase() }
-            .thenThrow(RuntimeException("boom"))
+        stubOfferFailure()
         initViewModel()
 
         underTest.state.test {
@@ -187,14 +199,34 @@ class SubscriptionOfferViewModelTest {
     }
 
     @Test
+    fun `test that the offer is cleared when the monitored offer goes away`() = runTest {
+        val offer = offer(subscription(Skus.SKU_PRO_I_MONTH))
+        val offers = MutableStateFlow<Result<RecommendedSubscriptionOffer?>>(Result.success(offer))
+        whenever(monitorSubscriptionOfferUseCase()).thenReturn(offers)
+        initViewModel()
+        advanceUntilIdle()
+        assertThat(underTest.state.value.offerSubscription).isEqualTo(localisedSubscription)
+
+        offers.value = Result.success(null)
+        advanceUntilIdle()
+
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.offerSubscription).isNull()
+            assertThat(state.offerValidUntil).isNull()
+            assertThat(state.hasMultipleOffers).isFalse()
+            assertThat(state.hasLoadError).isFalse()
+        }
+    }
+
+    @Test
     fun `test that onRetry exposes the offer when loading succeeds`() = runTest {
-        wheneverBlocking { getRecommendedSubscriptionWithOfferUseCase() }
-            .thenThrow(RuntimeException("boom"))
+        stubOfferFailure()
         initViewModel()
         advanceUntilIdle()
         assertThat(underTest.state.value.hasLoadError).isTrue()
 
-        reset(getRecommendedSubscriptionWithOfferUseCase)
+        reset(monitorSubscriptionOfferUseCase)
         stubOffer(Skus.SKU_PRO_I_MONTH)
         underTest.onRetry()
         advanceUntilIdle()
@@ -209,8 +241,7 @@ class SubscriptionOfferViewModelTest {
 
     @Test
     fun `test that onRetry keeps the load error when loading fails again`() = runTest {
-        wheneverBlocking { getRecommendedSubscriptionWithOfferUseCase() }
-            .thenThrow(RuntimeException("boom"))
+        stubOfferFailure()
         initViewModel()
         advanceUntilIdle()
 
