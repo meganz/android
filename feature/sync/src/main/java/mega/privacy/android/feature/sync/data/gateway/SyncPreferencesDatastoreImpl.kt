@@ -24,6 +24,7 @@ internal class SyncPreferencesDatastoreImpl @Inject constructor(
     private val onboardingShownKey = booleanPreferencesKey("onboardingShown")
     private val syncOnlyByWiFiKey = booleanPreferencesKey("syncOnlyByWiFi")
     private val syncOnlyByChargingKey = booleanPreferencesKey("syncOnlyByCharging")
+    private val pauseSyncOnBatterySaverKey = booleanPreferencesKey("pauseSyncOnBatterySaver")
     private val syncFrequencyKey = intPreferencesKey("syncFrequency")
     private val shouldRunForegroundKey = booleanPreferencesKey("shouldRunForeground")
 
@@ -53,6 +54,15 @@ internal class SyncPreferencesDatastoreImpl @Inject constructor(
 
     override fun monitorSyncOnlyByCharging(): Flow<Boolean?> =
         dataStore.data.map { it[syncOnlyByChargingKey] }
+
+    override suspend fun setPauseSyncOnBatterySaver(checked: Boolean) {
+        dataStore.edit {
+            it[pauseSyncOnBatterySaverKey] = checked
+        }
+    }
+
+    override fun monitorPauseSyncOnBatterySaver(): Flow<Boolean?> =
+        dataStore.data.map { it[pauseSyncOnBatterySaverKey] }
 
     override suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int) {
         dataStore.edit {

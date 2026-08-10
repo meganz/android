@@ -128,6 +128,27 @@ internal class SyncPreferencesRepositoryImplTest {
     }
 
     @Test
+    fun `test that setPauseSyncOnBatterySaver calls setPauseSyncOnBatterySaver on datastore`() =
+        runTest {
+            underTest.setPauseSyncOnBatterySaver(true)
+
+            verify(syncPreferencesDatastore).setPauseSyncOnBatterySaver(true)
+        }
+
+    @Test
+    fun `test that monitorPauseSyncOnBatterySaver returns flow from datastore`() = runTest {
+        val flow = flowOf(true)
+        whenever(syncPreferencesDatastore.monitorPauseSyncOnBatterySaver()).thenReturn(flow)
+
+        val result = underTest.monitorPauseSyncOnBatterySaver()
+
+        result.test {
+            assertThat(awaitItem()).isEqualTo(true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that isSyncPausedByTheUser returns false when gateway returns null`() = runTest {
         val syncId = 123L
         whenever(userPausedSyncGateway.getUserPausedSync(syncId)).thenReturn(null)

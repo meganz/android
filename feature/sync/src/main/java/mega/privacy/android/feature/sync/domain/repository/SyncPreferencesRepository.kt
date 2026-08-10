@@ -27,6 +27,16 @@ interface SyncPreferencesRepository {
      */
     fun monitorSyncByCharging(): Flow<Boolean?>
 
+    /**
+     * Sets if sync should be paused when the device is in power save mode (battery saver)
+     */
+    suspend fun setPauseSyncOnBatterySaver(checked: Boolean)
+
+    /**
+     * Gets if sync should be paused when the device is in power save mode (battery saver)
+     */
+    fun monitorPauseSyncOnBatterySaver(): Flow<Boolean?>
+
     suspend fun setOnboardingShown(shown: Boolean)
 
     suspend fun getOnboardingShown(): Boolean?

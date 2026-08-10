@@ -29,6 +29,13 @@ internal class SyncPreferencesRepositoryImpl @Inject constructor(
     override fun monitorSyncByCharging(): Flow<Boolean?> =
         syncPreferencesDatastore.monitorSyncOnlyByCharging()
 
+    override suspend fun setPauseSyncOnBatterySaver(checked: Boolean) {
+        syncPreferencesDatastore.setPauseSyncOnBatterySaver(checked)
+    }
+
+    override fun monitorPauseSyncOnBatterySaver(): Flow<Boolean?> =
+        syncPreferencesDatastore.monitorPauseSyncOnBatterySaver()
+
     override suspend fun setOnboardingShown(shown: Boolean) {
         syncPreferencesDatastore.setOnboardingShown(shown)
     }

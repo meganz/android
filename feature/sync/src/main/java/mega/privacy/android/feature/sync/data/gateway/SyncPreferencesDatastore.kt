@@ -16,6 +16,10 @@ internal interface SyncPreferencesDatastore {
 
     fun monitorSyncOnlyByCharging(): Flow<Boolean?>
 
+    suspend fun setPauseSyncOnBatterySaver(checked: Boolean)
+
+    fun monitorPauseSyncOnBatterySaver(): Flow<Boolean?>
+
     suspend fun setSyncFrequencyInMinutes(frequencyInMinutes: Int)
 
     suspend fun getSyncFrequencyMinutes(): Int?

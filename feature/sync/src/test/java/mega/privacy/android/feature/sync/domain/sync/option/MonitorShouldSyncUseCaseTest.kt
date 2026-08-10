@@ -13,7 +13,9 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.BatteryInfo
 import mega.privacy.android.domain.usecase.IsOnWifiNetworkUseCase
 import mega.privacy.android.domain.usecase.environment.MonitorBatteryInfoUseCase
+import mega.privacy.android.domain.usecase.environment.MonitorPowerSaveModeUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorPauseSyncOnBatterySaverUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorShouldSyncUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByChargingUseCase
 import mega.privacy.android.feature.sync.domain.usecase.sync.option.MonitorSyncByWiFiUseCase
@@ -31,7 +33,10 @@ internal class MonitorShouldSyncUseCaseTest {
 
     private val monitorSyncByWiFiUseCase: MonitorSyncByWiFiUseCase = mock()
     private val monitorSyncByChargingUseCase: MonitorSyncByChargingUseCase = mock()
+    private val monitorPauseSyncOnBatterySaverUseCase: MonitorPauseSyncOnBatterySaverUseCase =
+        mock()
     private val monitorBatteryInfoUseCase: MonitorBatteryInfoUseCase = mock()
+    private val monitorPowerSaveModeUseCase: MonitorPowerSaveModeUseCase = mock()
     private val isOnWifiNetworkUseCase: IsOnWifiNetworkUseCase = mock()
 
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
@@ -39,7 +44,9 @@ internal class MonitorShouldSyncUseCaseTest {
     private val underTest = MonitorShouldSyncUseCase(
         monitorSyncByWiFiUseCase = monitorSyncByWiFiUseCase,
         monitorSyncByChargingUseCase = monitorSyncByChargingUseCase,
+        monitorPauseSyncOnBatterySaverUseCase = monitorPauseSyncOnBatterySaverUseCase,
         monitorBatteryInfoUseCase = monitorBatteryInfoUseCase,
+        monitorPowerSaveModeUseCase = monitorPowerSaveModeUseCase,
         isOnWifiNetworkUseCase = isOnWifiNetworkUseCase,
         monitorConnectivityUseCase = monitorConnectivityUseCase
     )
@@ -49,7 +56,9 @@ internal class MonitorShouldSyncUseCaseTest {
         reset(
             monitorSyncByWiFiUseCase,
             monitorSyncByChargingUseCase,
+            monitorPauseSyncOnBatterySaverUseCase,
             monitorBatteryInfoUseCase,
+            monitorPowerSaveModeUseCase,
             isOnWifiNetworkUseCase,
             monitorConnectivityUseCase
         )
@@ -187,6 +196,120 @@ internal class MonitorShouldSyncUseCaseTest {
     }
 
     @Test
+    fun `test that sync is not allowed when pause on battery saver is enabled and device is in power save mode`() =
+        runTest {
+            setupMocks(
+                batteryInfo = BatteryInfo(level = 50, isCharging = false),
+                wiFiOnly = false,
+                chargingOnly = false,
+                isOnWiFi = true,
+                pauseOnBatterySaver = true,
+                isInPowerSaveMode = true
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                assertThat(result).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sync is allowed when pause on battery saver is enabled but device is not in power save mode`() =
+        runTest {
+            setupMocks(
+                batteryInfo = BatteryInfo(level = 50, isCharging = false),
+                wiFiOnly = false,
+                chargingOnly = false,
+                isOnWiFi = true,
+                pauseOnBatterySaver = true,
+                isInPowerSaveMode = false
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                assertThat(result).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sync is allowed when device is in power save mode but pause on battery saver is disabled`() =
+        runTest {
+            setupMocks(
+                batteryInfo = BatteryInfo(level = 50, isCharging = false),
+                wiFiOnly = false,
+                chargingOnly = false,
+                isOnWiFi = true,
+                pauseOnBatterySaver = false,
+                isInPowerSaveMode = true
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                assertThat(result).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sync is allowed when device is in power save mode but is charging`() =
+        runTest {
+            setupMocks(
+                batteryInfo = BatteryInfo(level = 50, isCharging = true),
+                wiFiOnly = false,
+                chargingOnly = false,
+                isOnWiFi = true,
+                pauseOnBatterySaver = true,
+                isInPowerSaveMode = true
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                assertThat(result).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sync is allowed when charging only and pause on battery saver are both enabled and device is charging in power save mode`() =
+        runTest {
+            setupMocks(
+                batteryInfo = BatteryInfo(level = 50, isCharging = true),
+                wiFiOnly = false,
+                chargingOnly = true,
+                isOnWiFi = true,
+                pauseOnBatterySaver = true,
+                isInPowerSaveMode = true
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                assertThat(result).isTrue()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that sync is not allowed when charging only and pause on battery saver are both enabled and device is not charging`() =
+        runTest {
+            setupMocks(
+                batteryInfo = BatteryInfo(level = 50, isCharging = false),
+                wiFiOnly = false,
+                chargingOnly = true,
+                isOnWiFi = true,
+                pauseOnBatterySaver = true,
+                isInPowerSaveMode = true
+            )
+
+            underTest().test {
+                val result = awaitItem()
+                assertThat(result).isFalse()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that sync is not allowed when isOnWifiNetworkUseCase throws exception`() = runTest {
         setupMocks(
             batteryInfo = BatteryInfo(level = 50, isCharging = false),
@@ -297,11 +420,15 @@ internal class MonitorShouldSyncUseCaseTest {
         wiFiOnly: Boolean,
         chargingOnly: Boolean,
         isOnWiFi: Boolean,
+        pauseOnBatterySaver: Boolean = false,
+        isInPowerSaveMode: Boolean = false,
         connectivityFlow: Flow<Boolean>? = null,
     ) {
         whenever(monitorBatteryInfoUseCase()).thenReturn(flowOf(batteryInfo))
         whenever(monitorSyncByWiFiUseCase()).thenReturn(flowOf(wiFiOnly))
         whenever(monitorSyncByChargingUseCase()).thenReturn(flowOf(chargingOnly))
+        whenever(monitorPauseSyncOnBatterySaverUseCase()).thenReturn(flowOf(pauseOnBatterySaver))
+        whenever(monitorPowerSaveModeUseCase()).thenReturn(flowOf(isInPowerSaveMode))
         wheneverBlocking { isOnWifiNetworkUseCase() }.thenReturn(isOnWiFi)
         whenever(monitorConnectivityUseCase()).thenReturn(
             connectivityFlow ?: flowOf(true).onCompletion {
