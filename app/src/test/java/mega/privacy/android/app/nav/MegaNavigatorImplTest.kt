@@ -24,6 +24,7 @@ import mega.privacy.android.navigation.OpenTextEditorParams
 import mega.privacy.android.navigation.contract.queue.NavPriority
 import mega.privacy.android.navigation.contract.queue.NavigationEventQueue
 import mega.privacy.android.navigation.contract.queue.snackbar.SnackbarEventQueue
+import mega.privacy.android.navigation.destination.ContactInfoNavKey
 import mega.privacy.android.navigation.destination.LegacyTextEditorNavKey
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
@@ -307,5 +308,43 @@ class MegaNavigatorImplTest {
             )
 
             verify(context).startActivity(any())
+        }
+
+    @Test
+    fun `test that openContactInfoActivity by email emits nav key when in single activity`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openContactInfoActivity(context, "contact@mega.co.nz")
+
+            verify(navigationQueue).emit(
+                argThat<NavKey> { navKey ->
+                    navKey is ContactInfoNavKey &&
+                            navKey.email == "contact@mega.co.nz" &&
+                            navKey.chatId == null
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+            verify(context, never()).startActivity(any())
+        }
+
+    @Test
+    fun `test that openContactInfoActivity by chatId emits nav key when in single activity`() =
+        runTest {
+            whenever(activityLifecycleHandler.getCurrentActivity()).thenReturn(mock<MegaActivity>())
+
+            underTest.openContactInfoActivity(context, 123L)
+
+            verify(navigationQueue).emit(
+                argThat<NavKey> { navKey ->
+                    navKey is ContactInfoNavKey &&
+                            navKey.chatId == 123L &&
+                            navKey.email == null
+                },
+                eq(NavPriority.Default),
+                isNull(),
+            )
+            verify(context, never()).startActivity(any())
         }
 }

@@ -402,6 +402,9 @@
             android:theme="@style/Theme.Mega"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity android:name=".presentation.contactinfo.ContactInfoActivity" />
+        <activity
+            android:name=".presentation.contactinfo.ContactInfoComposeActivity"
+            android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".presentation.fileinfo.FileInfoActivity" />
         <activity
             android:name=".activities.OfflineFileInfoActivity"

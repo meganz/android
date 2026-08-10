@@ -30,6 +30,8 @@ import mega.privacy.android.app.presentation.contact.CreateGroupChatComposeActiv
 import mega.privacy.android.app.presentation.contact.NewChatComposeActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactActivity
 import mega.privacy.android.app.presentation.contact.invite.InviteContactViewModel
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoActivity
+import mega.privacy.android.app.presentation.contactinfo.ContactInfoComposeActivity
 import mega.privacy.android.app.presentation.imagepreview.ImagePreviewActivity
 import mega.privacy.android.app.presentation.imagepreview.fetcher.OfflineImageNodeFetcher
 import mega.privacy.android.app.presentation.imagepreview.model.ImagePreviewFetcherSource
@@ -961,15 +963,37 @@ internal class MegaNavigatorImpl @Inject constructor(
     }
 
     override fun openContactInfoActivity(context: Context, email: String) {
-        navigateForSingleActivity(
-            context = context, singleActivityDestination = ContactInfoNavKey(email = email)
-        )
+        navigateIfInSingleActivity(
+            singleActivityDestination = ContactInfoNavKey(email = email)
+        ) {
+            val isContactInfoComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactInfoComposeUIEnabled) {
+                ContactInfoComposeActivity.getIntent(context, email)
+            } else {
+                Intent(context, ContactInfoActivity::class.java)
+                    .apply { putExtra(Constants.NAME, email) }
+            }
+            context.startActivity(intent)
+        }
     }
 
     override fun openContactInfoActivity(context: Context, chatId: Long) {
-        navigateForSingleActivity(
-            context = context, singleActivityDestination = ContactInfoNavKey(chatId = chatId)
-        )
+        navigateIfInSingleActivity(
+            singleActivityDestination = ContactInfoNavKey(chatId = chatId)
+        ) {
+            val isContactInfoComposeUIEnabled = runCatching {
+                getFeatureFlagValueUseCase(AppFeatures.ContactInfoComposeUI)
+            }.getOrDefault(false)
+            val intent = if (isContactInfoComposeUIEnabled) {
+                ContactInfoComposeActivity.getIntent(context, chatId)
+            } else {
+                Intent(context, ContactInfoActivity::class.java)
+                    .apply { putExtra(Constants.HANDLE, chatId) }
+            }
+            context.startActivity(intent)
+        }
     }
 
 
