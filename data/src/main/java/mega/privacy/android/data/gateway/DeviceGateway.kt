@@ -126,6 +126,16 @@ interface DeviceGateway {
     val monitorDevicePowerConnectionState: Flow<String?>
 
     /**
+     * Check if the device is in power save mode (Battery Saver)
+     */
+    fun isInPowerSaveMode(): Boolean
+
+    /**
+     * Monitor power save mode (Battery Saver) changes
+     */
+    val monitorPowerSaveState: Flow<Boolean>
+
+    /**
      * Monitor thermal state
      */
     val monitorThermalState: Flow<Int>

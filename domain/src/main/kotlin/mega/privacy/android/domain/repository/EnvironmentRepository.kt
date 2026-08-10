@@ -113,6 +113,13 @@ interface EnvironmentRepository {
     fun monitorDevicePowerConnectionState(): Flow<DevicePowerConnectionState>
 
     /**
+     * Monitor power save mode (Battery Saver)
+     *
+     * @return a Flow that emits true when power save mode is enabled
+     */
+    fun monitorPowerSaveMode(): Flow<Boolean>
+
+    /**
      * Get the number of available processors
      */
     fun availableProcessors(): Int

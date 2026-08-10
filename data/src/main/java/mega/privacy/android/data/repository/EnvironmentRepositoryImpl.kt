@@ -108,6 +108,11 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     override fun monitorDevicePowerConnectionState() =
         deviceGateway.monitorDevicePowerConnectionState.map { devicePowerConnectionStateMapper(it) }
 
+    override fun monitorPowerSaveMode() =
+        deviceGateway.monitorPowerSaveState
+            .onStart { emit(deviceGateway.isInPowerSaveMode()) }
+            .flowOn(ioDispatcher)
+
     override fun availableProcessors() =
         deviceGateway.getAvailableProcessors()
 

@@ -186,6 +186,18 @@ internal class EnvironmentRepositoryImplTest {
     }
 
     @Test
+    fun `test that monitorPowerSaveMode emits the current state followed by updates`() = runTest {
+        whenever(deviceGateway.isInPowerSaveMode()).thenReturn(false)
+        whenever(deviceGateway.monitorPowerSaveState).thenReturn(flowOf(true))
+
+        underTest.monitorPowerSaveMode().test {
+            assertThat(awaitItem()).isFalse()
+            assertThat(awaitItem()).isTrue()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `test that getTimezone returns the correct timezone`() = runTest {
         val expectedTimezone = "expectedTimezone"
         whenever(deviceGateway.getTimezone()).thenReturn(expectedTimezone)

@@ -188,6 +188,22 @@ internal class AndroidDeviceGateway @Inject constructor(
         }.catch {
             Timber.e(it, "An Exception occurred when monitoring the device power connection")
         }.toSharedFlow(appScope)
+
+    override fun isInPowerSaveMode(): Boolean {
+        val powerManager =
+            context.applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+        return powerManager.isPowerSaveMode
+    }
+
+    override val monitorPowerSaveState =
+        context.registerReceiverAsFlow(
+            flags = ContextCompat.RECEIVER_NOT_EXPORTED,
+            PowerManager.ACTION_POWER_SAVE_MODE_CHANGED,
+        ).map {
+            isInPowerSaveMode()
+        }.catch {
+            Timber.e(it, "An Exception occurred when monitoring the power save mode")
+        }.toSharedFlow(appScope)
 }
 
 private fun <T> Flow<T>.toSharedFlow(
