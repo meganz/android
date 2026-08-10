@@ -266,6 +266,17 @@ class FolderTypeMapperTest {
     }
 
     @Test
+    fun `test that folder in synced node ids is marked as a Sync folder`() = runTest {
+        val dataWithSyncedIds = folderTypeData.copy(
+            syncedNodeIds = setOf(folderId)
+        )
+
+        val actual = underTest(testFolder, dataWithSyncedIds)
+
+        assertThat(actual).isEqualTo(FolderType.Sync)
+    }
+
+    @Test
     fun `test that empty device string is not considered a device folder`() = runTest {
         val folderWithEmptyDevice = mock<FolderNode> {
             on { id }.thenReturn(folderId)

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
@@ -159,6 +160,15 @@ interface NodeRepository {
         folderTypeData: FolderTypeData? = null,
         sensitivityFilter: SensitivityFilterOption? = null,
     ): List<TypedNode>
+
+    /**
+     * Determine the folder type of a folder using pre-fetched [FolderTypeData]
+     *
+     * @param folder [FolderNode]
+     * @param folderTypeData [FolderTypeData]
+     * @return [FolderType]
+     */
+    suspend fun getFolderType(folder: FolderNode, folderTypeData: FolderTypeData): FolderType
 
     /**
      * Get node children in chunks for progressive loading

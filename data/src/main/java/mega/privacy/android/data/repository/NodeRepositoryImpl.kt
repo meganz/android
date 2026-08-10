@@ -41,6 +41,7 @@ import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.node.FolderTypeMapper
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -56,6 +57,7 @@ import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.domain.entity.NodeLabel
 import mega.privacy.android.domain.entity.Offline
@@ -145,6 +147,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val stringListMapper: StringListMapper,
     private val nodeLabelMapper: NodeLabelMapper,
     private val typedNodeMapper: TypedNodeMapper,
+    private val folderTypeMapper: FolderTypeMapper,
     private val nodePathMapper: NodePathMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : NodeRepository {
@@ -1361,6 +1364,13 @@ internal class NodeRepositoryImpl @Inject constructor(
                 offline = offlineItems[megaNode.handle.toString()]
             )
         }.filterNotNull()
+    }
+
+    override suspend fun getFolderType(
+        folder: FolderNode,
+        folderTypeData: FolderTypeData,
+    ): FolderType = withContext(ioDispatcher) {
+        folderTypeMapper(folder, folderTypeData)
     }
 
     override suspend fun getTypedNodesByIdInChunks(

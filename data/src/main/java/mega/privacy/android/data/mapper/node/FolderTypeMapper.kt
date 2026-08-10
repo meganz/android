@@ -31,10 +31,13 @@ class FolderTypeMapper @Inject constructor(
                 isRootBackup(id, data) -> FolderType.RootBackup
                 isChildBackup(id, data) -> FolderType.ChildBackup
                 isDeviceFolder(this) -> FolderType.DeviceBackup(getDeviceType(this))
-                folder.isSynced -> FolderType.Sync
+                isSyncedFolder(this, data) -> FolderType.Sync
                 else -> FolderType.Default
             }
         }
+
+    private fun isSyncedFolder(folder: FolderNode, data: FolderTypeData) =
+        folder.isSynced || folder.id in data.syncedNodeIds
 
     private fun isMediaSyncFolder(nodeId: NodeId, data: FolderTypeData) =
         nodeId.longValue in listOfNotNull(
@@ -51,7 +54,7 @@ class FolderTypeMapper @Inject constructor(
         nodeId: NodeId,
         data: FolderTypeData,
     ) = data.backupFolderPath?.let { backupFolderPath ->
-        val nodePath = megaApiGateway.getNodePathByHandle(nodeId.longValue) ?: return false
+        val nodePath = megaApiGateway.getNodePathByHandle(nodeId.longValue) ?: return@let false
         nodePath.startsWith(backupFolderPath)
     } ?: false
 

@@ -29,6 +29,9 @@ import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.StringListMapper
 import mega.privacy.android.data.mapper.node.FileNodeMapper
+import mega.privacy.android.data.mapper.node.FolderTypeMapper
+import mega.privacy.android.domain.entity.FolderType
+import mega.privacy.android.domain.entity.FolderTypeData
 import mega.privacy.android.data.mapper.node.MegaNodeMapper
 import mega.privacy.android.data.mapper.node.NodeListMapper
 import mega.privacy.android.data.mapper.node.NodeMapper
@@ -141,6 +144,7 @@ internal class NodeRepositoryImplTest {
     private val workManagerGateway = mock<WorkManagerGateway>()
     private val nodeLabelMapper = mock<NodeLabelMapper>()
     private val typedNodeMapper = mock<TypedNodeMapper>()
+    private val folderTypeMapper = mock<FolderTypeMapper>()
 
     private val fileNodeMapper = mock<FileNodeMapper>()
     private val nodeMapper = mock<NodeMapper>()
@@ -189,6 +193,7 @@ internal class NodeRepositoryImplTest {
             stringListMapper = stringListMapper,
             nodeLabelMapper = nodeLabelMapper,
             typedNodeMapper = typedNodeMapper,
+            folderTypeMapper = folderTypeMapper,
             nodePathMapper = nodePathMapper,
             applicationScope = CoroutineScope(UnconfinedTestDispatcher()),
         )
@@ -223,6 +228,7 @@ internal class NodeRepositoryImplTest {
             megaNodeMapper,
             workManagerGateway,
             nodePathMapper,
+            folderTypeMapper,
         )
     }
 
@@ -411,6 +417,24 @@ internal class NodeRepositoryImplTest {
             val actual = underTest.getNodeOutgoingShares(nodeId)
             assertThat(actual).containsExactly(share)
         }
+
+    @Test
+    fun `test that getFolderType returns the type from folderTypeMapper`() = runTest {
+        val folderTypeData = FolderTypeData(
+            primarySyncHandle = null,
+            secondarySyncHandle = null,
+            chatFilesFolderId = null,
+            backupFolderId = null,
+            backupFolderPath = null,
+            syncedNodeIds = emptySet(),
+        )
+        whenever(folderTypeMapper(folderNode, folderTypeData))
+            .thenReturn(FolderType.ChatFilesFolder)
+
+        val actual = underTest.getFolderType(folderNode, folderTypeData)
+
+        assertThat(actual).isEqualTo(FolderType.ChatFilesFolder)
+    }
 
     @Test
     fun `test that getNodePathById returns an empty node path if getNodePathByHandle returns null`() =
