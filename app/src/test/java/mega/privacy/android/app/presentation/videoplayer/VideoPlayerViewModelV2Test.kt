@@ -492,6 +492,40 @@ class VideoPlayerViewModelV2Test {
     }
 
     @Test
+    fun `test that isGesturesEnabled is set to true when feature flag returns true`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerGestures)).thenReturn(true)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isGesturesEnabled).isTrue()
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `test that isGesturesEnabled is set to false when feature flag returns false`() = runTest {
+        whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerGestures)).thenReturn(false)
+        initViewModel()
+        underTest.uiState.test {
+            assertThat(awaitItem().isGesturesEnabled).isFalse()
+            cancelAndConsumeRemainingEvents()
+        }
+        verify(getFeatureFlagValueUseCase).invoke(ApiFeatures.VideoPlayerGestures)
+    }
+
+    @Test
+    fun `test that isGesturesEnabled remains false when feature flag throws an exception`() =
+        runTest {
+            whenever(getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerGestures)).thenThrow(
+                RuntimeException("flag error")
+            )
+            initViewModel()
+            underTest.uiState.test {
+                assertThat(awaitItem().isGesturesEnabled).isFalse()
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
     fun `test that isConnected is updated to true when monitorConnectivityUseCase emits true`() =
         runTest {
             initViewModel()

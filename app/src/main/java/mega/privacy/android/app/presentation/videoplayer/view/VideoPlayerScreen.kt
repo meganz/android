@@ -418,6 +418,10 @@ internal fun VideoPlayerScreen(
         videoPlayerController?.updatePlaybackState(uiState.mediaPlaybackState)
     }
 
+    LaunchedEffect(uiState.isGesturesEnabled) {
+        videoPlayerController?.updateGesturesEnabled(uiState.isGesturesEnabled)
+    }
+
     DisposableEffect(Unit) {
         playbackState = player?.playbackState ?: STATE_IDLE
         isPlaying = player?.isPlaying ?: false

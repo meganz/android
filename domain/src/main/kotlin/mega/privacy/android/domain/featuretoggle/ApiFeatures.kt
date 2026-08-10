@@ -22,6 +22,17 @@ enum class ApiFeatures(
 ) : ApiFeature {
 
     /**
+     * Video Player gesture seek controls.
+     * When enabled, shows a seek-seconds overlay when the user taps the forward/backward
+     * buttons or double-taps the left/right side of the screen.
+     */
+    VideoPlayerGestures(
+        experimentName = "vpges",
+        description = "Enable gesture seek controls in Video Player",
+        defaultValue = false,
+    ),
+
+    /**
      * Quota-warning upsell screen (AND-24264).
      * When enabled, the storage over-quota flow shows the new quota-warning upsell screen instead
      * of the legacy over-quota dialog.

@@ -74,6 +74,7 @@ import mega.privacy.android.legacy.core.ui.model.SearchWidgetState
  *   current playing node, used to drive confirmation dialogs and snack bars from the activity.
  * @property isPipEnabled whether the Picture in Picture feature is enabled via feature flag
  * @property isInPipMode whether the video player is currently displayed in PIP mode
+ * @property isGesturesEnabled whether gesture seek controls are enabled via feature flag
  * @property isFromLink whether the video was opened from a public link (file link, folder link, or album sharing)
  * @property isLoggedIn whether the user is currently logged in; used together with [isFromLink] to determine if session validation is required
  * @property isFromOffline whether the video was opened from offline storage; when true the player reads a local file and needs no SDK session
@@ -137,6 +138,7 @@ data class VideoPlayerUiState(
     val moveOrRemoveNodeEvent: StateEventWithContent<MoveOrRemoveNodeResult> = consumed(),
     val isPipEnabled: Boolean = false,
     val isInPipMode: Boolean = false,
+    val isGesturesEnabled: Boolean = false,
     val isFromLink: Boolean = false,
     val isLoggedIn: Boolean = false,
     val isFromOffline: Boolean = false,

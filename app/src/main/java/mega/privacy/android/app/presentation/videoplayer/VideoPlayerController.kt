@@ -6,35 +6,63 @@ import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Matrix
+import android.os.Handler
+import android.os.Looper
+import android.util.TypedValue
 import android.view.GestureDetector
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.OptIn
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.isVisible
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerView
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import mega.android.core.ui.components.MegaText
+import mega.android.core.ui.components.image.MegaIcon
+import mega.android.core.ui.theme.AppTheme
+import mega.android.core.ui.theme.values.IconColor
+import mega.android.core.ui.theme.values.TextColor
 import mega.privacy.android.analytics.Analytics
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.queue.audio.AudioQueueFragment.Companion.SINGLE_PLAYLIST_SIZE
 import mega.privacy.android.app.presentation.videoplayer.model.MediaPlaybackState
 import mega.privacy.android.app.presentation.videoplayer.model.VideoPlayerUiState
 import mega.privacy.android.domain.entity.mediaplayer.RepeatToggleMode
+import mega.privacy.android.icon.pack.IconPack
+import mega.privacy.android.shared.resources.R as SharedR
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToLandscapePressedEvent
 import mega.privacy.mobile.analytics.event.VideoPlayerRotateToPortraitPressedEvent
 import timber.log.Timber
+import kotlin.math.abs
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(UnstableApi::class)
 class VideoPlayerController(
@@ -61,6 +89,21 @@ class VideoPlayerController(
     private val speedPlaybackButton = container.findViewById<TextView>(R.id.speed_playback)
     private val deviceRotateButton = container.findViewById<ImageButton>(R.id.device_rotated)
 
+    private val rewButton = container.findViewById<ImageButton>(R.id.exo_rew)
+    private val ffwdButton = container.findViewById<ImageButton>(R.id.exo_ffwd)
+
+    // Seek indicator overlay — created programmatically so it stays visible even when
+    // the player controller is auto-hidden.
+    private lateinit var seekIndicatorView: ComposeView
+    private val seekState = mutableStateOf<SeekIndicatorState?>(null)
+
+    private val seekHandler = Handler(Looper.getMainLooper())
+    private var accumulatedSeekMs = 0L
+    private val hideSeekIndicatorRunnable = Runnable {
+        accumulatedSeekMs = 0L
+        seekState.value = null
+    }
+
     private var scaleGestureDetector: ScaleGestureDetector? = null
     private var gestureDetector: GestureDetector? = null
     private var zoomLevel = 1.0f
@@ -71,9 +114,11 @@ class VideoPlayerController(
     private var isFullscreen = mutableStateOf(uiState.isFullscreen)
     private var playbackState = uiState.mediaPlaybackState
     private var isLocked = mutableStateOf(uiState.isLocked)
+    private var isGesturesEnabled = uiState.isGesturesEnabled
     private var playQueueInOverflowMenu = mutableStateOf(uiState.items.size > SINGLE_PLAYLIST_SIZE)
 
     init {
+        initSeekIndicatorOverlay()
         playerComposeView.setControllerAnimationEnabled(false)
         setupRepeatToggleButton(uiState.repeatToggleMode)
         setupMoreOptionButton()
@@ -81,8 +126,77 @@ class VideoPlayerController(
         setupFullscreen(uiState.isFullscreen)
         setupLockButton()
         setupSpeedPlaybackButton()
+        setupSeekButtons()
         setupGestures()
         setupDeviceRotateButton()
+    }
+
+    private fun initSeekIndicatorOverlay() {
+        fun Int.toPx(): Int = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), context.resources.displayMetrics
+        ).toInt()
+
+        seekIndicatorView = ComposeView(context)
+        seekIndicatorView.setupComposeView(context) { SeekIndicatorContent() }
+
+        val isLandscape =
+            context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        val bottomMarginDp =
+            if (isLandscape) SEEK_INDICATOR_BOTTOM_MARGIN_LAND_DP
+            else SEEK_INDICATOR_BOTTOM_MARGIN_PORT_DP
+
+        playerComposeView.addView(
+            seekIndicatorView,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+            ).also {
+                it.bottomMargin = bottomMarginDp.toPx()
+            },
+        )
+    }
+
+    private data class SeekIndicatorState(val seconds: Int, val isForward: Boolean)
+
+    @Composable
+    private fun SeekIndicatorContent() {
+        val state = seekState.value ?: return
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color(0x80000000))
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+        ) {
+            if (!state.isForward) {
+                MegaIcon(
+                    painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.FastBackward),
+                    contentDescription = null,
+                    tint = IconColor.Primary,
+                    modifier = Modifier.size(16.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            MegaText(
+                text = pluralStringResource(
+                    SharedR.plurals.video_player_seek_seconds,
+                    state.seconds,
+                    state.seconds
+                ),
+                textColor = TextColor.Primary,
+                style = AppTheme.typography.labelLarge
+            )
+            if (state.isForward) {
+                Spacer(modifier = Modifier.width(8.dp))
+                MegaIcon(
+                    painter = rememberVectorPainter(IconPack.Medium.Regular.Solid.FastForward),
+                    contentDescription = null,
+                    tint = IconColor.Primary,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        }
     }
 
     /**
@@ -227,6 +341,51 @@ class VideoPlayerController(
         playbackState = state
     }
 
+    internal fun updateGesturesEnabled(enabled: Boolean) {
+        isGesturesEnabled = enabled
+    }
+
+    private fun setupSeekButtons() {
+        rewButton?.setOnClickListener {
+            if (!isLocked.value) {
+                seekByDelta(-SEEK_STEP.inWholeMilliseconds)
+                resetAutoHideTimer()
+            }
+        }
+        ffwdButton?.setOnClickListener {
+            if (!isLocked.value) {
+                seekByDelta(+SEEK_STEP.inWholeMilliseconds)
+                resetAutoHideTimer()
+            }
+        }
+    }
+
+    private fun seekByDelta(deltaMs: Long) {
+        val player = playerComposeView.player ?: return
+        val newPosition = (player.currentPosition + deltaMs).coerceAtLeast(0L)
+        player.seekTo(newPosition)
+
+        if (!isGesturesEnabled) return
+
+        if (accumulatedSeekMs != 0L && (accumulatedSeekMs > 0) != (deltaMs > 0)) {
+            accumulatedSeekMs = deltaMs
+        } else {
+            accumulatedSeekMs += deltaMs
+        }
+
+        val absoluteSeconds = (abs(accumulatedSeekMs) / 1000L).toInt()
+        seekState.value = SeekIndicatorState(
+            seconds = absoluteSeconds,
+            isForward = accumulatedSeekMs > 0,
+        )
+
+        seekHandler.removeCallbacks(hideSeekIndicatorRunnable)
+        seekHandler.postDelayed(
+            hideSeekIndicatorRunnable,
+            SEEK_INDICATOR_HIDE_DELAY.inWholeMilliseconds
+        )
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupGestures() {
         scaleGestureDetector = ScaleGestureDetector(
@@ -260,6 +419,19 @@ class VideoPlayerController(
 
                 override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
                     playerViewClicked()
+                    return true
+                }
+
+                override fun onDoubleTap(e: MotionEvent): Boolean {
+                    if (isLocked.value || !isGesturesEnabled) return false
+                    val viewWidth = playerComposeView.width
+                    if (viewWidth == 0) return false
+                    if (e.x < viewWidth / 2f) {
+                        seekByDelta(-SEEK_STEP.inWholeMilliseconds)
+                    } else {
+                        seekByDelta(+SEEK_STEP.inWholeMilliseconds)
+                    }
+                    resetAutoHideTimer()
                     return true
                 }
             })
@@ -301,9 +473,26 @@ class VideoPlayerController(
         unlockButton?.setOnClickListener(null)
         speedPlaybackButton?.setOnClickListener(null)
         deviceRotateButton?.setOnClickListener(null)
+        rewButton?.setOnClickListener(null)
+        ffwdButton?.setOnClickListener(null)
+
+        seekHandler.removeCallbacks(hideSeekIndicatorRunnable)
+        seekState.value = null
+        playerComposeView.removeView(seekIndicatorView)
 
         playerComposeView?.setOnTouchListener(null)
         scaleGestureDetector = null
         gestureDetector = null
+    }
+
+    companion object {
+        private val SEEK_STEP = 15.seconds
+        private val SEEK_INDICATOR_HIDE_DELAY = 3.seconds
+
+        // Portrait: positions overlay above the controller bar (~128 dp tall, 30 dp margin).
+        private const val SEEK_INDICATOR_BOTTOM_MARGIN_PORT_DP = 145
+
+        // Landscape: centers overlay between the timebar (~75 dp from bottom) and the play/pause button (screen center).
+        private const val SEEK_INDICATOR_BOTTOM_MARGIN_LAND_DP = 110
     }
 }

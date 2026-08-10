@@ -109,6 +109,8 @@ interface IconPackInterface {
                 val Repeat: ImageVector
                 val RepeatOne: ImageVector
                 val Shuffle: ImageVector
+                val FastForward: ImageVector
+                val FastBackward: ImageVector
             }
         }
 

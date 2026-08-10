@@ -332,6 +332,7 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
         monitorConnectivity()
         monitorTransferOverQuota()
         loadPipFeatureFlag()
+        loadGesturesFeatureFlag()
         loadLinkAndLoginState()
     }
 
@@ -377,6 +378,17 @@ class VideoPlayerViewModelV2 @AssistedInject constructor(
                 uiState.update { it.copy(isPipEnabled = enabled) }
             }.onFailure {
                 Timber.e(it)
+            }
+        }
+    }
+
+    private fun loadGesturesFeatureFlag() {
+        viewModelScope.launch {
+            runCatching {
+                val enabled = getFeatureFlagValueUseCase(ApiFeatures.VideoPlayerGestures)
+                uiState.update { it.copy(isGesturesEnabled = enabled) }
+            }.onFailure {
+                Timber.e(it, "Failed to load VideoPlayerGestures feature flag")
             }
         }
     }
