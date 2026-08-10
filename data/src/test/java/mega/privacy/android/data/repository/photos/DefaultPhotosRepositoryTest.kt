@@ -54,6 +54,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.ImageNodeInfo
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
 import mega.privacy.android.domain.repository.NodeRepository
@@ -595,6 +596,66 @@ class DefaultPhotosRepositoryTest {
         )
 
         verify(sdkFilter).byTimestampAnchor(section.startDate, section.endDate, 8)
+    }
+
+    @Test
+    fun `test that listImageNodeInfoByPage maps every paged node to an id and name ref`() =
+        runTest {
+            val sdkFilter = mock<MegaListAllNodesFilter>()
+            val nodeList = mock<MegaNodeList>()
+            val imageMegaNode = createMegaNode(handle = 1L, name = "a.jpg")
+            val svgMegaNode = createMegaNode(handle = 2L, name = "b.svg")
+            val videoMegaNode = createMegaNode(handle = 3L, name = "c.mp4")
+            whenever(mediaTimelineListFilterMapper(mediaTimelineFilter)).thenReturn(sdkFilter)
+            whenever(cancelTokenProvider.getOrCreateCancelToken()).thenReturn(mock())
+            whenever(
+                megaApiGateway.listAllNodesByPageAtOffset(any(), any(), anyOrNull(), any(), any())
+            ).thenReturn(nodeList)
+            whenever(megaApiGateway.getNodesFromMegaNodeList(nodeList))
+                .thenReturn(listOf(imageMegaNode, svgMegaNode, videoMegaNode))
+            underTest = createUnderTest()
+
+            val result = underTest.listImageNodeInfoByPage(
+                filter = mediaTimelineFilter,
+                section = null,
+                order = SortOrder.ORDER_MODIFICATION_DESC,
+                maxElements = 5,
+                offset = 0L,
+            )
+
+            assertThat(result).containsExactly(
+                ImageNodeInfo(id = NodeId(1L), name = "a.jpg"),
+                ImageNodeInfo(id = NodeId(2L), name = "b.svg"),
+                ImageNodeInfo(id = NodeId(3L), name = "c.mp4"),
+            ).inOrder()
+        }
+
+    @Test
+    fun `test that getImageNode resolves the node by handle`() = runTest {
+        val megaNode = createMegaNode(handle = 7L)
+        val fileNode = mock<TypedFileNode> { on { id }.thenReturn(NodeId(7L)) }
+        val imageNode = mock<ImageNode>()
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = 7L)).thenReturn(megaNode)
+        whenever(
+            typedNodeMapper(eq(megaNode), anyOrNull(), anyOrNull(), any(), any())
+        ).thenReturn(fileNode)
+        whenever(typedFileNodeToImageNodeMapper(fileNode)).thenReturn(imageNode)
+        underTest = createUnderTest()
+
+        val result = underTest.getImageNode(NodeId(7L))
+
+        assertThat(result).isEqualTo(imageNode)
+        verify(megaApiGateway).getMegaNodeByHandle(nodeHandle = 7L)
+    }
+
+    @Test
+    fun `test that getImageNode returns null when no node exists for the id`() = runTest {
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle = 999L)).thenReturn(null)
+        underTest = createUnderTest()
+
+        val result = underTest.getImageNode(NodeId(999L))
+
+        assertThat(result).isNull()
     }
 
     private fun createUnderTest() = DefaultPhotosRepository(

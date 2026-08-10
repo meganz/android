@@ -3,11 +3,14 @@ package mega.privacy.android.data.mapper.node
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.ImageNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -19,19 +22,17 @@ internal class TypedFileNodeToImageNodeMapper @Inject constructor(
     private val previewFromServerMapper: PreviewFromServerMapper,
     private val fullImageFromServerMapper: FullImageFromServerMapper,
     private val megaApiGateway: MegaApiGateway,
+    private val cacheGateway: CacheGateway,
+    private val fileGateway: FileGateway,
 ) {
     operator fun invoke(node: TypedFileNode): ImageNode =
         object : ImageNode, FileNode by node {
-            // Match ImageNodeMapper: the viewer expects these to be null for online
-            // nodes and resolves the real paths on demand. TypedFileNode/FileNodeMapper
-            // populates them with (possibly non-existent) cache paths, which would make
-            // ImagePreviewVideoLauncher treat a streamed video as a local file.
             override val thumbnailPath: String? = null
             override val previewPath: String? = null
             override val fullSizePath: String? = null
-
             override val downloadThumbnail: suspend (String) -> String = { path ->
-                thumbnailFromServerMapper(requireMegaNode()).invoke(path)
+                cachedThumbnailPath(node.base64Id)
+                    ?: thumbnailFromServerMapper(requireMegaNode()).invoke(path)
             }
 
             override val downloadPreview: suspend (String) -> String = { path ->
@@ -56,4 +57,10 @@ internal class TypedFileNodeToImageNodeMapper @Inject constructor(
                 megaApiGateway.getMegaNodeByHandle(node.id.longValue)
                     ?: throw IllegalStateException("MegaNode not found for handle ${node.id.longValue}")
         }
+
+    private suspend fun cachedThumbnailPath(base64Id: String): String? {
+        val folder = cacheGateway.getThumbnailCacheFolderPath() ?: return null
+        val path = "$folder${File.separator}$base64Id"
+        return path.takeIf { fileGateway.isFileAvailable(it) }
+    }
 }

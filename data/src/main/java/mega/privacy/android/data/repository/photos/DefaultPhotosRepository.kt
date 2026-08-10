@@ -83,6 +83,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.ImageNodeInfo
 import mega.privacy.android.domain.entity.photos.TimelinePreferencesJSON
 import mega.privacy.android.domain.entity.search.SearchCategory
 import mega.privacy.android.domain.entity.search.SearchTarget
@@ -371,6 +372,43 @@ internal class DefaultPhotosRepository @Inject constructor(
                 )
             }
             .filterIsInstance<TypedFileNode>()
+    }
+
+    override suspend fun listImageNodeInfoByPage(
+        filter: MediaTimelineFilter,
+        section: MediaTimelineSection?,
+        order: SortOrder,
+        maxElements: Int,
+        offset: Long,
+    ): List<ImageNodeInfo> = withContext(ioDispatcher) {
+        val sdkFilter = mediaTimelineListFilterMapper(filter).also { sdkFilter ->
+            section?.let {
+                sdkFilter.byTimestampAnchor(it.startDate, it.endDate, sortOrderIntMapper(order))
+            }
+        }
+        val nodeList = megaApiFacade.listAllNodesByPageAtOffset(
+            filter = sdkFilter,
+            order = sortOrderIntMapper(order),
+            cancelToken = cancelTokenProvider.getOrCreateCancelToken(),
+            maxElements = maxElements,
+            offset = offset,
+        ) ?: return@withContext emptyList()
+
+        megaApiFacade.getNodesFromMegaNodeList(nodeList)
+            .map { ImageNodeInfo(id = NodeId(it.handle), name = it.name) }
+    }
+
+    override suspend fun getImageNode(nodeId: NodeId): ImageNode? {
+        val node = withContext(ioDispatcher) {
+            val megaNode = megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
+                ?: return@withContext null
+            typedNodeMapper(
+                megaNode = megaNode,
+                folderTypeData = null,
+                offline = offlineNodesCache[nodeId.longValue.toString()],
+            ) as? TypedFileNode
+        } ?: return null
+        return typedFileNodeToImageNodeMapper(node)
     }
 
     @Deprecated("Please consider using monitorMediaTypedNodes")

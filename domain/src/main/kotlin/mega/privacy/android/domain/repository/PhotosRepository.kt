@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.photos.ImageNodeInfo
 import java.io.File
 
 /**
@@ -317,4 +318,21 @@ interface PhotosRepository {
         maxElements: Int,
         offset: Long,
     ): List<TypedFileNode>
+
+    /**
+     * Lists a page of lightweight [ImageNodeInfo] refs (id + name) for [section], without mapping the
+     * full nodes.
+     */
+    suspend fun listImageNodeInfoByPage(
+        filter: MediaTimelineFilter,
+        section: MediaTimelineSection?,
+        order: SortOrder,
+        maxElements: Int,
+        offset: Long,
+    ): List<ImageNodeInfo>
+
+    /**
+     * Returns the [ImageNode] for [nodeId], or null when no node exists for it.
+     */
+    suspend fun getImageNode(nodeId: NodeId): ImageNode?
 }

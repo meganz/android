@@ -5,6 +5,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.CacheGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.entity.imageviewer.ImageProgress
 import mega.privacy.android.domain.entity.node.NodeId
@@ -16,6 +18,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -28,8 +31,11 @@ class TypedFileNodeToImageNodeMapperTest {
     private val previewFromServerMapper = mock<PreviewFromServerMapper>()
     private val fullImageFromServerMapper = mock<FullImageFromServerMapper>()
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val cacheGateway = mock<CacheGateway>()
+    private val fileGateway = mock<FileGateway>()
 
     private val handle = 123L
+    private val base64Id = "BASE64HANDLE"
 
     @BeforeAll
     fun setup() {
@@ -38,6 +44,8 @@ class TypedFileNodeToImageNodeMapperTest {
             previewFromServerMapper = previewFromServerMapper,
             fullImageFromServerMapper = fullImageFromServerMapper,
             megaApiGateway = megaApiGateway,
+            cacheGateway = cacheGateway,
+            fileGateway = fileGateway,
         )
     }
 
@@ -47,10 +55,13 @@ class TypedFileNodeToImageNodeMapperTest {
         previewFromServerMapper,
         fullImageFromServerMapper,
         megaApiGateway,
+        cacheGateway,
+        fileGateway,
     )
 
     private fun stubNode(): TypedFileNode = mock {
         on { id }.thenReturn(NodeId(handle))
+        on { base64Id }.thenReturn(base64Id)
         on { name }.thenReturn("photo.jpg")
         on { serializedData }.thenReturn("blob")
     }
@@ -132,4 +143,31 @@ class TypedFileNodeToImageNodeMapperTest {
 
         assertThat(exception).isInstanceOf(IllegalStateException::class.java)
     }
+
+    @Test
+    fun `test that downloadThumbnail reuses the grid cached thumbnail when available`() = runTest {
+        val node = stubNode()
+        whenever(cacheGateway.getThumbnailCacheFolderPath()).thenReturn("/cache/thumbnails")
+        whenever(fileGateway.isFileAvailable("/cache/thumbnails/$base64Id")).thenReturn(true)
+
+        val result = underTest(node).downloadThumbnail("ignored")
+
+        assertThat(result).isEqualTo("/cache/thumbnails/$base64Id")
+        verifyNoInteractions(thumbnailFromServerMapper, megaApiGateway)
+    }
+
+    @Test
+    fun `test that downloadThumbnail downloads from server when the cached thumbnail is missing`() =
+        runTest {
+            val node = stubNode()
+            val megaNode = mock<MegaNode>()
+            whenever(cacheGateway.getThumbnailCacheFolderPath()).thenReturn("/cache/thumbnails")
+            whenever(fileGateway.isFileAvailable("/cache/thumbnails/$base64Id")).thenReturn(false)
+            whenever(megaApiGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
+            whenever(thumbnailFromServerMapper(megaNode)).thenReturn { path -> "thumb-$path" }
+
+            val result = underTest(node).downloadThumbnail("p")
+
+            assertThat(result).isEqualTo("thumb-p")
+        }
 }
